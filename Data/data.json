@@ -1,5 +1,3 @@
-{
-  "Races2022": [
     {
       "headingLabel": "F1 Next Race",
       "countryFlag": "🇧🇭",
@@ -14,5 +12,3 @@
       "raceTime": "15:00",
       "footerLabel": "Qualifying in 81 days"
     }
-  ]
-}
