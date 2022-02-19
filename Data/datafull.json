@@ -1,26 +1,21 @@
 {
-"R1":
-    {
-	"Country": "🇧🇭 Bahrain",
-	"City": "Sakhir",
-	"Qual": "Mar 19 2022 15:00 UTC",
-	"Sprint": " ",
-	"Race": "Mar 20 2022 15:00 UTC"
-    },
-"R2":
-    {
-	"Country": "🇸🇦 Saudi Arabia",
-	"City": "Jeddah",
-	"Qual": "Mar 26 2022 12:00 UTC",
-	"Sprint": " ",
-	"Race": "Mar 27 2022 13:00 UTC"
-    },
-"R3":
-    {
-	"Country": "🇦🇺 Australia",
-	"City": "Melbourne",
-	"Qual": "Apr 9 2022 14:00 UTC",
-	"Sprint": " ",
-	"Race": "Apr 10 2022 14:00 UTC"
-    }
+"Country":	"🇧🇭 Bahrain",
+"City":	"Sakhir",
+"Qual":	"Mar 19 2022 15:00 UTC",
+"Sprint":	"",
+"Race":	"Mar 20 2022 15:00 UTC"
+},
+{
+"Country":	"🇸🇦 Saudi Arabia",
+"City":	"Jeddah",
+"Qual":	"Mar 26 2022 12:00 UTC",
+"Sprint":	"",
+"Race":	"Mar 27 2022 13:00 UTC"
+},
+{
+"Country":	"🇦🇺 Australia",
+"City":	"Melbourne",
+"Qual":	"Apr 9 2022 14:00 UTC",
+"Sprint":	"",
+"Race":	"Apr 10 2022 14:00 UTC"
 }
