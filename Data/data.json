@@ -1,18 +1,18 @@
 {
-  "Races2022": [
+  Races2022: [
     {
-      "headingLabel": "F1 Next Race",
-      "countryFlag": "🇧🇭",
-      "countryName": "Bahrain",
-      "trackName": "Sakhir",
-      "qualifyingmonth": "March",
-      "qualifyingday": "27",
-      "qualifyingTime": "15:00",
-      "sprintqualifyingTime": "",
-      "racemonth": "March",
-      "raceday": "28",
-      "raceTime": "15:00",
-      "footerLabel": "Qualifying in 81 days"
+      headingLabel: "F1 Next Race",
+      countryFlag: "🇧🇭",
+      countryName: "Bahrain",
+      trackName: "Sakhir",
+      qualifyingmonth: "March",
+      qualifyingday: "27",
+      qualifyingTime: "15:00",
+      sprintqualifyingTime: "",
+      racemonth: "March",
+      raceday: "28",
+      raceTime: "15:00",
+      footerLabel: "Qualifying in 81 days"
     }
   ]
 }
