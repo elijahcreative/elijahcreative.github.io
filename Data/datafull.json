@@ -1,17 +1,27 @@
 {
-  "Races2022":
+"1":
     {
-      "headingLabel": "F1 Next Race",
-      "countryFlag": "🇧🇭",
-      "countryName": "Bahrain",
-      "trackName": "Sakhir",
-      "qualifyingmonth": "March",
-      "qualifyingday": "27",
-      "qualifyingTime": "15:00",
-      "sprintqualifyingTime": "",
-      "racemonth": "March",
-      "raceday": "28",
-      "raceTime": "15:00",
-      "footerLabel": "Qualifying in 81 days"
+      "Country": "🇧🇭 Bahrain",
+	"City": " Sakhir",
+	"Qual": " Mar 27 2021 15:00 UTC",
+	"Sprint": " ",
+	"Race": " Mar 28 2021 15:00 UTC"
     }
+"2":
+    {
+      "Country": "🇮🇹 Italy",
+	"City": " Imola",
+	"Qual": " Apr 17 2021 12:00 UTC",
+	"Sprint": " ",
+	"Race": " Apr 18 2021 13:00 UTC"
+    }
+"3":
+    {
+      "Country": "🇵🇹 Portugal",
+	"City": " Portimao",
+	"Qual": " May 1 2021 14:00 UTC",
+	"Sprint": " ",
+	"Race": " May 2 2021 14:00 UTC"
+    }
+
 }
