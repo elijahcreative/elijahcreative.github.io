@@ -1,20 +1,26 @@
 {"Podiums": [
 {
+"Message":	"Points gained & Total",
+},
+{
 "Place":	"1",
 "Name":	"Driver name",
 "Team":	"Mercedes",
-"Points":	"+25"
+"Points":	"+25",
+"Total":	"000"
 },
 {
 "Place":	"2",
 "Name":	"Driver name",
 "Team":	"Mercedes",
-"Points":	"+18"
+"Points":	"+18",
+"Total":	"000"
 },
 {
 "Place":	"3",
 "Name":	"Driver name",
 "Team":	"Red Bull Racing",
-"Points":	"+15"
+"Points":	"+15",
+"Total":	"000"
 }
 ]}
