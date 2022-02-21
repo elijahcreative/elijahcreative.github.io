@@ -1,41 +1,41 @@
 {"Standings": [
 {
-"After":	"No points yet",
+"After":	"(2021 final)",
 },
 {
 "Place":	"1",
-"Name":	"Hamilton",
-"Team":	"Mercedes",
-"Points":	"000"
+"Name":	"Verstappen",
+"Team":	"Red Bull",
+"Points":	"395.5"
 },
 {
 "Place":	"2",
-"Name":	"Russell",
+"Name":	"Hamilton",
 "Team":	"Mercedes",
-"Points":	"000"
+"Points":	"387.5"
 },
 {
 "Place":	"3",
-"Name":	"Verstappen",
-"Team":	"Red Bull Racing",
-"Points":	"000"
+"Name":	"Bottas",
+"Team":	"Mercedes",
+"Points":	"226"
 },
 {
 "Place":	"4",
 "Name":	"Perez",
-"Team":	"Red Bull Racing",
-"Points":	"000"
+"Team":	"Red Bull",
+"Points":	"190"
 },
 {
 "Place":	"5",
-"Name":	"Leclerc",
+"Name":	"Sainz",
 "Team":	"Ferrari",
-"Points":	"000"
+"Points":	"164.5"
 },
 {
 "Place":	"6",
-"Name":	"Sainz",
-"Team":	"Ferrari",
-"Points":	"000"
+"Name":	"Norris",
+"Team":	"McLaren",
+"Points":	"160"
 }
 ]}
