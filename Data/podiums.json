@@ -1,19 +1,19 @@
 {"Podiums": [
 {
 "Place":	"1",
-"Name":	"Hamilton",
+"Name":	"Driver name",
 "Team":	"Mercedes",
 "Points":	"+25"
 },
 {
 "Place":	"2",
-"Name":	"Russell",
+"Name":	"Driver name",
 "Team":	"Mercedes",
 "Points":	"+18"
 },
 {
 "Place":	"3",
-"Name":	"Verstappen",
+"Name":	"Driver name",
 "Team":	"Red Bull Racing",
 "Points":	"+15"
 }
