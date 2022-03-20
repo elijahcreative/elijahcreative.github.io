@@ -1,28 +1,28 @@
 {"Podiums": [
 {
-"Country":	"🇦🇪 U.A. Emirates",
-"City":	"Abu Dhabi",
-"Message":	"2021 last race",
+"Country":	"🇧🇭 Bahrain",
+"City":	"Sakhir",
+"Message":	"2022 1st race",
 },
 {
 "Place":	"1",
-"Name":	"Verstappen",
-"Team":	"Red Bull",
-"Points":	"+26",
-"Total":	"395.5"
+"Name":	"Leclerc",
+"Team":	"Ferrari",
+"Points":	"+25",
+"Total":	"25"
 },
 {
 "Place":	"2",
-"Name":	"Hamilton",
-"Team":	"Mercedes",
+"Name":	"Sainz",
+"Team":	"Ferrari",
 "Points":	"+18",
-"Total":	"387.5"
+"Total":	"18"
 },
 {
 "Place":	"3",
-"Name":	"Sainz",
-"Team":	"Ferrari",
+"Name":	"Hamilton",
+"Team":	"Mercedes",
 "Points":	"+15",
-"Total":	"164.5"
+"Total":	"15"
 }
 ]}
