@@ -1,41 +1,41 @@
 {"Standings": [
 {
-"After":	"2021 final points",
+"After":	"After Bahrain",
 },
 {
 "Place":	"1",
-"Name":	"Verstappen",
-"Team":	"Red Bull",
-"Points":	"395.5"
+"Name":	"Leclerc",
+"Team":	"Ferrari",
+"Points":	"26"
 },
 {
 "Place":	"2",
-"Name":	"Hamilton",
-"Team":	"Mercedes",
-"Points":	"387.5"
+"Name":	"Sainz",
+"Team":	"Ferrari",
+"Points":	"18"
 },
 {
 "Place":	"3",
-"Name":	"Bottas",
+"Name":	"Hamilton",
 "Team":	"Mercedes",
-"Points":	"226"
+"Points":	"15"
 },
 {
 "Place":	"4",
-"Name":	"Perez",
-"Team":	"Red Bull",
-"Points":	"190"
+"Name":	"Russel",
+"Team":	"Mercedes",
+"Points":	"12"
 },
 {
 "Place":	"5",
-"Name":	"Sainz",
-"Team":	"Ferrari",
-"Points":	"164.5"
+"Name":	"Magnussen",
+"Team":	"Haas",
+"Points":	"10"
 },
 {
 "Place":	"6",
-"Name":	"Norris",
-"Team":	"McLaren",
-"Points":	"160"
+"Name":	"Bottas",
+"Team":	"Alfa Romeo",
+"Points":	"8"
 }
 ]}
