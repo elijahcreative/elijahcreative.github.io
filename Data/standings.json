@@ -1,41 +1,41 @@
 {"Standings": [
 {
-"After":	"After Bahrain",
+"After":	"After Saudi Arabia",
 },
 {
 "Place":	"1",
 "Name":	"Leclerc",
 "Team":	"Ferrari",
-"Points":	"26"
+"Points":	"45"
 },
 {
 "Place":	"2",
 "Name":	"Sainz",
 "Team":	"Ferrari",
-"Points":	"18"
+"Points":	"33"
 },
 {
 "Place":	"3",
-"Name":	"Hamilton",
-"Team":	"Mercedes",
-"Points":	"15"
+"Name":	"Verstappen",
+"Team":	"Red Bull",
+"Points":	"25"
 },
 {
 "Place":	"4",
 "Name":	"Russell",
 "Team":	"Mercedes",
-"Points":	"12"
+"Points":	"22"
 },
 {
 "Place":	"5",
-"Name":	"Magnussen",
-"Team":	"Haas",
-"Points":	"10"
+"Name":	"Hamilton",
+"Team":	"Mercedes",
+"Points":	"16"
 },
 {
 "Place":	"6",
-"Name":	"Bottas",
-"Team":	"Alfa Romeo",
-"Points":	"8"
+"Name":	"Ocon",
+"Team":	"Alpine",
+"Points":	"14"
 }
 ]}
