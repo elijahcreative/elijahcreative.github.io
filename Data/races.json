@@ -138,5 +138,33 @@
 "Best lap driver": "Verstappen, 2020",
 "First GP": "1950",
 "Track image": "https://elijahcreative.github.io/Images/TR-Silverstone.png"
+},
+{
+"Country":	"🇦🇹 Austria",
+"City":	"Spielberg",
+"Qual":	"Jul 8 2022 15:00 UTC",
+"Sprint":	"Jul 9 2022 14:30 UTC",
+"Race":	"Jul 10 2022 13:00 UTC",
+"Laps": "71",
+"Length": "4.3",
+"Race distance": "306.5",
+"Best lap": "1:05.619",
+"Best lap driver": "Sainz, 2020",
+"First GP": "1970",
+"Track image": "https://elijahcreative.github.io/Images/TR-Austria.png"
+},
+{
+"Country":	"🇫🇷 France",
+"City":	"Le Castellet",
+"Qual":	"Jul 23 2022 14:00 UTC",
+"Sprint":	"",
+"Race":	"Jul 24 2022 13:00 UTC",
+"Laps": "53",
+"Length": "5.8",
+"Race distance": "309.7",
+"Best lap": "1:32.740",
+"Best lap driver": "Vettel, 2019",
+"First GP": "1971",
+"Track image": "https://elijahcreative.github.io/Images/TR-France.png"
 }
 ]}
