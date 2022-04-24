@@ -1,41 +1,41 @@
 {"Standings": [
 {
-"After":	"After Australia",
+"After":	"After Italy",
 },
 {
 "Place":	"1",
 "Name":	"Leclerc",
 "Team":	"Ferrari",
-"Points":	"71"
+"Points":	"86"
 },
 {
 "Place":	"2",
-"Name":	"Russell",
-"Team":	"Mercedes",
-"Points":	"37"
+"Name":	"Verstappen",
+"Team":	"Red Bull",
+"Points":	"59"
 },
 {
 "Place":	"3",
-"Name":	"Sainz",
-"Team":	"Ferrari",
-"Points":	"33"
+"Name":	"Pérez",
+"Team":	"Red Bull",
+"Points":	"54"
 },
 {
 "Place":	"4",
-"Name":	"Perez",
-"Team":	"Red BUll",
-"Points":	"30"
+"Name":	"Russell",
+"Team":	"Mercedes",
+"Points":	"49"
 },
 {
 "Place":	"5",
-"Name":	"Hamilton",
-"Team":	"Mercedes",
-"Points":	"28"
+"Name":	"Sainz",
+"Team":	"Ferrari",
+"Points":	"38"
 },
 {
 "Place":	"6",
-"Name":	"Verstappen",
-"Team":	"Red Bull",
-"Points":	"25"
+"Name":	"Norris",
+"Team":	"McLaren",
+"Points":	"35"
 }
 ]}
