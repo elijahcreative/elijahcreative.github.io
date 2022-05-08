@@ -1,41 +1,41 @@
 {"Standings": [
 {
-"After":	"After Italy",
+"After":	"After Miami",
 },
 {
 "Place":	"1",
 "Name":	"Leclerc",
 "Team":	"Ferrari",
-"Points":	"86"
+"Points":	"104"
 },
 {
 "Place":	"2",
 "Name":	"Verstappen",
 "Team":	"Red Bull",
-"Points":	"59"
+"Points":	"85"
 },
 {
 "Place":	"3",
 "Name":	"Pérez",
 "Team":	"Red Bull",
-"Points":	"54"
+"Points":	"66"
 },
 {
 "Place":	"4",
 "Name":	"Russell",
 "Team":	"Mercedes",
-"Points":	"49"
+"Points":	"59"
 },
 {
 "Place":	"5",
 "Name":	"Sainz",
 "Team":	"Ferrari",
-"Points":	"38"
+"Points":	"53"
 },
 {
 "Place":	"6",
-"Name":	"Norris",
-"Team":	"McLaren",
-"Points":	"35"
+"Name":	"Hamilton",
+"Team":	"Mercedes",
+"Points":	"36"
 }
 ]}
