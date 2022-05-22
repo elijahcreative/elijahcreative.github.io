@@ -1,28 +1,28 @@
 {"Podiums": [
 {
-"Country":	"🇺🇸 USA",
-"City":	"Miami",
-"Message":	"2022 5th race",
+"Country":	"🇪🇸 Spain",
+"City":	"Catalunya",
+"Message":	"2022 6th race",
 },
 {
 "Place":	"1",
 "Name":	"Verstappen",
 "Team":	"Red Bull",
 "Points":	"+25",
-"Total":	"85"
+"Total":	"110"
 },
 {
 "Place":	"2",
-"Name":	"Leclerc",
-"Team":	"Ferrari",
+"Name":	"Pérez",
+"Team":	"Red Bull",
 "Points":	"+18",
-"Total":	"104"
+"Total":	"85"
 },
 {
 "Place":	"3",
-"Name":	"Sainz",
-"Team":	"Ferrari",
+"Name":	"Russell",
+"Team":	"Mercedes",
 "Points":	"+15",
-"Total":	"53"
+"Total":	"74"
 }
 ]}
