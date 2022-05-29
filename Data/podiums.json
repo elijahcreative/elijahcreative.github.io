@@ -1,28 +1,28 @@
 {"Podiums": [
 {
-"Country":	"🇪🇸 Spain",
-"City":	"Catalunya",
-"Message":	"2022 6th race",
+"Country":	"🇲🇨 Monaco",
+"City":	"Monte Carlo",
+"Message":	"2022 7th race",
 },
 {
 "Place":	"1",
-"Name":	"Verstappen",
+"Name":	"Pérez",
 "Team":	"Red Bull",
 "Points":	"+25",
 "Total":	"110"
 },
 {
 "Place":	"2",
-"Name":	"Pérez",
-"Team":	"Red Bull",
+"Name":	"Sainz",
+"Team":	"Ferrari",
 "Points":	"+18",
-"Total":	"85"
+"Total":	"83"
 },
 {
 "Place":	"3",
-"Name":	"Russell",
-"Team":	"Mercedes",
+"Name":	"Verstappen",
+"Team":	"Red Bull",
 "Points":	"+15",
-"Total":	"74"
+"Total":	"125"
 }
 ]}
