@@ -6,25 +6,25 @@
 "Place":	"1",
 "Name":	"Verstappen",
 "Team":	"Red Bull",
-"Points":	"125"
+"Points":	"150"
 },
 {
 "Place":	"2",
+"Name":	"Pérez",
+"Team":	"Red Bull",
+"Points":	"129"
+},
+{
+"Place":	"3",
 "Name":	"Leclerc",
 "Team":	"Ferrari",
 "Points":	"116"
 },
 {
-"Place":	"3",
-"Name":	"Pérez",
-"Team":	"Red Bull",
-"Points":	"110"
-},
-{
 "Place":	"4",
 "Name":	"Russell",
 "Team":	"Mercedes",
-"Points":	"84"
+"Points":	"99"
 },
 {
 "Place":	"5",
@@ -36,6 +36,6 @@
 "Place":	"6",
 "Name":	"Hamilton",
 "Team":	"Mercedes",
-"Points":	"50"
+"Points":	"62"
 }
 ]}
