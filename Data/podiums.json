@@ -1,28 +1,28 @@
 {"Podiums": [
 {
-"Country":	"🇲🇨 Monaco",
-"City":	"Monte Carlo",
-"Message":	"2022 7th race",
+"Country":	"🇦🇿 Azerbaijan",
+"City":	"Baku",
+"Message":	"2022 8th race",
 },
 {
 "Place":	"1",
-"Name":	"Pérez",
+"Name":	"Verstappen",
 "Team":	"Red Bull",
 "Points":	"+25",
-"Total":	"110"
+"Total":	"150"
 },
 {
 "Place":	"2",
-"Name":	"Sainz",
-"Team":	"Ferrari",
+"Name":	"Pérez",
+"Team":	"Red Bull",
 "Points":	"+18",
-"Total":	"83"
+"Total":	"129"
 },
 {
 "Place":	"3",
-"Name":	"Verstappen",
-"Team":	"Red Bull",
+"Name":	"Russell",
+"Team":	"Mercedes",
 "Points":	"+15",
-"Total":	"125"
+"Total":	"99"
 }
 ]}
