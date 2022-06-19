@@ -1,28 +1,28 @@
 {"Podiums": [
 {
-"Country":	"🇦🇿 Azerbaijan",
-"City":	"Baku",
-"Message":	"2022 8th race",
+"Country":	"🇨🇦 Canada",
+"City":	"Montreal",
+"Message":	"2022 9th race",
 },
 {
 "Place":	"1",
 "Name":	"Verstappen",
 "Team":	"Red Bull",
 "Points":	"+25",
-"Total":	"150"
+"Total":	"175"
 },
 {
 "Place":	"2",
-"Name":	"Pérez",
-"Team":	"Red Bull",
+"Name":	"Sainz",
+"Team":	"Ferrari",
 "Points":	"+18",
-"Total":	"129"
+"Total":	"102"
 },
 {
 "Place":	"3",
-"Name":	"Russell",
+"Name":	"Hamilton",
 "Team":	"Mercedes",
 "Points":	"+15",
-"Total":	"99"
+"Total":	"77"
 }
 ]}
