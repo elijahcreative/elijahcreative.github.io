@@ -1,12 +1,12 @@
 {"Standings": [
 {
-"After":	"After Austria",
+"After":	"After France",
 },
 {
 "Place":	"1",
 "Name":	"Verstappen",
 "Team":	"Red Bull",
-"Points":	"208"
+"Points":	"233"
 },
 {
 "Place":	"2",
@@ -18,24 +18,24 @@
 "Place":	"3",
 "Name":	"Pérez",
 "Team":	"Red Bull",
-"Points":	"151"
+"Points":	"163"
 },
 {
 "Place":	"4",
 "Name":	"Sainz",
 "Team":	"Ferrari",
-"Points":	"133"
+"Points":	"144"
 },
 {
 "Place":	"5",
 "Name":	"Russell",
 "Team":	"Mercedes",
-"Points":	"128"
+"Points":	"143"
 },
 {
 "Place":	"6",
 "Name":	"Hamilton",
 "Team":	"Mercedes",
-"Points":	"109"
+"Points":	"127"
 }
 ]}
