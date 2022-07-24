@@ -1,28 +1,28 @@
 {"Podiums": [
 {
-"Country":	"🇦🇹 Austria",
-"City":	"Spielberg",
-"Message":	"2022 11th race",
+"Country":	"🇫🇷 France",
+"City":	"Le Castellet",
+"Message":	"2022 12th race",
 },
 {
 "Place":	"1",
-"Name":	"Leclerc",
-"Team":	"Ferrari",
+"Name":	"Verstappen",
+"Team":	"Red Bull",
 "Points":	"+25",
-"Total":	"170"
+"Total":	"233"
 },
 {
 "Place":	"2",
-"Name":	"Verstappen",
-"Team":	"Red Bull",
+"Name":	"Hamilton",
+"Team":	"Mercedes",
 "Points":	"+18",
-"Total":	"208"
+"Total":	"127"
 },
 {
 "Place":	"3",
-"Name":	"Hamilton",
+"Name":	"Russell",
 "Team":	"Mercedes",
 "Points":	"+15",
-"Total":	"109"
+"Total":	"143"
 }
 ]}
