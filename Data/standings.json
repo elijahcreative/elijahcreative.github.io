@@ -1,41 +1,41 @@
 {"Standings": [
 {
-"After":	"After France",
+"After":	"After Hungary",
 },
 {
 "Place":	"1",
 "Name":	"Verstappen",
 "Team":	"Red Bull",
-"Points":	"233"
+"Points":	"258"
 },
 {
 "Place":	"2",
 "Name":	"Leclerc",
 "Team":	"Ferrari",
-"Points":	"170"
+"Points":	"178"
 },
 {
 "Place":	"3",
 "Name":	"Pérez",
 "Team":	"Red Bull",
-"Points":	"163"
+"Points":	"173"
 },
 {
 "Place":	"4",
-"Name":	"Sainz",
-"Team":	"Ferrari",
-"Points":	"144"
+"Name":	"Russell",
+"Team":	"Mercedes",
+"Points":	"158"
 },
 {
 "Place":	"5",
-"Name":	"Russell",
-"Team":	"Mercedes",
-"Points":	"143"
+"Name":	"Sainz",
+"Team":	"Ferrari",
+"Points":	"156"
 },
 {
 "Place":	"6",
 "Name":	"Hamilton",
 "Team":	"Mercedes",
-"Points":	"127"
+"Points":	"146"
 }
 ]}
