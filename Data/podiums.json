@@ -1,28 +1,28 @@
 {"Podiums": [
 {
-"Country":	"🇫🇷 France",
-"City":	"Le Castellet",
-"Message":	"2022 12th race",
+"Country":	"🇭🇺 Hungary",
+"City":	"Mogyoród",
+"Message":	"2022 13th race",
 },
 {
 "Place":	"1",
 "Name":	"Verstappen",
 "Team":	"Red Bull",
 "Points":	"+25",
-"Total":	"233"
+"Total":	"258"
 },
 {
 "Place":	"2",
 "Name":	"Hamilton",
 "Team":	"Mercedes",
 "Points":	"+18",
-"Total":	"127"
+"Total":	"146"
 },
 {
 "Place":	"3",
 "Name":	"Russell",
 "Team":	"Mercedes",
 "Points":	"+15",
-"Total":	"143"
+"Total":	"158"
 }
 ]}
