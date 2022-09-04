@@ -1,28 +1,28 @@
 {"Podiums": [
 {
-"Country":	"🇧🇪 Belgium",
-"City":	"Stavelot",
-"Message":	"2022 14th race"
+"Country":	"🇳🇱 Netherlands",
+"City":	"Zandvoort",
+"Message":	"2022 15th race"
 },
 {
 "Place":	"1",
 "Name":	"Verstappen",
 "Team":	"Red Bull",
 "Points":	"+25",
-"Total":	"284"
+"Total":	"310"
 },
 {
 "Place":	"2",
-"Name":	"Pérez",
-"Team":	"Red Bull",
+"Name":	"Russell",
+"Team":	"Mercedes",
 "Points":	"+18",
-"Total":	"191"
+"Total":	"188"
 },
 {
 "Place":	"3",
-"Name":	"Sainz",
+"Name":	"Leclerc",
 "Team":	"Ferrari",
 "Points":	"+15",
-"Total":	"171"
+"Total":	"201"
 }
 ]}
