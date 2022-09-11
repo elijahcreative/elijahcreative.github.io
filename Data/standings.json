@@ -1,41 +1,41 @@
 {"Standings": [
 {
-"After":	"After Netherlands"
+"After":	"After Italy"
 },
 {
 "Place":	"1",
 "Name":	"Verstappen",
 "Team":	"Red Bull",
-"Points":	"310"
+"Points":	"335"
 },
 {
 "Place":	"2",
 "Name":	"Leclerc",
 "Team":	"Ferrari",
-"Points":	"201"
+"Points":	"219"
 },
 {
 "Place":	"3",
 "Name":	"Pérez",
 "Team":	"Red Bull",
-"Points":	"201"
+"Points":	"210"
 },
 {
 "Place":	"4",
 "Name":	"Russell",
 "Team":	"Mercedes",
-"Points":	"188"
+"Points":	"203"
 },
 {
 "Place":	"5",
 "Name":	"Sainz",
 "Team":	"Ferrari",
-"Points":	"175"
+"Points":	"187"
 },
 {
 "Place":	"6",
 "Name":	"Hamilton",
 "Team":	"Mercedes",
-"Points":	"158"
+"Points":	"168"
 }
 ]}
