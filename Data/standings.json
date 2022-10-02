@@ -1,24 +1,24 @@
 {"Standings": [
 {
-"After":	"After Italy"
+"After":	"After Singapore"
 },
 {
 "Place":	"1",
 "Name":	"Verstappen",
 "Team":	"Red Bull",
-"Points":	"335"
+"Points":	"341"
 },
 {
 "Place":	"2",
 "Name":	"Leclerc",
 "Team":	"Ferrari",
-"Points":	"219"
+"Points":	"237"
 },
 {
 "Place":	"3",
 "Name":	"Pérez",
 "Team":	"Red Bull",
-"Points":	"210"
+"Points":	"235"
 },
 {
 "Place":	"4",
@@ -30,12 +30,12 @@
 "Place":	"5",
 "Name":	"Sainz",
 "Team":	"Ferrari",
-"Points":	"187"
+"Points":	"202"
 },
 {
 "Place":	"6",
 "Name":	"Hamilton",
 "Team":	"Mercedes",
-"Points":	"168"
+"Points":	"170"
 }
 ]}
