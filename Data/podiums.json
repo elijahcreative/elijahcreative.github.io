@@ -1,28 +1,28 @@
 {"Podiums": [
 {
-"Country":	"🇮🇹 Italy",
-"City":	"Monza",
-"Message":	"2022 16th race"
+"Country":	"🇸🇬 Singapore",
+"City":	"Marina Bay",
+"Message":	"2022 17th race"
 },
 {
 "Place":	"1",
-"Name":	"Verstappen",
+"Name":	"Pérez",
 "Team":	"Red Bull",
 "Points":	"+25",
-"Total":	"335"
+"Total":	"235"
 },
 {
 "Place":	"2",
 "Name":	"Leclerc",
 "Team":	"Ferrari",
 "Points":	"+18",
-"Total":	"219"
+"Total":	"237"
 },
 {
 "Place":	"3",
-"Name":	"Russell",
-"Team":	"Mercedes",
+"Name":	"Sainz",
+"Team":	"Ferrari",
 "Points":	"+15",
-"Total":	"203"
+"Total":	"202"
 }
 ]}
