@@ -1,28 +1,28 @@
 {"Podiums": [
 {
-"Country":	"🇸🇬 Singapore",
-"City":	"Marina Bay",
-"Message":	"2022 17th race"
+"Country":	"🇯🇵 Japan",
+"City":	"Suzuka",
+"Message":	"2022 18th race"
 },
 {
 "Place":	"1",
-"Name":	"Pérez",
+"Name":	" Verstappen",
 "Team":	"Red Bull",
 "Points":	"+25",
-"Total":	"235"
+"Total":	"366"
 },
 {
 "Place":	"2",
 "Name":	"Leclerc",
 "Team":	"Ferrari",
 "Points":	"+18",
-"Total":	"237"
+"Total":	"252"
 },
 {
 "Place":	"3",
-"Name":	"Sainz",
-"Team":	"Ferrari",
+"Name":	"Pérez",
+"Team":	"Red Bull",
 "Points":	"+15",
-"Total":	"202"
+"Total":	"253"
 }
 ]}
