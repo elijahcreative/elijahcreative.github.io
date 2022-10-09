@@ -1,30 +1,30 @@
 {"Standings": [
 {
-"After":	"After Singapore"
+"After":	"After Japan"
 },
 {
 "Place":	"1",
 "Name":	"Verstappen",
 "Team":	"Red Bull",
-"Points":	"341"
+"Points":	"366"
 },
 {
 "Place":	"2",
-"Name":	"Leclerc",
-"Team":	"Ferrari",
-"Points":	"237"
+"Name":	"Pérez",
+"Team":	"Red Bull",
+"Points":	"253"
 },
 {
 "Place":	"3",
-"Name":	"Pérez",
-"Team":	"Red Bull",
-"Points":	"235"
+"Name":	"Leclerc",
+"Team":	"Ferrari",
+"Points":	"252"
 },
 {
 "Place":	"4",
 "Name":	"Russell",
 "Team":	"Mercedes",
-"Points":	"203"
+"Points":	"207"
 },
 {
 "Place":	"5",
@@ -36,6 +36,6 @@
 "Place":	"6",
 "Name":	"Hamilton",
 "Team":	"Mercedes",
-"Points":	"170"
+"Points":	"180"
 }
 ]}
