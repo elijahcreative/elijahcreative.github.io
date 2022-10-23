@@ -1,28 +1,28 @@
 {"Podiums": [
 {
-"Country":	"🇯🇵 Japan",
-"City":	"Suzuka",
-"Message":	"2022 18th race"
+"Country":	"🇺🇸 USA",
+"City":	"Austin",
+"Message":	"2022 19th race"
 },
 {
 "Place":	"1",
 "Name":	" Verstappen",
 "Team":	"Red Bull",
 "Points":	"+25",
-"Total":	"366"
+"Total":	"391"
 },
 {
 "Place":	"2",
-"Name":	"Leclerc",
-"Team":	"Ferrari",
+"Name":	"Hamilton",
+"Team":	"Mercedes",
 "Points":	"+18",
-"Total":	"252"
+"Total":	"198"
 },
 {
 "Place":	"3",
-"Name":	"Pérez",
-"Team":	"Red Bull",
+"Name":	"Leclerc",
+"Team":	"Ferrari",
 "Points":	"+15",
-"Total":	"253"
+"Total":	"267"
 }
 ]}
