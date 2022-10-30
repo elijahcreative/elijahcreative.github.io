@@ -1,28 +1,28 @@
 {"Podiums": [
 {
-"Country":	"🇺🇸 USA",
-"City":	"Austin",
-"Message":	"2022 19th race"
+"Country":	"🇲🇽 Mexico",
+"City":	"Mexico City",
+"Message":	"2022 20th race"
 },
 {
 "Place":	"1",
 "Name":	" Verstappen",
 "Team":	"Red Bull",
 "Points":	"+25",
-"Total":	"391"
+"Total":	"416"
 },
 {
 "Place":	"2",
 "Name":	"Hamilton",
 "Team":	"Mercedes",
 "Points":	"+18",
-"Total":	"198"
+"Total":	"216"
 },
 {
 "Place":	"3",
-"Name":	"Leclerc",
-"Team":	"Ferrari",
+"Name":	"Pérez",
+"Team":	"Red Bull",
 "Points":	"+15",
-"Total":	"267"
+"Total":	"280"
 }
 ]}
