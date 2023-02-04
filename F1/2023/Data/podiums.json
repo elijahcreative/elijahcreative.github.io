@@ -1,0 +1,28 @@
+{"Podiums": [
+    {
+    "Country":	"🇦🇪 U.A. Emirates",
+    "City":	"Abu Dhabi",
+    "Message":	"2022 final race"
+    },
+    {
+    "Place":	"1",
+    "Name":	" Verstappen",
+    "Team":	"Red Bull",
+    "Points":	"+25",
+    "Total":	"454"
+    },
+    {
+    "Place":	"2",
+    "Name":	"Leclerc",
+    "Team":	"Ferrari",
+    "Points":	"+18",
+    "Total":	"308"
+    },
+    {
+    "Place":	"3",
+    "Name":	"Pérez",
+    "Team":	"Red Bll",
+    "Points":	"+15",
+    "Total":	"305"
+    }
+    ]}
