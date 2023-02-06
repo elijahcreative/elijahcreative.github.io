@@ -1,0 +1,21 @@
+{"Races": [
+    {
+    "Country":	"🇧🇭 Bahrain",
+    "City":	"Sakhir",
+    "Qualdate":	"Mar 4 2023",
+    "Qualtime":	"15:00 UTC",
+    "Sprintdate":	"",
+    "Sprinttime":	"",
+    "Racedate":	"Mar 5 2023",
+    "Racetime":	"15:00 UTC",
+
+    "Laps": "57",
+    "Length": "5.4",
+    "Race distance": "308.2",
+    "Best lap": "1:31.447",
+    "Best lap driver": "De la Rosa, 2005",
+    "First GP": "2004",
+    "Track image": "https://elijahcreative.github.io/F1/Images/TR-Bahrain.png"
+    }
+    ]
+}
