@@ -18,24 +18,24 @@
     "Place":	"3",
     "Name":	"Alonso",
     "Team":	"-",
-    "Points":	"30"
+    "Points":	"27"
     },
     {
     "Place":	"4",
+    "Name":	"Russell",
+    "Team":	"-",
+    "Points":	"21"
+    },
+    {
+    "Place":	"5",
     "Name":	"Sainz",
     "Team":	"-",
     "Points":	"20"
     },
     {
-    "Place":	"5",
+    "Place":	"6",
     "Name":	"Hamilton",
     "Team":	"-",
     "Points":	"20"
-    },
-    {
-    "Place":	"6",
-    "Name":	"Russell",
-    "Team":	"-",
-    "Points":	"18"
     }
     ]}
