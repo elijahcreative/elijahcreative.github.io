@@ -1,1 +1,32 @@
-
+{
+    "abacus": {
+        "type": "noun",
+        "definition": "a counting device that uses beads on rods to represent numbers",
+        "example_sentence": "She used an abacus to calculate the cost of the groceries.",
+        "etymology": "from the Greek word 'abax', meaning 'calculating board'"
+    },
+    "benevolent": {
+        "type": "adjective",
+        "definition": "kind and generous",
+        "example_sentence": "The benevolent donor gave a large sum of money to the charity.",
+        "etymology": "from the Latin word 'bene', meaning 'well' and 'volent', meaning 'willing'"
+    },
+    "cacophony": {
+        "type": "noun",
+        "definition": "a harsh, discordant mixture of sounds",
+        "example_sentence": "The traffic created a cacophony of noise outside the window.",
+        "etymology": "from the Greek words 'kakos', meaning 'bad', and 'phone', meaning 'sound'"
+    },
+    "dexterity": {
+        "type": "noun",
+        "definition": "skill and grace in physical movements, especially with the hands",
+        "example_sentence": "The artist's dexterity with a paintbrush was impressive.",
+        "etymology": "from the Latin word 'dexter', meaning 'right-handed'"
+    },
+    "eccentric": {
+        "type": "adjective",
+        "definition": "unconventional and slightly strange",
+        "example_sentence": "The eccentric inventor had many unusual ideas.",
+        "etymology": "from the Greek words 'ek', meaning 'out of', and 'kentron', meaning 'center'"
+    }
+}
