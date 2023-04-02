@@ -1,41 +1,41 @@
 {"Standings": [
     {
-    "After":	"After Saudi Arabia"
+    "After":	"After Australia"
     },
     {
     "Place":	"1",
     "Name":	"Verstappen",
     "Team":	"-",
-    "Points":	"44"
+    "Points":	"69"
     },
     {
     "Place":	"2",
     "Name":	"Pérez",
     "Team":	"-",
-    "Points":	"43"
+    "Points":	"54"
     },
     {
     "Place":	"3",
     "Name":	"Alonso",
     "Team":	"-",
-    "Points":	"30"
+    "Points":	"42"
     },
     {
     "Place":	"4",
-    "Name":	"Sainz",
+    "Name":	"Hamilton",
     "Team":	"-",
-    "Points":	"20"
+    "Points":	"38"
     },
     {
     "Place":	"5",
-    "Name":	"Hamilton",
+    "Name":	"Russell",
     "Team":	"-",
-    "Points":	"20"
+    "Points":	"21"
     },
     {
     "Place":	"6",
-    "Name":	"Russell",
+    "Name":	"Sainz",
     "Team":	"-",
-    "Points":	"18"
+    "Points":	"20"
     }
     ]}
