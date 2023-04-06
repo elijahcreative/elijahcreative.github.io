@@ -1,53 +1,35 @@
-const fetch = require("node-fetch"); // require the 'node-fetch' library for making HTTP requests
-const fs = require("fs"); // require the 'fs' library for file operations
+const racesFilePath = '/races.json';
+const nextRaceFilePath = '/racesmini.json';
 
-// set the URL of your JSON file
-const url = "https://elijahcreative.github.io/F1/2023/Data/races.json";
+const races = require(racesFilePath);
 
-// set the path and name of the file to update
-const updateFile = "https://elijahcreative.github.io/F1/2023/Data/racesmini.json";
-
-// set the interval in milliseconds for how often to update the file (e.g. every hour)
-const updateInterval = 60 * 60 * 1000;
-
-// function to get the next race from the race schedule
-function getNextRace(raceSchedule) {
-  const now = new Date();
-  let nextRace = null;
-  for (let i = 0; i < raceSchedule.length; i++) {
-    const race = raceSchedule[i];
-    const raceDate = new Date(race.Race);
-    if (raceDate > now && (!nextRace || raceDate < nextRace.Race)) {
-      nextRace = race;
-    }
-  }
-  return nextRace;
+// Find the index of the next race
+const now = new Date();
+let nextRaceIndex = -1;
+for (let i = 0; i < races.Races.length; i++) {
+const race = races.Races[i];
+if (new Date(race.Race) > now) {
+nextRaceIndex = i;
+break;
+}
 }
 
-// function to update the file with the next race data
-function updateNextRaceFile() {
-  fetch(url)
-    .then(response => response.json())
-    .then(raceSchedule => {
-      const nextRace = getNextRace(raceSchedule.Races);
-      if (nextRace) {
-        const data = JSON.stringify(nextRace, null, 2);
-        fs.writeFile(updateFile, data, err => {
-          if (err) {
-            console.error("Error writing to file:", err);
-          } else {
-            console.log("Next race updated:", nextRace.Country);
-          }
-        });
-      } else {
-        console.error("No upcoming races found");
-      }
-    })
-    .catch(error => console.error("Error fetching race schedule:", error));
-}
+// Extract the next race data
+const nextRace = races.Races[nextRaceIndex];
+const timeToQualify = Math.ceil((new Date(nextRace.Qual) - now) / (1000 * 60 * 60 * 24));
+const timeToRace = Math.ceil((new Date(nextRace.Race) - now) / (1000 * 60 * 60 * 24));
 
-// update the file initially
-updateNextRaceFile();
+// Create an object with the next race data
+const nextRaceData = {
+Country: nextRace.Country,
+City: nextRace.City,
+Qual: nextRace.Qual,
+Race: nextRace.Race,
+TimeToQualify: timeToQualify,
+TimeToRace: timeToRace
+};
 
-// set the interval to update the file periodically
-setInterval(updateNextRaceFile, updateInterval);
+// Write the next race data to a JSON file
+const fs = require('fs');
+const json = JSON.stringify(nextRaceData);
+fs.writeFileSync(nextRaceFilePath, json);
