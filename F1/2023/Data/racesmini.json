@@ -1,9 +1,9 @@
 {
   "Country": "🇦🇿 Azerbaijan",
   "City": "Baku",
-  "Qual": "április 28. 15:00",
-  "Sprint": "április 29. 15:30",
-  "Race": "április 30. 13:00",
+  "Qual": "ápr. 28. 15:00",
+  "Sprint": "ápr. 29. 15:30",
+  "Race": "ápr. 30. 13:00",
   "Laps": "51",
   "Length": "6.0",
   "Distance": "306.1",
@@ -12,6 +12,6 @@
   "FirstGP": "2016",
   "Trackimage": "https://elijahcreative.github.io/F1/Images/TR-Azerbaijan.png",
   "Track2": "https://elijahcreative.github.io/F1/Images2/TR-Azerbaijan.png",
-  "TimeToQualify": 22,
-  "TimeToRace": 24
+  "TimeToQualify": 20,
+  "TimeToRace": 22
 }

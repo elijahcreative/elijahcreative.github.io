@@ -22,7 +22,7 @@ const timeToRace = Math.ceil((new Date(nextRace.Race) - now) / (1000 * 60 * 60 *
 
 
 // Format the dates
-const options = { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+const options = { month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' };
 const qualDate = new Date(nextRace.Qual).toLocaleString('hu-HU', options);
 const sprintDate = new Date(nextRace.Sprint).toLocaleString('hu-HU', options);
 const raceDate = new Date(nextRace.Race).toLocaleString('hu-HU', options);
