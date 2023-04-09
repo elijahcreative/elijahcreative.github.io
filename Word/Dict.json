@@ -376,5 +376,166 @@
     "definition": "excessively talkative; using too many words",
     "example": "The garrulous old man talked for hours about his life.",
     "etymology": "From Latin 'garrulus,' meaning 'talkative.'"
+  },
+  "paradox": {
+    "type": "noun",
+    "pronunciation": "par-uh-doks",
+    "definition": "a statement or proposition that seems self-contradictory or absurd but in reality expresses a possible truth",
+    "example": "The concept of an omnipotent and omniscient God creating a stone that is too heavy for Him to lift is a classic example of a paradox.",
+    "etymology": "from the Greek word 'paradoxon' meaning 'contrary to expectations'"
+  },
+  "ephemeral": {
+    "type": "adjective",
+    "pronunciation": "ih-fem-er-uhl",
+    "definition": "lasting for a very short time",
+    "example": "The beauty of a cherry blossom is ephemeral, as the petals fall within days of blooming.",
+    "etymology": "from the Greek word 'ephēmeros' meaning 'lasting only one day'"
+  },
+  "trepidation": {
+    "type": "noun",
+    "pronunciation": "trep-i-dey-shuhn",
+    "definition": "a feeling of fear or agitation about something that may happen",
+    "example": "I felt a sense of trepidation as I stepped into the dark and unfamiliar room.",
+    "etymology": "from the Latin word 'trepidare' meaning 'to tremble'"
+  },
+  "apathetic": {
+    "type": "adjective",
+    "pronunciation": "ap-uh-thet-ik",
+    "definition": "showing or feeling no interest, enthusiasm, or concern",
+    "example": "The apathetic student didn't bother to do his homework, despite repeated warnings from his teacher.",
+    "etymology": "from the Greek word 'apathēs' meaning 'without feeling'"
+  },
+  "gloaming": {
+    "type": "noun",
+    "pronunciation": "gloh-ming",
+    "definition": "the time of day immediately following sunset",
+    "example": "We enjoyed a picnic in the gloaming.",
+    "etymology": "From Middle English \"gloamingen\", from Old English \"glōmung\"."
+  },
+  "lissome": {
+    "type": "adjective",
+    "pronunciation": "li-suhm",
+    "definition": "thin, supple, and graceful",
+    "example": "She moved with a lissome grace.",
+    "etymology": "From Old English \"liþsom\"."
+  },
+  "mnemonic": {
+    "type": "adjective",
+    "pronunciation": "ni-mon-ik",
+    "definition": "assisting or intended to assist memory",
+    "example": "I used a mnemonic to remember the order of the planets.",
+    "etymology": "From Greek \"mnēmonikos\" meaning \"relating to memory\"."
+  },
+  "propinquity": {
+    "type": "noun",
+    "pronunciation": "proh-ping-kwuh-tee",
+    "definition": "nearness in place or time; kinship",
+    "example": "The propinquity of the two towns made them natural trading partners.",
+    "etymology": "From Latin \"propinquitas\", from \"propinquus\" meaning \"near\"."
+  },
+  "vociferous": {
+    "type": "adjective",
+    "pronunciation": "voh-sif-er-uhs",
+    "definition": "marked by or given to vehement insistent outcry",
+    "example": "The protesters were vociferous in their demands for change.",
+    "etymology": "From Latin \"vociferari\", from \"voc-\" meaning \"voice\" and \"ferre\" meaning \"to bear\"."
+  },
+  "precarious": {
+    "type": "adjective",
+    "pronunciation": "/prɪˈkeərɪəs/",
+    "definition": "not securely held or in position; dangerously likely to fall or collapse",
+    "example": "The ladder felt precarious as I climbed up it.",
+    "etymology": "Mid 17th century (in the sense ‘dependent on circumstances or chance’): from Latin precarius ‘obtained by entreaty’ (from prex, prec- ‘prayer’) + -ous."
+  },
+  "luminous": {
+    "type": "adjective",
+    "pronunciation": "/ˈluːmɪnəs/",
+    "definition": "full of or shedding light; bright or shining, especially in the dark",
+    "example": "The moon was luminous in the night sky.",
+    "etymology": "Late Middle English: from Old French lumineux or Latin luminosus, from lumen ‘light’."
+  },
+  "quandary": {
+    "type": "noun",
+    "pronunciation": "/ˈkwɒnd(ə)ri/",
+    "definition": "a state of uncertainty over what to do in a difficult situation",
+    "example": "I was in a quandary about whether to tell the truth or not.",
+    "etymology": "Mid 16th century: of unknown origin."
+  },
+  "pensive": {
+    "type": "adjective",
+    "pronunciation": "/ˈpɛnsɪv/",
+    "definition": "engaged in, involving, or reflecting deep or serious thought",
+    "example": "She sat in a pensive mood, contemplating her future.",
+    "etymology": "Late Middle English: from Old French pensif, -ive, from penser ‘think’, from Latin pensare ‘consider’."
+  },
+  "perfidious": {
+    "type": "adjective",
+    "pronunciation": "per-FID-ee-uhs",
+    "definition": "deceitful and untrustworthy",
+    "example": "He had a perfidious nature, always looking for ways to deceive those around him.",
+    "etymology": "From Latin perfidia, meaning 'treachery' or 'perfidy'."
+  },
+  "quiescent": {
+    "type": "adjective",
+    "pronunciation": "kwee-ES-uhnt",
+    "definition": "in a state of inactivity or dormancy",
+    "example": "The volcano had been quiescent for many years, but scientists feared it would erupt again soon.",
+    "etymology": "From Latin quiescere, meaning 'to rest' or 'to become quiet'."
+  },
+  "temerity": {
+    "type": "noun",
+    "pronunciation": "tuh-MER-i-tee",
+    "definition": "excessive boldness or recklessness",
+    "example": "She had the temerity to insult her boss in front of the entire company.",
+    "etymology": "From Latin temeritas, meaning 'rashness' or 'recklessness'."
+  },
+  "rancorous": {
+    "type": "adjective",
+    "pronunciation": "RAN-ker-uhs",
+    "definition": "characterized by bitterness or resentment",
+    "example": "Their rancorous relationship had been strained for years, but they could never seem to resolve their differences.",
+    "etymology": "From Middle English rancour, meaning 'hate' or 'malice'."
+  },
+  "euphemism": {
+    "type": "noun",
+    "pronunciation": "YOO-fuh-miz-uhm",
+    "definition": "a mild or indirect word or expression used in place of one considered to be too harsh or blunt",
+    "example": "He used the euphemism 'passed away' instead of 'died' to soften the blow for the grieving family.",
+    "etymology": "From Greek euphēmismos, meaning 'the use of good words' or 'a good omen'."
+  },
+  "abscond": {
+    "type": "verb",
+    "pronunciation": "ab-skond",
+    "definition": "to depart secretly and hide oneself",
+    "example": "He absconded with the money.",
+    "etymology": "from Latin 'abscondere', meaning 'to hide'"
+  },
+  "disingenuous": {
+    "type": "adjective",
+    "pronunciation": "dis-in-jen-yoo-us",
+    "definition": "not candid or sincere",
+    "example": "Her disingenuous smile betrayed her true feelings.",
+    "etymology": "from Latin 'dis-', meaning 'not' + 'ingenous', meaning 'frank'"
+  },
+  "incorrigible": {
+    "type": "adjective",
+    "pronunciation": "in-kor-i-juh-buhl",
+    "definition": "not able to be corrected, improved, or reformed",
+    "example": "He was an incorrigible liar.",
+    "etymology": "from Latin 'in-', meaning 'not' + 'corrigere', meaning 'to correct'"
+  },
+  "pensive": {
+    "type": "adjective",
+    "pronunciation": "pen-siv",
+    "definition": "deeply or seriously thoughtful",
+    "example": "She sat in a pensive mood, reflecting on her life.",
+    "etymology": "from Latin 'pensare', meaning 'to consider'"
+  },
+  "quixotic": {
+    "type": "adjective",
+    "pronunciation": "kwik-sot-ik",
+    "definition": "foolishly impractical, idealistic, or romantic",
+    "example": "His quixotic plan to save the world was met with ridicule.",
+    "etymology": "from the character Don Quixote, who had unrealistic and chivalrous ideals"
   }
 }
