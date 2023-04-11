@@ -1,9 +1,15 @@
 {
   "Country": "🇦🇿 Azerbaijan",
   "City": "Baku",
-  "Qual": "ápr. 28. 15:00",
-  "Sprint": "ápr. 29. 15:30",
-  "Race": "ápr. 30. 13:00",
+  "Qual": "Apr 28 2023 13:00 UTC",
+  "Sprint": "Apr 29 2023 13:30 UTC",
+  "Race": "Apr 30 2023 11:00 UTC",
+  "QualDatePart": "2023. 04. 28.",
+  "QualTimePart": "15:00:00",
+  "SprintDatePart": "2023. 04. 29.",
+  "SprintTimePart": "15:30:00",
+  "RaceDatePart": "2023. 04. 30.",
+  "RaceTimePart": "13:00:00",
   "Laps": "51",
   "Length": "6.0",
   "Distance": "306.1",
@@ -12,6 +18,6 @@
   "FirstGP": "2016",
   "Trackimage": "https://elijahcreative.github.io/F1/Images/TR-Azerbaijan.png",
   "Track2": "https://elijahcreative.github.io/F1/Images2/TR-Azerbaijan.png",
-  "TimeToQualify": 20,
-  "TimeToRace": 22
+  "TimeToQualify": 17,
+  "TimeToRace": 19
 }
