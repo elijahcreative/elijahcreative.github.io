@@ -1,41 +1,41 @@
 {"Standings": [
     {
-    "After":	"After Azerbaijan"
+    "After":	"After USA"
     },
     {
     "Place":	"1",
     "Name":	"Verstappen",
     "Team":	"-",
-    "Points":	"87"
+    "Points":	"119"
     },
     {
     "Place":	"2",
     "Name":	"Pérez",
     "Team":	"-",
-    "Points":	"79"
+    "Points":	"105"
     },
     {
     "Place":	"3",
     "Name":	"Alonso",
     "Team":	"-",
-    "Points":	"57"
+    "Points":	"75"
     },
     {
     "Place":	"4",
     "Name":	"Hamilton",
     "Team":	"-",
-    "Points":	"46"
+    "Points":	"56"
     },
     {
     "Place":	"5",
     "Name":	"Sainz",
     "Team":	"-",
-    "Points":	"30"
+    "Points":	"44"
     },
     {
     "Place":	"6",
-    "Name":	"Stroll",
+    "Name":	"Russell",
     "Team":	"-",
-    "Points":	"26"
+    "Points":	"40"
     }
     ]}
