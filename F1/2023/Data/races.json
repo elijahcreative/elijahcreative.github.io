@@ -102,7 +102,8 @@
             "Best lap": "1:12.909",
             "Best lap driver": "Hamilton, 2021",
             "First GP": "1950",
-            "Track image": "https://elijahcreative.github.io/F1/Images/TR-Monaco.png"
+            "Track image": "https://elijahcreative.github.io/F1/Images/TR-Monaco.png",
+            "Track2": "https://elijahcreative.github.io/F1/Images2/TR-Monaco.png"
         },
         {
             "Country": "🇪🇸 Spain",
@@ -116,7 +117,8 @@
             "Best lap": "1:18.149",
             "Best lap driver": "Verstappen, 2021",
             "First GP": "1991",
-            "Track image": "https://elijahcreative.github.io/F1/Images/TR-Spain.png"
+            "Track image": "https://elijahcreative.github.io/F1/Images/TR-Spain.png",
+            "Track2": "https://elijahcreative.github.io/F1/Images2/TR-Spain.png"
         },
         {
             "Country": "🇨🇦 Canada",
@@ -130,7 +132,8 @@
             "Best lap": "1:13.078",
             "Best lap driver": "Bottas, 2019",
             "First GP": "1978",
-            "Track image": "https://elijahcreative.github.io/F1/Images/TR-Canada.png"
+            "Track image": "https://elijahcreative.github.io/F1/Images/TR-Canada.png",
+            "Track2": "https://elijahcreative.github.io/F1/Images2/TR-Canada.png"
         },
         {
             "Country": "🇦🇹 Austria",
