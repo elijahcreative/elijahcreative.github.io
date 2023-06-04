@@ -1,41 +1,41 @@
 {"Standings": [
     {
-    "After":	"After Monaco"
+    "After":	"After Spain"
     },
     {
     "Place":	"1",
     "Name":	"Verstappen",
     "Team":	"-",
-    "Points":	"144"
+    "Points":	"170"
     },
     {
     "Place":	"2",
     "Name":	"Pérez",
     "Team":	"-",
-    "Points":	"105"
+    "Points":	"117"
     },
     {
     "Place":	"3",
     "Name":	"Alonso",
     "Team":	"-",
-    "Points":	"93"
+    "Points":	"99"
     },
     {
     "Place":	"4",
     "Name":	"Hamilton",
     "Team":	"-",
-    "Points":	"69"
+    "Points":	"87"
     },
     {
     "Place":	"5",
     "Name":	"Russell",
     "Team":	"-",
-    "Points":	"50"
+    "Points":	"65"
     },
     {
     "Place":	"6",
     "Name":	"Sainz",
     "Team":	"-",
-    "Points":	"48"
+    "Points":	"58"
     }
     ]}

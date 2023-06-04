@@ -1,28 +1,28 @@
 {"Podiums": [
     {
-    "Country":	"🇲🇨 Monaco",
-    "City":	"Monte Carlo",
-    "Message":	"2023 6th race"
+    "Country":	"🇪🇸 Spain",
+    "City":	"Catalunya",
+    "Message":	"2023 7th race"
     },
     {
     "Place":	"1",
     "Name":	"Verstappen",
     "Team":	"-",
     "Points":	"+25",
-    "Total":	"144"
+    "Total":	"170"
     },
     {
     "Place":	"2",
-    "Name":	"Alonso",
+    "Name":	"Hamilton",
     "Team":	"-",
     "Points":	"+18",
-    "Total":	"93"
+    "Total":	"87"
     },
     {
     "Place":	"3",
-    "Name":	"Ocon",
+    "Name":	"Russell",
     "Team":	"-",
     "Points":	"+15",
-    "Total":	"21"
+    "Total":	"65"
     }
     ]}
