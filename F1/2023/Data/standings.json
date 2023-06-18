@@ -1,41 +1,41 @@
 {"Standings": [
     {
-    "After":	"After Spain"
+    "After":	"After Canada"
     },
     {
     "Place":	"1",
     "Name":	"Verstappen",
     "Team":	"-",
-    "Points":	"170"
+    "Points":	"195"
     },
     {
     "Place":	"2",
     "Name":	"Pérez",
     "Team":	"-",
-    "Points":	"117"
+    "Points":	"126"
     },
     {
     "Place":	"3",
     "Name":	"Alonso",
     "Team":	"-",
-    "Points":	"99"
+    "Points":	"117"
     },
     {
     "Place":	"4",
     "Name":	"Hamilton",
     "Team":	"-",
-    "Points":	"87"
+    "Points":	"102"
     },
     {
     "Place":	"5",
-    "Name":	"Russell",
+    "Name":	"Sainz",
     "Team":	"-",
-    "Points":	"65"
+    "Points":	"68"
     },
     {
     "Place":	"6",
-    "Name":	"Sainz",
+    "Name":	"Russell",
     "Team":	"-",
-    "Points":	"58"
+    "Points":	"65"
     }
     ]}

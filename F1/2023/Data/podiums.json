@@ -1,28 +1,28 @@
 {"Podiums": [
     {
-    "Country":	"🇪🇸 Spain",
-    "City":	"Catalunya",
-    "Message":	"2023 7th race"
+    "Country":	"🇨🇦 Canada",
+    "City":	"Montréal",
+    "Message":	"2023 8th race"
     },
     {
     "Place":	"1",
     "Name":	"Verstappen",
     "Team":	"-",
     "Points":	"+25",
-    "Total":	"170"
+    "Total":	"195"
     },
     {
     "Place":	"2",
-    "Name":	"Hamilton",
+    "Name":	"Alonso",
     "Team":	"-",
     "Points":	"+18",
-    "Total":	"87"
+    "Total":	"117"
     },
     {
     "Place":	"3",
-    "Name":	"Russell",
+    "Name":	"Hamilton",
     "Team":	"-",
     "Points":	"+15",
-    "Total":	"65"
+    "Total":	"102"
     }
     ]}
