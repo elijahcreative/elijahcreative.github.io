@@ -1,7 +1,7 @@
 {
   "avarice": {
     "type": "noun",
-    "pronunciation": "ˈævərɪs",
+    "pronunciation": "əˈværɪs",
     "definition": "extreme greed for wealth or material gain",
     "example": "His avarice led to his downfall.",
     "etymology": "Middle English: from Old French, from Latin avaritia, from avarus ‘greedy’, from avēre ‘desire’."
@@ -22,299 +22,299 @@
   },
   "deleterious": {
     "type": "adjective",
-    "pronunciation": "ˌdɛləˈtɪrɪəs",
+    "pronunciation": "ˌdɛlɪˈtɪriəs",
     "definition": "causing harm or damage",
     "example": "The deleterious effects of smoking are well known.",
     "etymology": "Early 17th century: from Greek dēlētērios ‘noxious’, from dēlētēr ‘destroyer’."
   },
-"abstemious": {
-        "type": "adjective",
-        "pronunciation": "ab-STEE-mee-uhs",
-        "definition": "not self-indulgent, especially when eating and drinking",
-        "example": "He had an abstemious lifestyle, never consuming more than a single glass of wine with dinner.",
-        "etymology": "From Latin abstemius, from ab- (without) + *temous, from temetum (intoxicating drink)."
-    },
-    "cognizant": {
-        "type": "adjective",
-        "pronunciation": "KOG-nuh-zuhnt",
-        "definition": "having knowledge or awareness of something",
-        "example": "As a teacher, she was always cognizant of her students' needs and tried her best to meet them.",
-        "etymology": "From Latin cognoscere (to get to know, recognize), from co- (together) + gnoscere (to know)."
-    },
-    "enervate": {
-        "type": "verb",
-        "pronunciation": "EN-er-vayt",
-        "definition": "to weaken or deprive of strength; to make lethargic",
-        "example": "The heat of the day enervated him, causing him to feel drained and sluggish.",
-        "etymology": "From Latin enervare, from e- (out of) + nervus (nerve)."
-    },
-    "mendacious": {
-        "type": "adjective",
-        "pronunciation": "men-DEY-shuhs",
-        "definition": "dishonest, deceitful",
-        "example": "The politician's mendacious statements caused many to question his integrity.",
-        "etymology": "From Latin mendax (lying), from mendum (fault, error) + -ax (inclined to)."
-    },
-"exacerbate": {
-        "type": "verb",
-        "pronunciation": "ig-zas-er-beyt",
-        "definition": "to make a problem or bad situation worse",
-        "example": "Her angry response only exacerbated the situation.",
-        "etymology": "from Latin exacerbatus, past participle of exacerbare, from ex- 'thoroughly' + acerbus 'harsh, bitter'"
-    },
-    "querulous": {
-        "type": "adjective",
-        "pronunciation": "kwer-yuh-luhs",
-        "definition": "complaining in a petulant or whining manner",
-        "example": "The patient was in a querulous mood and complained about everything.",
-        "etymology": "from Latin querulus 'full of complaints', from queri 'complain'"
-    },
-    "ludicrous": {
-        "type": "adjective",
-        "pronunciation": "loo-di-kruh s",
-        "definition": "so foolish, unreasonable, or out of place as to be amusing",
-        "example": "The idea of a pig flying was ludicrous to the farmer.",
-        "etymology": "from Latin ludicrus, from ludicrum 'a play, game, joke'"
-    },
-    "plethora": {
-        "type": "noun",
-        "pronunciation": "pleth-er-uh",
-        "definition": "a large or excessive amount of something",
-        "example": "There was a plethora of food at the banquet.",
-        "etymology": "from Greek plethōra 'fullness', from plēthein 'be full'"
-    },
-    "tenacious": {
-        "type": "adjective",
-        "pronunciation": "tuh-ney-shuhs",
-        "definition": "tending to keep a firm hold of something; clinging or adhering closely",
-        "example": "The ivy was tenacious and refused to let go of the wall.",
-        "etymology": "from Latin tenax, tenac- 'holding fast'"
-    },
+  "abstemious": {
+    "type": "adjective",
+    "pronunciation": "əbˈstiːmiəs",
+    "definition": "not self-indulgent, especially when eating and drinking",
+    "example": "He had an abstemious lifestyle, never consuming more than a single glass of wine with dinner.",
+    "etymology": "From Latin abstemius, from ab- (without) + *temous, from temetum (intoxicating drink)."
+  },
+  "cognizant": {
+    "type": "adjective",
+    "pronunciation": "ˈkɒɡnɪzənt",
+    "definition": "having knowledge or awareness of something",
+    "example": "As a teacher, she was always cognizant of her students' needs and tried her best to meet them.",
+    "etymology": "From Latin cognoscere (to get to know, recognize), from co- (together) + gnoscere (to know)."
+  },
+  "enervate": {
+    "type": "verb",
+    "pronunciation": "ˈɛnərveɪt",
+    "definition": "to weaken or deprive of strength; to make lethargic",
+    "example": "The heat of the day enervated him, causing him to feel drained and sluggish.",
+    "etymology": "From Latin enervare, from e- (out of) + nervus (nerve)."
+  },
+  "mendacious": {
+    "type": "adjective",
+    "pronunciation": "mɛnˈdeɪʃəs",
+    "definition": "dishonest, deceitful",
+    "example": "The politician's mendacious statements caused many to question his integrity.",
+    "etymology": "From Latin mendax (lying), from mendum (fault, error) + -ax (inclined to)."
+  },
+  "exacerbate": {
+    "type": "verb",
+    "pronunciation": "ɪɡˈzæsərbeɪt",
+    "definition": "to make a problem or bad situation worse",
+    "example": "Her angry response only exacerbated the situation.",
+    "etymology": "from Latin exacerbatus, past participle of exacerbare, from ex- 'thoroughly' + acerbus 'harsh, bitter'"
+  },
+  "querulous": {
+    "type": "adjective",
+    "pronunciation": "ˈkwɛrʊləs",
+    "definition": "complaining in a petulant or whining manner",
+    "example": "The patient was in a querulous mood and complained about everything.",
+    "etymology": "from Latin querulus 'full of complaints', from queri 'complain'"
+  },
+  "ludicrous": {
+    "type": "adjective",
+    "pronunciation": "ˈluːdɪkrəs",
+    "definition": "so foolish, unreasonable, or out of place as to be amusing",
+    "example": "The idea of a pig flying was ludicrous to the farmer.",
+    "etymology": "from Latin ludicrus, from ludicrum 'a play, game, joke'"
+  },
+  "plethora": {
+    "type": "noun",
+    "pronunciation": "ˈplɛθərə",
+    "definition": "a large or excessive amount of something",
+    "example": "There was a plethora of food at the banquet.",
+    "etymology": "from Greek plethōra 'fullness', from plēthein 'be full'"
+  },
+  "tenacious": {
+    "type": "adjective",
+    "pronunciation": "təˈneɪʃəs",
+    "definition": "tending to keep a firm hold of something; clinging or adhering closely",
+    "example": "The ivy was tenacious and refused to let go of the wall.",
+    "etymology": "from Latin tenax, tenac- 'holding fast'"
+  },
   "harangue": {
     "type": "verb",
-    "pronunciation": "huh-rang",
+    "pronunciation": "həˈræŋ",
     "definition": "a lengthy and aggressive speech aimed at persuading someone to do something",
     "example": "The coach harangued the team during halftime to motivate them to win the game.",
     "etymology": "from French harangue (16th century), from Old Italian aringa, from Germanic origin"
   },
   "eschew": {
     "type": "verb",
-    "pronunciation": "es-choo",
+    "pronunciation": "ɪsˈtʃuː",
     "definition": "to deliberately avoid or keep away from something",
     "example": "In order to maintain his healthy lifestyle, he eschewed fast food and soft drinks.",
     "etymology": "from Old French eschiver (12th century), from Frankish skiuhan 'to frighten off'"
   },
   "mawkish": {
     "type": "adjective",
-    "pronunciation": "maw-kish",
+    "pronunciation": "ˈmɔːkɪʃ",
     "definition": "excessively sentimental or emotional in an artificial or contrived way",
     "example": "The movie's mawkish ending left many viewers feeling unsatisfied.",
     "etymology": "from Middle English mawke, a type of gull, probably influenced by Middle Low German mak, 'maggot'"
   },
   "lascivious": {
     "type": "adjective",
-    "pronunciation": "luh-siv-ee-us",
+    "pronunciation": "ləˈsɪviəs",
     "definition": "showing an excessive interest in sexual matters; lewd or licentious",
     "example": "The song's lascivious lyrics were considered scandalous at the time.",
     "etymology": "from Middle English, from Old French lascivieux, from Latin lascivus 'playful, wanton'"
   },
   "abate": {
     "type": "verb",
-    "pronunciation": "/əˈbeɪt/",
+    "pronunciation": "əˈbeɪt",
     "definition": "become less intense or widespread",
     "example": "the storm suddenly abated",
     "etymology": "Middle English: from Old French abatre, from a- ‘to’ + batre ‘to beat’"
   },
   "comportment": {
     "type": "noun",
-    "pronunciation": "/kəmˈpɔːtmənt/",
+    "pronunciation": "kəmˈpɔːtmənt",
     "definition": "behavior; bearing",
     "example": "her dignified comportment at the funeral",
     "etymology": "early 17th century: from French comportement, from comporter ‘to bear, behave’"
   },
   "languor": {
     "type": "noun",
-    "pronunciation": "/ˈlaŋɡə/",
+    "pronunciation": "ˈlæŋɡər",
     "definition": "the state or feeling of being tired and listless",
     "example": "he was overcome by a sudden languor",
     "etymology": "late Middle English: from Old French langor, from Latin languor, from languere ‘languish’"
   },
   "pugnacious": {
     "type": "adjective",
-    "pronunciation": "/pʌɡˈneɪʃəs/",
+    "pronunciation": "pʌɡˈneɪʃəs",
     "definition": "eager or quick to argue, quarrel, or fight",
     "example": "the increasingly pugnacious demeanor of politicians",
     "etymology": "mid 17th century: from Latin pugnax, pugnac- ‘combative’, from pugnare ‘to fight’"
   },
   "sobriquet": {
-        "type": "noun",
-        "pronunciation": "soh-bri-ket",
-        "definition": "a nickname or term of endearment",
-        "example": "His sobriquet 'The King of Pop' became synonymous with Michael Jackson.",
-        "etymology": "From the French 'sobriquet', meaning 'nickname'."
-    },
-    "apoplectic": {
-        "type": "adjective",
-        "pronunciation": "ap-uh-plek-tik",
-        "definition": "overcome with anger; extremely indignant",
-        "example": "He was apoplectic when he found out that his proposal had been rejected.",
-        "etymology": "From the Greek 'apoplēktikos', meaning 'struck down'."
-    },
-    "dilatory": {
-        "type": "adjective",
-        "pronunciation": "dil-uh-tawr-ee",
-        "definition": "intentionally delaying; procrastinating",
-        "example": "His dilatory tactics were starting to frustrate his colleagues.",
-        "etymology": "From the Latin 'dilatorius', meaning 'delaying'."
-    },
-    "proselytize": {
-        "type": "verb",
-        "pronunciation": "pros-uh-luh-tahyz",
-        "definition": "to convert or attempt to convert someone from one religion, belief, or opinion to another",
-        "example": "He spent hours trying to proselytize his atheist friend to become a believer.",
-        "etymology": "From the Greek 'prosēlytos', meaning 'newcomer'."
-    },
-    "untenable": {
-        "type": "adjective",
-        "pronunciation": "uhn-ten-uh-buhl",
-        "definition": "not able to be maintained or defended against attack or objection",
-        "example": "His argument was clearly untenable in light of the new evidence.",
-        "etymology": "From the Latin 'tenere', meaning 'to hold'."
-    },
-    "foible": {
     "type": "noun",
-    "pronunciation": "FOY-buhl",
+    "pronunciation": "ˈsoʊbrɪkeɪ",
+    "definition": "a nickname or term of endearment",
+    "example": "His sobriquet 'The King of Pop' became synonymous with Michael Jackson.",
+    "etymology": "From the French 'sobriquet', meaning 'nickname'."
+  },
+  "apoplectic": {
+    "type": "adjective",
+    "pronunciation": "ˌæpəˈplɛktɪk",
+    "definition": "overcome with anger; extremely indignant",
+    "example": "He was apoplectic when he found out that his proposal had been rejected.",
+    "etymology": "From the Greek 'apoplēktikos', meaning 'struck down'."
+  },
+  "dilatory": {
+    "type": "adjective",
+    "pronunciation": "ˈdɪləˌtɔːri",
+    "definition": "intentionally delaying; procrastinating",
+    "example": "His dilatory tactics were starting to frustrate his colleagues.",
+    "etymology": "From the Latin 'dilatorius', meaning 'delaying'."
+  },
+  "proselytize": {
+    "type": "verb",
+    "pronunciation": "ˈprɑsələˌtaɪz",
+    "definition": "to convert or attempt to convert someone from one religion, belief, or opinion to another",
+    "example": "He spent hours trying to proselytize his atheist friend to become a believer.",
+    "etymology": "From the Greek 'prosēlytos', meaning 'newcomer'."
+  },
+  "untenable": {
+    "type": "adjective",
+    "pronunciation": "ʌnˈtɛnəbl̩",
+    "definition": "not able to be maintained or defended against attack or objection",
+    "example": "His argument was clearly untenable in light of the new evidence.",
+    "etymology": "From the Latin 'tenere', meaning 'to hold'."
+  },
+  "foible": {
+    "type": "noun",
+    "pronunciation": "ˈfɔɪbəl",
     "definition": "a minor flaw or shortcoming in character or behavior",
     "example": "His foible was his tendency to interrupt people while they were speaking.",
     "etymology": "From French 'foible' meaning 'weak point, failing'"
   },
   "indelible": {
     "type": "adjective",
-    "pronunciation": "in-DEL-uh-buhl",
+    "pronunciation": "ɪnˈdɛləbl̩",
     "definition": "making marks that cannot be removed; not able to be forgotten or removed",
     "example": "The pen had indelible ink that couldn't be erased.",
     "etymology": "From Latin 'indelibilis', from 'in-' meaning 'not' and 'delere' meaning 'to delete, destroy'"
   },
   "quintessential": {
     "type": "adjective",
-    "pronunciation": "kwin-tuh-SEN-shul",
+    "pronunciation": "ˌkwɪntəˈsɛnʃəl",
     "definition": "representing the most perfect or typical example of a quality or class",
     "example": "The quintessential beach vacation involves lounging on the sand, swimming in the ocean, and soaking up the sun.",
     "etymology": "From Latin 'quintus' meaning 'fifth' + 'essentia' meaning 'essence'"
   },
   "surreptitious": {
     "type": "adjective",
-    "pronunciation": "sur-uhp-TISH-uhs",
+    "pronunciation": "ˌsʌrəpˈtɪʃəs",
     "definition": "kept secret, especially because it would not be approved of",
     "example": "He took a surreptitious look at his phone during the meeting.",
     "etymology": "From Latin 'surrepticius' meaning 'stolen, secret'"
   },
   "verisimilitude": {
     "type": "noun",
-    "pronunciation": "ver-uh-si-MIL-i-tood",
+    "pronunciation": "vɛrɪsɪˈmɪlɪtjuːd",
     "definition": "the appearance of being true or real",
     "example": "The author's use of vivid details created a sense of verisimilitude in the story.",
     "etymology": "From Latin 'verus' meaning 'true' + 'similis' meaning 'like'"
   },
   "sardonic": {
     "type": "adjective",
-    "pronunciation": "/sɑːˈdɒnɪk/",
+    "pronunciation": "sɑrˈdɑnɪk",
     "definition": "grimly mocking or cynical.",
     "example": "a sardonic smile",
     "etymology": "mid 17th century: from French sardonique or late Latin sardonius, alteration of Greek sardonios (see sardonyx)"
   },
   "evanescent": {
     "type": "adjective",
-    "pronunciation": "/ˌɛvəˈnɛsənt/",
+    "pronunciation": "ˌɛvəˈnɛsənt",
     "definition": "quickly fading or disappearing; short-lived.",
     "example": "the evanescent Arctic summer",
     "etymology": "early 18th century: from Latin evanescere, from e- (variant of ex-) ‘out of’ + vanescere ‘disappear’"
   },
   "reprobate": {
     "type": "noun",
-    "pronunciation": "/ˈrɛprəbeɪt/",
+    "pronunciation": "ˈrɛprəˌbeɪt",
     "definition": "an unprincipled person (often used humorously or affectionately).",
     "example": "he's a loveable old reprobate",
     "etymology": "mid 16th century: from ecclesiastical Latin reprobatus ‘disapproved’, past participle of reprobare (see reprove)"
   },
   "supercilious": {
     "type": "adjective",
-    "pronunciation": "/ˌsuːpəˈsɪlɪəs/",
+    "pronunciation": "ˌsupərˈsɪliəs",
     "definition": "behaving or looking as though one thinks one is superior to others.",
     "example": "a supercilious lady's maid",
     "etymology": "late 16th century: from Latin superciliosus ‘haughty’, from supercilium ‘eyebrow’ (from super- ‘above’ + cilium ‘eyelid’)."
   },
   "rambunctious": {
-        "type": "adjective",
-        "pronunciation": "ram-buhngk-shuhs",
-        "definition": "uncontrollably exuberant; boisterous; marked by uncontrollable exuberance",
-        "example": "The rambunctious children were bouncing off the walls.",
-        "etymology": "First recorded in 1830-40, perhaps akin to rum and bumptious."
-    },
-    "panacea": {
-        "type": "noun",
-        "pronunciation": "pan-uh-see-uh",
-        "definition": "a remedy for all ills or difficulties; cure-all",
-        "example": "Some people believe that laughter is a panacea for many of life's problems.",
-        "etymology": "From Greek panakeia 'universal remedy', from pan- 'all' + akos 'cure'."
-    },
-    "flummox": {
-        "type": "verb",
-        "pronunciation": "fluhm-uhks",
-        "definition": "to confuse or perplex",
-        "example": "The complex instructions flummoxed even the experienced technicians.",
-        "etymology": "Origin uncertain; perhaps from the phrase 'flummix and fumble'."
-    },
-    "idiosyncrasy": {
-        "type": "noun",
-        "pronunciation": "id-ee-uh-sing-kruh-see",
-        "definition": "a peculiar personality trait or habit; quirk",
-        "example": "His idiosyncrasy of always wearing mismatched socks amused his colleagues.",
-        "etymology": "From Greek idiosynkrasia, from idio- 'own, personal' + synkrasis 'mixture'."
-    },
-    "gossamer": {
-        "type": "noun",
-        "pronunciation": "gos-uh-mer",
-        "definition": "a fine, filmy substance consisting of cobwebs spun by small spiders; something delicate, light, or flimsy",
-        "example": "The ballerina's gossamer tutu floated ethereally around her as she danced.",
-        "etymology": "From Middle English gossomer, gossomer, gossummer, from Old English gōsmære, literally 'goose-moth'."
-    },
-    "calibrate": {
-        "type": "verb",
-        "pronunciation": "/ˈkæl.ə.breɪt/",
-        "definition": "to adjust or standardize the measurement of a device",
-        "example": "The mechanic had to calibrate the speedometer.",
-        "etymology": "from Latin calibro, meaning 'chisel' or 'gauge'"
-    },
-    "indolent": {
-        "type": "adjective",
-        "pronunciation": "/ˈɪn.də.lənt/",
-        "definition": "avoiding exertion or physical activity",
-        "example": "The indolent cat spent the whole day sleeping.",
-        "etymology": "from Latin indolentia, meaning 'pain' or 'grief'"
-    },
-    "scrumptious": {
-        "type": "adjective",
-        "pronunciation": "/ˈskrʌm.pʃəs/",
-        "definition": "delightful and appetizing",
-        "example": "The cake looked scrumptious.",
-        "etymology": "origin unknown"
-    },
-    "zenith": {
-        "type": "noun",
-        "pronunciation": "/ˈziː.nɪθ/",
-        "definition": "the highest point or peak",
-        "example": "The sun was at its zenith at noon.",
-        "etymology": "from Arabic samt, meaning 'way' or 'path'"
-    },
-    "enigma": {
-        "type": "noun",
-        "pronunciation": "/ɪˈnɪɡ.mə/",
-        "definition": "a puzzling or mysterious phenomenon",
-        "example": "The disappearance of the airplane remains an enigma.",
-        "etymology": "from Latin aenigma, meaning 'riddle' or 'puzzle'"
-    },
-    "peruse": {
+    "type": "adjective",
+    "pronunciation": "ræmˈbʌŋkʃəs",
+    "definition": "uncontrollably exuberant; boisterous; marked by uncontrollable exuberance",
+    "example": "The rambunctious children were bouncing off the walls.",
+    "etymology": "First recorded in 1830-40, perhaps akin to rum and bumptious."
+  },
+  "panacea": {
+    "type": "noun",
+    "pronunciation": "pænəˈsiːə",
+    "definition": "a remedy for all ills or difficulties; cure-all",
+    "example": "Some people believe that laughter is a panacea for many of life's problems.",
+    "etymology": "From Greek panakeia 'universal remedy', from pan- 'all' + akos 'cure'."
+  },
+  "flummox": {
+    "type": "verb",
+    "pronunciation": "ˈflʌməks",
+    "definition": "to confuse or perplex",
+    "example": "The complex instructions flummoxed even the experienced technicians.",
+    "etymology": "Origin uncertain; perhaps from the phrase 'flummix and fumble'."
+  },
+  "idiosyncrasy": {
+    "type": "noun",
+    "pronunciation": "ˌɪdiəʊˈsɪŋkrəsi",
+    "definition": "a peculiar personality trait or habit; quirk",
+    "example": "His idiosyncrasy of always wearing mismatched socks amused his colleagues.",
+    "etymology": "From Greek idiosynkrasia, from idio- 'own, personal' + synkrasis 'mixture'."
+  },
+  "gossamer": {
+    "type": "noun",
+    "pronunciation": "ˈɡɒsəmər",
+    "definition": "a fine, filmy substance consisting of cobwebs spun by small spiders; something delicate, light, or flimsy",
+    "example": "The ballerina's gossamer tutu floated ethereally around her as she danced.",
+    "etymology": "From Middle English gossomer, gossomer, gossummer, from Old English gōsmære, literally 'goose-moth'."
+  },
+  "calibrate": {
+    "type": "verb",
+    "pronunciation": "ˈkælɪbreɪt",
+    "definition": "to adjust or standardize the measurement of a device",
+    "example": "The mechanic had to calibrate the speedometer.",
+    "etymology": "from Latin calibro, meaning 'chisel' or 'gauge'"
+  },
+  "indolent": {
+    "type": "adjective",
+    "pronunciation": "ˈɪndələnt",
+    "definition": "avoiding exertion or physical activity",
+    "example": "The indolent cat spent the whole day sleeping.",
+    "etymology": "from Latin indolentia, meaning 'pain' or 'grief'"
+  },
+  "scrumptious": {
+    "type": "adjective",
+    "pronunciation": "ˈskrʌmpʃəs",
+    "definition": "delightful and appetizing",
+    "example": "The cake looked scrumptious.",
+    "etymology": "origin unknown"
+  },
+  "zenith": {
+    "type": "noun",
+    "pronunciation": "ˈzɛnɪθ",
+    "definition": "the highest point or peak",
+    "example": "The sun was at its zenith at noon.",
+    "etymology": "from Arabic samt, meaning 'way' or 'path'"
+  },
+  "enigma": {
+    "type": "noun",
+    "pronunciation": "ɪˈnɪɡmə",
+    "definition": "a puzzling or mysterious phenomenon",
+    "example": "The disappearance of the airplane remains an enigma.",
+    "etymology": "from Latin aenigma, meaning 'riddle' or 'puzzle'"
+  },
+  "peruse": {
     "type": "verb",
     "pronunciation": "pəˈruːz",
     "definition": "to read or examine something in a thorough or careful way",
@@ -323,7 +323,7 @@
   },
   "gregarious": {
     "type": "adjective",
-    "pronunciation": "ɡrɪˈɡeəriəs",
+    "pronunciation": "ɡrɪˈɡɛəriəs",
     "definition": "fond of company; sociable",
     "example": "He was a gregarious man who loved to be around people.",
     "etymology": "From Latin 'gregarius,' meaning 'belonging to a herd or flock.'"
@@ -344,387 +344,492 @@
   },
   "garrulous": {
     "type": "adjective",
-    "pronunciation": "ˈɡærələs",
+    "pronunciation": "ˈɡærʊləs",
     "definition": "excessively talkative; using too many words",
     "example": "The garrulous old man talked for hours about his life.",
     "etymology": "From Latin 'garrulus,' meaning 'talkative.'"
   },
   "paradox": {
     "type": "noun",
-    "pronunciation": "par-uh-doks",
+    "pronunciation": "ˈpærədɒks",
     "definition": "a statement or proposition that seems self-contradictory or absurd but in reality expresses a possible truth",
     "example": "The concept of an omnipotent and omniscient God creating a stone that is too heavy for Him to lift is a classic example of a paradox.",
     "etymology": "from the Greek word 'paradoxon' meaning 'contrary to expectations'"
   },
   "ephemeral": {
     "type": "adjective",
-    "pronunciation": "ih-fem-er-uhl",
+    "pronunciation": "ɪˈfɛmərəl",
     "definition": "lasting for a very short time",
     "example": "The beauty of a cherry blossom is ephemeral, as the petals fall within days of blooming.",
     "etymology": "from the Greek word 'ephēmeros' meaning 'lasting only one day'"
   },
   "trepidation": {
     "type": "noun",
-    "pronunciation": "trep-i-dey-shuhn",
+    "pronunciation": "ˌtrɛpɪˈdeɪʃən",
     "definition": "a feeling of fear or agitation about something that may happen",
     "example": "I felt a sense of trepidation as I stepped into the dark and unfamiliar room.",
     "etymology": "from the Latin word 'trepidare' meaning 'to tremble'"
   },
   "apathetic": {
     "type": "adjective",
-    "pronunciation": "ap-uh-thet-ik",
+    "pronunciation": "ˌæpəˈθɛtɪk",
     "definition": "showing or feeling no interest, enthusiasm, or concern",
     "example": "The apathetic student didn't bother to do his homework, despite repeated warnings from his teacher.",
     "etymology": "from the Greek word 'apathēs' meaning 'without feeling'"
   },
   "gloaming": {
     "type": "noun",
-    "pronunciation": "gloh-ming",
+    "pronunciation": "ˈɡloʊmɪŋ",
     "definition": "the time of day immediately following sunset",
     "example": "We enjoyed a picnic in the gloaming.",
     "etymology": "From Middle English \"gloamingen\", from Old English \"glōmung\"."
   },
   "lissome": {
     "type": "adjective",
-    "pronunciation": "li-suhm",
+    "pronunciation": "ˈlɪsəm",
     "definition": "thin, supple, and graceful",
     "example": "She moved with a lissome grace.",
     "etymology": "From Old English \"liþsom\"."
   },
   "mnemonic": {
     "type": "adjective",
-    "pronunciation": "ni-mon-ik",
+    "pronunciation": "nəˈmɒnɪk",
     "definition": "assisting or intended to assist memory",
     "example": "I used a mnemonic to remember the order of the planets.",
     "etymology": "From Greek \"mnēmonikos\" meaning \"relating to memory\"."
   },
   "propinquity": {
     "type": "noun",
-    "pronunciation": "proh-ping-kwuh-tee",
+    "pronunciation": "prəˈpɪŋkwɪti",
     "definition": "nearness in place or time; kinship",
     "example": "The propinquity of the two towns made them natural trading partners.",
     "etymology": "From Latin \"propinquitas\", from \"propinquus\" meaning \"near\"."
   },
   "vociferous": {
     "type": "adjective",
-    "pronunciation": "voh-sif-er-uhs",
+    "pronunciation": "voʊˈsɪfərəs",
     "definition": "marked by or given to vehement insistent outcry",
     "example": "The protesters were vociferous in their demands for change.",
     "etymology": "From Latin \"vociferari\", from \"voc-\" meaning \"voice\" and \"ferre\" meaning \"to bear\"."
   },
   "precarious": {
     "type": "adjective",
-    "pronunciation": "/prɪˈkeərɪəs/",
+    "pronunciation": "ˈprɛkəriəs",
     "definition": "not securely held or in position; dangerously likely to fall or collapse",
     "example": "The ladder felt precarious as I climbed up it.",
     "etymology": "Mid 17th century (in the sense ‘dependent on circumstances or chance’): from Latin precarius ‘obtained by entreaty’ (from prex, prec- ‘prayer’) + -ous."
   },
   "luminous": {
     "type": "adjective",
-    "pronunciation": "/ˈluːmɪnəs/",
+    "pronunciation": "ˈluːmɪnəs",
     "definition": "full of or shedding light; bright or shining, especially in the dark",
     "example": "The moon was luminous in the night sky.",
     "etymology": "Late Middle English: from Old French lumineux or Latin luminosus, from lumen ‘light’."
   },
   "quandary": {
     "type": "noun",
-    "pronunciation": "/ˈkwɒnd(ə)ri/",
+    "pronunciation": "ˈkwɒndəri",
     "definition": "a state of uncertainty over what to do in a difficult situation",
     "example": "I was in a quandary about whether to tell the truth or not.",
     "etymology": "Mid 16th century: of unknown origin."
   },
   "perfidious": {
     "type": "adjective",
-    "pronunciation": "per-FID-ee-uhs",
+    "pronunciation": "pərˈfɪdiəs",
     "definition": "deceitful and untrustworthy",
     "example": "He had a perfidious nature, always looking for ways to deceive those around him.",
     "etymology": "From Latin perfidia, meaning 'treachery' or 'perfidy'."
   },
   "quiescent": {
     "type": "adjective",
-    "pronunciation": "kwee-ES-uhnt",
+    "pronunciation": "kwaɪˈɛsənt",
     "definition": "in a state of inactivity or dormancy",
     "example": "The volcano had been quiescent for many years, but scientists feared it would erupt again soon.",
     "etymology": "From Latin quiescere, meaning 'to rest' or 'to become quiet'."
   },
   "temerity": {
     "type": "noun",
-    "pronunciation": "tuh-MER-i-tee",
+    "pronunciation": "tɪˈmɛrɪti",
     "definition": "excessive boldness or recklessness",
     "example": "She had the temerity to insult her boss in front of the entire company.",
     "etymology": "From Latin temeritas, meaning 'rashness' or 'recklessness'."
   },
   "rancorous": {
     "type": "adjective",
-    "pronunciation": "RAN-ker-uhs",
+    "pronunciation": "ˈræŋkərəs",
     "definition": "characterized by bitterness or resentment",
     "example": "Their rancorous relationship had been strained for years, but they could never seem to resolve their differences.",
     "etymology": "From Middle English rancour, meaning 'hate' or 'malice'."
   },
   "euphemism": {
     "type": "noun",
-    "pronunciation": "YOO-fuh-miz-uhm",
+    "pronunciation": "ˈjuːfəmɪzəm",
     "definition": "a mild or indirect word or expression used in place of one considered to be too harsh or blunt",
     "example": "He used the euphemism 'passed away' instead of 'died' to soften the blow for the grieving family.",
     "etymology": "From Greek euphēmismos, meaning 'the use of good words' or 'a good omen'."
   },
   "abscond": {
     "type": "verb",
-    "pronunciation": "ab-skond",
+    "pronunciation": "əbˈskɒnd",
     "definition": "to depart secretly and hide oneself",
     "example": "He absconded with the money.",
     "etymology": "from Latin 'abscondere', meaning 'to hide'"
   },
   "disingenuous": {
     "type": "adjective",
-    "pronunciation": "dis-in-jen-yoo-us",
+    "pronunciation": "ˌdɪsɪnˈdʒɛnjʊəs",
     "definition": "not candid or sincere",
     "example": "Her disingenuous smile betrayed her true feelings.",
     "etymology": "from Latin 'dis-', meaning 'not' + 'ingenous', meaning 'frank'"
   },
   "incorrigible": {
     "type": "adjective",
-    "pronunciation": "in-kor-i-juh-buhl",
+    "pronunciation": "ɪnˈkɒrɪdʒəbl̩",
     "definition": "not able to be corrected, improved, or reformed",
     "example": "He was an incorrigible liar.",
     "etymology": "from Latin 'in-', meaning 'not' + 'corrigere', meaning 'to correct'"
   },
   "pensive": {
     "type": "adjective",
-    "pronunciation": "pen-siv",
+    "pronunciation": "ˈpɛnsɪv",
     "definition": "deeply or seriously thoughtful",
     "example": "She sat in a pensive mood, reflecting on her life.",
     "etymology": "from Latin 'pensare', meaning 'to consider'"
   },
   "quixotic": {
     "type": "adjective",
-    "pronunciation": "kwik-sot-ik",
+    "pronunciation": "kwɪkˈsɒtɪk",
     "definition": "foolishly impractical, idealistic, or romantic",
     "example": "His quixotic plan to save the world was met with ridicule.",
     "etymology": "from the character Don Quixote, who had unrealistic and chivalrous ideals"
   },
-    "pulchritudinous": {
-      "type": "adjective",
-      "pronunciation": "puhl-kri-tood-n-uhs",
-      "definition": "having great physical beauty and appeal",
-      "example": "The pulchritudinous sunset left everyone in awe.",
-      "etymology": "From Latin pulchritudo (beauty)."
-    },
-    "sesquipedalian": {
-      "type": "adjective",
-      "pronunciation": "ses-kwuh-pi-dey-lee-uhn",
-      "definition": "characterized by long words; long-winded",
-      "example": "His sesquipedalian speech left everyone in confusion.",
-      "etymology": "From Latin sesquipedalis (a foot and a half long)."
-    },
-    "effervescent": {
-      "type": "adjective",
-      "pronunciation": "ef-er-ves-uhnt",
-      "definition": "bubbly and enthusiastic; vivacious",
-      "example": "Her effervescent personality made her popular among her colleagues.",
-      "etymology": "From Latin effervescere (to boil up)."
-    },
-    "fugacious": {
-      "type": "adjective",
-      "pronunciation": "fyoo-gey-shuhs",
-      "definition": "fleeting; transitory",
-      "example": "The fugacious moment passed before he could capture it.",
-      "etymology": "From Latin fugax (fugacious), from fugere (to flee)."
-    },
-    "penultimate": {
-      "type": "adjective",
-      "pronunciation": "pi-nuhl-tuh-mit",
-      "definition": "second to last; immediately preceding the final",
-      "example": "The penultimate chapter of the book revealed the shocking twist.",
-      "etymology": "From Latin paene ultimus (almost last)."
-    }, 
-      "sanguine": {
-        "type": "adjective",
-        "pronunciation": "sang-gwin",
-        "definition": "optimistic, especially in a difficult situation",
-        "example": "Despite the challenges, she remained sanguine and confident in her abilities.",
-        "etymology": "Middle English (in the sense ‘blood-red’): from Old French sanguin, from Latin sanguineus, from sanguis ‘blood’."
-      },
-      "ambivalent": {
-        "type": "adjective",
-        "pronunciation": "am-biv-uh-luhnt",
-        "definition": "having mixed feelings or contradictory ideas about something or someone",
-        "example": "He was ambivalent about the new job offer as it meant relocating to a new city.",
-        "etymology": "From Latin ambi- (both) + valentia (strength)."
-      },
-      "delineate": {
-        "type": "verb",
-        "pronunciation": "dih-lin-ee-eyt",
-        "definition": "to describe or portray something precisely",
-        "example": "The artist's sketch delineated the contours of the landscape beautifully.",
-        "etymology": "From Latin delineatus (outlined), from de- (completely) + linea (line)."
-      },
-      "facetious": {
-        "type": "adjective",
-        "pronunciation": "fuh-see-shuhs",
-        "definition": "treating serious issues with inappropriate humor; not meant to be taken seriously",
-        "example": "He made a facetious remark about the company's financial troubles, which didn't sit well with his colleagues.",
-        "etymology": "From Latin facetia (jest, witticism)."
-      },
-      "magnanimous": {
-        "type": "adjective",
-        "pronunciation": "mag-nan-uh-muhs",
-        "definition": "generous and forgiving, especially towards a rival or less powerful person",
-        "example": "He was magnanimous in victory, congratulating his opponent and offering a handshake.",
-        "etymology": "From Latin magnus (great) + animus (mind, spirit)."
-      },
-      "ubiquitous": {
-        "type": "adjective",
-        "pronunciation": "yoo-bik-wi-tuhs",
-        "definition": "present, appearing, or found everywhere",
-        "example": "Cell phones have become ubiquitous in today's society.",
-        "etymology": "From Latin ubique (everywhere)."
-      },
-        "ebullient": {
-          "type": "adjective",
-          "pronunciation": "ih-buhl-yuhnt",
-          "definition": "cheerful and full of energy",
-          "example": "Her ebullient personality made her popular among her peers.",
-          "etymology": "Late 16th century: from Latin ebullient- ‘boiling up’, from the verb ebullire, from e- (variant of ex-) ‘out, forth’ + bullire ‘to boil’."
-        },
-        "impecunious": {
-          "type": "adjective",
-          "pronunciation": "im-pi-kyoo-nee-uhs",
-          "definition": "having little or no money",
-          "example": "As a struggling artist, she was impecunious for years.",
-          "etymology": "Early 17th century: from in- ‘not’ + obsolete pecunious ‘having money’, from Latin pecuniosus, from pecunia ‘money’."
-        },
-        "languid": {
-          "type": "adjective",
-          "pronunciation": "lang-gwid",
-          "definition": "displaying or having a disinclination for physical exertion or effort; slow and relaxed",
-          "example": "After a big meal, he felt languid and didn't want to do anything.",
-          "etymology": "Late 16th century: from French languide or Latin languidus, from languere ‘be weak or faint’."
-        },
-        "unctuous": {
-          "type": "adjective",
-          "pronunciation": "uhngk-choo-uhs",
-          "definition": "excessively or ingratiatingly flattering; oily",
-          "example": "His unctuous tone made it clear that he was trying to win favor with his boss.",
-          "etymology": "Early 17th century: from medieval Latin unctuosus, from Latin unctus ‘anointing’, from ungere ‘anoint’."
-        },
-        "insipid": {
-            "type": "adjective",
-            "pronunciation": "in-sip-id",
-            "definition": "lacking flavor, vigor, or interest",
-            "example": "The soup was insipid and bland.",
-            "etymology": "Early 17th century: from French insipide or late Latin inspidus, from in- ‘not’ + sapidus ‘savory’."
-          },
-          "prattle": {
-            "type": "verb",
-            "pronunciation": "prat-l",
-            "definition": "to talk at length in a foolish or inconsequential way",
-            "example": "She prattled on about her day at work.",
-            "etymology": "Middle English (in the sense ‘chatter, babble’): from prate + -le."
-          },
-          "quintessence": {
-            "type": "noun",
-            "pronunciation": "kwin-tes-uhns",
-            "definition": "the most perfect or typical example of a quality or class",
-            "example": "The movie was the quintessence of romantic comedy.",
-            "etymology": "Late Middle English: from medieval Latin quintessentia ‘fifth essence,’ representing the medieval concept of a pure, highly refined substance believed to be the essence of matter, from quinta essentia ‘fifth essence.’"
-          },
-          "perfidy": {
-            "type": "noun",
-            "pronunciation": "pur-fuh-dee",
-            "definition": "the quality of being deceitful and untrustworthy; unfaithfulness or treachery",
-            "example": "His perfidy towards his allies was shocking.",
-            "etymology": "Late Middle English: from Latin perfidia, from perfidus ‘treacherous’, from per- ‘away, completely’ + fides ‘faith’."
-          },
-          "inveigle": {
-            "type": "verb",
-            "pronunciation": "in-vey-guhl",
-            "definition": "to persuade (someone) to do something by means of deception or flattery",
-            "example": "He tried to inveigle me into signing the contract.",
-            "etymology": "Mid 16th century: from French aveugler ‘to blind, deceive’, from aveugle ‘blind’, from Latin ab oculis ‘lacking eyes’."
-          },
-          "capricious": {
-            "type": "adjective",
-            "pronunciation": "kuh-pri-shuhs",
-            "definition": "given to sudden and unaccountable changes of mood or behavior; unpredictable",
-            "example": "The boss was known for his capricious decisions.",
-            "etymology": "Late 16th century: from French capricieux, from Italian capriccioso, from capriccio ‘whim’."
-          },
-          "furtive": {
-            "type": "adjective",
-            "pronunciation": "fur-tiv",
-            "definition": "attempting to avoid notice or attention, typically because of guilt or a belief that discovery would lead to trouble; secretive",
-            "example": "He cast a furtive glance at his watch.",
-            "etymology": "Mid 17th century: from French furtif, -ive or Latin furtivus, from furtum ‘theft’."
-          },
-          "loquacious": {
-            "type": "adjective",
-            "pronunciation": "loh-kwey-shuhs",
-            "definition": "tending to talk a great deal; talkative",
-            "example": "The loquacious woman would not stop talking.",
-            "etymology": "Mid 17th century: from Latin loquax, loquac- (from loqui ‘to speak’) + -ious."
-          },
-          "paragon": {
-            "type": "noun",
-            "pronunciation": "par-uh-gon",
-            "definition": "a person or thing regarded as a perfect example of a particular quality",
-            "example": "He is a paragon of virtue.",
-            "etymology": "Late 16th century: from obsolete Italian paragone ‘touchstone used to test gold’ (from medieval Latin peraconem, of unknown origin) used figuratively to mean ‘test of excellence’, hence ‘an excellent person or thing’."
-          },
-          "zeitgeist": {
-            "type": "noun",
-            "pronunciation": "tsahyt-gahyst",
-            "definition": "the defining spirit or mood of a particular period of history as shown by the ideas and beliefs of the time",
-            "example": "The zeitgeist of the 1960s was one of social upheaval and political activism.",
-            "etymology": "Mid 19th century: from German Zeitgeist, from Zeit ‘time’ + Geist ‘spirit’."
-          },
-          "bellicose": {
-            "type": "adjective",
-            "pronunciation": "bel-uh-kohs",
-            "definition": "demonstrating aggression and willingness to fight",
-            "example": "The bellicose behavior of the two rivals nearly led to a physical altercation.",
-            "etymology": "Mid 16th century: from Latin bellicosus, from bellum ‘war’."
-          },
-          "compendious": {
-            "type": "adjective",
-            "pronunciation": "kuhm-pen-dee-uhs",
-            "definition": "containing or presenting the essential facts of something in a comprehensive but concise way",
-            "example": "The compendious summary of the book allowed the students to understand its main points quickly.",
-            "etymology": "Late Middle English: from Latin compendiosus, from compendium ‘saving, abbreviation’."
-          },
-          "dogmatic": {
-            "type": "adjective",
-            "pronunciation": "dawg-mat-ik",
-            "definition": "inclined to lay down principles as incontrovertibly true",
-            "example": "The dogmatic professor refused to consider any viewpoints that differed from his own.",
-            "etymology": "Mid 17th century: from French dogmatique or Latin dogmaticus, from Greek dogmatikos, from dogma ‘opinion’."
-          },
-          "enigmatic": {
-            "type": "adjective",
-            "pronunciation": "en-ig-mat-ik",
-            "definition": "difficult to interpret or understand; mysterious",
-            "example": "The enigmatic smile of the Mona Lisa has puzzled art historians for centuries.",
-            "etymology": "Late 16th century: from Greek ainigmatikos, from ainigma ‘riddle’."
-          },
-          "incandescent": {
-            "type": "adjective",
-            "pronunciation": "in-kuhn-des-uhnt",
-            "definition": "emitting light as a result of being heated; passionate or brilliant",
-            "example": "The incandescent glow of the fireplace made the room feel cozy and warm.",
-            "etymology": "Mid 18th century: from Latin incandescent-, from the verb incandescere, from in- ‘into’ + candescere ‘become white’."
-          },
-          "jocose": {
-            "type": "adjective",
-            "pronunciation": "joh-kohs",
-            "definition": "fond of or characterized by joking; humorous or playful",
-            "example": "The jocose banter between the two friends lightened the mood during the tense situation.",
-            "etymology": "Early 17th century: from Latin jocosus, from jocus ‘joke’."
-          },
-          "lugubrious": {
-            "type": "adjective",
-            "pronunciation": "loo-goo-bree-uhs",
-            "definition": "looking or sounding sad and dismal",
-            "example": "The lugubrious music in the movie added to the melancholic atmosphere of the scene.",
-            "etymology": "Late Middle English: from Latin lugubris, from lugere ‘mourn’."
-          }
-        }
+  "pulchritudinous": {
+    "type": "adjective",
+    "pronunciation": "ˌpʌlkrɪˈtjuːdənəs",
+    "definition": "having great physical beauty and appeal",
+    "example": "The pulchritudinous sunset left everyone in awe.",
+    "etymology": "From Latin pulchritudo (beauty)."
+  },
+  "sesquipedalian": {
+    "type": "adjective",
+    "pronunciation": "ˌsɛskwɪpɪˈdeɪliən",
+    "definition": "characterized by long words; long-winded",
+    "example": "His sesquipedalian speech left everyone in confusion.",
+    "etymology": "From Latin sesquipedalis (a foot and a half long)."
+  },
+  "effervescent": {
+    "type": "adjective",
+    "pronunciation": "ˌɛfərˈvɛsənt",
+    "definition": "bubbly and enthusiastic; vivacious",
+    "example": "Her effervescent personality made her popular among her colleagues.",
+    "etymology": "From Latin effervescere (to boil up)."
+  },
+  "fugacious": {
+    "type": "adjective",
+    "pronunciation": "fjuˈɡeɪʃəs",
+    "definition": "fleeting; transitory",
+    "example": "The fugacious moment passed before he could capture it.",
+    "etymology": "From Latin fugax (fugacious), from fugere (to flee)."
+  },
+  "penultimate": {
+    "type": "adjective",
+    "pronunciation": "pɪˈnʌltɪmɪt",
+    "definition": "second to last; immediately preceding the final",
+    "example": "The penultimate chapter of the book revealed the shocking twist.",
+    "etymology": "From Latin paene ultimus (almost last)."
+  },
+  "sanguine": {
+    "type": "adjective",
+    "pronunciation": "ˈsæŋɡwɪn",
+    "definition": "optimistic, especially in a difficult situation",
+    "example": "Despite the challenges, she remained sanguine and confident in her abilities.",
+    "etymology": "Middle English (in the sense ‘blood-red’): from Old French sanguin, from Latin sanguineus, from sanguis ‘blood’."
+  },
+  "ambivalent": {
+    "type": "adjective",
+    "pronunciation": "æmˈbɪvələnt",
+    "definition": "having mixed feelings or contradictory ideas about something or someone",
+    "example": "He was ambivalent about the new job offer as it meant relocating to a new city.",
+    "etymology": "From Latin ambi- (both) + valentia (strength)."
+  },
+  "delineate": {
+    "type": "verb",
+    "pronunciation": "dɪˈlɪniːeɪt",
+    "definition": "to describe or portray something precisely",
+    "example": "The artist's sketch delineated the contours of the landscape beautifully.",
+    "etymology": "From Latin delineatus (outlined), from de- (completely) + linea (line)."
+  },
+  "facetious": {
+    "type": "adjective",
+    "pronunciation": "fəˈsiːʃəs",
+    "definition": "treating serious issues with inappropriate humor; not meant to be taken seriously",
+    "example": "He made a facetious remark about the company's financial troubles, which didn't sit well with his colleagues.",
+    "etymology": "From Latin facetia (jest, witticism)."
+  },
+  "magnanimous": {
+    "type": "adjective",
+    "pronunciation": "mæɡˈnænɪməs",
+    "definition": "generous and forgiving, especially towards a rival or less powerful person",
+    "example": "He was magnanimous in victory, congratulating his opponent and offering a handshake.",
+    "etymology": "From Latin magnus (great) + animus (mind, spirit)."
+  },
+  "ubiquitous": {
+    "type": "adjective",
+    "pronunciation": "juːˈbɪkwɪtəs",
+    "definition": "present, appearing, or found everywhere",
+    "example": "Cell phones have become ubiquitous in today's society.",
+    "etymology": "From Latin ubique (everywhere)."
+  },
+  "ebullient": {
+    "type": "adjective",
+    "pronunciation": "ɪˈbʌliənt",
+    "definition": "cheerful and full of energy",
+    "example": "Her ebullient personality made her popular among her peers.",
+    "etymology": "Late 16th century: from Latin ebullient- ‘boiling up’, from the verb ebullire, from e- (variant of ex-) ‘out, forth’ + bullire ‘to boil’."
+  },
+  "impecunious": {
+    "type": "adjective",
+    "pronunciation": "ˌɪmpɪˈkjuːniəs",
+    "definition": "having little or no money",
+    "example": "As a struggling artist, she was impecunious for years.",
+    "etymology": "Early 17th century: from in- ‘not’ + obsolete pecunious ‘having money’, from Latin pecuniosus, from pecunia ‘money’."
+  },
+  "languid": {
+    "type": "adjective",
+    "pronunciation": "ˈlæŋɡwɪd",
+    "definition": "displaying or having a disinclination for physical exertion or effort; slow and relaxed",
+    "example": "After a big meal, he felt languid and didn't want to do anything.",
+    "etymology": "Late 16th century: from French languide or Latin languidus, from languere ‘be weak or faint’."
+  },
+  "unctuous": {
+    "type": "adjective",
+    "pronunciation": "ˈʌŋktʃʊəs",
+    "definition": "excessively or ingratiatingly flattering; oily",
+    "example": "His unctuous tone made it clear that he was trying to win favor with his boss.",
+    "etymology": "Early 17th century: from medieval Latin unctuosus, from Latin unctus ‘anointing’, from ungere ‘anoint’."
+  },
+  "insipid": {
+    "type": "adjective",
+    "pronunciation": "ɪnˈsɪpɪd",
+    "definition": "lacking flavor, vigor, or interest",
+    "example": "The soup was insipid and bland.",
+    "etymology": "Early 17th century: from French insipide or late Latin inspidus, from in- ‘not’ + sapidus ‘savory’."
+  },
+  "prattle": {
+    "type": "verb",
+    "pronunciation": "ˈprætl̩",
+    "definition": "to talk at length in a foolish or inconsequential way",
+    "example": "She prattled on about her day at work.",
+    "etymology": "Middle English (in the sense ‘chatter, babble’): from prate + -le."
+  },
+  "quintessence": {
+    "type": "noun",
+    "pronunciation": "ˌkwɪntəˈsɛns",
+    "definition": "the most perfect or typical example of a quality or class",
+    "example": "The movie was the quintessence of romantic comedy.",
+    "etymology": "Late Middle English: from medieval Latin quintessentia ‘fifth essence,’ representing the medieval concept of a pure, highly refined substance believed to be the essence of matter, from quinta essentia ‘fifth essence.’"
+  },
+  "perfidy": {
+    "type": "noun",
+    "pronunciation": "ˈpɜːrfɪdi",
+    "definition": "the quality of being deceitful and untrustworthy; unfaithfulness or treachery",
+    "example": "His perfidy towards his allies was shocking.",
+    "etymology": "Late Middle English: from Latin perfidia, from perfidus ‘treacherous’, from per- ‘away, completely’ + fides ‘faith’."
+  },
+  "inveigle": {
+    "type": "verb",
+    "pronunciation": "ɪnˈveɪɡəl",
+    "definition": "to persuade (someone) to do something by means of deception or flattery",
+    "example": "He tried to inveigle me into signing the contract.",
+    "etymology": "Mid 16th century: from French aveugler ‘to blind, deceive’, from aveugle ‘blind’, from Latin ab oculis ‘lacking eyes’."
+  },
+  "capricious": {
+    "type": "adjective",
+    "pronunciation": "kəˈprɪʃəs",
+    "definition": "given to sudden and unaccountable changes of mood or behavior; unpredictable",
+    "example": "The boss was known for his capricious decisions.",
+    "etymology": "Late 16th century: from French capricieux, from Italian capriccioso, from capriccio ‘whim’."
+  },
+  "furtive": {
+    "type": "adjective",
+    "pronunciation": "ˈfɜːrtɪv",
+    "definition": "attempting to avoid notice or attention, typically because of guilt or a belief that discovery would lead to trouble; secretive",
+    "example": "He cast a furtive glance at his watch.",
+    "etymology": "Mid 17th century: from French furtif, -ive or Latin furtivus, from furtum ‘theft’."
+  },
+  "loquacious": {
+    "type": "adjective",
+    "pronunciation": "ləˈkweɪʃəs",
+    "definition": "tending to talk a great deal; talkative",
+    "example": "The loquacious woman would not stop talking.",
+    "etymology": "Mid 17th century: from Latin loquax, loquac- (from loqui ‘to speak’) + -ious."
+  },
+  "paragon": {
+    "type": "noun",
+    "pronunciation": "ˈpærəɡɒn",
+    "definition": "a person or thing regarded as a perfect example of a particular quality",
+    "example": "He is a paragon of virtue.",
+    "etymology": "Late 16th century: from obsolete Italian paragone ‘touchstone used to test gold’ (from medieval Latin peraconem, of unknown origin) used figuratively to mean ‘test of excellence’, hence ‘an excellent person or thing’."
+  },
+  "zeitgeist": {
+    "type": "noun",
+    "pronunciation": "ˈzaɪtɡaɪst",
+    "definition": "the defining spirit or mood of a particular period of history as shown by the ideas and beliefs of the time",
+    "example": "The zeitgeist of the 1960s was one of social upheaval and political activism.",
+    "etymology": "Mid 19th century: from German Zeitgeist, from Zeit ‘time’ + Geist ‘spirit’."
+  },
+  "bellicose": {
+    "type": "adjective",
+    "pronunciation": "ˈbɛlɪkoʊs",
+    "definition": "demonstrating aggression and willingness to fight",
+    "example": "The bellicose behavior of the two rivals nearly led to a physical altercation.",
+    "etymology": "Mid 16th century: from Latin bellicosus, from bellum ‘war’."
+  },
+  "compendious": {
+    "type": "adjective",
+    "pronunciation": "kəmˈpɛndiəs",
+    "definition": "containing or presenting the essential facts of something in a comprehensive but concise way",
+    "example": "The compendious summary of the book allowed the students to understand its main points quickly.",
+    "etymology": "Late Middle English: from Latin compendiosus, from compendium ‘saving, abbreviation’."
+  },
+  "dogmatic": {
+    "type": "adjective",
+    "pronunciation": "dɒɡˈmætɪk",
+    "definition": "inclined to lay down principles as incontrovertibly true",
+    "example": "The dogmatic professor refused to consider any viewpoints that differed from his own.",
+    "etymology": "Mid 17th century: from French dogmatique or Latin dogmaticus, from Greek dogmatikos, from dogma ‘opinion’."
+  },
+  "enigmatic": {
+    "type": "adjective",
+    "pronunciation": "ˌɛnɪɡˈmætɪk",
+    "definition": "difficult to interpret or understand; mysterious",
+    "example": "The enigmatic smile of the Mona Lisa has puzzled art historians for centuries.",
+    "etymology": "Late 16th century: from Greek ainigmatikos, from ainigma ‘riddle’."
+  },
+  "incandescent": {
+    "type": "adjective",
+    "pronunciation": "ˌɪnkænˈdɛsənt",
+    "definition": "emitting light as a result of being heated; passionate or brilliant",
+    "example": "The incandescent glow of the fireplace made the room feel cozy and warm.",
+    "etymology": "Mid 18th century: from Latin incandescent-, from the verb incandescere, from in- ‘into’ + candescere ‘become white’."
+  },
+  "jocose": {
+    "type": "adjective",
+    "pronunciation": "dʒəʊˈkoʊs",
+    "definition": "fond of or characterized by joking; humorous or playful",
+    "example": "The jocose banter between the two friends lightened the mood during the tense situation.",
+    "etymology": "Early 17th century: from Latin jocosus, from jocus ‘joke’."
+  },
+  "lugubrious": {
+    "type": "adjective",
+    "pronunciation": "luːˈɡjuːbriəs",
+    "definition": "looking or sounding sad and dismal",
+    "example": "The lugubrious music in the movie added to the melancholic atmosphere of the scene.",
+    "etymology": "Late Middle English: from Latin lugubris, from lugere ‘mourn’."
+  },
+  "effulgent": {
+    "type": "adjective",
+    "pronunciation": "(ɪˈfʌl.dʒənt)",
+    "definition": "radiant; shining brilliantly",
+    "example": "The sunset cast an effulgent glow over the horizon.",
+    "etymology": "From Latin effulgēns, present participle of effulgēre, meaning 'to shine forth'."
+  },
+  "pulchritude": {
+    "type": "noun",
+    "pronunciation": "(ˈpʌl.krə.tud)",
+    "definition": "physical beauty, especially that which is striking or breathtaking",
+    "example": "She possessed both intelligence and pulchritude.",
+    "etymology": "From Latin pulchritudo, meaning 'beauty'."
+  },
+  "mellifluous": {
+    "type": "adjective",
+    "pronunciation": "(məˈlɪf.lu.əs)",
+    "definition": "having a smooth, flowing, and sweet-sounding quality",
+    "example": "Her mellifluous voice captivated the audience.",
+    "etymology": "From Latin mellifluus, from mel, mellis 'honey' + fluere 'to flow'."
+  },
+  "serendipity": {
+    "type": "noun",
+    "pronunciation": "(ˌsɛr.ənˈdɪp.ɪ.ti)",
+    "definition": "the occurrence of fortunate events by chance or accident",
+    "example": "They met through serendipity while traveling in a foreign country.",
+    "etymology": "Coined by Horace Walpole in reference to the fairy tale 'The Three Princes of Serendip'."
+  },
+  "nefarious": {
+    "type": "adjective",
+    "pronunciation": "(nɪˈfɛə.ri.əs)",
+    "definition": "wicked, evil, or villainous in nature",
+    "example": "The villain devised a nefarious plan to take over the city.",
+    "etymology": "From Latin nefarius, from nefas 'crime, sin'."
+  },
+  "insidious": {
+    "type": "adjective",
+    "pronunciation": "(ɪnˈsɪd.i.əs)",
+    "definition": "proceeding in a gradual, subtle way, but with harmful effects",
+    "example": "The insidious nature of the disease made it difficult to detect in its early stages.",
+    "etymology": "From Latin insidiosus, from insidiae 'ambush, plot'."
+  },
+  "resplendent": {
+    "type": "adjective",
+    "pronunciation": "(rɪˈsplɛn.dənt)",
+    "definition": "shining brilliantly; characterized by a glowing splendor",
+    "example": "The bride looked resplendent in her sparkling wedding gown.",
+    "etymology": "From Latin resplendēre, meaning 'to shine brightly'."
+  },
+  "veracity": {
+    "type": "noun",
+    "pronunciation": "(vəˈræs.ɪ.ti)",
+    "definition": "habitual observance of truthfulness; accuracy",
+    "example": "The witness's veracity was questioned during the cross-examination.",
+    "etymology": "From Latin vērācitās, from vērax 'true'."
+  },
+  "ennui": {
+    "type": "noun",
+    "pronunciation": "(ɑ̃nˈwi)",
+    "definition": "a feeling of weariness and dissatisfaction due to lack of interest or boredom",
+    "example": "She was overcome with ennui after spending hours doing the same monotonous task.",
+    "etymology": "From French ennui, meaning 'boredom' or 'annoyance'."
+  },
+  "vicarious": {
+    "type": "adjective",
+    "pronunciation": "(vɪˈkɛə.ri.əs)",
+    "definition": "experienced or felt by imagined participation in the experience of another person",
+    "example": "She lived vicariously through her daughter's achievements, feeling a sense of pride and accomplishment.",
+    "etymology": "From Latin vicarius, meaning 'substitute' or 'deputy'."
+  },
+  "ineffable": {
+    "type": "adjective",
+    "pronunciation": "(ɪnˈɛf.ə.bəl)",
+    "definition": "too great or extreme to be expressed or described in words; beyond words",
+    "example": "The beauty of the sunset was ineffable, leaving the spectators speechless.",
+    "etymology": "From Latin ineffabilis, from in- 'not' + effabilis 'able to be spoken'."
+  },
+  "resilient": {
+    "type": "adjective",
+    "pronunciation": "(rɪˈzɪl.yənt)",
+    "definition": "able to withstand or recover quickly from difficult conditions; flexible; durable",
+    "example": "Despite facing numerous challenges, she remained resilient and never gave up.",
+    "etymology": "From Latin resilire, meaning 'to rebound' or 'to recoil'."
+  },
+  "resonate": {
+    "type": "verb",
+    "pronunciation": "(ˈrɛz.ə.neɪt)",
+    "definition": "Evoke a feeling of shared emotion or understanding; have a lasting impact",
+    "example": "The powerful speech by the activist resonated with people around the world.",
+    "etymology": "Derived from the Latin word 'resonare,' meaning 'to sound again.'"
+  },
+  "eclectic": {
+    "type": "adjective",
+    "pronunciation": "(ɪˈklɛk.tɪk)",
+    "definition": "Selecting or employing a variety of styles, ideas, or sources",
+    "example": "Her artwork showcased an eclectic mix of different artistic influences.",
+    "etymology": "Derived from the Greek word 'eklektikos,' meaning 'selective.'"
+  },
+  "serene": {
+    "type": "adjective",
+    "pronunciation": "(səˈrin)",
+    "definition": "Calm, peaceful, and untroubled",
+    "example": "Sitting by the tranquil lake, she felt a sense of serene relaxation.",
+    "etymology": "Derived from the Latin word 'serenus,' meaning 'clear' or 'calm.'"
+  }
+}
