@@ -1,41 +1,41 @@
 {"Standings": [
     {
-    "After":	"After Austria"
+    "After":	"After UK"
     },
     {
     "Place":	"1",
     "Name":	"Verstappen",
     "Team":	"-",
-    "Points":	"229"
+    "Points":	"255"
     },
     {
     "Place":	"2",
     "Name":	"Pérez",
     "Team":	"-",
-    "Points":	"148"
+    "Points":	"156"
     },
     {
     "Place":	"3",
     "Name":	"Alonso",
     "Team":	"-",
-    "Points":	"131"
+    "Points":	"137"
     },
     {
     "Place":	"4",
     "Name":	"Hamilton",
     "Team":	"-",
-    "Points":	"106"
+    "Points":	"121"
     },
     {
     "Place":	"5",
     "Name":	"Sainz",
     "Team":	"-",
-    "Points":	"82"
+    "Points":	"83"
     },
     {
     "Place":	"6",
-    "Name":	"Leclerc",
+    "Name":	"Russell",
     "Team":	"-",
-    "Points":	"72"
+    "Points":	"82"
     }
     ]}
