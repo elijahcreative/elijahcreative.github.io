@@ -177,7 +177,8 @@
             "Best lap": "1:16.627",
             "Best lap driver": "Hamilton, 2020",
             "First GP": "1986",
-            "Track image": "https://elijahcreative.github.io/F1/Images/TR-Hungary.png"
+            "Track image": "https://elijahcreative.github.io/F1/Images/TR-Hungary.png",
+            "Track2": "https://elijahcreative.github.io/F1/Images/TR-Hungary.png"
         },
         {
             "Country": "🇧🇪 Belgium",
@@ -191,7 +192,8 @@
             "Best lap": "1:46.286",
             "Best lap driver": "Bottas, 2018",
             "First GP": "1950",
-            "Track image": "https://elijahcreative.github.io/F1/Images/TR-Spa.png"
+            "Track image": "https://elijahcreative.github.io/F1/Images/TR-Spa.png",
+            "Track2": "https://elijahcreative.github.io/F1/Images/TR-Spa.png"
         },
         {
             "Country": "🇳🇱 Netherlands",
@@ -205,7 +207,8 @@
             "Best lap": "1:11.097",
             "Best lap driver": "Hamilton, 2021",
             "First GP": "1952",
-            "Track image": "https://elijahcreative.github.io/F1/Images/TR-Netherlands.png"
+            "Track image": "https://elijahcreative.github.io/F1/Images/TR-Netherlands.png",
+            "Track2": "https://elijahcreative.github.io/F1/Images/TR-Netherlands.png"
         },
         {
             "Country": "🇮🇹 Italy",
@@ -219,7 +222,8 @@
             "Best lap": "1:21.046",
             "Best lap driver": "Barrichello, 2004",
             "First GP": "1950",
-            "Track image": "https://elijahcreative.github.io/F1/Images/TR-Monza2.png"
+            "Track image": "https://elijahcreative.github.io/F1/Images/TR-Monza2.png",
+            "Track2": "https://elijahcreative.github.io/F1/Images/TR-Monza2.png"
         },
         {
             "Country": "🇸🇬 Singapore",
