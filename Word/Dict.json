@@ -729,107 +729,256 @@
   },
   "effulgent": {
     "type": "adjective",
-    "pronunciation": "(ɪˈfʌl.dʒənt)",
+    "pronunciation": "ɪˈfʌl.dʒənt",
     "definition": "radiant; shining brilliantly",
     "example": "The sunset cast an effulgent glow over the horizon.",
     "etymology": "From Latin effulgēns, present participle of effulgēre, meaning 'to shine forth'."
   },
   "pulchritude": {
     "type": "noun",
-    "pronunciation": "(ˈpʌl.krə.tud)",
+    "pronunciation": "ˈpʌl.krə.tud",
     "definition": "physical beauty, especially that which is striking or breathtaking",
     "example": "She possessed both intelligence and pulchritude.",
     "etymology": "From Latin pulchritudo, meaning 'beauty'."
   },
   "mellifluous": {
     "type": "adjective",
-    "pronunciation": "(məˈlɪf.lu.əs)",
+    "pronunciation": "məˈlɪf.lu.əs",
     "definition": "having a smooth, flowing, and sweet-sounding quality",
     "example": "Her mellifluous voice captivated the audience.",
     "etymology": "From Latin mellifluus, from mel, mellis 'honey' + fluere 'to flow'."
   },
   "serendipity": {
     "type": "noun",
-    "pronunciation": "(ˌsɛr.ənˈdɪp.ɪ.ti)",
+    "pronunciation": "ˌsɛr.ənˈdɪp.ɪ.ti",
     "definition": "the occurrence of fortunate events by chance or accident",
     "example": "They met through serendipity while traveling in a foreign country.",
     "etymology": "Coined by Horace Walpole in reference to the fairy tale 'The Three Princes of Serendip'."
   },
   "nefarious": {
     "type": "adjective",
-    "pronunciation": "(nɪˈfɛə.ri.əs)",
+    "pronunciation": "nɪˈfɛə.ri.əs",
     "definition": "wicked, evil, or villainous in nature",
     "example": "The villain devised a nefarious plan to take over the city.",
     "etymology": "From Latin nefarius, from nefas 'crime, sin'."
   },
   "insidious": {
     "type": "adjective",
-    "pronunciation": "(ɪnˈsɪd.i.əs)",
+    "pronunciation": "ɪnˈsɪd.i.əs",
     "definition": "proceeding in a gradual, subtle way, but with harmful effects",
     "example": "The insidious nature of the disease made it difficult to detect in its early stages.",
     "etymology": "From Latin insidiosus, from insidiae 'ambush, plot'."
   },
   "resplendent": {
     "type": "adjective",
-    "pronunciation": "(rɪˈsplɛn.dənt)",
+    "pronunciation": "rɪˈsplɛn.dənt",
     "definition": "shining brilliantly; characterized by a glowing splendor",
     "example": "The bride looked resplendent in her sparkling wedding gown.",
     "etymology": "From Latin resplendēre, meaning 'to shine brightly'."
   },
   "veracity": {
     "type": "noun",
-    "pronunciation": "(vəˈræs.ɪ.ti)",
+    "pronunciation": "vəˈræs.ɪ.ti",
     "definition": "habitual observance of truthfulness; accuracy",
     "example": "The witness's veracity was questioned during the cross-examination.",
     "etymology": "From Latin vērācitās, from vērax 'true'."
   },
   "ennui": {
     "type": "noun",
-    "pronunciation": "(ɑ̃nˈwi)",
+    "pronunciation": "ɑ̃nˈwi",
     "definition": "a feeling of weariness and dissatisfaction due to lack of interest or boredom",
     "example": "She was overcome with ennui after spending hours doing the same monotonous task.",
     "etymology": "From French ennui, meaning 'boredom' or 'annoyance'."
   },
   "vicarious": {
     "type": "adjective",
-    "pronunciation": "(vɪˈkɛə.ri.əs)",
+    "pronunciation": "vɪˈkɛə.ri.əs",
     "definition": "experienced or felt by imagined participation in the experience of another person",
     "example": "She lived vicariously through her daughter's achievements, feeling a sense of pride and accomplishment.",
     "etymology": "From Latin vicarius, meaning 'substitute' or 'deputy'."
   },
   "ineffable": {
     "type": "adjective",
-    "pronunciation": "(ɪnˈɛf.ə.bəl)",
+    "pronunciation": "ɪnˈɛf.ə.bəl",
     "definition": "too great or extreme to be expressed or described in words; beyond words",
     "example": "The beauty of the sunset was ineffable, leaving the spectators speechless.",
     "etymology": "From Latin ineffabilis, from in- 'not' + effabilis 'able to be spoken'."
   },
   "resilient": {
     "type": "adjective",
-    "pronunciation": "(rɪˈzɪl.yənt)",
+    "pronunciation": "rɪˈzɪl.yənt",
     "definition": "able to withstand or recover quickly from difficult conditions; flexible; durable",
     "example": "Despite facing numerous challenges, she remained resilient and never gave up.",
     "etymology": "From Latin resilire, meaning 'to rebound' or 'to recoil'."
   },
   "resonate": {
     "type": "verb",
-    "pronunciation": "(ˈrɛz.ə.neɪt)",
+    "pronunciation": "ˈrɛz.ə.neɪt",
     "definition": "Evoke a feeling of shared emotion or understanding; have a lasting impact",
     "example": "The powerful speech by the activist resonated with people around the world.",
     "etymology": "Derived from the Latin word 'resonare,' meaning 'to sound again.'"
   },
   "eclectic": {
     "type": "adjective",
-    "pronunciation": "(ɪˈklɛk.tɪk)",
+    "pronunciation": "ɪˈklɛk.tɪk",
     "definition": "Selecting or employing a variety of styles, ideas, or sources",
     "example": "Her artwork showcased an eclectic mix of different artistic influences.",
     "etymology": "Derived from the Greek word 'eklektikos,' meaning 'selective.'"
   },
   "serene": {
     "type": "adjective",
-    "pronunciation": "(səˈrin)",
+    "pronunciation": "səˈrin",
     "definition": "Calm, peaceful, and untroubled",
     "example": "Sitting by the tranquil lake, she felt a sense of serene relaxation.",
     "etymology": "Derived from the Latin word 'serenus,' meaning 'clear' or 'calm.'"
+  },
+  "rhapsody": {
+    "type": "noun",
+    "pronunciation": "ˈræpsədi",
+    "definition": "an ecstatic expression of feeling or enthusiasm",
+    "example": "The musician's performance was a rhapsody of emotion and skill."
+  },
+  "intrinsic": {
+    "type": "adjective",
+    "pronunciation": "ɪnˈtrɪnzɪk",
+    "definition": "belonging naturally; essential",
+    "example": "Her intrinsic talent for painting shines through in every brushstroke."
+  },
+  "exemplary": {
+    "type": "adjective",
+    "pronunciation": "ɪɡˈzɛmpləri",
+    "definition": "serving as a desirable model; commendable",
+    "example": "He set an exemplary standard of professionalism for his colleagues to follow."
+  },
+  "placid": {
+    "type": "adjective",
+    "pronunciation": "ˈplæsɪd",
+    "definition": "calm and peaceful",
+    "example": "The lake was placid, reflecting the tranquility of the surrounding mountains."
+  },
+  "eloquent": {
+    "type": "adjective",
+    "pronunciation": "ˈɛləkwənt",
+    "definition": "fluent or persuasive in speaking or writing",
+    "example": "Her eloquent speech moved the audience to tears."
+  },
+  "abhor": {
+    "type": "verb",
+    "pronunciation": "əbˈhɔːr",
+    "definition": "regard with disgust and hatred",
+    "example": "She abhors violence in any form.",
+    "etymology": "Late Middle English: from Latin abhorrere, from ab- ‘away from’ + horrere ‘shudder’."
+  },
+  "complacent": {
+    "type": "adjective",
+    "pronunciation": "kəmˈpleɪsnt",
+    "definition": "showing smug or uncritical satisfaction with oneself or one's achievements",
+    "example": "He had become complacent after years of success.",
+    "etymology": "Early 17th century: from Latin complacent- ‘pleasing greatly’, from the verb complacere, from com- ‘with’ + placere ‘to please’."
+  },
+  "nebulous": {
+    "type": "adjective",
+    "pronunciation": "ˈnɛbjʊləs",
+    "definition": "unclear, vague, or ill-defined",
+    "example": "The concept was still nebulous and required further clarification.",
+    "etymology": "Late Middle English: from Latin nebulosus, from nebula ‘mist, cloud’."
+  },
+  "ebullience": {
+    "type": "noun",
+    "pronunciation": "ɪˈbʌliəns",
+    "definition": "enthusiasm or excitement",
+    "example": "She couldn't contain her ebullience upon receiving the good news.",
+    "etymology": "Late 18th century: from Latin ebullientia, from the verb ebullire ‘boil over’."
+  },
+  "serendipitous": {
+    "type": "adjective",
+    "pronunciation": "ˌsɛrənˈdɪpɪtəs",
+    "definition": "occurring or discovered by chance in a happy or beneficial way",
+    "example": "They had a serendipitous encounter that changed their lives.",
+    "etymology": "Mid 18th century: coined by Horace Walpole, suggested by The Three Princes of Serendip, the title of a fairy tale in which the heroes 'were always making discoveries, by accidents and sagacity, of things they were not in quest of'."
+  },
+  "vicissitude": {
+    "type": "noun",
+    "pronunciation": "vɪˈsɪsɪˌtjuːd",
+    "definition": "a change of circumstances or fortune, typically one that is unwelcome or unpleasant",
+    "example": "She had experienced many vicissitudes throughout her life.",
+    "etymology": "Late Middle English: from Old French, or from Latin vicissitudo, from vicissim ‘by turns’."
+  },
+  "elysium": {
+    "type": "noun",
+    "pronunciation": "ɪˈlɪziəm",
+    "definition": "a state or place of perfect happiness; paradise",
+    "example": "The garden was like an elysium, filled with blooming flowers and tranquil beauty.",
+    "etymology": "From Greek Elysion, the abode of the blessed after death."
+  },
+  "ethereal": {
+    "type": "adjective",
+    "pronunciation": "ɪˈθɪəriəl",
+    "definition": "extremely delicate and light; seeming to belong to another world",
+    "example": "The ballet dancer's movements were so graceful and ethereal, as if she was floating on air.",
+    "etymology": "From Greek aithēr, meaning 'upper air' or 'pure, bright air'."
+  },
+  "serenity": {
+    "type": "noun",
+    "pronunciation": "səˈrɛnəti",
+    "definition": "the state of being calm, peaceful, and untroubled",
+    "example": "She found solace and serenity in the quiet beauty of nature.",
+    "etymology": "From Latin serenus, meaning 'clear, calm'."
+  },
+  "melancholy": {
+    "type": "noun",
+    "pronunciation": "ˈmɛlənkɒli",
+    "definition": "a feeling of pensive sadness, typically with no obvious cause",
+    "example": "The sound of rain falling outside evoked a sense of melancholy in her.",
+    "etymology": "From Greek melankholia, from melas ('black') + kholē ('bile')."
+  },
+  "prodigious": {
+    "type": "adjective",
+    "pronunciation": "prəˈdɪdʒəs",
+    "definition": "remarkably or impressively great in extent, size, or degree",
+    "example": "She showed prodigious talent in playing the piano at a young age.",
+    "etymology": "From Latin prodigiosus, from prodigium meaning 'portent, omen'."
+  },
+  "diatribe": {
+    "type": "noun",
+    "pronunciation": "ˈdaɪətraɪb",
+    "definition": "a forceful and bitter verbal attack or criticism",
+    "example": "He launched into a diatribe against the government's policies during his speech.",
+    "etymology": "From Greek diatribē, meaning 'a wearing away, a lecture'."
+  },
+  "novelty": {
+    "type": "noun",
+    "pronunciation": "ˈnɒvəlti",
+    "definition": "something new, original, or unusual",
+    "example": "The store offers a wide range of novelties and unique gifts.",
+    "etymology": "From Old French novelte, from Latin novellus, meaning 'new'."
+  },
+  "quell": {
+    "type": "verb",
+    "pronunciation": "kwɛl",
+    "definition": "to suppress or extinguish; to calm or settle",
+    "example": "He tried to quell his anger and respond calmly.",
+    "etymology": "From Old English cwellan, meaning 'to kill, destroy'."
+  },
+  "flourish": {
+    "type": "verb",
+    "pronunciation": "ˈflʌrɪʃ",
+    "definition": "to thrive or prosper; to grow or develop in a healthy or vigorous way",
+    "example": "The business started to flourish after implementing new strategies.",
+    "etymology": "From Old French floriss-, stem of florir, from Latin florere, meaning 'to bloom'."
+  },
+  "exquisite": {
+    "type": "adjective",
+    "pronunciation": "ɪkˈskwɪzɪt",
+    "definition": "extremely beautiful, delicate, or carefully made",
+    "example": "The artist's paintings were known for their exquisite detail.",
+    "etymology": "From Latin exquisitus, meaning 'carefully sought out' or 'choice'."
+  },
+  "renowned": {
+    "type": "adjective",
+    "pronunciation": "rɪˈnaʊnd",
+    "definition": "famous or well-known, especially for a positive quality or achievement",
+    "example": "The renowned author received numerous awards for her literary works.",
+    "etymology": "From Middle English renouned, from Old French renome, meaning 'reputation'."
   }
 }
