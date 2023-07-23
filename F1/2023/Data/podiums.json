@@ -1,28 +1,28 @@
 {"Podiums": [
     {
-    "Country":	"🇬🇧 UK",
-    "City":	"Silverstone",
-    "Message":	"2023 10th race"
+    "Country":	"🇭🇺 Hungary",
+    "City":	"Mogyoród",
+    "Message":	"2023 11th race"
     },
     {
     "Place":	"1",
     "Name":	"Verstappen",
     "Team":	"-",
     "Points":	"+25",
-    "Total":	"255"
+    "Total":	"281"
     },
     {
     "Place":	"2",
     "Name":	"Norris",
     "Team":	"-",
     "Points":	"+18",
-    "Total":	"42"
+    "Total":	"60"
     },
     {
     "Place":	"3",
-    "Name":	"Hamilton",
+    "Name":	"Pérez",
     "Team":	"-",
     "Points":	"+15",
-    "Total":	"121"
+    "Total":	"171"
     }
     ]}
