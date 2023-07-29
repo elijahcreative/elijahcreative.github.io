@@ -1,12 +1,12 @@
 {"Standings": [
     {
-    "After":	"After Hungary"
+    "After":	"After Belgian sprint"
     },
     {
     "Place":	"1",
     "Name":	"Verstappen",
     "Team":	"-",
-    "Points":	"281"
+    "Points":	"289"
     },
     {
     "Place":	"2",
@@ -24,18 +24,18 @@
     "Place":	"4",
     "Name":	"Hamilton",
     "Team":	"-",
-    "Points":	"133"
+    "Points":	"135"
     },
     {
     "Place":	"5",
-    "Name":	"Russell",
+    "Name":	"Sainz",
     "Team":	"-",
-    "Points":	"90"
+    "Points":	"92"
     },
     {
     "Place":	"6",
-    "Name":	"Sainz",
+    "Name":	"Russell",
     "Team":	"-",
-    "Points":	"87"
+    "Points":	"91"
     }
     ]}
