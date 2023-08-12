@@ -1,0 +1,1352 @@
+[
+    {
+        "Question": "Which Italian city is famous for its leaning tower and stunning Piazza dei Miracoli?",
+        "Option1": "Florence",
+        "Option2": "Venice",
+        "Option3": "Milan",
+        "Option4": "Pisa",
+        "Answer": "Pisa",
+        "Fact": "The Leaning Tower of Pisa is a UNESCO World Heritage site."
+    },
+    {
+        "Question": "Which country is known as the Land of the Rising Sun?",
+        "Option1": "Japan",
+        "Option2": "China",
+        "Option3": "South Korea",
+        "Option4": "Thailand",
+        "Answer": "Japan",
+        "Fact": "The cherry blossom season in Japan is a breathtaking sight."
+    },
+    {
+        "Question": "What natural wonder spans across Argentina and Brazil?",
+        "Option1": "Amazon Rainforest",
+        "Option2": "Sahara Desert",
+        "Option3": "Iguazu Falls",
+        "Option4": "Victoria Falls",
+        "Answer": "Iguazu Falls",
+        "Fact": "Iguazu Falls is taller than Niagara Falls and wider than Victoria Falls."
+    },
+    {
+        "Question": "Which European city is famous for its canals and gondolas?",
+        "Option1": "Paris",
+        "Option2": "Venice",
+        "Option3": "Amsterdam",
+        "Option4": "Prague",
+        "Answer": "Venice",
+        "Fact": "Venice has over 400 bridges connecting its canals."
+    },
+    {
+        "Question": "Which African country is known for its stunning wildlife and safaris?",
+        "Option1": "Kenya",
+        "Option2": "Egypt",
+        "Option3": "Nigeria",
+        "Option4": "South Africa",
+        "Answer": "Kenya",
+        "Fact": "The Great Migration of wildebeests and zebras takes place in Kenya's Maasai Mara."
+    },
+    {
+        "Question": "In which US state can you find the Grand Canyon?",
+        "Option1": "Arizona",
+        "Option2": "California",
+        "Option3": "Nevada",
+        "Option4": "Texas",
+        "Answer": "Arizona",
+        "Fact": "The Grand Canyon is over a mile deep and was carved by the Colorado River."
+    },
+    {
+        "Question": "Which Asian city is renowned for its futuristic skyline and technological innovations?",
+        "Option1": "Beijing",
+        "Option2": "Tokyo",
+        "Option3": "Seoul",
+        "Option4": "Dubai",
+        "Answer": "Tokyo",
+        "Fact": "Tokyo's Shibuya Crossing is one of the busiest pedestrian crossings globally."
+    },
+    {
+        "Question": "What is the world's tallest mountain?",
+        "Option1": "Mount Kilimanjaro",
+        "Option2": "Mount Everest",
+        "Option3": "Mount Fuji",
+        "Option4": "Mount McKinley",
+        "Answer": "Mount Everest",
+        "Fact": "Sir Edmund Hillary and Tenzing Norgay were the first to summit Mount Everest in 1953."
+    },
+    {
+        "Question": "Which famous ancient wonder is located in Giza, Egypt?",
+        "Option1": "Parthenon",
+        "Option2": "Colosseum",
+        "Option3": "Great Pyramid of Giza",
+        "Option4": "Petra",
+        "Answer": "Great Pyramid of Giza",
+        "Fact": "The Great Pyramid is the oldest of the Seven Wonders of the Ancient World."
+    },
+    {
+        "Question": "Which South American city is renowned for its Carnival festival?",
+        "Option1": "Rio de Janeiro",
+        "Option2": "Buenos Aires",
+        "Option3": "Lima",
+        "Option4": "Santiago",
+        "Answer": "Rio de Janeiro",
+        "Fact": "The Rio Carnival is the largest carnival in the world, attracting millions of visitors."
+    },
+    {
+        "Question": "What is the capital of Australia?",
+        "Option1": "Sydney",
+        "Option2": "Melbourne",
+        "Option3": "Canberra",
+        "Option4": "Brisbane",
+        "Answer": "Canberra",
+        "Fact": "Canberra is purpose-built as the capital city and is known for its modern architecture."
+    },
+    {
+        "Question": "In which European city can you find the Anne Frank House?",
+        "Option1": "Paris",
+        "Option2": "Berlin",
+        "Option3": "Amsterdam",
+        "Option4": "Vienna",
+        "Answer": "Amsterdam",
+        "Fact": "The Anne Frank House provides a moving insight into the life of Anne Frank during WWII."
+    },
+    {
+        "Question": "Which African country is home to the Serengeti National Park?",
+        "Option1": "Kenya",
+        "Option2": "South Africa",
+        "Option3": "Tanzania",
+        "Option4": "Botswana",
+        "Answer": "Tanzania",
+        "Fact": "The Serengeti hosts the Great Migration, one of the most spectacular wildlife events."
+    },
+    {
+        "Question": "What is the currency of Japan?",
+        "Option1": "Yen",
+        "Option2": "Won",
+        "Option3": "Baht",
+        "Option4": "Rupee",
+        "Answer": "Yen",
+        "Fact": "The Japanese yen features images of historical figures and cultural icons."
+    },
+    {
+        "Question": "Which famous river runs through Egypt?",
+        "Option1": "Nile",
+        "Option2": "Amazon",
+        "Option3": "Mississippi",
+        "Option4": "Danube",
+        "Answer": "Nile",
+        "Fact": "The Nile is the longest river in the world, sustaining ancient civilizations."
+    },
+    {
+        "Question": "What is the official language of Brazil?",
+        "Option1": "Portuguese",
+        "Option2": "Spanish",
+        "Option3": "Italian",
+        "Option4": "French",
+        "Answer": "Portuguese",
+        "Fact": "Brazil is the largest Portuguese-speaking country in the world."
+    },
+    {
+        "Question": "Which Asian city is famous for its iconic Petronas Towers?",
+        "Option1": "Bangkok",
+        "Option2": "Jakarta",
+        "Option3": "Kuala Lumpur",
+        "Option4": "Manila",
+        "Answer": "Kuala Lumpur",
+        "Fact": "The Petronas Towers were once the world's tallest twin towers."
+    },
+    {
+        "Question": "What is the primary language spoken in Switzerland?",
+        "Option1": "German",
+        "Option2": "French",
+        "Option3": "Italian",
+        "Option4": "Dutch",
+        "Answer": "German",
+        "Fact": "Switzerland has four official languages due to its diverse regions."
+    },
+    {
+        "Question": "Which desert covers much of Northern Africa?",
+        "Option1": "Sahara",
+        "Option2": "Mojave",
+        "Option3": "Gobi",
+        "Option4": "Atacama",
+        "Answer": "Sahara",
+        "Fact": "The Sahara Desert is larger than the contiguous United States."
+    },
+    {
+        "Question": "What is the nickname for the city of New Orleans, USA?",
+        "Option1": "The Windy City",
+        "Option2": "The Big Easy",
+        "Option3": "The Emerald City",
+        "Option4": "The Sunshine State",
+        "Answer": "The Big Easy",
+        "Fact": "New Orleans is known for its relaxed atmosphere and vibrant culture."
+    },
+    {
+        "Question": "In which country would you find Machu Picchu?",
+        "Option1": "Peru",
+        "Option2": "Mexico",
+        "Option3": "Chile",
+        "Option4": "Argentina",
+        "Answer": "Peru",
+        "Fact": "Machu Picchu is a UNESCO World Heritage site and ancient Incan city."
+    },
+    {
+        "Question": "What is the official language of India?",
+        "Option1": "Hindi",
+        "Option2": "English",
+        "Option3": "Bengali",
+        "Option4": "Urdu",
+        "Answer": "Hindi",
+        "Fact": "India has a rich linguistic diversity with many languages spoken."
+    },
+    {
+        "Question": "Which ocean is the largest on Earth?",
+        "Option1": "Pacific Ocean",
+        "Option2": "Atlantic Ocean",
+        "Option3": "Indian Ocean",
+        "Option4": "Arctic Ocean",
+        "Answer": "Pacific Ocean",
+        "Fact": "The Pacific Ocean covers more area than all the land combined."
+    },
+    {
+        "Question": "Which European city is famous for its canals and historic architecture?",
+        "Option1": "Rome",
+        "Option2": "Venice",
+        "Option3": "Paris",
+        "Option4": "Barcelona",
+        "Answer": "Venice",
+        "Fact": "The city's intricate canal system is navigated by gondolas and boats."
+    },
+    {
+        "Question": "What is the world's second-largest country by land area?",
+        "Option1": "China",
+        "Option2": "Russia",
+        "Option3": "Canada",
+        "Option4": "United States",
+        "Answer": "Canada",
+        "Fact": "Canada is known for its vast wilderness and natural beauty."
+    },
+    {
+        "Question": "Which South American country is home to the Amazon Rainforest?",
+        "Option1": "Brazil",
+        "Option2": "Colombia",
+        "Option3": "Argentina",
+        "Option4": "Peru",
+        "Answer": "Brazil",
+        "Fact": "The Amazon Rainforest is often referred to as the \"Lungs of the Earth.\""
+    },
+    {
+        "Question": "In which country is the Great Wall located?",
+        "Option1": "China",
+        "Option2": "Japan",
+        "Option3": "South Korea",
+        "Option4": "Mongolia",
+        "Answer": "China",
+        "Fact": "The Great Wall of China is a UNESCO World Heritage site."
+    },
+    {
+        "Question": "What is the largest reef system in the world?",
+        "Option1": "Great Barrier Reef",
+        "Option2": "Belize Barrier Reef",
+        "Option3": "Red Sea Coral Reef",
+        "Option4": "Maldives Coral Reef",
+        "Answer": "Great Barrier Reef",
+        "Fact": "The Great Barrier Reef is visible from space and supports diverse marine life."
+    },
+    {
+        "Question": "Which US state is famous for its vibrant music scene in cities like Nashville and Memphis?",
+        "Option1": "California",
+        "Option2": "Texas",
+        "Option3": "New York",
+        "Option4": "Tennessee",
+        "Answer": "Tennessee",
+        "Fact": "Nashville is known as the \"Music City\" and is a hub for country music."
+    },
+    {
+        "Question": "What is the tallest mountain in North America?",
+        "Option1": "Mount McKinley",
+        "Option2": "Mount St. Helens",
+        "Option3": "Mount Rushmore",
+        "Option4": "Mount Everest",
+        "Answer": "Mount McKinley",
+        "Fact": "Also known as Denali, it's located in Alaska, USA."
+    },
+    {
+        "Question": "Which famous waterfall straddles the border between the United States and Canada?",
+        "Option1": "Niagara Falls",
+        "Option2": "Victoria Falls",
+        "Option3": "Angel Falls",
+        "Option4": "Iguazu Falls",
+        "Answer": "Niagara Falls",
+        "Fact": "Niagara Falls is made up of three waterfalls and is a popular tourist attraction."
+    },
+    {
+        "Question": "In which country would you find the historic city of Petra?",
+        "Option1": "Jordan",
+        "Option2": "Egypt",
+        "Option3": "Israel",
+        "Option4": "Lebanon",
+        "Answer": "Jordan",
+        "Fact": "Petra is an ancient city carved into the rose-red cliffs of southern Jordan."
+    },
+    {
+        "Question": "What is the largest city in Africa by population?",
+        "Option1": "Cairo",
+        "Option2": "Lagos",
+        "Option3": "Johannesburg",
+        "Option4": "Kinshasa",
+        "Answer": "Lagos",
+        "Fact": "Lagos is a bustling megacity and economic hub in West Africa."
+    },
+    {
+        "Question": "Which country is known for its stunning fjords and Northern Lights?",
+        "Option1": "Sweden",
+        "Option2": "Norway",
+        "Option3": "Denmark",
+        "Option4": "Finland",
+        "Answer": "Norway",
+        "Fact": "The Northern Lights, or Aurora Borealis, illuminate Norway's Arctic skies."
+    },
+    {
+        "Question": "What is the official language of South Africa?",
+        "Option1": "Zulu",
+        "Option2": "Afrikaans",
+        "Option3": "Xhosa",
+        "Option4": "English",
+        "Answer": "Afrikaans and English",
+        "Fact": "South Africa has 11 official languages, reflecting its diverse population."
+    },
+    {
+        "Question": "Which famous festival in Spain involves running with bulls through the streets?",
+        "Option1": "La Tomatina",
+        "Option2": "Oktoberfest",
+        "Option3": "Running of the Bulls",
+        "Option4": "Carnival of Cadiz",
+        "Answer": "Running of the Bulls",
+        "Fact": "This adrenaline-packed event takes place in Pamplona during the San Fermín festival."
+    },
+    {
+        "Question": "In which European country would you find the historic city of Prague?",
+        "Option1": "Austria",
+        "Option2": "Poland",
+        "Option3": "Czech Republic",
+        "Option4": "Hungary",
+        "Answer": "Czech Republic",
+        "Fact": "Prague is renowned for its stunning architecture and rich history."
+    },
+    {
+        "Question": "What is the world's smallest country by land area?",
+        "Option1": "Monaco",
+        "Option2": "Vatican City",
+        "Option3": "Liechtenstein",
+        "Option4": "San Marino",
+        "Answer": "Vatican City",
+        "Fact": "Vatican City is the spiritual and administrative center of the Roman Catholic Church."
+    },
+    {
+        "Question": "Which Asian country is known for its ancient temples, including Angkor Wat?",
+        "Option1": "Vietnam",
+        "Option2": "Thailand",
+        "Option3": "Cambodia",
+        "Option4": "Laos",
+        "Answer": "Cambodia",
+        "Fact": "Angkor Wat is the largest religious monument in the world."
+    },
+    {
+        "Question": "In which African country is the Sphinx located?",
+        "Option1": "Egypt",
+        "Option2": "Libya",
+        "Option3": "Algeria",
+        "Option4": "Sudan",
+        "Answer": "Egypt",
+        "Fact": "The Great Sphinx of Giza has the body of a lion and the head of a pharaoh."
+    },
+    {
+        "Question": "What is the world's largest hot desert?",
+        "Option1": "Gobi Desert",
+        "Option2": "Sahara Desert",
+        "Option3": "Arabian Desert",
+        "Option4": "Kalahari Desert",
+        "Answer": "Sahara Desert",
+        "Fact": "The Sahara covers much of North Africa and is roughly the size of the United States."
+    },
+    {
+        "Question": "Which city is often referred to as the \"Pearl of the Orient\"?",
+        "Option1": "Shanghai",
+        "Option2": "Manila",
+        "Option3": "Mumbai",
+        "Option4": "Singapore",
+        "Answer": "Manila",
+        "Fact": "Manila's historical and cultural significance earned it this moniker."
+    },
+    {
+        "Question": "What is the tallest waterfall in the world?",
+        "Option1": "Iguazu Falls",
+        "Option2": "Angel Falls",
+        "Option3": "Niagara Falls",
+        "Option4": "Victoria Falls",
+        "Answer": "Angel Falls",
+        "Fact": "Angel Falls plunges from a height of over 3,200 feet in Venezuela."
+    },
+    {
+        "Question": "Which country is known for its stunning fjords, Viking history, and northern lights?",
+        "Option1": "Sweden",
+        "Option2": "Norway",
+        "Option3": "Denmark",
+        "Option4": "Finland",
+        "Answer": "Norway",
+        "Fact": "The Northern Lights and breathtaking fjords are a hallmark of Norway's beauty."
+    },
+    {
+        "Question": "What is the iconic mountain range that stretches across Europe?",
+        "Option1": "Rocky Mountains",
+        "Option2": "Andes",
+        "Option3": "Alps",
+        "Option4": "Himalayas",
+        "Answer": "Alps",
+        "Fact": "The Alps offer picturesque landscapes, ski resorts, and cultural richness."
+    },
+    {
+        "Question": "Which city is famous for its iconic statue of Christ the Redeemer?",
+        "Option1": "Rio de Janeiro",
+        "Option2": "Buenos Aires",
+        "Option3": "Lima",
+        "Option4": "Santiago",
+        "Answer": "Rio de Janeiro",
+        "Fact": "Christ the Redeemer overlooks the vibrant city of Rio de Janeiro, Brazil."
+    },
+    {
+        "Question": "In which country would you find the Great Barrier Reef?",
+        "Option1": "Australia",
+        "Option2": "Fiji",
+        "Option3": "Thailand",
+        "Option4": "Maldives",
+        "Answer": "Australia",
+        "Fact": "The Great Barrier Reef is the world's largest coral reef system."
+    },
+    {
+        "Question": "What is the capital city of Canada?",
+        "Option1": "Toronto",
+        "Option2": "Vancouver",
+        "Option3": "Ottawa",
+        "Option4": "Montreal",
+        "Answer": "Ottawa",
+        "Fact": "Ottawa is home to important government institutions and cultural attractions."
+    },
+    {
+        "Question": "Which mountain range stretches across the western part of North America?",
+        "Option1": "Rocky Mountains",
+        "Option2": "Andes",
+        "Option3": "Alps",
+        "Option4": "Himalayas",
+        "Answer": "Rocky Mountains",
+        "Fact": "The Rockies are known for their breathtaking landscapes and outdoor activities."
+    },
+    {
+        "Question": "What is the famous canal that connects the Atlantic and Pacific Oceans?",
+        "Option1": "Panama Canal",
+        "Option2": "Suez Canal",
+        "Option3": "Kiel Canal",
+        "Option4": "Corinth Canal",
+        "Answer": "Panama Canal",
+        "Fact": "The Panama Canal revolutionized global trade by shortening shipping routes."
+    },
+    {
+        "Question": "What is the largest country by land area in the world?",
+        "Option1": "Russia",
+        "Option2": "China",
+        "Option3": "United States",
+        "Option4": "Brazil",
+        "Answer": "Russia",
+        "Fact": "Russia spans 11 time zones and covers about one-eighth of Earth's land surface."
+    },
+    {
+        "Question": "In which African country can you find the pyramids of Giza?",
+        "Option1": "Egypt",
+        "Option2": "Sudan",
+        "Option3": "Algeria",
+        "Option4": "Libya",
+        "Answer": "Egypt",
+        "Fact": "The pyramids are some of the most iconic structures in human history."
+    },
+    {
+        "Question": "What is the official language of Argentina?",
+        "Option1": "Spanish",
+        "Option2": "Portuguese",
+        "Option3": "Italian",
+        "Option4": "French",
+        "Answer": "Spanish",
+        "Fact": "Argentina is known for tango, soccer, and its rich cultural heritage."
+    },
+    {
+        "Question": "Which island nation is famous for its unique wildlife, including giant tortoises?",
+        "Option1": "Madagascar",
+        "Option2": "Fiji",
+        "Option3": "Seychelles",
+        "Option4": "Mauritius",
+        "Answer": "Seychelles",
+        "Fact": "Giant tortoises are a hallmark of Seychelles' natural wonders."
+    },
+    {
+        "Question": "What is the largest island in the Mediterranean Sea?",
+        "Option1": "Corsica",
+        "Option2": "Sicily",
+        "Option3": "Sardinia",
+        "Option4": "Crete",
+        "Answer": "Sicily",
+        "Fact": "Sicily boasts a rich history influenced by various cultures."
+    },
+    {
+        "Question": "Which city is known as the \"City of Love\" and is home to the Eiffel Tower?",
+        "Option1": "Paris",
+        "Option2": "Rome",
+        "Option3": "Vienna",
+        "Option4": "Prague",
+        "Answer": "Paris",
+        "Fact": "The Eiffel Tower is a symbol of romance and architectural marvel."
+    },
+    {
+        "Question": "In which Asian country would you find the ancient city of Petra?",
+        "Option1": "Jordan",
+        "Option2": "Lebanon",
+        "Option3": "Iraq",
+        "Option4": "Saudi Arabia",
+        "Answer": "Jordan",
+        "Fact": "Petra is a UNESCO World Heritage site known for its rock-cut architecture."
+    },
+    {
+        "Question": "What is the official language of Germany?",
+        "Option1": "German",
+        "Option2": "Dutch",
+        "Option3": "French",
+        "Option4": "Polish",
+        "Answer": "German",
+        "Fact": "Germany has a rich literary and cultural heritage."
+    },
+    {
+        "Question": "Which African country is home to the famous Victoria Falls?",
+        "Option1": "Zambia",
+        "Option2": "Zimbabwe",
+        "Option3": "Mozambique",
+        "Option4": "Malawi",
+        "Answer": "Zambia and Zimbabwe",
+        "Fact": "Victoria Falls is one of the Seven Natural Wonders of the World."
+    },
+    {
+        "Question": "What is the world's largest tropical rainforest?",
+        "Option1": "Amazon Rainforest",
+        "Option2": "Congo Rainforest",
+        "Option3": "Borneo Rainforest",
+        "Option4": "Sumatra Rainforest",
+        "Answer": "Amazon Rainforest",
+        "Fact": "The Amazon Rainforest is home to a staggering diversity of species."
+    },
+    {
+        "Question": "Which US state is famous for its stunning red rock formations in places like Sedona?",
+        "Option1": "Utah",
+        "Option2": "Arizona",
+        "Option3": "Nevada",
+        "Option4": "New Mexico",
+        "Answer": "Arizona",
+        "Fact": "Sedona's red rocks are renowned for their spiritual and natural beauty."
+    },
+    {
+        "Question": "In which country would you find the iconic city of Dubai?",
+        "Option1": "Saudi Arabia",
+        "Option2": "Qatar",
+        "Option3": "UAE",
+        "Option4": "Kuwait",
+        "Answer": "UAE",
+        "Fact": "Dubai is known for its futuristic architecture and luxury lifestyle."
+    },
+    {
+        "Question": "What is the official language of China?",
+        "Option1": "Mandarin",
+        "Option2": "Cantonese",
+        "Option3": "Tibetan",
+        "Option4": "Uighur",
+        "Answer": "Mandarin",
+        "Fact": "Mandarin is the most widely spoken language in the world."
+    },
+    {
+        "Question": "Which South American country is famous for its tango dance and beef?",
+        "Option1": "Brazil",
+        "Option2": "Argentina",
+        "Option3": "Chile",
+        "Option4": "Uruguay",
+        "Answer": "Argentina",
+        "Fact": "Tango is a passionate dance that originated in the working-class neighborhoods of Buenos Aires."
+    },
+    {
+        "Question": "What is the smallest continent by land area?",
+        "Option1": "Asia",
+        "Option2": "Europe",
+        "Option3": "Africa",
+        "Option4": "Australia",
+        "Answer": "Australia",
+        "Fact": "Australia's unique flora and fauna evolved in isolation."
+    },
+    {
+        "Question": "Which city is known for its historic Alhambra palace complex?",
+        "Option1": "Madrid",
+        "Option2": "Barcelona",
+        "Option3": "Seville",
+        "Option4": "Granada",
+        "Answer": "Granada",
+        "Fact": "The Alhambra is a masterpiece of Islamic architecture and design."
+    },
+    {
+        "Question": "In which country would you find the ancient city of Machu Picchu?",
+        "Option1": "Peru",
+        "Option2": "Mexico",
+        "Option3": "Chile",
+        "Option4": "Ecuador",
+        "Answer": "Peru",
+        "Fact": "Machu Picchu is perched atop the Andes Mountains and offers breathtaking views."
+    },
+    {
+        "Question": "What is the world's largest island nation by area?",
+        "Option1": "Indonesia",
+        "Option2": "Philippines",
+        "Option3": "Japan",
+        "Option4": "New Zealand",
+        "Answer": "Indonesia",
+        "Fact": "Indonesia's thousands of islands host diverse cultures and landscapes."
+    },
+    {
+        "Question": "Which famous structure is located in Agra, India, and is a UNESCO World Heritage site?",
+        "Option1": "Taj Mahal",
+        "Option2": "Angkor Wat",
+        "Option3": "Pyramids of Giza",
+        "Option4": "Parthenon",
+        "Answer": "Taj Mahal",
+        "Fact": "The Taj Mahal is a symbol of eternal love and architectural beauty."
+    },
+    {
+        "Question": "What is the iconic canal that links the Mediterranean Sea to the Red Sea?",
+        "Option1": "Suez Canal",
+        "Option2": "Panama Canal",
+        "Option3": "Corinth Canal",
+        "Option4": "Kiel Canal",
+        "Answer": "Suez Canal",
+        "Fact": "The Suez Canal is a vital waterway for global trade and transportation."
+    },
+    {
+        "Question": "Which US state is known as the \"Sunshine State\"?",
+        "Option1": "California",
+        "Option2": "Florida",
+        "Option3": "Texas",
+        "Option4": "Hawaii",
+        "Answer": "Florida",
+        "Fact": "Florida's sunny climate and beaches attract millions of tourists."
+    },
+    {
+        "Question": "What is the world's longest river?",
+        "Option1": "Nile",
+        "Option2": "Amazon",
+        "Option3": "Yangtze",
+        "Option4": "Mississippi",
+        "Answer": "Nile",
+        "Fact": "The Nile has played a central role in the history of ancient civilizations."
+    },
+    {
+        "Question": "Which European city is famous for its canals and bike-friendly culture?",
+        "Option1": "Amsterdam",
+        "Option2": "Paris",
+        "Option3": "Venice",
+        "Option4": "Copenhagen",
+        "Answer": "Amsterdam",
+        "Fact": "Bicycles are a popular mode of transportation in this charming city."
+    },
+    {
+        "Question": "In which African country can you find the Maasai Mara National Reserve?",
+        "Option1": "Kenya",
+        "Option2": "Tanzania",
+        "Option3": "South Africa",
+        "Option4": "Botswana",
+        "Answer": "Kenya",
+        "Fact": "The Maasai Mara is renowned for its annual wildebeest migration."
+    },
+    {
+        "Question": "What is the iconic tower in London that houses the Big Ben clock?",
+        "Option1": "London Eye",
+        "Option2": "Tower Bridge",
+        "Option3": "Buckingham Palace",
+        "Option4": "Elizabeth Tower",
+        "Answer": "Elizabeth Tower",
+        "Fact": "The tower was renamed to honor Queen Elizabeth II's Diamond Jubilee."
+    },
+    {
+        "Question": "Which Asian city is famous for its towering skyscrapers and neon lights?",
+        "Option1": "Tokyo",
+        "Option2": "Beijing",
+        "Option3": "Seoul",
+        "Option4": "Shanghai",
+        "Answer": "Tokyo",
+        "Fact": "Tokyo's skyline is a dazzling display of modern architecture."
+    },
+    {
+        "Question": "In which country is the ancient city of Rome located?",
+        "Option1": "Italy",
+        "Option2": "Greece",
+        "Option3": "Turkey",
+        "Option4": "Spain",
+        "Answer": "Italy",
+        "Fact": "Rome is often called the \"Eternal City\" due to its historical significance."
+    },
+    {
+        "Question": "What is the world's highest mountain?",
+        "Option1": "Mount Everest",
+        "Option2": "Mount McKinley",
+        "Option3": "Mount Kilimanjaro",
+        "Option4": "Mount Fuji",
+        "Answer": "Mount Everest",
+        "Fact": "Climbing Everest is a monumental challenge for mountaineers."
+    },
+    {
+        "Question": "Which South American country is famous for its carnival celebrations, including Rio's Carnival?",
+        "Option1": "Brazil",
+        "Option2": "Argentina",
+        "Option3": "Chile",
+        "Option4": "Colombia",
+        "Answer": "Brazil",
+        "Fact": "Rio's Carnival is one of the world's largest and most famous festivals."
+    },
+    {
+        "Question": "What is the official language of Mexico?",
+        "Option1": "Spanish",
+        "Option2": "Portuguese",
+        "Option3": "Italian",
+        "Option4": "French",
+        "Answer": "Spanish",
+        "Fact": "Mexico's rich culture and history are reflected in its language."
+    },
+    {
+        "Question": "Which city is known as the \"City of Seven Hills\" and is the capital of Italy?",
+        "Option1": "Athens",
+        "Option2": "Rome",
+        "Option3": "Istanbul",
+        "Option4": "Madrid",
+        "Answer": "Rome",
+        "Fact": "Rome's hills offer panoramic views of its ancient landmarks."
+    },
+    {
+        "Question": "In which country would you find the Great Wall of China?",
+        "Option1": "China",
+        "Option2": "Japan",
+        "Option3": "South Korea",
+        "Option4": "Mongolia",
+        "Answer": "China",
+        "Fact": "The Great Wall is a testament to human ingenuity and engineering."
+    },
+    {
+        "Question": "What is the famous archaeological site in Greece with iconic ruins of temples?",
+        "Option1": "Acropolis",
+        "Option2": "Parthenon",
+        "Option3": "Delphi",
+        "Option4": "Olympia",
+        "Answer": "Acropolis",
+        "Fact": "The Parthenon is a symbol of ancient Greek civilization."
+    },
+    {
+        "Question": "Which island nation is located in the Indian Ocean and is famous for its turquoise waters and overwater bungalows?",
+        "Option1": "Fiji",
+        "Option2": "Seychelles",
+        "Option3": "Maldives",
+        "Option4": "Mauritius",
+        "Answer": "Maldives",
+        "Fact": "The Maldives is a popular destination for luxury travelers and honeymooners."
+    },
+    {
+        "Question": "What is the official language of Russia?",
+        "Option1": "Russian",
+        "Option2": "Ukrainian",
+        "Option3": "Belarusian",
+        "Option4": "Latvian",
+        "Answer": "Russian",
+        "Fact": "Russia is the largest country in the world by land area."
+    },
+    {
+        "Question": "Which city is famous for its annual Oktoberfest beer festival?",
+        "Option1": "Munich",
+        "Option2": "Berlin",
+        "Option3": "Frankfurt",
+        "Option4": "Hamburg",
+        "Answer": "Munich",
+        "Fact": "Oktoberfest is a celebration of Bavarian culture and tradition."
+    },
+    {
+        "Question": "In which country would you find the Inca Trail leading to Machu Picchu?",
+        "Option1": "Peru",
+        "Option2": "Ecuador",
+        "Option3": "Bolivia",
+        "Option4": "Colombia",
+        "Answer": "Peru",
+        "Fact": "The Inca Trail offers a scenic trek through the Andes Mountains."
+    },
+    {
+        "Question": "What is the world's largest ocean?",
+        "Option1": "Pacific Ocean",
+        "Option2": "Atlantic Ocean",
+        "Option3": "Indian Ocean",
+        "Option4": "Arctic Ocean",
+        "Answer": "Pacific Ocean",
+        "Fact": "The Pacific Ocean covers more area than all the land combined."
+    },
+    {
+        "Question": "Which African country is known for its vibrant cultural heritage, including the city of Marrakech?",
+        "Option1": "Morocco",
+        "Option2": "Egypt",
+        "Option3": "Algeria",
+        "Option4": "Tunisia",
+        "Answer": "Morocco",
+        "Fact": "Marrakech's medina is a UNESCO World Heritage site."
+    },
+    {
+        "Question": "What is the iconic palace in India that was once the residence of Mughal emperors?",
+        "Option1": "Red Fort",
+        "Option2": "Hawa Mahal",
+        "Option3": "Taj Mahal",
+        "Option4": "Amber Fort",
+        "Answer": "Red Fort",
+        "Fact": "The Red Fort is a UNESCO World Heritage site in Delhi."
+    },
+    {
+        "Question": "In which European country would you find the historic city of Florence?",
+        "Option1": "Italy",
+        "Option2": "France",
+        "Option3": "Spain",
+        "Option4": "Greece",
+        "Answer": "Italy",
+        "Fact": "Florence is often called the \"Cradle of the Renaissance.\""
+    },
+    {
+        "Question": "What is the official language of Japan?",
+        "Option1": "Japanese",
+        "Option2": "Chinese",
+        "Option3": "Korean",
+        "Option4": "Thai",
+        "Answer": "Japanese",
+        "Fact": "Japan is known for its rich cultural heritage and modern innovations."
+    },
+    {
+        "Question": "Which desert is known for its unique sand dunes that change shape due to wind?",
+        "Option1": "Sahara Desert",
+        "Option2": "Atacama Desert",
+        "Option3": "Gobi Desert",
+        "Option4": "Namib Desert",
+        "Answer": "Namib Desert",
+        "Fact": "The Namib Desert's dunes are iconic and ever-shifting."
+    },
+    {
+        "Question": "Which US city is famous for its iconic Golden Gate Bridge?",
+        "Option1": "Los Angeles",
+        "Option2": "San Francisco",
+        "Option3": "New York City",
+        "Option4": "Seattle",
+        "Answer": "San Francisco",
+        "Fact": "The Golden Gate Bridge is a symbol of engineering and beauty."
+    },
+    {
+        "Question": "What is the largest lake in Africa by surface area?",
+        "Option1": "Lake Victoria",
+        "Option2": "Lake Tanganyika",
+        "Option3": "Lake Malawi",
+        "Option4": "Lake Chad",
+        "Answer": "Lake Victoria",
+        "Fact": "Lake Victoria is one of the African Great Lakes."
+    },
+    {
+        "Question": "Which island nation is famous for its lush rainforests, diverse wildlife, and Pura Vida lifestyle?",
+        "Option1": "Hawaii",
+        "Option2": "Fiji",
+        "Option3": "Maldives",
+        "Option4": "Costa Rica",
+        "Answer": "Costa Rica",
+        "Fact": "\"Pura Vida\" means \"pure life\" and captures the country's positive vibe."
+    },
+    {
+        "Question": "In which country is the city of Marrakech located?",
+        "Option1": "Egypt",
+        "Option2": "Morocco",
+        "Option3": "Algeria",
+        "Option4": "Tunisia",
+        "Answer": "Morocco",
+        "Fact": "Marrakech is a vibrant and bustling city known for its markets."
+    },
+    {
+        "Question": "What is the iconic tower in Paris that offers panoramic views of the city?",
+        "Option1": "Eiffel Tower",
+        "Option2": "Louvre Pyramid",
+        "Option3": "Arc de Triomphe",
+        "Option4": "Montparnasse Tower",
+        "Answer": "Eiffel Tower",
+        "Fact": "The Eiffel Tower was built for the 1889 World's Fair."
+    },
+    {
+        "Question": "Which African country is famous for its iconic Table Mountain and diverse flora and fauna?",
+        "Option1": "Kenya",
+        "Option2": "South Africa",
+        "Option3": "Tanzania",
+        "Option4": "Nigeria",
+        "Answer": "South Africa",
+        "Fact": "Table Mountain overlooks the city of Cape Town."
+    },
+    {
+        "Question": "What is the official language of Brazil?",
+        "Option1": "Portuguese",
+        "Option2": "Spanish",
+        "Option3": "Italian",
+        "Option4": "French",
+        "Answer": "Portuguese",
+        "Fact": "Brazil is the largest Portuguese-speaking country in the world."
+    },
+    {
+        "Question": "Which city is known for its stunning skyline, traditional souks, and ultramodern architecture?",
+        "Option1": "Dubai",
+        "Option2": "Abu Dhabi",
+        "Option3": "Doha",
+        "Option4": "Riyadh",
+        "Answer": "Dubai",
+        "Fact": "Dubai's skyscrapers and luxurious lifestyle draw visitors worldwide."
+    },
+    {
+        "Question": "In which European country would you find the historic city of Vienna?",
+        "Option1": "Austria",
+        "Option2": "Czech Republic",
+        "Option3": "Hungary",
+        "Option4": "Poland",
+        "Answer": "Austria",
+        "Fact": "Vienna is known for its classical music heritage and grand architecture."
+    },
+    {
+        "Question": "What is the famous archaeological site in Mexico known for its ancient pyramids?",
+        "Option1": "Teotihuacan",
+        "Option2": "Chichen Itza",
+        "Option3": "Palenque",
+        "Option4": "Tulum",
+        "Answer": "Chichen Itza",
+        "Fact": "Chichen Itza was a major city of the ancient Maya civilization."
+    },
+    {
+        "Question": "Which island nation is famous for its diverse marine life and the Great Barrier Reef?",
+        "Option1": "Fiji",
+        "Option2": "Seychelles",
+        "Option3": "Maldives",
+        "Option4": "Australia",
+        "Answer": "Australia",
+        "Fact": "The Great Barrier Reef is a UNESCO World Heritage site."
+    },
+    {
+        "Question": "What is the official language of Spain?",
+        "Option1": "Spanish",
+        "Option2": "Portuguese",
+        "Option3": "Catalan",
+        "Option4": "Basque",
+        "Answer": "Spanish",
+        "Fact": "Spain is known for its rich cultural heritage and cuisine."
+    },
+    {
+        "Question": "Which Asian country is famous for its ancient temples, bustling markets, and tuk-tuk taxis?",
+        "Option1": "Vietnam",
+        "Option2": "Cambodia",
+        "Option3": "Thailand",
+        "Option4": "Malaysia",
+        "Answer": "Thailand",
+        "Fact": "Bangkok is a vibrant and energetic city that never sleeps."
+    },
+    {
+        "Question": "In which country would you find the city of Beijing?",
+        "Option1": "China",
+        "Option2": "Japan",
+        "Option3": "South Korea",
+        "Option4": "Vietnam",
+        "Answer": "China",
+        "Fact": "Beijing is the capital of the People's Republic of China."
+    },
+    {
+        "Question": "What is the iconic city located on the French Riviera known for its luxury and glamour?",
+        "Option1": "Nice",
+        "Option2": "Cannes",
+        "Option3": "Monaco",
+        "Option4": "Marseille",
+        "Answer": "Monaco",
+        "Fact": "Monaco is one of the world's smallest and wealthiest countries."
+    },
+    {
+        "Question": "Which African country is home to the iconic Victoria Falls and diverse wildlife in Hwange National Park?",
+        "Option1": "Kenya",
+        "Option2": "Zimbabwe",
+        "Option3": "South Africa",
+        "Option4": "Tanzania",
+        "Answer": "Zimbabwe",
+        "Fact": "Victoria Falls is one of Africa's most breathtaking natural wonders."
+    },
+    {
+        "Question": "What is the official language of Canada?",
+        "Option1": "English",
+        "Option2": "French",
+        "Option3": "Spanish",
+        "Option4": "Indigenous languages",
+        "Answer": "English and French",
+        "Fact": "Canada is a bilingual country with a rich multicultural fabric."
+    },
+    {
+        "Question": "In which European city can you find the iconic Brandenburg Gate?",
+        "Option1": "Berlin",
+        "Option2": "Paris",
+        "Option3": "Rome",
+        "Option4": "London",
+        "Answer": "Berlin",
+        "Fact": "The Brandenburg Gate is a symbol of Germany's reunification."
+    },
+    {
+        "Question": "Which ancient city is renowned for its massive stone temples and statues on Easter Island?",
+        "Option1": "Angkor Wat",
+        "Option2": "Machu Picchu",
+        "Option3": "Petra",
+        "Option4": "Rapa Nui",
+        "Answer": "Rapa Nui",
+        "Fact": "Rapa Nui, also known as Easter Island, is famous for its mysterious moai statues."
+    },
+    {
+        "Question": "Which island nation is located in the Caribbean Sea and is famous for its white sandy beaches and blue waters?",
+        "Option1": "Bahamas",
+        "Option2": "Barbados",
+        "Option3": "Jamaica",
+        "Option4": "Maldives",
+        "Answer": "Bahamas",
+        "Fact": "The Bahamas is a tropical paradise for beach lovers and water sports enthusiasts."
+    },
+    {
+        "Question": "What is the official language of Turkey?",
+        "Option1": "Turkish",
+        "Option2": "Arabic",
+        "Option3": "Persian",
+        "Option4": "Kurdish",
+        "Answer": "Turkish",
+        "Fact": "Turkey is a transcontinental country bridging Europe and Asia."
+    },
+    {
+        "Question": "Which city is famous for its iconic Sydney Opera House and picturesque harbor?",
+        "Option1": "Melbourne",
+        "Option2": "Sydney",
+        "Option3": "Brisbane",
+        "Option4": "Perth",
+        "Answer": "Sydney",
+        "Fact": "The Sydney Opera House is a UNESCO World Heritage site."
+    },
+    {
+        "Question": "In which Asian country would you find the historic city of Kyoto?",
+        "Option1": "China",
+        "Option2": "Japan",
+        "Option3": "South Korea",
+        "Option4": "Thailand",
+        "Answer": "Japan",
+        "Fact": "Kyoto is renowned for its traditional temples, gardens, and geisha culture."
+    },
+    {
+        "Question": "What is the famous fortress complex in India known for its intricate architecture and impressive palaces?",
+        "Option1": "Red Fort",
+        "Option2": "Amber Fort",
+        "Option3": "Golconda Fort",
+        "Option4": "Gwalior Fort",
+        "Answer": "Amber Fort",
+        "Fact": "The Amber Fort overlooks Jaipur and offers stunning views."
+    },
+    {
+        "Question": "Which African country is known for its Serengeti National Park and annual wildebeest migration?",
+        "Option1": "Tanzania",
+        "Option2": "Kenya",
+        "Option3": "Uganda",
+        "Option4": "Rwanda",
+        "Answer": "Tanzania",
+        "Fact": "The Serengeti is home to one of the world's most incredible wildlife spectacles."
+    },
+    {
+        "Question": "What is the iconic structure in Rome that once hosted gladiator contests and other public spectacles?",
+        "Option1": "Roman Forum",
+        "Option2": "Colosseum",
+        "Option3": "Pantheon",
+        "Option4": "Trevi Fountain",
+        "Answer": "Colosseum",
+        "Fact": "The Colosseum is a symbol of Ancient Rome's grandeur."
+    },
+    {
+        "Question": "Which US state is famous for its volcanic landscapes, including the Hawaii Volcanoes National Park?",
+        "Option1": "Alaska",
+        "Option2": "Hawaii",
+        "Option3": "California",
+        "Option4": "Oregon",
+        "Answer": "Hawaii",
+        "Fact": "Kilauea and Mauna Loa are active volcanoes in the park."
+    },
+    {
+        "Question": "What is the world's second-largest continent by land area?",
+        "Option1": "Africa",
+        "Option2": "Asia",
+        "Option3": "Europe",
+        "Option4": "North America",
+        "Answer": "Africa",
+        "Fact": "Africa is home to diverse cultures, landscapes, and wildlife."
+    },
+    {
+        "Question": "In which country would you find the city of Bangkok?",
+        "Option1": "Thailand",
+        "Option2": "Vietnam",
+        "Option3": "Cambodia",
+        "Option4": "Laos",
+        "Answer": "Thailand",
+        "Fact": "Bangkok is a bustling metropolis known for its vibrant street life."
+    },
+    {
+        "Question": "What is the iconic structure in Greece that is dedicated to the goddess Athena?",
+        "Option1": "Parthenon",
+        "Option2": "Acropolis",
+        "Option3": "Erechtheion",
+        "Option4": "Temple of Zeus",
+        "Answer": "Parthenon",
+        "Fact": "The Parthenon is an enduring symbol of ancient Greek architecture."
+    },
+    {
+        "Question": "Which island nation is known for its blue-domed churches and stunning sunsets over the caldera?",
+        "Option1": "Cyprus",
+        "Option2": "Crete",
+        "Option3": "Santorini",
+        "Option4": "Rhodes",
+        "Answer": "Santorini",
+        "Fact": "Santorini's unique beauty attracts honeymooners and travelers."
+    },
+    {
+        "Question": "What is the official language of South Korea?",
+        "Option1": "Korean",
+        "Option2": "Japanese",
+        "Option3": "Chinese",
+        "Option4": "Vietnamese",
+        "Answer": "Korean",
+        "Fact": "South Korea is known for its technological advancements and pop culture."
+    },
+    {
+        "Question": "Which European city is famous for its canals, gondolas, and historic architecture?",
+        "Option1": "Venice",
+        "Option2": "Rome",
+        "Option3": "Florence",
+        "Option4": "Milan",
+        "Answer": "Venice",
+        "Fact": "Venice's intricate canals make it a romantic and unique destination."
+    },
+    {
+        "Question": "In which country would you find the historic city of Cairo?",
+        "Option1": "Egypt",
+        "Option2": "Morocco",
+        "Option3": "Jordan",
+        "Option4": "Tunisia",
+        "Answer": "Egypt",
+        "Fact": "Cairo is home to the iconic Pyramids of Giza and Sphinx."
+    },
+    {
+        "Question": "What is the famous archaeological site in Italy known for its well-preserved Roman ruins?",
+        "Option1": "Pompeii",
+        "Option2": "Herculaneum",
+        "Option3": "Ostia Antica",
+        "Option4": "Paestum",
+        "Answer": "Pompeii",
+        "Fact": "The eruption of Mount Vesuvius preserved Pompeii in time."
+    },
+    {
+        "Question": "Which African country is famous for its diverse landscapes, including the Sahara Desert and Atlas Mountains?",
+        "Option1": "Algeria",
+        "Option2": "Libya",
+        "Option3": "Egypt",
+        "Option4": "Sudan",
+        "Answer": "Algeria",
+        "Fact": "The Sahara covers much of Algeria's southern expanse."
+    },
+    {
+        "Question": "What is the official language of India?",
+        "Option1": "Hindi",
+        "Option2": "English",
+        "Option3": "Urdu",
+        "Option4": "Bengali",
+        "Answer": "Hindi",
+        "Fact": "India has a rich cultural tapestry woven from many languages."
+    },
+    {
+        "Question": "Which country is famous for its tulip fields and windmills?",
+        "Option1": "Netherlands",
+        "Option2": "Belgium",
+        "Option3": "Denmark",
+        "Option4": "Sweden",
+        "Answer": "Netherlands",
+        "Fact": "The Netherlands is often called \"Holland\" colloquially."
+    },
+    {
+        "Question": "What is the famous ancient city in Egypt known for its grand temples and avenue of sphinxes?",
+        "Option1": "Karnak",
+        "Option2": "Luxor",
+        "Option3": "Abu Simbel",
+        "Option4": "Edfu",
+        "Answer": "Luxor",
+        "Fact": "Luxor was the capital of ancient Egypt's New Kingdom."
+    },
+    {
+        "Question": "Which Caribbean island is famous for its reggae music and stunning Blue Mountains?",
+        "Option1": "Jamaica",
+        "Option2": "Barbados",
+        "Option3": "Puerto Rico",
+        "Option4": "Trinidad and Tobago",
+        "Answer": "Jamaica",
+        "Fact": "Bob Marley is a global icon of reggae music from Jamaica."
+    },
+    {
+        "Question": "What is the world's largest coral reef system, located off the coast of Australia?",
+        "Option1": "Great Barrier Reef",
+        "Option2": "Coral Triangle",
+        "Option3": "Red Sea Coral Reef",
+        "Option4": "Maldives Coral Reef",
+        "Answer": "Great Barrier Reef",
+        "Fact": "The reef is visible from space and supports diverse marine life."
+    },
+    {
+        "Question": "Which ancient city, featured in a famous film is known for its iconic Treasury carved into a rock face?",
+        "Option1": "Petra",
+        "Option2": "Palmyra",
+        "Option3": "Ur",
+        "Option4": "Thebes",
+        "Answer": "Petra",
+        "Fact": "The Treasury in Jordan was showcased in the film \"Indiana Jones and the Last Crusade\"."
+    },
+    {
+        "Question": "In which country would you find the city of Istanbul, straddling Europe and Asia?",
+        "Option1": "Turkey",
+        "Option2": "Greece",
+        "Option3": "Bulgaria",
+        "Option4": "Cyprus",
+        "Answer": "Turkey",
+        "Fact": "Istanbul is one of the world's oldest and most culturally rich cities."
+    },
+    {
+        "Question": "Which US state is famous for its stunning beaches, theme parks, and NASA's Kennedy Space Center?",
+        "Option1": "Florida",
+        "Option2": "California",
+        "Option3": "Texas",
+        "Option4": "New York",
+        "Answer": "Florida",
+        "Fact": "Cape Canaveral is the site of historic space launches."
+    },
+    {
+        "Question": "What is the iconic stone circle in England believed to be a prehistoric ritual site?",
+        "Option1": "Stonehenge",
+        "Option2": "Avebury",
+        "Option3": "Callanish",
+        "Option4": "Rollright Stones",
+        "Answer": "Stonehenge",
+        "Fact": "Stonehenge's purpose and construction remain mysteries."
+    },
+    {
+        "Question": "Which Asian country is famous for its ancient temples of Angkor Wat and bustling markets of Siem Reap?",
+        "Option1": "Thailand",
+        "Option2": "Cambodia",
+        "Option3": "Vietnam",
+        "Option4": "Laos",
+        "Answer": "Cambodia",
+        "Fact": "Angkor Wat is the world's largest religious monument."
+    },
+    {
+        "Question": "What is the famous canyon in the US known for its stunning red rock formations and the Colorado River?",
+        "Option1": "Grand Canyon",
+        "Option2": "Bryce Canyon",
+        "Option3": "Zion Canyon",
+        "Option4": "Antelope Canyon",
+        "Answer": "Grand Canyon",
+        "Fact": "The Grand Canyon is over 277 miles long and up to 18 miles wide."
+    },
+    {
+        "Question": "Which European city is famous for its historic art and architecture, including Michelangelo's David?",
+        "Option1": "Paris",
+        "Option2": "Florence",
+        "Option3": "Barcelona",
+        "Option4": "Prague",
+        "Answer": "Florence",
+        "Fact": "Florence is considered the birthplace of the Renaissance."
+    },
+    {
+        "Question": "What is the famous river that flows through Egypt and is associated with ancient civilization?",
+        "Option1": "Nile",
+        "Option2": "Amazon",
+        "Option3": "Yangtze",
+        "Option4": "Mississippi",
+        "Answer": "Nile",
+        "Fact": "The Nile is the longest river in the world."
+    },
+    {
+        "Question": "Which South American country is famous for its vibrant Carnival celebrations, samba dance, and Christ the Redeemer statue?",
+        "Option1": "Brazil",
+        "Option2": "Argentina",
+        "Option3": "Colombia",
+        "Option4": "Chile",
+        "Answer": "Brazil",
+        "Fact": "Christ the Redeemer overlooks Rio de Janeiro and Corcovado Mountain."
+    },
+    {
+        "Question": "What is the famous ancient Japanese practice of folding paper into various shapes and designs?",
+        "Option1": "Origami",
+        "Option2": "Sumi-e",
+        "Option3": "Ikebana",
+        "Option4": "Calligraphy",
+        "Answer": "Origami",
+        "Fact": "Origami is a traditional art form that dates back centuries."
+    },
+    {
+        "Question": "Which African country is known for its rich history, including the city of Timbuktu?",
+        "Option1": "Mali",
+        "Option2": "Niger",
+        "Option3": "Chad",
+        "Option4": "Burkina Faso",
+        "Answer": "Mali",
+        "Fact": "Timbuktu was a major center of learning and trade in ancient times."
+    },
+    {
+        "Question": "What is the famous island known for its stunning landscapes, including the Cliffs of Moher and the Ring of Kerry?",
+        "Option1": "Iceland",
+        "Option2": "Ireland",
+        "Option3": "Isle of Man",
+        "Option4": "Greenland",
+        "Answer": "Ireland",
+        "Fact": "The Cliffs of Moher offer breathtaking views of the Atlantic."
+    },
+    {
+        "Question": "In which country would you find the city of Athens, considered the cradle of Western civilization?",
+        "Option1": "Greece",
+        "Option2": "Italy",
+        "Option3": "Turkey",
+        "Option4": "Spain",
+        "Answer": "Greece",
+        "Fact": "Athens is famous for the Parthenon and its philosophical heritage."
+    },
+    {
+        "Question": "Which ocean is the largest and covers more area than all the land combined?",
+        "Option1": "Pacific Ocean",
+        "Option2": "Atlantic Ocean",
+        "Option3": "Indian Ocean",
+        "Option4": "Arctic Ocean",
+        "Answer": "Pacific Ocean",
+        "Fact": "The Pacific Ocean is named after the Latin word \"pacificus\" meaning peaceful."
+    },
+    {
+        "Question": "What is the famous waterfall system located on the border of Canada and the United States?",
+        "Option1": "Niagara Falls",
+        "Option2": "Victoria Falls",
+        "Option3": "Angel Falls",
+        "Option4": "Iguazu Falls",
+        "Answer": "Niagara Falls",
+        "Fact": "The falls consist of Horseshoe Falls, American Falls, and Bridal Veil Falls."
+    },
+    {
+        "Question": "Which European country is famous for its stunning fjords, Viking history, and Northern Lights?",
+        "Option1": "Norway",
+        "Option2": "Sweden",
+        "Option3": "Denmark",
+        "Option4": "Finland",
+        "Answer": "Norway",
+        "Fact": "The Northern Lights, or Aurora Borealis, are a natural light display."
+    }
+]
