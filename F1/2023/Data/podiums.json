@@ -1,28 +1,28 @@
 {"Podiums": [
     {
-    "Country":	"🇧🇪 Belgium",
-    "City":	"Stavelot",
-    "Message":	"2023 12th race"
+    "Country":	"🇳🇱 Netherlands",
+    "City":	"Zandvoort",
+    "Message":	"2023 13th race"
     },
     {
     "Place":	"1",
     "Name":	"Verstappen",
     "Team":	"-",
     "Points":	"+25",
-    "Total":	"314"
+    "Total":	"339"
     },
     {
     "Place":	"2",
-    "Name":	"Pérez",
+    "Name":	"Alonso",
     "Team":	"-",
     "Points":	"+18",
-    "Total":	"189"
+    "Total":	"168"
     },
     {
     "Place":	"3",
-    "Name":	"Leclerc",
+    "Name":	"Gasly",
     "Team":	"-",
     "Points":	"+15",
-    "Total":	"99"
+    "Total":	"37"
     }
     ]}

@@ -1,40 +1,40 @@
 {"Standings": [
     {
-    "After":	"After Belgium"
+    "After":	"After Netherlands"
     },
     {
     "Place":	"1",
     "Name":	"Verstappen",
     "Team":	"-",
-    "Points":	"314"
+    "Points":	"339"
     },
     {
     "Place":	"2",
     "Name":	"Pérez",
     "Team":	"-",
-    "Points":	"189"
+    "Points":	"201"
     },
     {
     "Place":	"3",
     "Name":	"Alonso",
     "Team":	"-",
-    "Points":	"149"
+    "Points":	"168"
     },
     {
     "Place":	"4",
     "Name":	"Hamilton",
     "Team":	"-",
-    "Points":	"148"
+    "Points":	"156"
     },
     {
     "Place":	"5",
-    "Name":	"Leclerc",
+    "Name":	"Sainz",
     "Team":	"-",
-    "Points":	"99"
+    "Points":	"102"
     },
     {
     "Place":	"6",
-    "Name":	"Russell",
+    "Name":	"Leclerc",
     "Team":	"-",
     "Points":	"99"
     }
