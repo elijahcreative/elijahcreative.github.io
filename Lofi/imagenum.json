@@ -1,5 +1,7 @@
 {
     "numberOfDaytimeImages": 43,
     "numberOfNightImages": 13,
-    "path": "https://elijahcreative.github.io/Lofi/Small/"
+    "pathMain": "https://elijahcreative.github.io/Lofi/Small/",
+    "pathDay": "https://elijahcreative.github.io/Lofi/Small/Day/",
+    "pathNight": "https://elijahcreative.github.io/Lofi/Small/Night/"
 }
