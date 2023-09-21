@@ -252,7 +252,8 @@
             "Best lap": "1:30.983",
             "Best lap driver": "Hamilton, 2019",
             "First GP": "1987",
-            "Track image": "https://elijahcreative.github.io/F1/Images/TR-Suzuka.png"
+            "Track image": "https://elijahcreative.github.io/F1/Images/TR-Suzuka.png",
+            "Track2": "https://elijahcreative.github.io/F1/Images2/TR-Suzuka.png"
         },
         {
             "Country": "🇶🇦 Qatar",
@@ -266,7 +267,8 @@
             "Best lap": "1:23.196",
             "Best lap driver": "Verstappen, 2021",
             "First GP": "2021",
-            "Track image": "https://elijahcreative.github.io/F1/Images/TR-Quatar.png"
+            "Track image": "https://elijahcreative.github.io/F1/Images/TR-Quatar.png",
+            "Track2": "https://elijahcreative.github.io/F1/Images2/TR-Quatar.png"
         },
         {
             "Country": "🇺🇸 USA",
@@ -280,7 +282,8 @@
             "Best lap": "1:36.169",
             "Best lap driver": "Leclerc, 2019",
             "First GP": "2012",
-            "Track image": "https://elijahcreative.github.io/F1/Images/TR-Austin2.png"
+            "Track image": "https://elijahcreative.github.io/F1/Images/TR-Austin2.png",
+            "Track2": "https://elijahcreative.github.io/F1/Images2/TR-Austin2.png"
         },
         {
             "Country": "🇲🇽 Mexico",
@@ -294,7 +297,8 @@
             "Best lap": "1:17.774",
             "Best lap driver": "Bottas, 2021",
             "First GP": "1963",
-            "Track image": "https://elijahcreative.github.io/F1/Images/TR-Mexico.png"
+            "Track image": "https://elijahcreative.github.io/F1/Images/TR-Mexico.png",
+            "Track2": "https://elijahcreative.github.io/F1/Images2/TR-Mexico.png"
         },
         {
             "Country": "🇧🇷 Brazil",
@@ -308,7 +312,8 @@
             "Best lap": "1:10.540",
             "Best lap driver": "Bottas, 2018",
             "First GP": "1973",
-            "Track image": "https://elijahcreative.github.io/F1/Images/TR-Brazil.png"
+            "Track image": "https://elijahcreative.github.io/F1/Images/TR-Brazil.png",
+            "Track2": "https://elijahcreative.github.io/F1/Images2/TR-Brazil.png"
         },
         {
             "Country": "🇺🇸 USA",
@@ -322,7 +327,8 @@
             "Best lap": "-",
             "Best lap driver": "-",
             "First GP": "2023",
-            "Track image": "https://elijahcreative.github.io/F1/Images/TR-LasVegas.png"
+            "Track image": "https://elijahcreative.github.io/F1/Images/TR-LasVegas.png",
+            "Track2": "https://elijahcreative.github.io/F1/Images2/TR-LasVegas.png"
         },
         {
             "Country": "🇦🇪 U.A. Emirates",
@@ -336,7 +342,8 @@
             "Best lap": "1:26.103",
             "Best lap driver": "Verstappen, 2021",
             "First GP": "2009",
-            "Track image": "https://elijahcreative.github.io/F1/Images/TR-AbuDhabi.png"
+            "Track image": "https://elijahcreative.github.io/F1/Images/TR-AbuDhabi.png",
+            "Track2": "https://elijahcreative.github.io/F1/Images2/TR-AbuDhabi.png"
         }
     ]
 }
