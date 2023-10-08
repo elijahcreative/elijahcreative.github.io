@@ -1,28 +1,28 @@
 {"Podiums": [
     {
-    "Country":	"🇯🇵 Japan",
-    "City":	"Suzuka",
-    "Message":	"2023 16th race"
+    "Country":	"🇶🇦 Qatar",
+    "City":	"Doha",
+    "Message":	"2023 17th race"
     },
     {
     "Place":	"1",
     "Name":	"Verstappen",
     "Team":	"-",
     "Points":	"+25",
-    "Total":	"400"
+    "Total":	"433"
     },
     {
     "Place":	"2",
-    "Name":	"Norris",
+    "Name":	"Piastri",
     "Team":	"-",
     "Points":	"+18",
-    "Total":	"115"
+    "Total":	"83"
     },
     {
     "Place":	"3",
-    "Name":	"Piastri",
+    "Name":	"Norris",
     "Team":	"-",
     "Points":	"+15",
-    "Total":	"57"
+    "Total":	"136"
     }
     ]}
