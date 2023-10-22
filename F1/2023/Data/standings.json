@@ -1,24 +1,24 @@
 {"Standings": [
     {
-    "After":	"After Qatar"
+    "After":	"After USA"
     },
     {
     "Place":	"1",
     "Name":	"Verstappen 🏆",
     "Team":	"-",
-    "Points":	"433"
+    "Points":	"466"
     },
     {
     "Place":	"2",
     "Name":	"Pérez",
     "Team":	"-",
-    "Points":	"224"
+    "Points":	"238"
     },
     {
     "Place":	"3",
     "Name":	"Hamilton",
     "Team":	"-",
-    "Points":	"194"
+    "Points":	"219"
     },
     {
     "Place":	"4",
@@ -30,12 +30,12 @@
     "Place":	"5",
     "Name":	"Sainz",
     "Team":	"-",
-    "Points":	"153"
+    "Points":	"168"
     },
     {
     "Place":	"6",
     "Name":	"Leclerc",
     "Team":	"-",
-    "Points":	"145"
+    "Points":	"159"
     }
     ]}

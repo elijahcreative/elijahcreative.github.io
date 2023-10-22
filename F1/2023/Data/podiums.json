@@ -1,28 +1,28 @@
 {"Podiums": [
     {
-    "Country":	"🇶🇦 Qatar",
-    "City":	"Doha",
-    "Message":	"2023 17th race"
+    "Country":	"🇺🇸 USA",
+    "City":	"Austin",
+    "Message":	"2023 18th race"
     },
     {
     "Place":	"1",
     "Name":	"Verstappen",
     "Team":	"-",
     "Points":	"+25",
-    "Total":	"433"
+    "Total":	"466"
     },
     {
     "Place":	"2",
-    "Name":	"Piastri",
+    "Name":	"Hamilton",
     "Team":	"-",
     "Points":	"+18",
-    "Total":	"83"
+    "Total":	"219"
     },
     {
     "Place":	"3",
     "Name":	"Norris",
     "Team":	"-",
     "Points":	"+15",
-    "Total":	"136"
+    "Total":	"156"
     }
     ]}
