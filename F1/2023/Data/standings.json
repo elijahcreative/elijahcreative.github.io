@@ -12,13 +12,13 @@
     "Place":	"2",
     "Name":	"Pérez",
     "Team":	"-",
-    "Points":	"238"
+    "Points":	"240"
     },
     {
     "Place":	"3",
     "Name":	"Hamilton",
     "Team":	"-",
-    "Points":	"219"
+    "Points":	"201"
     },
     {
     "Place":	"4",
@@ -30,11 +30,11 @@
     "Place":	"5",
     "Name":	"Sainz",
     "Team":	"-",
-    "Points":	"168"
+    "Points":	"171"
     },
     {
     "Place":	"6",
-    "Name":	"Leclerc",
+    "Name":	"Norris",
     "Team":	"-",
     "Points":	"159"
     }
