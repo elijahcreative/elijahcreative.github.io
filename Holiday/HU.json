@@ -1,0 +1,179 @@
+{
+    "info": [
+        {
+            "date": "2024-01-01",
+            "name": "Újév",
+            "workday": true
+        },
+        {
+            "date": "2024-01-22",
+            "name": "A magyar kultúra napja",
+            "workday": false
+        },
+        {
+            "date": "2024-02-01",
+            "name": "A köztársaság napja",
+            "workday": false
+        },
+        {
+            "date": "2024-03-08",
+            "name": "Nőnap",
+            "workday": false
+        },
+        {
+            "date": "2024-03-15",
+            "name": "Az 1848-as forradalom ünnepe",
+            "workday": true
+        },
+        {
+            "date": "2024-03-29",
+            "name": "Nagypéntek",
+            "workday": true
+        },
+        {
+            "date": "2024-03-31",
+            "name": "Húsvét",
+            "workday": true
+        },
+        {
+            "date": "2024-04-01",
+            "name": "Húsvét hétfő",
+            "workday": true
+        },
+        {
+            "date": "2024-04-16",
+            "name": "A holokauszt áldozatainak emléknapja",
+            "workday": false
+        },
+        {
+            "date": "2024-05-01",
+            "name": "A munka ünnepe",
+            "workday": true
+        },
+        {
+            "date": "2024-05-05",
+            "name": "Anyák napja",
+            "workday": false
+        },
+        {
+            "date": "2024-05-19",
+            "name": "Pünkösd",
+            "workday": true
+        },
+        {
+            "date": "2024-05-20",
+            "name": "Pünkösd hétfő",
+            "workday": true
+        },
+        {
+            "date": "2024-05-26",
+            "name": "Gyermeknap",
+            "workday": false
+        },
+        {
+            "date": "2024-06-04",
+            "name": "A nemzeti összetartozás napja",
+            "workday": false
+        },
+        {
+            "date": "2024-06-16",
+            "name": "Nagy Imre emléknap",
+            "workday": false
+        },
+        {
+            "date": "2024-06-16",
+            "name": "Apák napja",
+            "workday": false
+        },
+        {
+            "date": "2024-07-22",
+            "name": "A nándorfehérvári diadal emléknapja",
+            "workday": false
+        },
+        {
+            "date": "2024-08-03",
+            "name": "Áthelyezett munkanap",
+            "workday": true
+        },
+        {
+            "date": "2024-08-19",
+            "name": "Pihenőnap",
+            "workday": false
+        },
+        {
+            "date": "2024-08-20",
+            "name": "Az államalapítás ünnepe",
+            "workday": true
+        },
+        {
+            "date": "2024-10-06",
+            "name": "Az aradi vértanúk emléknapja",
+            "workday": false
+        },
+        {
+            "date": "2024-10-23",
+            "name": "Az 1956-os forradalom ünnepe",
+            "workday": true
+        },
+        {
+            "date": "2024-10-31",
+            "name": "Halloween",
+            "workday": false
+        },
+        {
+            "date": "2024-11-01",
+            "name": "Mindenszentek napja",
+            "workday": true
+        },
+        {
+            "date": "2024-11-02",
+            "name": "Halottak napja",
+            "workday": false
+        },
+        {
+            "date": "2024-11-04",
+            "name": "Az emlékezés napja",
+            "workday": false
+        },
+        {
+            "date": "2024-11-13",
+            "name": "A magyar nyelv napja",
+            "workday": false
+        },
+        {
+            "date": "2024-12-06",
+            "name": "Mikulás",
+            "workday": false
+        },
+        {
+            "date": "2024-12-07",
+            "name": "Áthelyezett munkanap",
+            "workday": true
+        },
+        {
+            "date": "2024-12-14",
+            "name": "Áthelyezett munkanap",
+            "workday": true
+        },
+        {
+            "date": "2024-12-24",
+            "name": "Karácsony",
+            "workday": true
+        },
+        {
+            "date": "2024-12-25",
+            "name": "Karácsony másnap",
+            "workday": true
+        },
+        {
+            "date": "2024-12-27",
+            "name": "Pihenőnap",
+            "workday": false
+        },
+        {
+            "date": "2024-12-31",
+            "name": "Szilveszter",
+            "workday": true
+        }
+    ]
+}
