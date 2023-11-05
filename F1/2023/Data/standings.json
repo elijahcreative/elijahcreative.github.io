@@ -1,41 +1,41 @@
 {"Standings": [
     {
-    "After":	"After Mexico"
+    "After":	"After Brazil"
     },
     {
     "Place":	"1",
     "Name":	"Verstappen 🏆",
     "Team":	"-",
-    "Points":	"491"
+    "Points":	"524"
     },
     {
     "Place":	"2",
     "Name":	"Pérez",
     "Team":	"-",
-    "Points":	"240"
+    "Points":	"258"
     },
     {
     "Place":	"3",
     "Name":	"Hamilton",
     "Team":	"-",
-    "Points":	"220"
+    "Points":	"226"
     },
     {
     "Place":	"4",
-    "Name":	"Sainz",
+    "Name":	"Alonso",
     "Team":	"-",
-    "Points":	"183"
+    "Points":	"198"
     },
     {
     "Place":	"5",
-    "Name":	"Alonso",
+    "Name":	"Norris",
     "Team":	"-",
-    "Points":	"183"
+    "Points":	"195"
     },
     {
     "Place":	"6",
-    "Name":	"Norris",
+    "Name":	"Sainz",
     "Team":	"-",
-    "Points":	"169"
+    "Points":	"192"
     }
     ]}

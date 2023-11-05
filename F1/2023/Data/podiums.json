@@ -1,28 +1,28 @@
 {"Podiums": [
     {
-    "Country":	"🇲🇽 Mexico",
-    "City":	"Mexico City",
-    "Message":	"2023 19th race"
+    "Country":	"🇧🇷 Brazil",
+    "City":	"São Paulo",
+    "Message":	"2023 20th race"
     },
     {
     "Place":	"1",
     "Name":	"Verstappen",
     "Team":	"-",
     "Points":	"+25",
-    "Total":	"491"
+    "Total":	"524"
     },
     {
     "Place":	"2",
-    "Name":	"Hamilton",
+    "Name":	"Norris",
     "Team":	"-",
     "Points":	"+18",
-    "Total":	"220"
+    "Total":	"195"
     },
     {
     "Place":	"3",
-    "Name":	"Leclerc",
+    "Name":	"Alonso",
     "Team":	"-",
     "Points":	"+15",
-    "Total":	"166"
+    "Total":	"198"
     }
     ]}
