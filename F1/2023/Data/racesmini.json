@@ -17,5 +17,7 @@
   "Bestlapdriver": "-",
   "FirstGP": "2023",
   "Trackimage": "https://elijahcreative.github.io/F1/Images/TR-LasVegas.png",
-  "Track2": "https://elijahcreative.github.io/F1/Images2/TR-LasVegas.png"
+  "Track2": "https://elijahcreative.github.io/F1/Images2/TR-LasVegas.png",
+  "Day": "https://elijahcreative.github.io/F1/Card/LasVegas/Day/Day02.png",
+  "Night": "https://elijahcreative.github.io/F1/Card/LasVegas/Day/Night02.png"
 }
