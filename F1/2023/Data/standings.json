@@ -1,41 +1,41 @@
 {"Standings": [
     {
-    "After":	"After USA"
+    "After":	"After U.A. Emirates"
     },
     {
     "Place":	"1",
-    "Name":	"Verstappen 🏆",
+    "Name":	"Verstappen 🥇",
     "Team":	"-",
-    "Points":	"549"
+    "Points":	"575"
     },
     {
     "Place":	"2",
-    "Name":	"Pérez",
+    "Name":	"Pérez 🥈",
     "Team":	"-",
-    "Points":	"273"
+    "Points":	"285"
     },
     {
     "Place":	"3",
-    "Name":	"Hamilton",
+    "Name":	"Hamilton 🥉",
     "Team":	"-",
-    "Points":	"232"
+    "Points":	"234"
     },
     {
     "Place":	"4",
-    "Name":	"Sainz",
+    "Name":	"Alonso",
     "Team":	"-",
-    "Points":	"200"
+    "Points":	"206"
     },
     {
     "Place":	"5",
-    "Name":	"Alonso",
+    "Name":	"Leclerc",
     "Team":	"-",
-    "Points":	"200"
+    "Points":	"206"
     },
     {
     "Place":	"6",
     "Name":	"Norris",
     "Team":	"-",
-    "Points":	"195"
+    "Points":	"205"
     }
     ]}
