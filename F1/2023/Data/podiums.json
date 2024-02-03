@@ -1,28 +1,28 @@
 {"Podiums": [
     {
-    "Country":	"🇦🇪 U.A. Emirates",
-    "City":	"Abu Dhabi",
-    "Message":	"2023 22st race"
+    "Country":	"🇦🇪 -",
+    "City":	"-",
+    "Message":	"-"
     },
     {
     "Place":	"1",
-    "Name":	"Verstappen",
+    "Name":	"-",
     "Team":	"-",
     "Points":	"+25",
-    "Total":	"575"
+    "Total":	"-"
     },
     {
     "Place":	"2",
-    "Name":	"Leclerc",
+    "Name":	"-",
     "Team":	"-",
     "Points":	"+18",
-    "Total":	"206"
+    "Total":	"-"
     },
     {
     "Place":	"3",
-    "Name":	"Russell",
+    "Name":	"-",
     "Team":	"-",
     "Points":	"+15",
-    "Total":	"175"
+    "Total":	"-"
     }
     ]}
