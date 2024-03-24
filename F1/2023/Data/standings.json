@@ -1,6 +1,6 @@
 {"Standings": [
     {
-    "After":	"After Saudi Arabia"
+    "After":	"After Australia"
     },
     {
     "Place":	"1",
@@ -10,32 +10,32 @@
     },
     {
     "Place":	"2",
-    "Name":	"Pérez",
+    "Name":	"Leclerc",
     "Team":	"-",
-    "Points":	"36"
+    "Points":	"47"
     },
     {
     "Place":	"3",
-    "Name":	"Leclerc",
+    "Name":	"Pérez",
     "Team":	"-",
-    "Points":	"28"
+    "Points":	"46"
     },
     {
     "Place":	"4",
-    "Name":	"Russell",
+    "Name":	"Sainz",
     "Team":	"-",
-    "Points":	"18"
+    "Points":	"40"
     },
     {
     "Place":	"5",
     "Name":	"Piastri",
     "Team":	"-",
-    "Points":	"16"
+    "Points":	"28"
     },
     {
     "Place":	"6",
-    "Name":	"Sainz",
+    "Name":	"Norris",
     "Team":	"-",
-    "Points":	"15"
+    "Points":	"27"
     }
     ]}
