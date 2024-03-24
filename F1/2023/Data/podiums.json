@@ -1,28 +1,28 @@
 {"Podiums": [
     {
-    "Country":	"🇸🇦 Saudi Arabia",
-    "City":	"Jeddah",
-    "Message":	"2024 2nd race"
+    "Country":	"🇦🇺 Australia",
+    "City":	"Melbourne",
+    "Message":	"2024 3rd race"
     },
     {
     "Place":	"1",
-    "Name":	"Verstappen",
+    "Name":	"Sainz",
     "Team":	"-",
     "Points":	"+25",
-    "Total":	"51"
+    "Total":	"40"
     },
     {
     "Place":	"2",
-    "Name":	"Pérez",
+    "Name":	"Leclerc",
     "Team":	"-",
     "Points":	"+18",
-    "Total":	"36"
+    "Total":	"47"
     },
     {
     "Place":	"3",
-    "Name":	"Leclerc",
+    "Name":	"Norris",
     "Team":	"-",
     "Points":	"+15",
-    "Total":	"28"
+    "Total":	"27"
     }
     ]}
