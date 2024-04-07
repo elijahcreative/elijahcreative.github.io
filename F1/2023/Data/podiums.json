@@ -1,28 +1,28 @@
 {"Podiums": [
     {
-    "Country":	"🇦🇺 Australia",
-    "City":	"Melbourne",
-    "Message":	"2024 3rd race"
+    "Country":	"🇯🇵 Japan",
+    "City":	"Suzuka",
+    "Message":	"2024 4rd race"
     },
     {
     "Place":	"1",
-    "Name":	"Sainz",
+    "Name":	"Verstappen",
     "Team":	"-",
     "Points":	"+25",
-    "Total":	"40"
+    "Total":	"77"
     },
     {
     "Place":	"2",
-    "Name":	"Leclerc",
+    "Name":	"Pérez",
     "Team":	"-",
     "Points":	"+18",
-    "Total":	"47"
+    "Total":	"64"
     },
     {
     "Place":	"3",
-    "Name":	"Norris",
+    "Name":	"Sainz",
     "Team":	"-",
     "Points":	"+15",
-    "Total":	"27"
+    "Total":	"55"
     }
     ]}
