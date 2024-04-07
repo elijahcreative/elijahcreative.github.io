@@ -10,14 +10,14 @@
   "SprintTimePart": "-",
   "RaceDatePart": "április 7.",
   "RaceTimePart": "9:00",
-  "Laps": "53",
-  "Length": "5.8",
-  "Race distance": "307.5",
-  "Best lap": "1:30.983",
-  "Best lap driver": "Hamilton, 2019",
-  "First GP": "1987",
-  "Track image": "https://elijahcreative.github.io/F1/Images/TR-Suzuka.png",
-  "Track2": "https://elijahcreative.github.io/F1/Images2/TR-Suzuka.png",
+  "Laps": "56",
+            "Length": "5.4",
+            "Race distance": "305.1",
+            "Best lap": "1:32.238",
+            "Best lap driver": "Schumacher, 2004",
+            "First GP": "2004",
+            "Track image": "https://elijahcreative.github.io/F1/Images/TR-Suzuka.png",
+            "Track2": "https://elijahcreative.github.io/F1/Images2/TR-Suzuka.png"
   "Day": "",
   "Night": ""
 }
