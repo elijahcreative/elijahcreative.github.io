@@ -1,28 +1,28 @@
 {"Podiums": [
     {
-    "Country":	"🇨🇳 China",
-    "City":	"Shanghai",
-    "Message":	"2024 5th race"
+    "Country":	"🇺🇸 USA",
+    "City":	"Miami",
+    "Message":	"2024 6th race"
     },
     {
     "Place":	"1",
-    "Name":	"Verstappen",
+    "Name":	"Norris",
     "Team":	"-",
     "Points":	"+25",
-    "Total":	"110"
+    "Total":	"83"
     },
     {
     "Place":	"2",
-    "Name":	"Norris",
+    "Name":	"Verstappen",
     "Team":	"-",
     "Points":	"+18",
-    "Total":	"58"
+    "Total":	"136"
     },
     {
     "Place":	"3",
-    "Name":	"Pérez",
+    "Name":	"Leclerc",
     "Team":	"-",
     "Points":	"+15",
-    "Total":	"85"
+    "Total":	"98"
     }
     ]}
