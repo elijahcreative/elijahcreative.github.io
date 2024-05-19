@@ -1,28 +1,28 @@
 {"Podiums": [
     {
-    "Country":	"🇺🇸 USA",
-    "City":	"Miami",
-    "Message":	"2024 6th race"
+    "Country":	"🇮🇹 Italy",
+    "City":	"Imola",
+    "Message":	"2024 7th race"
     },
     {
     "Place":	"1",
-    "Name":	"Norris",
+    "Name":	"Verstappen",
     "Team":	"-",
     "Points":	"+25",
-    "Total":	"83"
+    "Total":	"161"
     },
     {
     "Place":	"2",
-    "Name":	"Verstappen",
+    "Name":	"Norris",
     "Team":	"-",
     "Points":	"+18",
-    "Total":	"136"
+    "Total":	"101"
     },
     {
     "Place":	"3",
     "Name":	"Leclerc",
     "Team":	"-",
     "Points":	"+15",
-    "Total":	"98"
+    "Total":	"113"
     }
     ]}

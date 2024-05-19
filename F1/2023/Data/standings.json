@@ -6,36 +6,36 @@
     "Place":	"1",
     "Name":	"Verstappen",
     "Team":	"-",
-    "Points":	"136"
+    "Points":	"161"
     },
     {
     "Place":	"2",
-    "Name":	"Pérez",
+    "Name":	"Leclerc",
     "Team":	"-",
-    "Points":	"103"
+    "Points":	"113"
     },
     {
     "Place":	"3",
-    "Name":	"Leclerc",
+    "Name":	"Pérez",
     "Team":	"-",
-    "Points":	"98"
+    "Points":	"107"
     },
     {
     "Place":	"4",
     "Name":	"Norris",
     "Team":	"-",
-    "Points":	"83"
+    "Points":	"101"
     },
     {
     "Place":	"5",
     "Name":	"Sainz",
     "Team":	"-",
-    "Points":	"83"
+    "Points":	"93"
     },
     {
     "Place":	"6",
     "Name":	"Piastri",
     "Team":	"-",
-    "Points":	"41"
+    "Points":	"53"
     }
     ]}
