@@ -6,23 +6,23 @@
     },
     {
     "Place":	"1",
-    "Name":	"Verstappen",
+    "Name":	"Leclerc",
     "Team":	"-",
     "Points":	"+25",
-    "Total":	"161"
+    "Total":	"138"
     },
     {
     "Place":	"2",
-    "Name":	"Norris",
+    "Name":	"Piastri",
     "Team":	"-",
     "Points":	"+18",
-    "Total":	"101"
+    "Total":	"71"
     },
     {
     "Place":	"3",
-    "Name":	"Leclerc",
+    "Name":	"Sainz",
     "Team":	"-",
     "Points":	"+15",
-    "Total":	"113"
+    "Total":	"108"
     }
     ]}
