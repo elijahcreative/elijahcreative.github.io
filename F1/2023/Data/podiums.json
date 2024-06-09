@@ -1,28 +1,28 @@
 {"Podiums": [
     {
-    "Country":	"🇮🇹 Italy",
-    "City":	"Imola",
-    "Message":	"2024 7th race"
+    "Country":	"🇨🇦 Canada",
+    "City":	"Montréal",
+    "Message":	"2024 8th race"
     },
     {
     "Place":	"1",
-    "Name":	"Leclerc",
+    "Name":	"Verstappen",
     "Team":	"-",
     "Points":	"+25",
-    "Total":	"138"
+    "Total":	"194"
     },
     {
     "Place":	"2",
-    "Name":	"Piastri",
+    "Name":	"Norris",
     "Team":	"-",
     "Points":	"+18",
-    "Total":	"71"
+    "Total":	"131"
     },
     {
     "Place":	"3",
-    "Name":	"Sainz",
+    "Name":	"Russell",
     "Team":	"-",
     "Points":	"+15",
-    "Total":	"108"
+    "Total":	"69"
     }
     ]}
