@@ -1,41 +1,41 @@
 {"Standings": [
     {
-    "After":	"After Italy"
+    "After":	"After Spain"
     },
     {
     "Place":	"1",
     "Name":	"Verstappen",
     "Team":	"-",
-    "Points":	"194"
+    "Points":	"219"
     },
     {
     "Place":	"2",
-    "Name":	"Leclerc",
+    "Name":	"Norris",
     "Team":	"-",
-    "Points":	"138"
+    "Points":	"150"
     },
     {
     "Place":	"3",
-    "Name":	"Norris",
+    "Name":	"Leclerc",
     "Team":	"-",
-    "Points":	"131"
+    "Points":	"148"
     },
     {
     "Place":	"4",
     "Name":	"Sainz",
     "Team":	"-",
-    "Points":	"108"
+    "Points":	"116"
     },
     {
     "Place":	"5",
     "Name":	"Pérez",
     "Team":	"-",
-    "Points":	"107"
+    "Points":	"111"
     },
     {
     "Place":	"6",
     "Name":	"Piastri",
     "Team":	"-",
-    "Points":	"81"
+    "Points":	"87"
     }
     ]}

@@ -1,28 +1,28 @@
 {"Podiums": [
     {
-    "Country":	"🇨🇦 Canada",
-    "City":	"Montréal",
-    "Message":	"2024 8th race"
+    "Country":	"🇪🇸 Spain",
+    "City":	"Barcelona",
+    "Message":	"2024 9th race"
     },
     {
     "Place":	"1",
     "Name":	"Verstappen",
     "Team":	"-",
     "Points":	"+25",
-    "Total":	"194"
+    "Total":	"219"
     },
     {
     "Place":	"2",
     "Name":	"Norris",
     "Team":	"-",
     "Points":	"+18",
-    "Total":	"131"
+    "Total":	"150"
     },
     {
     "Place":	"3",
-    "Name":	"Russell",
+    "Name":	"Hamilton",
     "Team":	"-",
     "Points":	"+15",
-    "Total":	"69"
+    "Total":	"70"
     }
     ]}
