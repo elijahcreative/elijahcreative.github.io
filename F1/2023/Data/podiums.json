@@ -1,28 +1,28 @@
 {"Podiums": [
     {
-    "Country":	"🇪🇸 Spain",
-    "City":	"Barcelona",
-    "Message":	"2024 9th race"
+    "Country":	"🇦🇹 Austria",
+    "City":	"Spielberg",
+    "Message":	"2024 10th race"
     },
     {
     "Place":	"1",
-    "Name":	"Verstappen",
+    "Name":	"Russell",
     "Team":	"-",
     "Points":	"+25",
-    "Total":	"219"
+    "Total":	"111"
     },
     {
     "Place":	"2",
-    "Name":	"Norris",
+    "Name":	"Piastri",
     "Team":	"-",
     "Points":	"+18",
-    "Total":	"150"
+    "Total":	"112"
     },
     {
     "Place":	"3",
-    "Name":	"Hamilton",
+    "Name":	"Sainz",
     "Team":	"-",
     "Points":	"+15",
-    "Total":	"70"
+    "Total":	"135"
     }
     ]}
