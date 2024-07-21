@@ -1,28 +1,28 @@
 {"Podiums": [
     {
-    "Country":	"🇬🇧 UK",
-    "City":	"Silverstone",
-    "Message":	"2024 11th race"
+    "Country":	"🇭🇺 Hungary",
+    "City":	"Mogyoród",
+    "Message":	"2024 12th race"
     },
     {
     "Place":	"1",
-    "Name":	"Hamilton",
+    "Name":	"Piastri",
     "Team":	"-",
     "Points":	"+25",
-    "Total":	"110"
+    "Total":	"149"
     },
     {
     "Place":	"2",
-    "Name":	"Verstappen",
+    "Name":	"Norris",
     "Team":	"-",
     "Points":	"+18",
-    "Total":	"255"
+    "Total":	"189"
     },
     {
     "Place":	"3",
-    "Name":	"Norris",
+    "Name":	"Hamilton",
     "Team":	"-",
     "Points":	"+15",
-    "Total":	"171"
+    "Total":	"125"
     }
     ]}
