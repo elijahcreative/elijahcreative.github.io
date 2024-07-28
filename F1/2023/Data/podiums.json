@@ -1,28 +1,28 @@
 {"Podiums": [
     {
-    "Country":	"🇭🇺 Hungary",
-    "City":	"Mogyoród",
-    "Message":	"2024 12th race"
+    "Country":	"🇧🇪 Belgium",
+    "City":	"Stavelot",
+    "Message":	"2024 13th race"
     },
     {
     "Place":	"1",
-    "Name":	"Piastri",
+    "Name":	"Russell",
     "Team":	"-",
     "Points":	"+25",
-    "Total":	"149"
+    "Total":	"141"
     },
     {
     "Place":	"2",
-    "Name":	"Norris",
+    "Name":	"Hamilton",
     "Team":	"-",
     "Points":	"+18",
-    "Total":	"189"
+    "Total":	"143"
     },
     {
     "Place":	"3",
-    "Name":	"Hamilton",
+    "Name":	"Piastri",
     "Team":	"-",
     "Points":	"+15",
-    "Total":	"125"
+    "Total":	"164"
     }
     ]}
