@@ -1,28 +1,28 @@
 {"Podiums": [
     {
-    "Country":	"🇦🇿 Azerbaijan",
-    "City":	"Baku",
-    "Message":	"2024 16th race"
+    "Country":	"🇸🇬 Singapore",
+    "City":	"Marina Bay",
+    "Message":	"2024 17th race"
     },
     {
     "Place":	"1",
-    "Name":	"Piastri",
+    "Name":	"Norris",
     "Team":	"-",
     "Points":	"+25",
-    "Total":	"222"
+    "Total":	"279"
     },
     {
     "Place":	"2",
-    "Name":	"Leclerc",
+    "Name":	"Verstappen",
     "Team":	"-",
     "Points":	"+18",
-    "Total":	"235"
+    "Total":	"331"
     },
     {
     "Place":	"3",
-    "Name":	"Russell",
+    "Name":	"Piastri",
     "Team":	"-",
     "Points":	"+15",
-    "Total":	"143"
+    "Total":	"237"
     }
     ]}
