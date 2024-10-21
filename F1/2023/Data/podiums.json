@@ -1,28 +1,28 @@
 {"Podiums": [
     {
-    "Country":	"🇸🇬 Singapore",
-    "City":	"Marina Bay",
-    "Message":	"2024 17th race"
+    "Country":	"🇺🇸 USA",
+    "City":	"Austin",
+    "Message":	"2024 18th race"
     },
     {
     "Place":	"1",
-    "Name":	"Norris",
+    "Name":	"Leclerc",
     "Team":	"-",
     "Points":	"+25",
-    "Total":	"279"
+    "Total":	"275"
     },
     {
     "Place":	"2",
-    "Name":	"Verstappen",
+    "Name":	"Sainz",
     "Team":	"-",
     "Points":	"+18",
-    "Total":	"331"
+    "Total":	"215"
     },
     {
     "Place":	"3",
-    "Name":	"Piastri",
+    "Name":	"Verstappen",
     "Team":	"-",
     "Points":	"+15",
-    "Total":	"237"
+    "Total":	"354"
     }
     ]}
