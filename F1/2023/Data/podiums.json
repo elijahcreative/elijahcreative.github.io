@@ -1,28 +1,28 @@
 {"Podiums": [
     {
-    "Country":	"🇺🇸 USA",
-    "City":	"Austin",
-    "Message":	"2024 18th race"
+    "Country":	"🇲🇽 Mexico",
+    "City":	"Mexico City",
+    "Message":	"2024 19th race"
     },
     {
     "Place":	"1",
-    "Name":	"Leclerc",
+    "Name":	"Sainz",
     "Team":	"-",
     "Points":	"+25",
-    "Total":	"275"
+    "Total":	"240"
     },
     {
     "Place":	"2",
-    "Name":	"Sainz",
+    "Name":	"Norris",
     "Team":	"-",
     "Points":	"+18",
-    "Total":	"215"
+    "Total":	"315"
     },
     {
     "Place":	"3",
-    "Name":	"Verstappen",
+    "Name":	"Leclerc",
     "Team":	"-",
     "Points":	"+15",
-    "Total":	"354"
+    "Total":	"291"
     }
     ]}
