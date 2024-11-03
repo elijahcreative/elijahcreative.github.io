@@ -1,28 +1,28 @@
 {"Podiums": [
     {
-    "Country":	"🇲🇽 Mexico",
-    "City":	"Mexico City",
-    "Message":	"2024 19th race"
+    "Country":	"🇧🇷 Brazil",
+    "City":	"São Paulo",
+    "Message":	"2024 20th race"
     },
     {
     "Place":	"1",
-    "Name":	"Sainz",
+    "Name":	"Verstappen",
     "Team":	"-",
     "Points":	"+25",
-    "Total":	"240"
+    "Total":	"393"
     },
     {
     "Place":	"2",
-    "Name":	"Norris",
+    "Name":	"Ocon",
     "Team":	"-",
     "Points":	"+18",
-    "Total":	"315"
+    "Total":	"23"
     },
     {
     "Place":	"3",
-    "Name":	"Leclerc",
+    "Name":	"Gasly",
     "Team":	"-",
     "Points":	"+15",
-    "Total":	"291"
+    "Total":	"26"
     }
     ]}
