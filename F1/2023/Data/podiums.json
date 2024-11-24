@@ -1,28 +1,28 @@
 {"Podiums": [
     {
-    "Country":	"🇧🇷 Brazil",
-    "City":	"São Paulo",
-    "Message":	"2024 20th race"
+    "Country":	"🇺🇸 USA",
+    "City":	"Las Vegas",
+    "Message":	"2024 21th race"
     },
     {
     "Place":	"1",
-    "Name":	"Verstappen",
+    "Name":	"Russell",
     "Team":	"-",
     "Points":	"+25",
-    "Total":	"393"
+    "Total":	"217"
     },
     {
     "Place":	"2",
-    "Name":	"Ocon",
+    "Name":	"Hamilton",
     "Team":	"-",
     "Points":	"+18",
-    "Total":	"23"
+    "Total":	"208"
     },
     {
     "Place":	"3",
-    "Name":	"Gasly",
+    "Name":	"Sainz",
     "Team":	"-",
     "Points":	"+15",
-    "Total":	"26"
+    "Total":	"259"
     }
     ]}
