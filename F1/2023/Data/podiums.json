@@ -1,28 +1,28 @@
 {"Podiums": [
     {
-    "Country":	"🇺🇸 USA",
-    "City":	"Las Vegas",
-    "Message":	"2024 21th race"
+    "Country":	"🇶🇦 Qatar",
+    "City":	"Doha",
+    "Message":	"2024 22nd race"
     },
     {
     "Place":	"1",
-    "Name":	"Russell",
+    "Name":	"Verstappen",
     "Team":	"-",
     "Points":	"+25",
-    "Total":	"217"
+    "Total":	"429"
     },
     {
     "Place":	"2",
-    "Name":	"Hamilton",
+    "Name":	"Leclerc",
     "Team":	"-",
     "Points":	"+18",
-    "Total":	"208"
+    "Total":	"341"
     },
     {
     "Place":	"3",
-    "Name":	"Sainz",
+    "Name":	"Piastri",
     "Team":	"-",
     "Points":	"+15",
-    "Total":	"259"
+    "Total":	"291"
     }
     ]}
