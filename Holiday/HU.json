@@ -166,11 +166,6 @@
             "workday": true
         },
         {
-            "date": "2024-12-27",
-            "name": "Pihenőnap",
-            "workday": false
-        },
-        {
             "date": "2024-12-31",
             "name": "Szilveszter",
             "workday": true
