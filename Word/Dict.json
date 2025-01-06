@@ -836,31 +836,36 @@
     "type": "noun",
     "pronunciation": "ˈræpsədi",
     "definition": "an ecstatic expression of feeling or enthusiasm",
-    "example": "The musician's performance was a rhapsody of emotion and skill."
+    "example": "The musician's performance was a rhapsody of emotion and skill.",
+    "etymology": "Mid 16th century: via Latin from Greek rhapsōidia, from rhaptein ‘to sew’ + ōidē ‘song’."
   },
   "intrinsic": {
     "type": "adjective",
     "pronunciation": "ɪnˈtrɪnzɪk",
     "definition": "belonging naturally; essential",
-    "example": "Her intrinsic talent for painting shines through in every brushstroke."
+    "example": "Her intrinsic talent for painting shines through in every brushstroke.",
+    "etymology": "Late Middle English: from late Latin intrinsecus ‘on the inside’, from Latin intra ‘within’ + secus ‘alongside’."
   },
   "exemplary": {
     "type": "adjective",
     "pronunciation": "ɪɡˈzɛmpləri",
     "definition": "serving as a desirable model; commendable",
-    "example": "He set an exemplary standard of professionalism for his colleagues to follow."
+    "example": "He set an exemplary standard of professionalism for his colleagues to follow.",
+    "etymology": "Late Middle English: from Latin exemplaris, from exemplum ‘sample, imitation’."
   },
   "placid": {
     "type": "adjective",
     "pronunciation": "ˈplæsɪd",
     "definition": "calm and peaceful",
-    "example": "The lake was placid, reflecting the tranquility of the surrounding mountains."
+    "example": "The lake was placid, reflecting the tranquility of the surrounding mountains.",
+    "etymology": "Early 17th century: from French placide, from Latin placidus, from placere ‘to please’."
   },
   "eloquent": {
     "type": "adjective",
     "pronunciation": "ˈɛləkwənt",
     "definition": "fluent or persuasive in speaking or writing",
-    "example": "Her eloquent speech moved the audience to tears."
+    "example": "Her eloquent speech moved the audience to tears.",
+    "etymology": "Late Middle English: from Old French, or from Latin eloquent- ‘speaking out’, from the verb eloqui."
   },
   "abhor": {
     "type": "verb",
