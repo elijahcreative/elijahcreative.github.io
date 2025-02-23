@@ -1,28 +1,28 @@
 {"Podiums": [
     {
-    "Country":	"🇦🇪 2024 last race",
+    "Country":	"🇦🇪 2025 1st race",
     "City":	"Abu Dhabi",
-    "Message":	"2024 23rd race"
+    "Message":	"2025 1st race"
     },
     {
     "Place":	"1",
-    "Name":	"Norris",
+    "Name":	"Driver",
     "Team":	"-",
     "Points":	"+25",
-    "Total":	"374"
+    "Total":	"Pts"
     },
     {
     "Place":	"2",
-    "Name":	"Sainz",
+    "Name":	"Driver",
     "Team":	"-",
     "Points":	"+18",
-    "Total":	"290"
+    "Total":	"Pts"
     },
     {
     "Place":	"3",
-    "Name":	"Leclerc",
+    "Name":	"Driver",
     "Team":	"-",
     "Points":	"+15",
-    "Total":	"356"
+    "Total":	"Pts"
     }
     ]}
