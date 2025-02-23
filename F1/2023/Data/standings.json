@@ -1,41 +1,41 @@
 {"Standings": [
     {
-    "After":	"2024 finals"
+    "After":	"After 2025 1st race"
     },
     {
     "Place":	"1",
-    "Name":	"Verstappen 🏆",
+    "Name":	"Driver",
     "Team":	"-",
-    "Points":	"437"
+    "Points":	"Pts"
     },
     {
     "Place":	"2",
-    "Name":	"Norris 🥈",
+    "Name":	"Driver",
     "Team":	"-",
-    "Points":	"374"
+    "Points":	"Pts"
     },
     {
     "Place":	"3",
-    "Name":	"Leclerc 🥉",
+    "Name":	"Driver",
     "Team":	"-",
-    "Points":	"356"
+    "Points":	"Pts"
     },
     {
     "Place":	"4",
-    "Name":	"Piastri",
+    "Name":	"Driver",
     "Team":	"-",
-    "Points":	"292"
+    "Points":	"Pts"
     },
     {
     "Place":	"5",
-    "Name":	"Sainz",
+    "Name":	"Driver",
     "Team":	"-",
-    "Points":	"290"
+    "Points":	"Pts"
     },
     {
     "Place":	"6",
-    "Name":	"Russell",
+    "Name":	"Driver",
     "Team":	"-",
-    "Points":	"245"
+    "Points":	"Pts"
     }
     ]}
