@@ -1,28 +1,28 @@
 {"Podiums": [
     {
-    "Country":	"🇦🇪 2025 1st race",
-    "City":	"Abu Dhabi",
+    "Country":	"🇦🇺 Australia",
+    "City":	"Melbourne",
     "Message":	"2025 1st race"
     },
     {
     "Place":	"1",
-    "Name":	"Driver",
+    "Name":	"Norris",
     "Team":	"-",
     "Points":	"+25",
-    "Total":	"Pts"
+    "Total":	"25"
     },
     {
     "Place":	"2",
-    "Name":	"Driver",
+    "Name":	"Verstappen",
     "Team":	"-",
     "Points":	"+18",
-    "Total":	"Pts"
+    "Total":	"18"
     },
     {
     "Place":	"3",
-    "Name":	"Driver",
+    "Name":	"Russell",
     "Team":	"-",
     "Points":	"+15",
-    "Total":	"Pts"
+    "Total":	"15"
     }
     ]}
