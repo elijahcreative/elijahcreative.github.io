@@ -1,41 +1,43 @@
-{"Standings": [
-    {
-    "After":	"After Australia"
-    },
-    {
-    "Place":	"1",
-    "Name":	"Norris",
-    "Team":	"-",
-    "Points":	"25"
-    },
-    {
-    "Place":	"2",
-    "Name":	"Verstappen",
-    "Team":	"-",
-    "Points":	"18"
-    },
-    {
-    "Place":	"3",
-    "Name":	"Russell",
-    "Team":	"-",
-    "Points":	"15"
-    },
-    {
-    "Place":	"4",
-    "Name":	"Albon",
-    "Team":	"-",
-    "Points":	"12"
-    },
-    {
-    "Place":	"5",
-    "Name":	"Antonelli",
-    "Team":	"-",
-    "Points":	"10"
-    },
-    {
-    "Place":	"6",
-    "Name":	"Stroll",
-    "Team":	"-",
-    "Points":	"8"
-    }
-    ]}
+{
+    "Standings": [
+      {
+        "After": "After China"
+      },
+      {
+        "Place": "1",
+        "Name": "Norris",
+        "Team": "McLaren",
+        "Points": "44"
+      },
+      {
+        "Place": "2",
+        "Name": "Verstappen",
+        "Team": "Red Bull",
+        "Points": "36"
+      },
+      {
+        "Place": "3",
+        "Name": "Russell",
+        "Team": "Mercedes",
+        "Points": "35"
+      },
+      {
+        "Place": "4",
+        "Name": "Piastri",
+        "Team": "McLaren",
+        "Points": "34"
+      },
+      {
+        "Place": "5",
+        "Name": "Antonelli",
+        "Team": "Mercedes",
+        "Points": "18"
+      },
+      {
+        "Place": "6",
+        "Name": "Leclerc",
+        "Team": "Ferrari",
+        "Points": "18"
+      }
+    ]
+  }
