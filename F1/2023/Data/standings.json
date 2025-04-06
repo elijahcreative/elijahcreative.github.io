@@ -1,43 +1,43 @@
 {
     "Standings": [
       {
-        "After": "After China"
+        "After": "After Japan"
       },
       {
         "Place": "1",
         "Name": "Norris",
         "Team": "McLaren",
-        "Points": "44"
+        "Points": "62"
       },
       {
         "Place": "2",
         "Name": "Verstappen",
         "Team": "Red Bull",
-        "Points": "36"
+        "Points": "61"
       },
       {
         "Place": "3",
-        "Name": "Russell",
-        "Team": "Mercedes",
-        "Points": "35"
+        "Name": "Piastri",
+        "Team": "-",
+        "Points": "49"
       },
       {
         "Place": "4",
-        "Name": "Piastri",
-        "Team": "McLaren",
-        "Points": "34"
+        "Name": "Russell",
+        "Team": "",
+        "Points": "45"
       },
       {
         "Place": "5",
         "Name": "Antonelli",
         "Team": "Mercedes",
-        "Points": "22"
+        "Points": "30"
       },
       {
         "Place": "6",
-        "Name": "Albon",
-        "Team": "Williams",
-        "Points": "16"
+        "Name": "Leclerc",
+        "Team": "-",
+        "Points": "20"
       }
     ]
   }
