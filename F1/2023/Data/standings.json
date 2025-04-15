@@ -1,43 +1,43 @@
 {
-    "Standings": [
-      {
-        "After": "After Japan"
-      },
-      {
-        "Place": "1",
-        "Name": "Norris",
-        "Team": "McLaren",
-        "Points": "62"
-      },
-      {
-        "Place": "2",
-        "Name": "Verstappen",
-        "Team": "Red Bull",
-        "Points": "61"
-      },
-      {
-        "Place": "3",
-        "Name": "Piastri",
-        "Team": "-",
-        "Points": "49"
-      },
-      {
-        "Place": "4",
-        "Name": "Russell",
-        "Team": "",
-        "Points": "45"
-      },
-      {
-        "Place": "5",
-        "Name": "Antonelli",
-        "Team": "Mercedes",
-        "Points": "30"
-      },
-      {
-        "Place": "6",
-        "Name": "Leclerc",
-        "Team": "-",
-        "Points": "20"
-      }
-    ]
-  }
+  "Standings": [
+    {
+      "After": "After Bahrain"
+    },
+    {
+      "Place": "1",
+      "Name": "Lando Norris",
+      "Team": "McLaren",
+      "Points": "77"
+    },
+    {
+      "Place": "2",
+      "Name": "Oscar Piastri",
+      "Team": "McLaren",
+      "Points": "74"
+    },
+    {
+      "Place": "3",
+      "Name": "Max Verstappen",
+      "Team": "Red Bull",
+      "Points": "69"
+    },
+    {
+      "Place": "4",
+      "Name": "George Russell",
+      "Team": "Mercedes",
+      "Points": "63"
+    },
+    {
+      "Place": "5",
+      "Name": "Charles Leclerc",
+      "Team": "Ferrari",
+      "Points": "32"
+    },
+    {
+      "Place": "6",
+      "Name": "Kimi Antonelli",
+      "Team": "Mercedes",
+      "Points": "30"
+    }
+  ]
+}
