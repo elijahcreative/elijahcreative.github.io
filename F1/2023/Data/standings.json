@@ -5,37 +5,37 @@
     },
     {
       "Place": "1",
-      "Name": "Lando Norris",
+      "Name": "Norris",
       "Team": "McLaren",
       "Points": "77"
     },
     {
       "Place": "2",
-      "Name": "Oscar Piastri",
+      "Name": "Piastri",
       "Team": "McLaren",
       "Points": "74"
     },
     {
       "Place": "3",
-      "Name": "Max Verstappen",
+      "Name": "Verstappen",
       "Team": "Red Bull",
       "Points": "69"
     },
     {
       "Place": "4",
-      "Name": "George Russell",
+      "Name": "Russell",
       "Team": "Mercedes",
       "Points": "63"
     },
     {
       "Place": "5",
-      "Name": "Charles Leclerc",
+      "Name": "Leclerc",
       "Team": "Ferrari",
       "Points": "32"
     },
     {
       "Place": "6",
-      "Name": "Kimi Antonelli",
+      "Name": "Antonelli",
       "Team": "Mercedes",
       "Points": "30"
     }
