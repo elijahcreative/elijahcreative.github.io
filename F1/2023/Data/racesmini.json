@@ -10,12 +10,12 @@
   "SprintTimePart": "18:00",
   "RaceDatePart": "május 4.",
   "RaceTimePart": "22:00",
-  "Laps": "50",
-  "Length": "6.2",
-  "Distance": "308.5",
-  "Bestlap": "1:30.734",
-  "Bestlapdriver": "Hamilton, 2021",
-  "FirstGP": "2021",
-  "Trackimage": "https://elijahcreative.github.io/F1/Images/TR-Saudi.png",
-  "Track2": "https://elijahcreative.github.io/F1/Images2/TR-Saudi.png"
+  "Laps": "57",
+  "Length": "5.4",
+  "Race distance": "308.4",
+  "Best lap": "1:31.361",
+  "Best lap driver": "Verstappen, 2022",
+  "First GP": "2022",
+  "Track image": "https://elijahcreative.github.io/F1/Images/TR-Miami.png",
+  "Track2": "https://elijahcreative.github.io/F1/Images2/TR-Miami.png"
 }
