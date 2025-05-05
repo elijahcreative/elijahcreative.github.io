@@ -1,43 +1,43 @@
 {
   "Standings": [
     {
-      "After": "After Saudi Arabia"
+      "After": "After Miami"
     },
     {
       "Place": "1",
       "Name": "Piastri",
       "Team": "McLaren",
-      "Points": "99"
+      "Points": "131"
     },
     {
       "Place": "2",
       "Name": "Norris",
       "Team": "McLaren",
-      "Points": "89"
+      "Points": "115"
     },
     {
       "Place": "3",
       "Name": "Verstappen",
       "Team": "Red Bull",
-      "Points": "87"
+      "Points": "99"
     },
     {
       "Place": "4",
       "Name": "Russell",
       "Team": "Mercedes",
-      "Points": "73"
+      "Points": "93"
     },
     {
       "Place": "5",
       "Name": "Leclerc",
       "Team": "Ferrari",
-      "Points": "47"
+      "Points": "53"
     },
     {
       "Place": "6",
       "Name": "Antonelli",
       "Team": "Mercedes",
-      "Points": "38"
+      "Points": "48"
     }
   ]
 }
