@@ -1,43 +1,43 @@
 {
   "Standings": [
     {
-      "After": "After USA"
+      "After": "Italy"
     },
     {
       "Place": "1",
       "Name": "Piastri",
       "Team": "McLaren",
-      "Points": "131"
+      "Points": "146"
     },
     {
       "Place": "2",
       "Name": "Norris",
       "Team": "McLaren",
-      "Points": "115"
+      "Points": "133"
     },
     {
       "Place": "3",
       "Name": "Verstappen",
       "Team": "Red Bull",
-      "Points": "99"
+      "Points": "124"
     },
     {
       "Place": "4",
       "Name": "Russell",
       "Team": "Mercedes",
-      "Points": "93"
+      "Points": "99"
     },
     {
       "Place": "5",
       "Name": "Leclerc",
       "Team": "Ferrari",
-      "Points": "53"
+      "Points": "61"
     },
     {
       "Place": "6",
-      "Name": "Antonelli",
-      "Team": "Mercedes",
-      "Points": "48"
+      "Name": "Hamilton",
+      "Team": "Ferrari",
+      "Points": "53"
     }
   ]
 }
