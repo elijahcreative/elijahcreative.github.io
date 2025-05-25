@@ -1,25 +1,25 @@
 {
   "Standings": [
     {
-      "After": "Italy"
+      "After": "Monaco"
     },
     {
       "Place": "1",
       "Name": "Piastri",
       "Team": "McLaren",
-      "Points": "146"
+      "Points": "161"
     },
     {
       "Place": "2",
       "Name": "Norris",
       "Team": "McLaren",
-      "Points": "133"
+      "Points": "158"
     },
     {
       "Place": "3",
       "Name": "Verstappen",
       "Team": "Red Bull",
-      "Points": "124"
+      "Points": "136"
     },
     {
       "Place": "4",
@@ -31,13 +31,13 @@
       "Place": "5",
       "Name": "Leclerc",
       "Team": "Ferrari",
-      "Points": "61"
+      "Points": "79"
     },
     {
       "Place": "6",
       "Name": "Hamilton",
       "Team": "Ferrari",
-      "Points": "53"
+      "Points": "63"
     }
   ]
 }

@@ -1,30 +1,30 @@
 {
   "Podiums": [
     {
-      "Country": "🇮🇹 Italy",
-      "City": "Imola",
-      "Message": "2025 7th race"
+      "Country": "🇲🇨 Monaco",
+      "City": "Monte Carlo",
+      "Message": "2025 8th race"
     },
     {
       "Place": "1",
-      "Name": "Verstappen",
-      "Team": "Red Bull",
+      "Name": "Norris",
+      "Team": "McLaren",
       "Points": "+25",
-      "Total": "124"
+      "Total": "158"
     },
     {
       "Place": "2",
-      "Name": "Norris",
-      "Team": "McLaren",
+      "Name": "Leclerc",
+      "Team": "Ferrari",
       "Points": "+18",
-      "Total": "133"
+      "Total": "79"
     },
     {
       "Place": "3",
       "Name": "Piastri",
       "Team": "McLaren",
       "Points": "+15",
-      "Total": "146"
+      "Total": "161"
     }
   ]
 }
