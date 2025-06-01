@@ -1,30 +1,30 @@
 {
   "Podiums": [
     {
-      "Country": "🇲🇨 Monaco",
-      "City": "Monte Carlo",
-      "Message": "2025 8th race"
+      "Country": "🇪🇸 Spain",
+      "City": "Barcelona",
+      "Message": "2025 9th race"
     },
     {
       "Place": "1",
-      "Name": "Norris",
+      "Name": "Piastri",
       "Team": "McLaren",
       "Points": "+25",
-      "Total": "158"
+      "Total": "186"
     },
     {
       "Place": "2",
-      "Name": "Leclerc",
-      "Team": "Ferrari",
+      "Name": "Norris",
+      "Team": "McLaren",
       "Points": "+18",
-      "Total": "79"
+      "Total": "176"
     },
     {
       "Place": "3",
-      "Name": "Piastri",
-      "Team": "McLaren",
+      "Name": "Leclerc",
+      "Team": "Ferrari",
       "Points": "+15",
-      "Total": "161"
+      "Total": "94"
     }
   ]
 }
