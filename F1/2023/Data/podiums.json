@@ -1,30 +1,30 @@
 {
   "Podiums": [
     {
-      "Country": "🇪🇸 Spain",
-      "City": "Barcelona",
-      "Message": "2025 9th race"
+      "Country": "🇦🇹 Austria",
+      "City": "Spielberg",
+      "Message": "2025 11th race"
     },
     {
       "Place": "1",
-      "Name": "Piastri",
+      "Name": "Norris",
       "Team": "McLaren",
       "Points": "+25",
-      "Total": "186"
+      "Total": "201"
     },
     {
       "Place": "2",
-      "Name": "Norris",
+      "Name": "Piastri",
       "Team": "McLaren",
       "Points": "+18",
-      "Total": "176"
+      "Total": "216"
     },
     {
       "Place": "3",
       "Name": "Leclerc",
       "Team": "Ferrari",
       "Points": "+15",
-      "Total": "94"
+      "Total": "119"
     }
   ]
 }
