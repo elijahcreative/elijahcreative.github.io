@@ -1,30 +1,30 @@
 {
   "Podiums": [
     {
-      "Country": "🇦🇹 Austria",
-      "City": "Spielberg",
-      "Message": "2025 11th race"
+      "Country": "🇬🇧 UK",
+      "City": "Silverstone",
+      "Message": "2025 12th race"
     },
     {
       "Place": "1",
       "Name": "Norris",
       "Team": "McLaren",
       "Points": "+25",
-      "Total": "201"
+      "Total": "226"
     },
     {
       "Place": "2",
       "Name": "Piastri",
       "Team": "McLaren",
       "Points": "+18",
-      "Total": "216"
+      "Total": "234"
     },
     {
       "Place": "3",
-      "Name": "Leclerc",
-      "Team": "Ferrari",
+      "Name": "Hulkenberg",
+      "Team": "Sauber",
       "Points": "+15",
-      "Total": "119"
+      "Total": "37"
     }
   ]
 }

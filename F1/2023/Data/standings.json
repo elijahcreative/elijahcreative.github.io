@@ -1,31 +1,31 @@
 {
   "Standings": [
     {
-      "After": "After Austria"
+      "After": "After UK"
     },
     {
       "Place": "1",
       "Name": "Piastri",
       "Team": "McLaren",
-      "Points": "216"
+      "Points": "234"
     },
     {
       "Place": "2",
       "Name": "Norris",
       "Team": "McLaren",
-      "Points": "201"
+      "Points": "226"
     },
     {
       "Place": "3",
       "Name": "Verstappen",
       "Team": "Red Bull",
-      "Points": "155"
+      "Points": "165"
     },
     {
       "Place": "4",
       "Name": "Russell",
       "Team": "Mercedes",
-      "Points": "146"
+      "Points": "147"
     },
     {
       "Place": "5",
@@ -37,7 +37,7 @@
       "Place": "6",
       "Name": "Hamilton",
       "Team": "Ferrari",
-      "Points": "91"
+      "Points": "103"
     }
   ]
 }
