@@ -1,0 +1,25 @@
+name: Update wttr.json daily
+
+on:
+  schedule:
+    - cron: "0 4 * * *"  # minden nap 6:00 magyar idő
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Fetch wttr.in JSON
+        run: |
+          curl https://wttr.in/?format=j1 -o weather/wttr.json
+
+      - name: Commit changes
+        run: |
+          git config user.name "GitHub Action"
+          git config user.email "actions@github.com"
+          git add weather/wttr.json
+          git commit -m "Update wttr.json" || echo "No changes"
+          git push
