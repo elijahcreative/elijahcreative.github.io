@@ -1,30 +1,30 @@
 {
   "Podiums": [
     {
-      "Country": "🇭🇺 Hungary",
-      "City": "Mogyoród",
-      "Message": "2025 14th race"
+      "Country": "🇳🇱 Netherlands",
+      "City": "Zandvoort",
+      "Message": "2025 15th race"
     },
     {
       "Place": "1",
-      "Name": "Norris",
+      "Name": "Piastri",
       "Team": "McLaren",
       "Points": "+25",
-      "Total": "275"
+      "Total": "309"
     },
     {
       "Place": "2",
-      "Name": "Piastri",
-      "Team": "McLaren",
+      "Name": "Verstappen",
+      "Team": "Red Bull",
       "Points": "+18",
-      "Total": "284"
+      "Total": "205"
     },
     {
       "Place": "3",
-      "Name": "Russell",
-      "Team": "Mercedes",
+      "Name": "Hadjar",
+      "Team": "Racing Bulls",
       "Points": "+15",
-      "Total": "172"
+      "Total": "37"
     }
   ]
 }
