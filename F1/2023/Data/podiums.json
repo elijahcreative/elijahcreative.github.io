@@ -1,30 +1,30 @@
 {
   "Podiums": [
     {
-      "Country": "🇮🇹 Italy",
-      "City": "Monza",
-      "Message": "2025 16th race"
+      "Country": "🇦🇿 Azerbaijan",
+      "City": "Baku",
+      "Message": "2025 17th race"
     },
     {
       "Place": "1",
       "Name": "Verstappen",
       "Team": "Red Bull",
       "Points": "+25",
-      "Total": "230"
+      "Total": "255"
     },
     {
       "Place": "2",
-      "Name": "Norris",
-      "Team": "McLaren",
+      "Name": "Russell",
+      "Team": "Mercedes",
       "Points": "+18",
-      "Total": "293"
+      "Total": "212"
     },
     {
       "Place": "3",
-      "Name": "Piastri",
-      "Team": "McLaren",
+      "Name": "Sainz",
+      "Team": "Williams",
       "Points": "+15",
-      "Total": "324"
+      "Total": "31"
     }
   ]
 }
