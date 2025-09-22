@@ -1,7 +1,7 @@
 {
   "Standings": [
     {
-      "After": "After Italy"
+      "After": "After Azerbaijan"
     },
     {
       "Place": "1",
@@ -13,31 +13,31 @@
       "Place": "2",
       "Name": "Norris",
       "Team": "McLaren",
-      "Points": "293"
+      "Points": "299"
     },
     {
       "Place": "3",
       "Name": "Verstappen",
       "Team": "Red Bull",
-      "Points": "230"
+      "Points": "255"
     },
     {
       "Place": "4",
       "Name": "Russell",
       "Team": "Mercedes",
-      "Points": "194"
+      "Points": "212"
     },
     {
       "Place": "5",
       "Name": "Leclerc",
       "Team": "Ferrari",
-      "Points": "163"
+      "Points": "165"
     },
     {
       "Place": "6",
       "Name": "Hamilton",
       "Team": "Ferrari",
-      "Points": "117"
+      "Points": "121"
     }
   ]
 }
