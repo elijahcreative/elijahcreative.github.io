@@ -7,21 +7,21 @@
     },
     {
       "Place": "1",
-      "Name": "George Russell",
+      "Name": "Russell",
       "Team": "Mercedes",
       "Points": "+25",
       "Total": "237"
     },
     {
       "Place": "2",
-      "Name": "Max Verstappen",
+      "Name": "Verstappen",
       "Team": "Red Bull",
       "Points": "+18",
       "Total": "273"
     },
     {
       "Place": "3",
-      "Name": "Lando Norris",
+      "Name": "Norris",
       "Team": "McLaren",
       "Points": "+15",
       "Total": "314"
