@@ -1,43 +1,43 @@
 {
   "Standings": [
     {
-      "After": "After Azerbaijan"
+      "After": "After Singapore"
     },
     {
       "Place": "1",
-      "Name": "Piastri",
+      "Name": "Oscar Piastri",
       "Team": "McLaren",
-      "Points": "324"
+      "Points": "336"
     },
     {
       "Place": "2",
-      "Name": "Norris",
+      "Name": "Lando Norris",
       "Team": "McLaren",
-      "Points": "299"
+      "Points": "314"
     },
     {
       "Place": "3",
-      "Name": "Verstappen",
-      "Team": "Red Bull",
-      "Points": "255"
+      "Name": "Max Verstappen",
+      "Team": "Red Bull Racing",
+      "Points": "273"
     },
     {
       "Place": "4",
-      "Name": "Russell",
+      "Name": "George Russell",
       "Team": "Mercedes",
-      "Points": "212"
+      "Points": "237"
     },
     {
       "Place": "5",
-      "Name": "Leclerc",
+      "Name": "Charles Leclerc",
       "Team": "Ferrari",
-      "Points": "165"
+      "Points": "173"
     },
     {
       "Place": "6",
-      "Name": "Hamilton",
+      "Name": "Lewis Hamilton",
       "Team": "Ferrari",
-      "Points": "121"
+      "Points": "125"
     }
   ]
 }
