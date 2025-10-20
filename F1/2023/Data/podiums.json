@@ -1,30 +1,30 @@
 {
   "Podiums": [
     {
-      "Country": "🇸🇬 Singapore",
-      "City": "Singapore",
-      "Message": "2025 18th race"
+      "Country": "🇺🇸 United States",
+      "City": "Austin",
+      "Message": "2025 19th race"
     },
     {
       "Place": "1",
-      "Name": "Russell",
-      "Team": "Mercedes",
+      "Name": "Verstappen",
+      "Team": "Red Bull",
       "Points": "+25",
-      "Total": "237"
+      "Total": "306"
     },
     {
       "Place": "2",
-      "Name": "Verstappen",
-      "Team": "Red Bull",
+      "Name": "Norris",
+      "Team": "McLaren",
       "Points": "+18",
-      "Total": "273"
+      "Total": "332"
     },
     {
       "Place": "3",
-      "Name": "Norris",
-      "Team": "McLaren",
+      "Name": "Leclerc",
+      "Team": "Ferrari",
       "Points": "+15",
-      "Total": "314"
+      "Total": "192"
     }
   ]
 }
