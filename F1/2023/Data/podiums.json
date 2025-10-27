@@ -1,30 +1,30 @@
 {
   "Podiums": [
     {
-      "Country": "🇺🇸 United States",
-      "City": "Austin",
-      "Message": "2025 19th race"
+      "Country": "🇲🇽 Mexico",
+      "City": "Mexico City",
+      "Message": "2025 20th race"
     },
     {
       "Place": "1",
-      "Name": "Verstappen",
-      "Team": "Red Bull",
+      "Name": "Norris",
+      "Team": "McLaren",
       "Points": "+25",
-      "Total": "306"
+      "Total": "357"
     },
     {
       "Place": "2",
-      "Name": "Norris",
-      "Team": "McLaren",
+      "Name": "Leclerc",
+      "Team": "Ferrari",
       "Points": "+18",
-      "Total": "332"
+      "Total": "210"
     },
     {
       "Place": "3",
-      "Name": "Leclerc",
-      "Team": "Ferrari",
+      "Name": "Verstappen",
+      "Team": "Red Bull",
       "Points": "+15",
-      "Total": "192"
+      "Total": "321"
     }
   ]
 }

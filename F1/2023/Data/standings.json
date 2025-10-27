@@ -1,43 +1,43 @@
 {
   "Standings": [
     {
-      "After": "After United States"
+      "After": "After Mexico"
     },
     {
       "Place": "1",
-      "Name": "Piastri",
+      "Name": "Norris",
       "Team": "McLaren",
-      "Points": "346"
+      "Points": "357"
     },
     {
       "Place": "2",
-      "Name": "Norris",
+      "Name": "Piastri",
       "Team": "McLaren",
-      "Points": "332"
+      "Points": "356"
     },
     {
       "Place": "3",
       "Name": "Verstappen",
       "Team": "Red Bull",
-      "Points": "306"
+      "Points": "321"
     },
     {
       "Place": "4",
       "Name": "Russell",
       "Team": "Mercedes",
-      "Points": "252"
+      "Points": "258"
     },
     {
       "Place": "5",
       "Name": "Leclerc",
       "Team": "Ferrari",
-      "Points": "192"
+      "Points": "210"
     },
     {
       "Place": "6",
       "Name": "Hamilton",
       "Team": "Ferrari",
-      "Points": "142"
+      "Points": "146"
     }
   ]
 }
