@@ -1,7 +1,7 @@
 {
   "Standings": [
     {
-      "After": "After Brazil"
+      "After": "After Las Vegas"
     },
     {
       "Place": "1",
@@ -19,25 +19,25 @@
       "Place": "3",
       "Name": "Verstappen",
       "Team": "Red Bull",
-      "Points": "341"
+      "Points": "366"
     },
     {
       "Place": "4",
       "Name": "Russell",
       "Team": "Mercedes",
-      "Points": "276"
+      "Points": "294"
     },
     {
       "Place": "5",
       "Name": "Leclerc",
       "Team": "Ferrari",
-      "Points": "214"
+      "Points": "226"
     },
     {
       "Place": "6",
       "Name": "Hamilton",
       "Team": "Ferrari",
-      "Points": "148"
+      "Points": "152"
     }
   ]
 }

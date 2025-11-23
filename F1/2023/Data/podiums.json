@@ -1,30 +1,30 @@
 {
   "Podiums": [
     {
-      "Country": "🇧🇷 Brazil",
-      "City": "São Paulo",
-      "Message": "2025 21st race"
+      "Country": "🇺🇸 United States",
+      "City": "Las Vegas",
+      "Message": "2025 22nd race"
     },
     {
       "Place": "1",
-      "Name": "Norris",
-      "Team": "McLaren",
+      "Name": "Verstappen",
+      "Team": "Red Bull",
       "Points": "+25",
-      "Total": "390"
+      "Total": "366"
     },
     {
       "Place": "2",
-      "Name": "Antonelli",
+      "Name": "Russell",
       "Team": "Mercedes",
       "Points": "+18",
-      "Total": "122"
+      "Total": "294"
     },
     {
       "Place": "3",
-      "Name": "Verstappen",
-      "Team": "Red Bull",
+      "Name": "Antonelli",
+      "Team": "Mercedes",
       "Points": "+15",
-      "Total": "341"
+      "Total": "137"
     }
   ]
 }
