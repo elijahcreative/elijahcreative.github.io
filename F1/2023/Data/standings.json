@@ -7,37 +7,37 @@
       "Place": "1",
       "Name": "Norris",
       "Team": "McLaren",
-      "Points": "408"
+      "Points": "423"
     },
     {
       "Place": "2",
       "Name": "Verstappen",
       "Team": "Red Bull",
-      "Points": "396"
+      "Points": "421"
     },
     {
       "Place": "3",
       "Name": "Piastri",
       "Team": "McLaren",
-      "Points": "392"
+      "Points": "410"
     },
     {
       "Place": "4",
       "Name": "Russell",
       "Team": "Mercedes",
-      "Points": "309"
+      "Points": "319"
     },
     {
       "Place": "5",
       "Name": "Leclerc",
       "Team": "Ferrari",
-      "Points": "230"
+      "Points": "242"
     },
     {
       "Place": "6",
       "Name": "Hamilton",
       "Team": "Ferrari",
-      "Points": "152"
+      "Points": "156"
     }
   ]
 }

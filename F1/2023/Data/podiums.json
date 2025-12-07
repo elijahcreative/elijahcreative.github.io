@@ -1,30 +1,30 @@
 {
   "Podiums": [
     {
-      "Country": "🇶🇦 Qatar",
-      "City": "Doha",
-      "Message": "2025 23rd race"
+      "Country": "🇦🇪 U.A. Emirates",
+      "City": "Abu Dhabi",
+      "Message": "2025 24th race"
     },
     {
       "Place": "1",
       "Name": "Verstappen",
       "Team": "Red Bull",
       "Points": "+25",
-      "Total": "396"
+      "Total": "421"
     },
     {
       "Place": "2",
       "Name": "Piastri",
       "Team": "McLaren",
       "Points": "+18",
-      "Total": "392"
+      "Total": "410"
     },
     {
       "Place": "3",
-      "Name": "Sainz",
-      "Team": "Williams",
+      "Name": "Norris",
+      "Team": "McLaren",
       "Points": "+15",
-      "Total": "64"
+      "Total": "423"
     }
   ]
 }
