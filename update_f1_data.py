@@ -12,7 +12,7 @@ import sys
 
 # Configuration
 JOLPICA_BASE_URL = "http://api.jolpi.ca/ergast/f1"
-RACES_FILE = "F1/2023/Data/races2026.json"
+RACES_FILE = "F1/2023/Data/races.json"
 STANDINGS_FILE = "F1/2023/Data/standings.json"
 PODIUMS_FILE = "F1/2023/Data/podiums.json"
 
