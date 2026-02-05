@@ -1,0 +1,44 @@
+name: F1 Auto-Update
+
+on:
+  # Run daily at 22:00 UTC (after most races finish)
+  schedule:
+    - cron: '0 22 * * *'
+  
+  # Allow manual trigger
+  workflow_dispatch:
+
+jobs:
+  update-f1-data:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          pip install requests
+      
+      - name: Run F1 update script
+        run: |
+          python update_f1_data.py
+      
+      - name: Check for changes
+        id: git-check
+        run: |
+          git diff --exit-code || echo "changes=true" >> $GITHUB_OUTPUT
+      
+      - name: Commit and push if changed
+        if: steps.git-check.outputs.changes == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add F1/2023/Data/standings.json F1/2023/Data/podiums.json
+          git commit -m "🏁 Auto-update: F1 results after race"
+          git push
