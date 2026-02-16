@@ -1,1 +1,320 @@
+<!doctype html>
+<html lang="hu">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daylight Map Widget</title>
+    <style>
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        background: #000;
+      }
+      body {
+        display: grid;
+        place-items: center;
+      }
+      .widget {
+        width: min(100vmin, 1024px);
+        aspect-ratio: 1 / 1;
+        background: #000;
+        overflow: hidden;
+      }
+      #map {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="widget">
+      <canvas id="map" aria-label="Daylight map" role="img"></canvas>
+    </div>
 
+    <script>
+      const canvas = document.getElementById("map");
+      const ctx = canvas.getContext("2d", { alpha: true });
+
+      const params = new URLSearchParams(window.location.search);
+      const mapSrc =
+        params.get("map") ||
+        "https://upload.wikimedia.org/wikipedia/commons/c/c0/Equirectangular_projection_world_map_without_borders.svg";
+
+      const mapImage = new Image();
+      mapImage.crossOrigin = "anonymous";
+      mapImage.src = mapSrc;
+
+      let mapReady = false;
+
+      const landBuffer = document.createElement("canvas");
+      const landCtx = landBuffer.getContext("2d", { alpha: true });
+      const shadeBuffer = document.createElement("canvas");
+      const shadeCtx = shadeBuffer.getContext("2d", { alpha: true });
+      let mapRect = { x: 0, y: 0, w: 0, h: 0 };
+
+      function clamp(v, min, max) {
+        return Math.min(max, Math.max(min, v));
+      }
+
+      function wrapLon(lon) {
+        return ((lon + 540) % 360) - 180;
+      }
+
+      function toRad(deg) {
+        return (deg * Math.PI) / 180;
+      }
+
+      function fromRad(rad) {
+        return (rad * 180) / Math.PI;
+      }
+
+      function solarPosition(date) {
+        const msPerDay = 86400000;
+        const jd = date.getTime() / msPerDay + 2440587.5;
+        const T = (jd - 2451545.0) / 36525.0;
+
+        const L0 = (280.46646 + T * (36000.76983 + T * 0.0003032)) % 360;
+        const M = 357.52911 + T * (35999.05029 - 0.0001537 * T);
+        const e = 0.016708634 - T * (0.000042037 + 0.0000001267 * T);
+
+        const Mrad = toRad(M);
+        const C =
+          Math.sin(Mrad) * (1.914602 - T * (0.004817 + 0.000014 * T)) +
+          Math.sin(2 * Mrad) * (0.019993 - 0.000101 * T) +
+          Math.sin(3 * Mrad) * 0.000289;
+
+        const trueLong = L0 + C;
+        const omega = 125.04 - 1934.136 * T;
+        const lambda = trueLong - 0.00569 - 0.00478 * Math.sin(toRad(omega));
+
+        const epsilon0 =
+          23 +
+          (26 +
+            (21.448 -
+              T *
+                (46.815 +
+                  T *
+                    (0.00059 -
+                      T * 0.001813))) /
+              60) /
+            60;
+        const epsilon = epsilon0 + 0.00256 * Math.cos(toRad(omega));
+
+        const decl = fromRad(
+          Math.asin(Math.sin(toRad(epsilon)) * Math.sin(toRad(lambda)))
+        );
+
+        const y = Math.tan(toRad(epsilon / 2)) ** 2;
+        const Etime =
+          4 *
+          fromRad(
+            y * Math.sin(2 * toRad(L0)) -
+              2 * e * Math.sin(Mrad) +
+              4 * e * y * Math.sin(Mrad) * Math.cos(2 * toRad(L0)) -
+              0.5 * y * y * Math.sin(4 * toRad(L0)) -
+              1.25 * e * e * Math.sin(2 * Mrad)
+          );
+
+        const utcMinutes =
+          date.getUTCHours() * 60 +
+          date.getUTCMinutes() +
+          date.getUTCSeconds() / 60 +
+          date.getUTCMilliseconds() / 60000;
+
+        const subsolarLon = wrapLon((720 - utcMinutes - Etime) / 4);
+        return { declination: decl, subsolarLon };
+      }
+
+      function resize() {
+        const ratio = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        const w = Math.max(1, Math.round(rect.width));
+        const h = Math.max(1, Math.round(rect.height));
+
+        canvas.width = Math.round(w * ratio);
+        canvas.height = Math.round(h * ratio);
+        ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+        landBuffer.width = Math.max(1, w);
+        landBuffer.height = Math.max(1, h);
+
+        if (mapReady) {
+          buildLandLayer(w, h);
+        }
+      }
+
+      function buildLandLayer(w, h) {
+        landCtx.clearRect(0, 0, w, h);
+
+        const srcW = mapImage.naturalWidth;
+        const srcH = mapImage.naturalHeight;
+        const srcAspect = srcW / srcH;
+        const dstAspect = w / h;
+
+        let drawW = w;
+        let drawH = h;
+        if (srcAspect > dstAspect) {
+          drawW = w;
+          drawH = w / srcAspect;
+        } else {
+          drawH = h;
+          drawW = h * srcAspect;
+        }
+
+        mapRect = {
+          x: (w - drawW) * 0.5,
+          y: (h - drawH) * 0.5,
+          w: drawW,
+          h: drawH,
+        };
+
+        shadeBuffer.width = Math.max(2, Math.round(mapRect.w * 0.66));
+        shadeBuffer.height = Math.max(2, Math.round(mapRect.h * 0.66));
+
+        landCtx.drawImage(
+          mapImage,
+          0,
+          0,
+          srcW,
+          srcH,
+          mapRect.x,
+          mapRect.y,
+          mapRect.w,
+          mapRect.h
+        );
+
+        // Keep only the map alpha and tint it to light gray (continents).
+        landCtx.globalCompositeOperation = "source-in";
+        landCtx.fillStyle = "rgb(208, 212, 220)";
+        landCtx.fillRect(0, 0, w, h);
+        landCtx.globalCompositeOperation = "source-over";
+      }
+
+      function drawDayNightMask(w, h, solar) {
+        const sw = shadeBuffer.width;
+        const sh = shadeBuffer.height;
+        const image = shadeCtx.createImageData(sw, sh);
+        const data = image.data;
+        const upperBoundary = new Array(sw).fill(-1);
+
+        const decl = toRad(solar.declination);
+        const lon0 = toRad(solar.subsolarLon);
+
+        for (let x = 0; x < sw; x++) {
+          let prevNight = null;
+          for (let y = 0; y < sh; y++) {
+            const lat = toRad(90 - ((y + 0.5) / sh) * 180);
+            const sinLat = Math.sin(lat);
+            const cosLat = Math.cos(lat);
+            const lon = toRad(((x + 0.5) / sw) * 360 - 180);
+            const hourAngle = lon - lon0;
+
+            const sinAlt =
+              sinLat * Math.sin(decl) +
+              cosLat * Math.cos(decl) * Math.cos(hourAngle);
+            const isNight = sinAlt < 0;
+
+            const i = (y * sw + x) * 4;
+            if (isNight) {
+              data[i] = 0;
+              data[i + 1] = 0;
+              data[i + 2] = 0;
+              data[i + 3] = 185;
+            } else {
+              data[i] = 0;
+              data[i + 1] = 0;
+              data[i + 2] = 0;
+              data[i + 3] = 0;
+            }
+
+            if (
+              prevNight !== null &&
+              upperBoundary[x] === -1 &&
+              prevNight !== isNight
+            ) {
+              upperBoundary[x] = y;
+            }
+            prevNight = isNight;
+          }
+        }
+
+        shadeCtx.putImageData(image, 0, 0);
+        ctx.drawImage(
+          shadeBuffer,
+          0,
+          0,
+          sw,
+          sh,
+          mapRect.x,
+          mapRect.y,
+          mapRect.w,
+          mapRect.h
+        );
+
+        // "Area chart" top boundary line.
+        ctx.save();
+        ctx.strokeStyle = "rgba(215, 220, 232, 0.5)";
+        ctx.lineWidth = Math.max(1.8, mapRect.h * 0.0036);
+        ctx.beginPath();
+        let started = false;
+        for (let x = 0; x < sw; x++) {
+          const y = upperBoundary[x];
+          if (y < 0) continue;
+          const px = mapRect.x + ((x + 0.5) / sw) * mapRect.w;
+          const py = mapRect.y + ((y + 0.5) / sh) * mapRect.h;
+          if (!started) {
+            ctx.moveTo(px, py);
+            started = true;
+          } else {
+            ctx.lineTo(px, py);
+          }
+        }
+        if (started) {
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      function render() {
+        const w = canvas.clientWidth;
+        const h = canvas.clientHeight;
+
+        ctx.fillStyle = "#000";
+        ctx.fillRect(0, 0, w, h);
+
+        if (mapReady) {
+          ctx.save();
+          ctx.globalAlpha = 0.45;
+          ctx.drawImage(landBuffer, 0, 0, w, h);
+          ctx.restore();
+        }
+
+        drawDayNightMask(w, h, solarPosition(new Date()));
+      }
+
+      mapImage.onload = () => {
+        mapReady = true;
+        buildLandLayer(canvas.clientWidth || 1, canvas.clientHeight || 1);
+        render();
+      };
+
+      mapImage.onerror = () => {
+        mapReady = false;
+        render();
+      };
+
+      const observer = new ResizeObserver(() => {
+        resize();
+        render();
+      });
+
+      observer.observe(canvas);
+      resize();
+      render();
+      setInterval(render, 1000);
+    </script>
+  </body>
+</html>
