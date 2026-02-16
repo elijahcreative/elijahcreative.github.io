@@ -54,6 +54,7 @@
       const shadeBuffer = document.createElement("canvas");
       const shadeCtx = shadeBuffer.getContext("2d", { alpha: true });
       let mapRect = { x: 0, y: 0, w: 0, h: 0 };
+      let southClipY = Number.POSITIVE_INFINITY;
 
       function clamp(v, min, max) {
         return Math.min(max, Math.max(min, v));
@@ -154,9 +155,9 @@
         const srcAspect = srcW / srcH;
         const dstAspect = w / h;
 
-        const zoom = Number(params.get("zoom") || "0.96");
-        const isWidgy = params.get("widgy") === "1";
-        const offsetY = Number(params.get("offsetY") || (isWidgy ? "-0.12" : "0"));
+        const zoom = Number(params.get("z") || params.get("zoom") || "0.96");
+        const offsetY = Number(params.get("y") || params.get("offsetY") || "-0.12");
+        const southCutLat = Number(params.get("cut") || params.get("southCutLat") || "-60");
         let drawW = w;
         let drawH = h;
 
@@ -175,6 +176,8 @@
           w: drawW,
           h: drawH,
         };
+
+        southClipY = mapRect.y + ((90 - southCutLat) / 180) * mapRect.h;
 
         shadeBuffer.width = Math.max(2, Math.round(mapRect.w * 0.66));
         shadeBuffer.height = Math.max(2, Math.round(mapRect.h * 0.66));
@@ -196,6 +199,12 @@
         landCtx.fillStyle = "rgb(208, 212, 220)";
         landCtx.fillRect(0, 0, w, h);
         landCtx.globalCompositeOperation = "source-over";
+
+        // Hide Antarctica/south polar strip below selected latitude.
+        if (Number.isFinite(southClipY)) {
+          const clipY = Math.max(0, Math.min(h, southClipY));
+          landCtx.clearRect(0, clipY, w, h - clipY);
+        }
       }
 
       function drawDayNightMask(w, h, solar) {
@@ -261,6 +270,12 @@
 
         // Area-chart top boundary line.
         ctx.save();
+        if (Number.isFinite(southClipY)) {
+          const clipHeight = Math.max(0, Math.min(h, southClipY) - mapRect.y);
+          ctx.beginPath();
+          ctx.rect(mapRect.x, mapRect.y, mapRect.w, clipHeight);
+          ctx.clip();
+        }
         ctx.strokeStyle = "rgba(215, 220, 232, 0.5)";
         ctx.lineWidth = Math.max(1.8, mapRect.h * 0.0036);
         ctx.beginPath();
