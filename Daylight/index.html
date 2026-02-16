@@ -39,13 +39,15 @@
       const ctx = canvas.getContext("2d", { alpha: true });
 
       const params = new URLSearchParams(window.location.search);
-      const mapSrc =
-        params.get("map") ||
-        "https://upload.wikimedia.org/wikipedia/commons/c/c0/Equirectangular_projection_world_map_without_borders.svg";
+      const mapSources = [
+        params.get("map"),
+        "./world-map.svg",
+        "./world-map.png",
+        "https://upload.wikimedia.org/wikipedia/commons/c/c0/Equirectangular_projection_world_map_without_borders.svg",
+      ].filter(Boolean);
 
       const mapImage = new Image();
-      mapImage.crossOrigin = "anonymous";
-      mapImage.src = mapSrc;
+      let sourceIndex = 0;
 
       let mapReady = false;
 
@@ -301,9 +303,17 @@
         render();
       };
 
+      function loadNextMapSource() {
+        if (sourceIndex >= mapSources.length) {
+          mapReady = false;
+          render();
+          return;
+        }
+        mapImage.src = mapSources[sourceIndex++];
+      }
+
       mapImage.onerror = () => {
-        mapReady = false;
-        render();
+        loadNextMapSource();
       };
 
       const observer = new ResizeObserver(() => {
@@ -314,6 +324,7 @@
       observer.observe(canvas);
       resize();
       render();
+      loadNextMapSource();
       setInterval(render, 1000);
     </script>
   </body>
