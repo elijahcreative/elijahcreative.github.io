@@ -155,6 +155,8 @@
         const dstAspect = w / h;
 
         const zoom = Number(params.get("zoom") || "0.96");
+        const isWidgy = params.get("widgy") === "1";
+        const offsetY = Number(params.get("offsetY") || (isWidgy ? "-0.12" : "0"));
         let drawW = w;
         let drawH = h;
 
@@ -169,7 +171,7 @@
 
         mapRect = {
           x: (w - drawW) * 0.5,
-          y: (h - drawH) * 0.5,
+          y: (h - drawH) * 0.5 + offsetY * h,
           w: drawW,
           h: drawH,
         };
