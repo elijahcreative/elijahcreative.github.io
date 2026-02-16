@@ -13,12 +13,11 @@
         background: #000;
       }
       body {
-        display: grid;
-        place-items: center;
+        overflow: hidden;
       }
       .widget {
-        width: min(100vmin, 1024px);
-        aspect-ratio: 1 / 1;
+        width: 100vw;
+        height: 100vh;
         background: #000;
         overflow: hidden;
       }
@@ -48,7 +47,6 @@
 
       const mapImage = new Image();
       let sourceIndex = 0;
-
       let mapReady = false;
 
       const landBuffer = document.createElement("canvas");
@@ -156,14 +154,17 @@
         const srcAspect = srcW / srcH;
         const dstAspect = w / h;
 
+        const zoom = Number(params.get("zoom") || "0.96");
         let drawW = w;
         let drawH = h;
+
+        // Contain fit (zoomed out vs cover), with small adjustable scale.
         if (srcAspect > dstAspect) {
-          drawW = w;
-          drawH = w / srcAspect;
+          drawW = w * zoom;
+          drawH = drawW / srcAspect;
         } else {
-          drawH = h;
-          drawW = h * srcAspect;
+          drawH = h * zoom;
+          drawW = drawH * srcAspect;
         }
 
         mapRect = {
@@ -188,7 +189,7 @@
           mapRect.h
         );
 
-        // Keep only the map alpha and tint it to light gray (continents).
+        // Keep only map alpha and tint to light gray (continents).
         landCtx.globalCompositeOperation = "source-in";
         landCtx.fillStyle = "rgb(208, 212, 220)";
         landCtx.fillRect(0, 0, w, h);
@@ -256,7 +257,7 @@
           mapRect.h
         );
 
-        // "Area chart" top boundary line.
+        // Area-chart top boundary line.
         ctx.save();
         ctx.strokeStyle = "rgba(215, 220, 232, 0.5)";
         ctx.lineWidth = Math.max(1.8, mapRect.h * 0.0036);
@@ -297,12 +298,6 @@
         drawDayNightMask(w, h, solarPosition(new Date()));
       }
 
-      mapImage.onload = () => {
-        mapReady = true;
-        buildLandLayer(canvas.clientWidth || 1, canvas.clientHeight || 1);
-        render();
-      };
-
       function loadNextMapSource() {
         if (sourceIndex >= mapSources.length) {
           mapReady = false;
@@ -311,6 +306,12 @@
         }
         mapImage.src = mapSources[sourceIndex++];
       }
+
+      mapImage.onload = () => {
+        mapReady = true;
+        buildLandLayer(canvas.clientWidth || 1, canvas.clientHeight || 1);
+        render();
+      };
 
       mapImage.onerror = () => {
         loadNextMapSource();
