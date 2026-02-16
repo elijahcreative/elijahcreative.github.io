@@ -270,12 +270,6 @@
 
         // Area-chart top boundary line.
         ctx.save();
-        if (Number.isFinite(southClipY)) {
-          const clipHeight = Math.max(0, Math.min(h, southClipY) - mapRect.y);
-          ctx.beginPath();
-          ctx.rect(mapRect.x, mapRect.y, mapRect.w, clipHeight);
-          ctx.clip();
-        }
         ctx.strokeStyle = "rgba(215, 220, 232, 0.5)";
         ctx.lineWidth = Math.max(1.8, mapRect.h * 0.0036);
         ctx.beginPath();
