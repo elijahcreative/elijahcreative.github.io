@@ -39,9 +39,13 @@
 
       // Visual controls (single place to tweak alpha values)
       const VISUAL = {
-        mapAlpha: 0.55,      // map layer opacity (0..1)
-        areaAlpha: 155,      // day/night area opacity (0..255)
-        lineAlpha: 0.4,      // area boundary line opacity (0..1)
+        mapAlpha: 0.55,        // map layer opacity (0..1)
+        areaAlpha: 155,        // day/night area opacity (0..255)
+        lineAlpha: 0.4,        // area boundary line opacity (0..1)
+        lineCap: "butt",     // "butt" | "round" | "square"
+        lineJoin: "bevel",    // "miter" | "round" | "bevel"
+        lineShadowAlpha: 0.5, // 0..1
+        lineShadowBlur: 1,     // px
       };
 
       const params = new URLSearchParams(window.location.search);
@@ -219,24 +223,48 @@
         const sh = shadeBuffer.height;
         const image = shadeCtx.createImageData(sw, sh);
         const data = image.data;
-        const upperBoundary = new Array(sw).fill(-1);
 
         const decl = toRad(solar.declination);
         const lon0 = toRad(solar.subsolarLon);
 
+        function sinAltAt(lat, lon) {
+          return (
+            Math.sin(lat) * Math.sin(decl) +
+            Math.cos(lat) * Math.cos(decl) * Math.cos(lon - lon0)
+          );
+        }
+
+        function terminatorLatForLon(lon) {
+          let lo = -Math.PI / 2 + 1e-4;
+          let hi = Math.PI / 2 - 1e-4;
+          let flo = sinAltAt(lo, lon);
+          let fhi = sinAltAt(hi, lon);
+
+          // No zero crossing at this longitude (polar day/night edge case).
+          if (flo === 0) return lo;
+          if (fhi === 0) return hi;
+          if (flo * fhi > 0) return null;
+
+          for (let i = 0; i < 22; i++) {
+            const mid = 0.5 * (lo + hi);
+            const fmid = sinAltAt(mid, lon);
+            if (Math.abs(fmid) < 1e-8) return mid;
+            if (flo * fmid <= 0) {
+              hi = mid;
+              fhi = fmid;
+            } else {
+              lo = mid;
+              flo = fmid;
+            }
+          }
+          return 0.5 * (lo + hi);
+        }
+
         for (let x = 0; x < sw; x++) {
-          let prevNight = null;
+          const lon = toRad(((x + 0.5) / sw) * 360 - 180);
           for (let y = 0; y < sh; y++) {
             const lat = toRad(90 - ((y + 0.5) / sh) * 180);
-            const sinLat = Math.sin(lat);
-            const cosLat = Math.cos(lat);
-            const lon = toRad(((x + 0.5) / sw) * 360 - 180);
-            const hourAngle = lon - lon0;
-
-            const sinAlt =
-              sinLat * Math.sin(decl) +
-              cosLat * Math.cos(decl) * Math.cos(hourAngle);
-            const isNight = sinAlt < 0;
+            const isNight = sinAltAt(lat, lon) < 0;
 
             const i = (y * sw + x) * 4;
             if (isNight) {
@@ -250,15 +278,6 @@
               data[i + 2] = 0;
               data[i + 3] = 0;
             }
-
-            if (
-              prevNight !== null &&
-              upperBoundary[x] === -1 &&
-              prevNight !== isNight
-            ) {
-              upperBoundary[x] = y;
-            }
-            prevNight = isNight;
           }
         }
 
@@ -275,22 +294,30 @@
           mapRect.h
         );
 
-        // Area-chart top boundary line.
+        // Area-chart top boundary line (analytical/antialiased, not pixel-grid traced).
         ctx.save();
         ctx.strokeStyle = `rgba(215, 220, 232, ${VISUAL.lineAlpha})`;
         ctx.lineWidth = Math.max(1.8, mapRect.h * 0.0036);
+        ctx.lineCap = VISUAL.lineCap;
+        ctx.lineJoin = VISUAL.lineJoin;
+        ctx.shadowColor = `rgba(215, 220, 232, ${VISUAL.lineShadowAlpha})`;
+        ctx.shadowBlur = VISUAL.lineShadowBlur;
         ctx.beginPath();
         let started = false;
-        for (let x = 0; x < sw; x++) {
-          const y = upperBoundary[x];
-          if (y < 0) continue;
-          const px = mapRect.x + ((x + 0.5) / sw) * mapRect.w;
-          const py = mapRect.y + ((y + 0.5) / sh) * mapRect.h;
+        const stepPx = 1;
+        for (let px = 0; px <= mapRect.w; px += stepPx) {
+          const t = mapRect.w <= 1 ? 0 : px / mapRect.w;
+          const lon = toRad(t * 360 - 180);
+          const lat = terminatorLatForLon(lon);
+          if (lat === null) continue;
+
+          const nx = mapRect.x + t * mapRect.w;
+          const ny = mapRect.y + ((Math.PI / 2 - lat) / Math.PI) * mapRect.h;
           if (!started) {
-            ctx.moveTo(px, py);
+            ctx.moveTo(nx, ny);
             started = true;
           } else {
-            ctx.lineTo(px, py);
+            ctx.lineTo(nx, ny);
           }
         }
         if (started) {
