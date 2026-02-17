@@ -142,13 +142,18 @@
 
       function resize() {
         const ratio = window.devicePixelRatio || 1;
+        const ssParam = Number(params.get("ss") || "1");
+        const ss = Number.isFinite(ssParam) ? Math.min(3, Math.max(1, ssParam)) : 1;
+        const renderScale = ratio * ss;
         const rect = canvas.getBoundingClientRect();
         const w = Math.max(1, Math.round(rect.width));
         const h = Math.max(1, Math.round(rect.height));
 
-        canvas.width = Math.round(w * ratio);
-        canvas.height = Math.round(h * ratio);
-        ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+        canvas.width = Math.round(w * renderScale);
+        canvas.height = Math.round(h * renderScale);
+        ctx.setTransform(renderScale, 0, 0, renderScale, 0, 0);
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
 
         landBuffer.width = Math.max(1, w);
         landBuffer.height = Math.max(1, h);
