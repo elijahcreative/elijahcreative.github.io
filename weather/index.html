@@ -3,123 +3,46 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Weather Widget</title>
+    <title>Weather Background Widget</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <main class="widget-shell">
-      <section class="weather-widget" id="weather-widget" data-theme="sunny-day">
-        <div class="widget-top">
-          <div class="current-block">
-            <p class="location-line">
-              <span id="location">Budapest</span>
-              <span class="location-pin" aria-hidden="true">↗</span>
-            </p>
-            <h1 class="temperature-line">
-              <span id="temperature">10</span><span class="unit">°</span>
-            </h1>
-          </div>
-
-          <div class="summary-block">
-            <svg class="hero-icon" id="weather-icon" viewBox="0 0 64 64" role="img" aria-hidden="true">
-              <use href="#icon-cloud"></use>
-            </svg>
-            <p class="condition" id="condition-label">Felhős</p>
-            <p class="range-line">
-              Max: <span id="high-temp">12°</span> Min: <span id="low-temp">5°</span>
-            </p>
-          </div>
+      <section class="weather-widget" id="weather-widget" data-theme="clear-day">
+        <div class="sky-gradient"></div>
+        <div class="ambient-glow ambient-glow-a"></div>
+        <div class="ambient-glow ambient-glow-b"></div>
+        <div class="horizon-haze"></div>
+        <div class="celestial-orb"></div>
+        <div class="celestial-halo"></div>
+        <div class="cloud-layer cloud-back">
+          <span class="cloud cloud-1"></span>
+          <span class="cloud cloud-2"></span>
+          <span class="cloud cloud-3"></span>
         </div>
-
-        <section class="hourly-strip" id="hourly-strip" aria-label="Óránkénti előrejelzés"></section>
+        <div class="cloud-layer cloud-front">
+          <span class="cloud cloud-4"></span>
+          <span class="cloud cloud-5"></span>
+          <span class="cloud cloud-6"></span>
+        </div>
+        <div class="rain-layer">
+          <span class="rain-streak r1"></span>
+          <span class="rain-streak r2"></span>
+          <span class="rain-streak r3"></span>
+          <span class="rain-streak r4"></span>
+          <span class="rain-streak r5"></span>
+          <span class="rain-streak r6"></span>
+        </div>
+        <div class="snow-layer">
+          <span class="snowflake s1"></span>
+          <span class="snowflake s2"></span>
+          <span class="snowflake s3"></span>
+          <span class="snowflake s4"></span>
+          <span class="snowflake s5"></span>
+        </div>
+        <div class="storm-flash"></div>
       </section>
     </main>
-
-    <svg width="0" height="0" class="symbol-sprite" aria-hidden="true" focusable="false">
-      <defs>
-        <symbol id="icon-sun" viewBox="0 0 64 64">
-          <circle cx="32" cy="32" r="12" fill="currentColor"></circle>
-          <g stroke="currentColor" stroke-linecap="round" stroke-width="4" fill="none">
-            <path d="M32 8v8"></path>
-            <path d="M32 48v8"></path>
-            <path d="M8 32h8"></path>
-            <path d="M48 32h8"></path>
-            <path d="M15.03 15.03l5.66 5.66"></path>
-            <path d="M43.31 43.31l5.66 5.66"></path>
-            <path d="M48.97 15.03l-5.66 5.66"></path>
-            <path d="M20.69 43.31l-5.66 5.66"></path>
-          </g>
-        </symbol>
-
-        <symbol id="icon-cloud" viewBox="0 0 64 64">
-          <path
-            d="M21 49h23c7.18 0 13-5.6 13-12.5S51.18 24 44 24h-.53C41.7 18.2 36.46 14 30.25 14c-7.4 0-13.4 5.93-13.5 13.29C10.64 28.23 6 33.15 6 39c0 5.52 4.48 10 10 10h5z"
-            fill="currentColor"
-          ></path>
-        </symbol>
-
-        <symbol id="icon-cloud-sun" viewBox="0 0 64 64">
-          <circle cx="22" cy="20" r="9" fill="currentColor" opacity="0.9"></circle>
-          <g stroke="currentColor" stroke-linecap="round" stroke-width="3.5" fill="none" opacity="0.9">
-            <path d="M22 5v5"></path>
-            <path d="M22 30v5"></path>
-            <path d="M7 20h5"></path>
-            <path d="M32 20h5"></path>
-          </g>
-          <path
-            d="M24 49h20c6.63 0 12-5.15 12-11.5S50.63 26 44 26h-.49C41.88 21.24 37.55 18 32.41 18c-6.11 0-11.08 4.89-11.17 10.97C16.14 29.74 12 34.19 12 39c0 5.52 4.48 10 10 10h2z"
-            fill="currentColor"
-          ></path>
-        </symbol>
-
-        <symbol id="icon-rain" viewBox="0 0 64 64">
-          <path
-            d="M18 39h28c6.63 0 12-5.15 12-11.5S52.63 16 46 16h-.49C43.88 11.24 39.55 8 34.41 8c-6.11 0-11.08 4.89-11.17 10.97C18.14 19.74 14 24.19 14 29c0 5.52 4.48 10 10 10h-6z"
-            fill="currentColor"
-          ></path>
-          <g stroke="currentColor" stroke-linecap="round" stroke-width="4">
-            <path d="M24 44l-3 8"></path>
-            <path d="M34 44l-3 10"></path>
-            <path d="M44 44l-3 8"></path>
-          </g>
-        </symbol>
-
-        <symbol id="icon-storm" viewBox="0 0 64 64">
-          <path
-            d="M18 39h28c6.63 0 12-5.15 12-11.5S52.63 16 46 16h-.49C43.88 11.24 39.55 8 34.41 8c-6.11 0-11.08 4.89-11.17 10.97C18.14 19.74 14 24.19 14 29c0 5.52 4.48 10 10 10h-6z"
-            fill="currentColor"
-          ></path>
-          <path d="M35 42l-8 10h6l-4 10 12-14h-6l4-6z" fill="currentColor"></path>
-        </symbol>
-
-        <symbol id="icon-snow" viewBox="0 0 64 64">
-          <path
-            d="M18 36h28c6.63 0 12-5.15 12-11.5S52.63 13 46 13h-.49C43.88 8.24 39.55 5 34.41 5c-6.11 0-11.08 4.89-11.17 10.97C18.14 16.74 14 21.19 14 26c0 5.52 4.48 10 10 10h-6z"
-            fill="currentColor"
-          ></path>
-          <g stroke="currentColor" stroke-linecap="round" stroke-width="3">
-            <path d="M22 45h8"></path>
-            <path d="M26 41v8"></path>
-            <path d="M23 42l6 6"></path>
-            <path d="M29 42l-6 6"></path>
-            <path d="M38 47h8"></path>
-            <path d="M42 43v8"></path>
-            <path d="M39 44l6 6"></path>
-            <path d="M45 44l-6 6"></path>
-          </g>
-        </symbol>
-
-        <symbol id="icon-sunrise" viewBox="0 0 64 64">
-          <path d="M14 44h36" stroke="currentColor" stroke-width="4" stroke-linecap="round"></path>
-          <path d="M22 40a10 10 0 0 1 20 0" fill="currentColor"></path>
-          <path d="M32 12v16" stroke="currentColor" stroke-width="4" stroke-linecap="round"></path>
-          <path d="M24 20l8 8 8-8" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
-          <path d="M16 34h4" stroke="currentColor" stroke-width="4" stroke-linecap="round"></path>
-          <path d="M44 34h4" stroke="currentColor" stroke-width="4" stroke-linecap="round"></path>
-        </symbol>
-      </defs>
-    </svg>
-
     <script src="./app.js"></script>
   </body>
 </html>
