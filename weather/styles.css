@@ -1,6 +1,7 @@
 :root {
-  --widget-width: 100vw;
-  --widget-height: 100vh;
+  --widget-max-width: 658px;
+  --widget-width: min(var(--widget-max-width), calc(100vw - 24px));
+  --widget-height: calc(var(--widget-width) * 155 / 329);
   --sky-top: #77a5d4;
   --sky-mid: #8bb6dc;
   --sky-bottom: #c6dced;
@@ -30,6 +31,10 @@ body {
 }
 
 body {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 0;
   background: transparent;
 }
 
@@ -46,6 +51,7 @@ body {
   background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 56%, var(--sky-bottom) 100%);
   isolation: isolate;
 }
+
 
 .sky-gradient,
 .ambient-glow,
