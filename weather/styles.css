@@ -87,8 +87,8 @@ body {
 
 .temperature-line {
   margin: 10px 0 0;
-  font-size: clamp(4.2rem, 14vw, 8.4rem);
-  line-height: 0.84;
+  font-size: clamp(3.8rem, 12vw, 7.2rem);
+  line-height: 0.9;
   letter-spacing: -0.04em;
   font-weight: 250;
 }
