@@ -1,0 +1,232 @@
+:root {
+  --bg-1: #8da2b4;
+  --bg-2: #9bb0c1;
+  --bg-3: #b8cad8;
+  --text-main: #ffffff;
+  --text-soft: rgba(255, 255, 255, 0.92);
+  --text-faint: rgba(255, 255, 255, 0.78);
+  --accent-warm: #ffd24a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+}
+
+body {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.14), transparent 36%),
+    linear-gradient(180deg, #0d1320 0%, #1e2740 100%);
+}
+
+.widget-shell {
+  width: min(100%, 720px);
+}
+
+.weather-widget {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  aspect-ratio: 329 / 155;
+  padding: clamp(18px, 3.2vw, 32px);
+  color: var(--text-main);
+  background:
+    radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.14), transparent 34%),
+    radial-gradient(circle at 80% 110%, rgba(255, 255, 255, 0.08), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0)),
+    linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 58%, var(--bg-3) 100%);
+}
+
+.location-line,
+.temperature-line,
+.condition,
+.range-line,
+.hourly-time,
+.hourly-temp {
+  text-shadow: 0 4px 10px rgba(38, 54, 76, 0.18);
+}
+
+.widget-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.current-block,
+.summary-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.location-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: clamp(1.05rem, 3vw, 1.7rem);
+  line-height: 1;
+  font-weight: 600;
+  color: var(--text-soft);
+  letter-spacing: 0.005em;
+}
+
+.location-pin {
+  font-size: 0.8em;
+  transform: translateY(-0.02em);
+}
+
+.temperature-line {
+  margin: 10px 0 0;
+  font-size: clamp(4.2rem, 14vw, 8.4rem);
+  line-height: 0.84;
+  letter-spacing: -0.04em;
+  font-weight: 250;
+}
+
+.unit {
+  margin-left: 2px;
+}
+
+.summary-block {
+  align-items: flex-end;
+  text-align: right;
+  padding-top: clamp(4px, 1vw, 10px);
+}
+
+.hero-icon {
+  width: clamp(28px, 5vw, 44px);
+  height: clamp(28px, 5vw, 44px);
+  margin-bottom: 6px;
+  color: #ffffff;
+  filter: drop-shadow(0 5px 10px rgba(38, 54, 76, 0.18));
+}
+
+.condition,
+.range-line {
+  margin: 0;
+}
+
+.condition {
+  font-size: clamp(1.2rem, 4vw, 2.25rem);
+  line-height: 1.05;
+  font-weight: 500;
+  letter-spacing: 0.004em;
+}
+
+.range-line {
+  margin-top: 4px;
+  font-size: clamp(0.95rem, 2.8vw, 1.55rem);
+  line-height: 1.1;
+  color: var(--text-soft);
+  letter-spacing: 0.05em;
+  word-spacing: 0.08em;
+}
+
+.hourly-strip {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: clamp(10px, 1.8vw, 18px);
+  align-items: end;
+}
+
+.hourly-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(8px, 1.4vw, 12px);
+  min-width: 0;
+}
+
+.hourly-time,
+.hourly-temp {
+  margin: 0;
+  line-height: 1;
+  color: var(--text-soft);
+  letter-spacing: 0.008em;
+}
+
+.hourly-time {
+  font-size: clamp(0.95rem, 2.9vw, 1.45rem);
+  font-weight: 600;
+}
+
+.hourly-temp {
+  font-size: clamp(0.95rem, 3.1vw, 1.55rem);
+  font-weight: 500;
+}
+
+.hourly-icon {
+  width: clamp(24px, 4.8vw, 40px);
+  height: clamp(24px, 4.8vw, 40px);
+  color: #ffffff;
+  filter: drop-shadow(0 4px 8px rgba(38, 54, 76, 0.16));
+}
+
+.hourly-item[data-highlight="true"] .hourly-icon {
+  color: var(--accent-warm);
+}
+
+.weather-widget[data-theme="sunny-day"] {
+  --bg-1: #6e9bc6;
+  --bg-2: #8fb7db;
+  --bg-3: #c5daeb;
+}
+
+.weather-widget[data-theme="clear-night"] {
+  --bg-1: #233858;
+  --bg-2: #3a567f;
+  --bg-3: #6f87a7;
+}
+
+.weather-widget[data-theme="cloudy-day"] {
+  --bg-1: #879bab;
+  --bg-2: #9fb1bf;
+  --bg-3: #bdcdd9;
+}
+
+.weather-widget[data-theme="rainy"] {
+  --bg-1: #61788f;
+  --bg-2: #8198ac;
+  --bg-3: #a8b9c8;
+}
+
+.weather-widget[data-theme="storm"] {
+  --bg-1: #49516b;
+  --bg-2: #65718f;
+  --bg-3: #8a97b4;
+}
+
+.weather-widget[data-theme="snow"] {
+  --bg-1: #a6b7c6;
+  --bg-2: #c5d2de;
+  --bg-3: #e4eef5;
+}
+
+@media (max-width: 560px) {
+  body {
+    padding: 12px;
+  }
+
+  .weather-widget {
+    padding: 16px;
+  }
+
+  .widget-top {
+    gap: 14px;
+  }
+
+  .hourly-strip {
+    gap: 8px;
+  }
+}
