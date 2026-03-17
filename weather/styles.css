@@ -20,10 +20,8 @@ body {
 }
 
 body {
-  display: grid;
-  place-items: center;
   min-height: 100vh;
-  padding: 20px;
+  padding: 0 20px 20px;
   background:
     radial-gradient(circle at top, rgba(255, 255, 255, 0.14), transparent 36%),
     linear-gradient(180deg, #0d1320 0%, #1e2740 100%);
@@ -31,6 +29,7 @@ body {
 
 .widget-shell {
   width: min(100%, 720px);
+  margin: 0 auto;
 }
 
 .weather-widget {
@@ -214,10 +213,6 @@ body {
 }
 
 @media (max-width: 560px) {
-  body {
-    padding: 12px;
-  }
-
   .weather-widget {
     padding: 16px;
   }
