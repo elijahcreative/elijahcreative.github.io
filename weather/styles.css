@@ -41,6 +41,7 @@ body {
   padding: clamp(18px, 3.2vw, 32px);
   color: var(--text-main);
   background:
+    linear-gradient(180deg, rgba(28, 39, 58, 0.18), rgba(28, 39, 58, 0.08)),
     radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.14), transparent 34%),
     radial-gradient(circle at 80% 110%, rgba(255, 255, 255, 0.08), transparent 28%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0)),
@@ -66,6 +67,7 @@ body {
 .summary-block {
   display: flex;
   flex-direction: column;
+  gap: 0;
 }
 
 .location-line {
@@ -74,7 +76,7 @@ body {
   gap: 6px;
   margin: 0;
   font-size: clamp(1.05rem, 3vw, 1.7rem);
-  line-height: 1;
+  line-height: 0.95;
   font-weight: 600;
   color: var(--text-soft);
   letter-spacing: 0.005em;
@@ -86,9 +88,9 @@ body {
 }
 
 .temperature-line {
-  margin: 10px 0 0;
+  margin: 2px 0 0;
   font-size: clamp(3.8rem, 12vw, 7.2rem);
-  line-height: 0.9;
+  line-height: 0.82;
   letter-spacing: -0.04em;
   font-weight: 250;
 }
@@ -100,13 +102,15 @@ body {
 .summary-block {
   align-items: flex-end;
   text-align: right;
-  padding-top: clamp(4px, 1vw, 10px);
+  justify-content: flex-start;
+  padding-top: 0;
 }
 
 .hero-icon {
   width: clamp(28px, 5vw, 44px);
   height: clamp(28px, 5vw, 44px);
-  margin-bottom: 6px;
+  display: block;
+  margin: 0 0 2px;
   color: #ffffff;
   filter: drop-shadow(0 5px 10px rgba(38, 54, 76, 0.18));
 }
@@ -118,15 +122,15 @@ body {
 
 .condition {
   font-size: clamp(1.2rem, 4vw, 2.25rem);
-  line-height: 1.05;
+  line-height: 0.98;
   font-weight: 500;
   letter-spacing: 0.004em;
 }
 
 .range-line {
-  margin-top: 4px;
+  margin-top: 0;
   font-size: clamp(0.95rem, 2.8vw, 1.55rem);
-  line-height: 1.1;
+  line-height: 1;
   color: var(--text-soft);
   letter-spacing: 0.05em;
   word-spacing: 0.08em;
@@ -137,6 +141,7 @@ body {
   grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: clamp(10px, 1.8vw, 18px);
   align-items: end;
+  margin-top: 8px;
 }
 
 .hourly-item {
@@ -168,6 +173,7 @@ body {
 .hourly-icon {
   width: clamp(24px, 4.8vw, 40px);
   height: clamp(24px, 4.8vw, 40px);
+  display: block;
   color: #ffffff;
   filter: drop-shadow(0 4px 8px rgba(38, 54, 76, 0.16));
 }
