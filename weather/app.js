@@ -1,248 +1,160 @@
-const defaultWeather = {
-  location: "Budapest",
+const fallbackConfig = {
   latitude: 47.4979,
   longitude: 19.0402,
-  temperature: 10,
-  high: 12,
-  low: 5,
-  condition: "cloudy",
-  hourly: [
-    { time: "17", temp: 9, condition: "cloudy" },
-    { time: "17:51", temp: 9, condition: "sunrise", highlight: true },
-    { time: "18", temp: 9, condition: "cloudy" },
-    { time: "19", temp: 8, condition: "cloudy" },
-    { time: "20", temp: 8, condition: "cloudy" },
-    { time: "21", temp: 7, condition: "cloudy" },
-  ],
-};
-
-const conditionConfig = {
-  sunny: {
-    label: "Napos",
-    icon: "#icon-sun",
-    theme: "sunny-day",
-  },
-  "clear-night": {
-    label: "Tiszta",
-    icon: "#icon-sun",
-    theme: "clear-night",
-  },
-  "partly-cloudy": {
-    label: "Reszben felhos",
-    icon: "#icon-cloud-sun",
-    theme: "cloudy-day",
-  },
-  cloudy: {
-    label: "Felhos",
-    icon: "#icon-cloud",
-    theme: "cloudy-day",
-  },
-  rain: {
-    label: "Eso",
-    icon: "#icon-rain",
-    theme: "rainy",
-  },
-  storm: {
-    label: "Vihar",
-    icon: "#icon-storm",
-    theme: "storm",
-  },
-  snow: {
-    label: "Ho",
-    icon: "#icon-snow",
-    theme: "snow",
-  },
-  sunrise: {
-    label: "Napkelte",
-    icon: "#icon-sunrise",
-    theme: "sunny-day",
-  },
-  sunset: {
-    label: "Napnyugta",
-    icon: "#icon-sunrise",
-    theme: "sunny-day",
-  },
 };
 
 function getParams() {
   const params = new URLSearchParams(window.location.search);
-  const latitude = Number(params.get("lat") || defaultWeather.latitude);
-  const longitude = Number(params.get("lon") || defaultWeather.longitude);
+  const latitude = Number(params.get("lat") || fallbackConfig.latitude);
+  const longitude = Number(params.get("lon") || fallbackConfig.longitude);
+  const previewTheme = params.get("theme");
+  const previewProgress = Number(params.get("progress"));
+  const previewClouds = Number(params.get("clouds"));
 
   return {
-    location: params.get("location") || defaultWeather.location,
-    latitude: Number.isFinite(latitude) ? latitude : defaultWeather.latitude,
-    longitude: Number.isFinite(longitude) ? longitude : defaultWeather.longitude,
-    units: params.get("units") === "fahrenheit" ? "fahrenheit" : "celsius",
+    latitude: Number.isFinite(latitude) ? latitude : fallbackConfig.latitude,
+    longitude: Number.isFinite(longitude) ? longitude : fallbackConfig.longitude,
+    previewTheme,
+    previewProgress: Number.isFinite(previewProgress) ? previewProgress : null,
+    previewClouds: Number.isFinite(previewClouds) ? previewClouds : null,
   };
 }
 
-function formatTemperature(value) {
-  return Number.isFinite(value) ? Math.round(value) : "--";
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
 }
 
-function getConditionConfig(condition) {
-  return conditionConfig[condition] || conditionConfig.cloudy;
-}
-
-function mapWeatherCode(code, isDay = 1) {
-  if (code === 0) {
-    return isDay ? "sunny" : "clear-night";
-  }
-
-  if ([1, 2].includes(code)) {
-    return "partly-cloudy";
-  }
-
-  if ([3, 45, 48].includes(code)) {
-    return "cloudy";
-  }
-
+function mapWeatherToTheme(code, isDay) {
+  if ([95, 96, 99].includes(code)) return "storm";
+  if ([71, 73, 75, 77, 85, 86].includes(code)) return "snow";
   if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(code)) {
-    return "rain";
+    return isDay ? "rain-day" : "rain-night";
+  }
+  if ([1, 2, 3, 45, 48].includes(code)) {
+    return isDay ? "cloudy-day" : "cloudy-night";
+  }
+  return isDay ? "clear-day" : "clear-night";
+}
+
+function getCloudinessFactor(code, cloudCover = 0) {
+  if ([95, 96, 99].includes(code)) return 0.92;
+  if ([71, 73, 75, 77, 85, 86].includes(code)) return 0.72;
+  if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return 0.88;
+  if ([45, 48].includes(code)) return 0.84;
+  if ([3].includes(code)) return 0.78;
+  if ([1, 2].includes(code)) return 0.46;
+  return clamp(cloudCover / 100, 0.12, 0.92);
+}
+
+function getOrbProgress(now, sunrise, sunset, isDay) {
+  const current = now.getTime();
+  const rise = new Date(sunrise).getTime();
+  const set = new Date(sunset).getTime();
+
+  if (isDay && current >= rise && current <= set) {
+    return clamp((current - rise) / (set - rise || 1), 0, 1);
   }
 
-  if ([71, 73, 75, 77, 85, 86].includes(code)) {
-    return "snow";
-  }
-
-  if ([95, 96, 99].includes(code)) {
-    return "storm";
-  }
-
-  return "cloudy";
+  const previousSunset = current > set ? set : set - 24 * 60 * 60 * 1000;
+  const nextSunrise = current < rise ? rise : rise + 24 * 60 * 60 * 1000;
+  return clamp((current - previousSunset) / (nextSunrise - previousSunset || 1), 0, 1);
 }
 
-function formatHourLabel(isoDate, locale = "hu-HU") {
-  const date = new Date(isoDate);
-  return new Intl.DateTimeFormat(locale, {
-    hour: "numeric",
-  }).format(date);
+function applyVisualState(weather, preview = {}) {
+  const widget = document.getElementById("weather-widget");
+  const derivedIsDay = weather.current.is_day === 1;
+  const isDay = preview.theme ? !preview.theme.includes("night") : derivedIsDay;
+  const progress = preview.progress ?? getOrbProgress(
+    new Date(),
+    weather.daily.sunrise[0],
+    weather.daily.sunset[0],
+    isDay
+  );
+  const theme = preview.theme || mapWeatherToTheme(weather.current.weather_code, isDay);
+  const cloudiness = preview.cloudiness ?? getCloudinessFactor(
+    weather.current.weather_code,
+    weather.current.cloud_cover
+  );
+  const orbX = 16 + progress * 68;
+  const arc = Math.sin(progress * Math.PI);
+  const orbY = isDay ? 64 - arc * 40 : 70 - arc * 24;
+  const orbSize = isDay ? 92 - cloudiness * 18 : 74 - cloudiness * 10;
+
+  widget.dataset.theme = theme;
+  widget.style.setProperty("--orb-x", `${orbX}%`);
+  widget.style.setProperty("--orb-y", `${orbY}%`);
+  widget.style.setProperty("--orb-size", `${orbSize}px`);
+  widget.style.setProperty("--halo-scale", isDay ? "1.9" : "1.55");
+  widget.style.setProperty("--cloud-opacity-back", `${0.08 + cloudiness * 0.24}`);
+  widget.style.setProperty("--cloud-opacity-front", `${0.14 + cloudiness * 0.34}`);
+  widget.style.setProperty("--cloud-brightness", isDay ? `${1.02 - cloudiness * 0.12}` : `${0.82 - cloudiness * 0.12}`);
+  widget.style.setProperty("--haze-opacity", `${isDay ? 0.12 + cloudiness * 0.12 : 0.06 + cloudiness * 0.06}`);
 }
 
-function formatClockLabel(isoDate, locale = "hu-HU") {
-  const date = new Date(isoDate);
-  return new Intl.DateTimeFormat(locale, {
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(date);
-}
-
-function findSpecialEvent(targetDate, sunriseIso, sunsetIso) {
-  const targetMs = new Date(targetDate).getTime();
-  const candidates = [
-    { iso: sunriseIso, type: "sunrise" },
-    { iso: sunsetIso, type: "sunset" },
-  ].filter((entry) => entry.iso);
-
-  return candidates.find((entry) => {
-    const diff = Math.abs(new Date(entry.iso).getTime() - targetMs);
-    return diff <= 30 * 60 * 1000;
-  });
-}
-
-function buildHourlyForecast(data) {
-  const now = Date.now();
-  const hourlyTimes = data.hourly.time || [];
-  const hourlyTemps = data.hourly.temperature_2m || [];
-  const hourlyCodes = data.hourly.weather_code || [];
-  const sunriseIso = data.daily.sunrise?.[0];
-  const sunsetIso = data.daily.sunset?.[0];
-
-  const nextEntries = hourlyTimes
-    .map((time, index) => ({
-      time,
-      temp: hourlyTemps[index],
-      code: hourlyCodes[index],
-    }))
-    .filter((entry) => new Date(entry.time).getTime() >= now)
-    .slice(0, 6);
-
-  return nextEntries.map((entry) => {
-    const specialEvent = findSpecialEvent(entry.time, sunriseIso, sunsetIso);
-
-    if (specialEvent) {
-      return {
-        time: formatClockLabel(specialEvent.iso),
-        temp: entry.temp,
-        condition: specialEvent.type,
-        highlight: true,
-      };
-    }
-
-    return {
-      time: formatHourLabel(entry.time),
-      temp: entry.temp,
-      condition: mapWeatherCode(entry.code, data.current.is_day),
-      highlight: false,
-    };
-  });
-}
-
-async function fetchWeather(params) {
+async function fetchWeather() {
+  const params = getParams();
   const url = new URL("https://api.open-meteo.com/v1/forecast");
+
   url.searchParams.set("latitude", params.latitude);
   url.searchParams.set("longitude", params.longitude);
-  url.searchParams.set("current", "temperature_2m,weather_code,is_day");
-  url.searchParams.set("hourly", "temperature_2m,weather_code");
-  url.searchParams.set("daily", "temperature_2m_max,temperature_2m_min,sunrise,sunset");
+  url.searchParams.set("current", "weather_code,is_day,cloud_cover");
+  url.searchParams.set("daily", "sunrise,sunset");
   url.searchParams.set("timezone", "auto");
-  url.searchParams.set("forecast_days", "2");
-  url.searchParams.set("temperature_unit", params.units);
+  url.searchParams.set("forecast_days", "1");
 
   const response = await fetch(url.toString());
   if (!response.ok) {
     throw new Error(`Weather request failed with status ${response.status}`);
   }
 
-  const data = await response.json();
-  return {
-    location: params.location,
-    temperature: data.current.temperature_2m,
-    high: data.daily.temperature_2m_max?.[0],
-    low: data.daily.temperature_2m_min?.[0],
-    condition: mapWeatherCode(data.current.weather_code, data.current.is_day),
-    hourly: buildHourlyForecast(data),
-  };
+  return response.json();
 }
 
-function renderHourlyItem(entry) {
-  const config = getConditionConfig(entry.condition);
-
-  return `
-    <article class="hourly-item" data-highlight="${entry.highlight ? "true" : "false"}">
-      <p class="hourly-time">${entry.time}</p>
-      <svg class="hourly-icon" viewBox="0 0 64 64" aria-hidden="true">
-        <use href="${config.icon}"></use>
-      </svg>
-      <p class="hourly-temp">${formatTemperature(entry.temp)}°</p>
-    </article>
-  `;
-}
-
-function renderWidget(weather) {
-  const config = getConditionConfig(weather.condition);
-  const widget = document.getElementById("weather-widget");
-
-  widget.dataset.theme = config.theme;
-  document.getElementById("location").textContent = weather.location;
-  document.getElementById("temperature").textContent = formatTemperature(weather.temperature);
-  document.getElementById("condition-label").textContent = config.label;
-  document.getElementById("high-temp").textContent = `${formatTemperature(weather.high)}°`;
-  document.getElementById("low-temp").textContent = `${formatTemperature(weather.low)}°`;
-  document.querySelector("#weather-icon use").setAttribute("href", config.icon);
-  document.getElementById("hourly-strip").innerHTML = weather.hourly.map(renderHourlyItem).join("");
+function applyFallbackState() {
+  applyVisualState({
+    current: {
+      weather_code: 3,
+      is_day: 1,
+      cloud_cover: 54,
+    },
+    daily: {
+      sunrise: [new Date().toISOString()],
+      sunset: [new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString()],
+    },
+  });
 }
 
 async function init() {
   const params = getParams();
 
+  if (params.previewTheme) {
+    applyVisualState(
+      {
+        current: {
+          weather_code: 1,
+          is_day: params.previewTheme.includes("night") ? 0 : 1,
+          cloud_cover: params.previewClouds ?? 40,
+        },
+        daily: {
+          sunrise: [new Date().toISOString()],
+          sunset: [new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString()],
+        },
+      },
+      {
+        theme: params.previewTheme,
+        progress: params.previewProgress !== null ? clamp(params.previewProgress, 0, 1) : 0.5,
+        cloudiness: params.previewClouds !== null ? clamp(params.previewClouds / 100, 0, 1) : null,
+      }
+    );
+    return;
+  }
+
   try {
-    const weather = await fetchWeather(params);
-    renderWidget(weather);
+    const weather = await fetchWeather();
+    applyVisualState(weather);
   } catch (error) {
-    console.error("Weather widget fallback activated.", error);
-    renderWidget(defaultWeather);
+    console.error("Weather background fallback activated.", error);
+    applyFallbackState();
   }
 }
 
