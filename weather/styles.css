@@ -1,16 +1,16 @@
 :root {
   --widget-width: 658px;
-  --sky-top: #377fdf;
-  --sky-mid: #6eb2ec;
-  --sky-bottom: #d8eeff;
-  --tint-top: rgba(255, 255, 255, 0.02);
+  --sky-top: #1d529d;
+  --sky-mid: #4478bb;
+  --sky-bottom: #86b0de;
+  --tint-top: rgba(255, 255, 255, 0.015);
   --tint-bottom: rgba(255, 255, 255, 0);
-  --pool-a: rgba(248, 228, 186, 0.07);
-  --pool-b: rgba(255, 255, 255, 0.13);
-  --horizon: rgba(230, 244, 255, 0.28);
-  --lift: rgba(255, 255, 255, 0.08);
-  --vignette-top: rgba(13, 26, 44, 0.01);
-  --vignette-bottom: rgba(13, 26, 44, 0.01);
+  --pool-a: rgba(228, 205, 162, 0.04);
+  --pool-b: rgba(255, 255, 255, 0.06);
+  --horizon: rgba(180, 212, 242, 0.12);
+  --lift: rgba(255, 255, 255, 0.025);
+  --vignette-top: rgba(13, 26, 44, 0.065);
+  --vignette-bottom: rgba(13, 26, 44, 0.05);
 }
 
 * {
@@ -55,7 +55,7 @@ body {
 
 .sky-base {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 28%),
     linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 56%, var(--sky-bottom) 100%);
 }
 
@@ -91,66 +91,66 @@ body {
 
 .weather-widget[data-phase="dawn"] {
   --sky-top: #355b8d;
-  --sky-mid: #f19a83;
-  --sky-bottom: #ffe2bf;
+  --sky-mid: #d67eaf;
+  --sky-bottom: #f3b1c8;
   --tint-top: rgba(132, 163, 255, 0.12);
   --tint-bottom: rgba(255, 255, 255, 0.02);
-  --pool-a: rgba(255, 192, 126, 0.28);
-  --pool-b: rgba(255, 223, 190, 0.14);
-  --horizon: rgba(255, 214, 167, 0.34);
+  --pool-a: rgba(255, 178, 214, 0.18);
+  --pool-b: rgba(255, 222, 241, 0.14);
+  --horizon: rgba(244, 175, 214, 0.22);
   --vignette-top: rgba(19, 32, 61, 0.08);
-  --vignette-bottom: rgba(88, 54, 60, 0.08);
+  --vignette-bottom: rgba(88, 48, 70, 0.12);
 }
 
 .weather-widget[data-phase="morning"] {
-  --sky-top: #5f9ddb;
-  --sky-mid: #95c7f1;
-  --sky-bottom: #e3f3ff;
-  --tint-top: rgba(255, 255, 255, 0.05);
+  --sky-top: #2f7fcb;
+  --sky-mid: #63b9ea;
+  --sky-bottom: #a8e3f2;
+  --tint-top: rgba(255, 255, 255, 0.03);
   --tint-bottom: rgba(255, 255, 255, 0);
-  --pool-a: rgba(255, 222, 160, 0.2);
-  --pool-b: rgba(255, 255, 255, 0.12);
-  --horizon: rgba(255, 239, 204, 0.24);
-  --vignette-top: rgba(16, 28, 42, 0.04);
-  --vignette-bottom: rgba(16, 28, 42, 0.06);
+  --pool-a: rgba(176, 241, 255, 0.08);
+  --pool-b: rgba(255, 255, 255, 0.1);
+  --horizon: rgba(196, 246, 255, 0.18);
+  --vignette-top: rgba(16, 28, 42, 0.035);
+  --vignette-bottom: rgba(16, 28, 42, 0.04);
 }
 
 .weather-widget[data-phase="day"] {
-  --sky-top: #377fdf;
-  --sky-mid: #6eb2ec;
-  --sky-bottom: #d8eeff;
-  --tint-top: rgba(255, 255, 255, 0.02);
+  --sky-top: #1d529d;
+  --sky-mid: #4478bb;
+  --sky-bottom: #86b0de;
+  --tint-top: rgba(255, 255, 255, 0.015);
   --tint-bottom: rgba(255, 255, 255, 0);
-  --pool-a: rgba(248, 228, 186, 0.07);
-  --pool-b: rgba(255, 255, 255, 0.13);
-  --horizon: rgba(230, 244, 255, 0.28);
-  --vignette-top: rgba(13, 26, 44, 0.01);
-  --vignette-bottom: rgba(13, 26, 44, 0.01);
+  --pool-a: rgba(228, 205, 162, 0.04);
+  --pool-b: rgba(255, 255, 255, 0.06);
+  --horizon: rgba(180, 212, 242, 0.12);
+  --vignette-top: rgba(13, 26, 44, 0.065);
+  --vignette-bottom: rgba(13, 26, 44, 0.05);
 }
 
 .weather-widget[data-phase="golden-hour"] {
   --sky-top: #4f77b3;
   --sky-mid: #efa06d;
-  --sky-bottom: #ffd0a5;
+  --sky-bottom: #e9ab7c;
   --tint-top: rgba(126, 151, 224, 0.1);
   --tint-bottom: rgba(255, 205, 164, 0.06);
-  --pool-a: rgba(255, 188, 108, 0.24);
+  --pool-a: rgba(255, 180, 98, 0.18);
   --pool-b: rgba(255, 214, 179, 0.12);
-  --horizon: rgba(255, 192, 136, 0.34);
+  --horizon: rgba(242, 166, 104, 0.24);
   --vignette-top: rgba(22, 28, 54, 0.06);
-  --vignette-bottom: rgba(88, 44, 34, 0.1);
+  --vignette-bottom: rgba(88, 44, 34, 0.14);
 }
 
 .weather-widget[data-phase="dusk"] {
-  --sky-top: #1d2f5b;
-  --sky-mid: #845f96;
+  --sky-top: #66486d;
+  --sky-mid: #b05f77;
   --sky-bottom: #e29a8a;
-  --tint-top: rgba(118, 134, 235, 0.12);
+  --tint-top: rgba(214, 138, 178, 0.08);
   --tint-bottom: rgba(255, 214, 187, 0.06);
-  --pool-a: rgba(255, 163, 113, 0.18);
-  --pool-b: rgba(209, 185, 255, 0.1);
-  --horizon: rgba(255, 176, 134, 0.26);
-  --vignette-top: rgba(7, 12, 25, 0.14);
+  --pool-a: rgba(255, 174, 120, 0.16);
+  --pool-b: rgba(245, 194, 216, 0.08);
+  --horizon: rgba(255, 180, 138, 0.24);
+  --vignette-top: rgba(34, 18, 24, 0.12);
   --vignette-bottom: rgba(36, 22, 28, 0.14);
 }
 
