@@ -111,13 +111,17 @@ function getParams() {
   const latitude = Number(params.get("lat") || fallbackConfig.latitude);
   const longitude = Number(params.get("lon") || fallbackConfig.longitude);
   const previewPhase = params.get("phase");
-  const previewProgress = Number(params.get("progress"));
+  const progressParam = params.get("progress");
+  const previewProgress = progressParam === null ? null : Number(progressParam);
 
   return {
     latitude: Number.isFinite(latitude) ? latitude : fallbackConfig.latitude,
     longitude: Number.isFinite(longitude) ? longitude : fallbackConfig.longitude,
     previewPhase: previewPhases.has(previewPhase) ? previewPhase : null,
-    previewProgress: Number.isFinite(previewProgress) ? Math.min(1, Math.max(0, previewProgress)) : null,
+    previewProgress:
+      previewProgress !== null && Number.isFinite(previewProgress)
+        ? Math.min(1, Math.max(0, previewProgress))
+        : null,
   };
 }
 
