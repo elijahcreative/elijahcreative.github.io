@@ -111,12 +111,12 @@ body {
 }
 
 .weather-widget[data-phase="day"] {
-  --sky-top: #6f8fad;
-  --sky-mid: #8fa9bf;
-  --sky-bottom: #c2d0dc;
+  --sky-top: #4f87cb;
+  --sky-mid: #7fa3c1;
+  --sky-bottom: #c3d1dc;
   --tint-top: rgba(255, 255, 255, 0.03);
   --tint-bottom: rgba(255, 255, 255, 0);
-  --pool-a: rgba(245, 218, 170, 0.12);
+  --pool-a: rgba(240, 214, 166, 0.1);
   --pool-b: rgba(255, 255, 255, 0.08);
   --horizon: rgba(244, 226, 194, 0.16);
   --vignette-top: rgba(13, 26, 44, 0.08);
