@@ -3,44 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Weather Background Widget</title>
+    <title>Daylight Gradient Widget</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <main class="widget-shell">
-      <section class="weather-widget" id="weather-widget" data-theme="clear-day">
-        <div class="sky-gradient"></div>
-        <div class="ambient-glow ambient-glow-a"></div>
-        <div class="ambient-glow ambient-glow-b"></div>
-        <div class="horizon-haze"></div>
-        <div class="celestial-orb"></div>
-        <div class="celestial-halo"></div>
-        <div class="cloud-layer cloud-back">
-          <span class="cloud cloud-1"></span>
-          <span class="cloud cloud-2"></span>
-          <span class="cloud cloud-3"></span>
-        </div>
-        <div class="cloud-layer cloud-front">
-          <span class="cloud cloud-4"></span>
-          <span class="cloud cloud-5"></span>
-          <span class="cloud cloud-6"></span>
-        </div>
-        <div class="rain-layer">
-          <span class="rain-streak r1"></span>
-          <span class="rain-streak r2"></span>
-          <span class="rain-streak r3"></span>
-          <span class="rain-streak r4"></span>
-          <span class="rain-streak r5"></span>
-          <span class="rain-streak r6"></span>
-        </div>
-        <div class="snow-layer">
-          <span class="snowflake s1"></span>
-          <span class="snowflake s2"></span>
-          <span class="snowflake s3"></span>
-          <span class="snowflake s4"></span>
-          <span class="snowflake s5"></span>
-        </div>
-        <div class="storm-flash"></div>
+      <section class="weather-widget" id="weather-widget" data-phase="day">
+        <div class="sky-base"></div>
+        <div class="sky-tint"></div>
+        <div class="light-pool light-pool-a"></div>
+        <div class="light-pool light-pool-b"></div>
+        <div class="horizon-glow"></div>
+        <div class="vignette"></div>
       </section>
     </main>
     <script src="./app.js"></script>
