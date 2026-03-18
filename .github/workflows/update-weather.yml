@@ -1,0 +1,35 @@
+name: Update weather data
+
+on:
+  schedule:
+    # futás óránként – ha sok, később átírhatjuk (pl. napi 1x)
+    - cron: "0 * * * *"
+  workflow_dispatch:
+
+jobs:
+  update-weather:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch weather data from wttr.in
+        run: |
+          curl "https://wttr.in/41.19,-122.92?format=j1" -o weather/wttr.json
+
+      - name: Commit and push if changed
+        run: |
+          if git diff --quiet; then
+            echo "No changes in wttr.json, skipping commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add weather/wttr.json
+          git commit -m "Update wttr.json via workflow"
+          git push
