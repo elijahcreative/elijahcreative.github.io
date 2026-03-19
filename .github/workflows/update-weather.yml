@@ -18,7 +18,7 @@ jobs:
 
       - name: Fetch weather data from wttr.in
         run: |
-          curl "https://wttr.in/41.19,-122.92?format=j1" -o weather/wttr.json
+          curl "https://wttr.in/Budapest?format=j1" -o weather/wttr.json
 
       - name: Commit and push if changed
         run: |
