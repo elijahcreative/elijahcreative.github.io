@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="hu">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather Widget - Gradient Editor</title>
+    <style>
+      :root {
+        --bg: #0c1018;
+        --panel-border: rgba(255, 255, 255, 0.08);
+        --text: #edf3ff;
+        --muted: #9fb0c9;
+        --accent: #67b7ff;
+        --widget-width: 658px;
+        --sky-top: #06101f;
+        --sky-mid: #123153;
+        --sky-bottom: #2f5175;
+        --tint-top: rgba(73, 118, 184, 0.12);
+        --tint-bottom: rgba(255, 255, 255, 0.02);
+        --pool-a: rgba(93, 128, 182, 0.12);
+        --pool-b: rgba(174, 205, 255, 0.08);
+        --horizon: rgba(106, 148, 197, 0.12);
+        --lift: rgba(255, 255, 255, 0.025);
+        --vignette-top: rgba(0, 0, 0, 0.18);
+        --vignette-bottom: rgba(0, 0, 0, 0.2);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        padding: 24px;
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top, rgba(73, 114, 180, 0.18), transparent 28%),
+          linear-gradient(180deg, #0a0f18 0%, #101827 100%);
+      }
+
+      .app {
+        display: grid;
+        gap: 20px;
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      .panel {
+        padding: 18px;
+        border: 1px solid var(--panel-border);
+        border-radius: 20px;
+        background: rgba(19, 25, 38, 0.9);
+        backdrop-filter: blur(12px);
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .top {
+        display: grid;
+        grid-template-columns: minmax(0, 580px) minmax(0, 1fr);
+        gap: 20px;
+        align-items: start;
+      }
+
+      .left-column {
+        width: min(100%, 580px);
+      }
+
+      .widget-shell {
+        width: 100%;
+        margin-bottom: 12px;
+      }
+
+      .weather-widget {
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+        aspect-ratio: 329 / 155;
+        isolation: isolate;
+        background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 56%, var(--sky-bottom) 100%);
+      }
+
+      .sky-base,
+      .sky-tint,
+      .light-pool,
+      .horizon-glow,
+      .vignette {
+        position: absolute;
+        inset: 0;
+      }
+
+      .sky-base {
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 28%),
+          linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 56%, var(--sky-bottom) 100%);
+      }
+
+      .sky-tint {
+        background: linear-gradient(180deg, var(--tint-top) 0%, var(--tint-bottom) 100%);
+      }
+
+      .light-pool {
+        mix-blend-mode: screen;
+      }
+
+      .light-pool-a {
+        background: radial-gradient(circle at 18% 20%, var(--pool-a), transparent 34%);
+      }
+
+      .light-pool-b {
+        background: radial-gradient(circle at 78% 18%, var(--pool-b), transparent 30%);
+      }
+
+      .horizon-glow {
+        top: auto;
+        height: 44%;
+        background:
+          linear-gradient(180deg, transparent 0%, var(--horizon) 100%),
+          linear-gradient(180deg, transparent 10%, var(--lift) 100%);
+      }
+
+      .vignette {
+        background:
+          linear-gradient(180deg, var(--vignette-top), transparent 34%),
+          linear-gradient(180deg, transparent 62%, var(--vignette-bottom) 100%);
+      }
+
+      .toolbar {
+        display: grid;
+        gap: 12px;
+        width: 100%;
+      }
+
+      .toolbar-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .toolbar label,
+      .editor-panel label,
+      .status {
+        font-size: 0.92rem;
+        color: var(--muted);
+      }
+
+      input[type="range"] {
+        flex: 1;
+      }
+
+      button {
+        font: inherit;
+        padding: 10px 14px;
+        border: 1px solid var(--panel-border);
+        border-radius: 12px;
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.06);
+        cursor: pointer;
+      }
+
+      .phase-buttons {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 8px;
+        overflow-x: auto;
+      }
+
+      .phase-buttons button {
+        padding: 7px 10px;
+        border-radius: 999px;
+        font-size: 0.88rem;
+        white-space: nowrap;
+      }
+
+      .phase-buttons button.is-active {
+        border-color: rgba(103, 183, 255, 0.5);
+        background: rgba(103, 183, 255, 0.2);
+        color: #ffffff;
+      }
+
+      .transitions-panel {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .transitions-label {
+        font-size: 0.92rem;
+        color: var(--muted);
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
+      .transition-controls {
+        display: flex;
+        flex: 1;
+        min-width: 0;
+        gap: 12px;
+      }
+
+      .transition-item {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 4px;
+        flex: 1;
+        min-width: 0;
+      }
+
+      .transition-item-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 4px;
+      }
+
+      .transition-item-header span {
+        font-size: 0.8rem;
+        color: var(--muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .transition-item-header strong {
+        font-size: 0.8rem;
+        color: var(--accent);
+        font-variant-numeric: tabular-nums;
+        flex-shrink: 0;
+      }
+
+      .transition-item input[type="range"] {
+        width: 100%;
+        margin: 0;
+        accent-color: var(--accent);
+      }
+
+      .editor-panel {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 220px;
+        gap: 14px;
+        padding: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.03);
+        align-items: start;
+      }
+
+      .editor-panel h3,
+      .picker-panel h4,
+      .picker-panel p {
+        margin: 0;
+      }
+
+      .editor-panel h3 {
+        grid-column: 1 / -1;
+      }
+
+      .phase-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .field {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 38px;
+      }
+
+      .field.is-empty {
+        visibility: hidden;
+      }
+
+      .field label {
+        min-width: 74px;
+        font-size: 0.86rem;
+      }
+
+      .color-swatch {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.14);
+        cursor: pointer;
+      }
+
+      .color-swatch.is-active {
+        outline: 2px solid rgba(103, 183, 255, 0.85);
+        outline-offset: 2px;
+      }
+
+      .picker-panel {
+        display: grid;
+        gap: 10px;
+        padding: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 14px;
+        background: rgba(10, 14, 22, 0.8);
+        justify-items: start;
+        grid-column: 2 / 3;
+        grid-row: 2 / 4;
+        align-self: start;
+      }
+
+      .editor-actions {
+        display: flex;
+        gap: 10px;
+        grid-column: 1 / 2;
+      }
+
+      .picker-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .picker-meta strong,
+      .picker-meta span {
+        font-size: 0.92rem;
+      }
+
+      .picker-surface-wrap {
+        position: relative;
+        width: 100%;
+        max-width: 220px;
+        aspect-ratio: 1 / 1;
+        border-radius: 14px;
+        overflow: hidden;
+        cursor: crosshair;
+        background:
+          linear-gradient(to top, black, transparent),
+          linear-gradient(to right, white, transparent);
+      }
+
+      .picker-surface {
+        position: absolute;
+        inset: 0;
+      }
+
+      .picker-surface-handle {
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        border: 2px solid white;
+        border-radius: 50%;
+        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+      }
+
+      .picker-slider-row {
+        display: grid;
+        gap: 6px;
+        width: 100%;
+        max-width: 220px;
+      }
+
+      .picker-slider-row label {
+        font-size: 0.84rem;
+      }
+
+      .picker-slider-row input[type="range"] {
+        width: 100%;
+        margin: 0;
+      }
+
+      .picker-readout {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .picker-current {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.16);
+      }
+
+      .picker-values {
+        display: grid;
+        gap: 2px;
+        min-width: 0;
+      }
+
+      .picker-values code {
+        font-size: 0.8rem;
+        color: var(--text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      @media (max-width: 980px) {
+        .top {
+          grid-template-columns: 1fr;
+        }
+
+        .left-column {
+          width: 100%;
+        }
+
+        .editor-panel {
+          grid-template-columns: 1fr;
+        }
+
+        .editor-panel h3 {
+          grid-column: auto;
+        }
+
+        .editor-actions {
+          grid-column: auto;
+          flex-wrap: wrap;
+        }
+
+        .phase-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .toolbar-row {
+          flex-wrap: wrap;
+        }
+
+        .phase-buttons {
+          flex-wrap: wrap;
+          overflow-x: visible;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <section class="panel header">
+        <strong>Gradient Editor</strong>
+        <div class="header-actions">
+          <button id="save-palettes" type="button">Save</button>
+          <span class="status" id="save-status">No saved changes yet.</span>
+        </div>
+      </section>
+
+      <section class="panel top">
+        <div class="left-column">
+          <div class="widget-shell">
+            <section class="weather-widget" id="preview-widget">
+              <div class="sky-base"></div>
+              <div class="sky-tint"></div>
+              <div class="light-pool light-pool-a"></div>
+              <div class="light-pool light-pool-b"></div>
+              <div class="horizon-glow"></div>
+              <div class="vignette"></div>
+            </section>
+          </div>
+
+          <div class="toolbar">
+            <div class="toolbar-row">
+              <label for="progress">Timeline</label>
+              <input id="progress" type="range" min="0" max="1000" value="0" />
+              <strong id="progress-label">0.000</strong>
+            </div>
+            <div class="toolbar-row">
+              <label>Jump to phase</label>
+              <div class="phase-buttons" id="phase-buttons"></div>
+            </div>
+          </div>
+        </div>
+
+        <section class="editor-panel">
+          <h3 id="active-phase-title">Night</h3>
+          <div class="phase-grid" id="phase-grid"></div>
+          <div class="editor-actions">
+            <button id="reset-color" type="button">Reset color</button>
+            <button id="reset-palette" type="button">Reset palette</button>
+          </div>
+          <div class="picker-panel">
+            <div class="picker-meta">
+              <strong id="picker-title">top</strong>
+              <span class="status" id="picker-phase">Night</span>
+            </div>
+            <div class="picker-surface-wrap" id="picker-surface-wrap" aria-label="Color surface">
+              <div class="picker-surface" id="picker-surface"></div>
+              <div class="picker-surface-handle" id="picker-surface-handle"></div>
+            </div>
+            <div class="picker-slider-row">
+              <label for="picker-hue">Hue</label>
+              <input id="picker-hue" type="range" min="0" max="360" value="0" />
+            </div>
+            <div class="picker-slider-row">
+              <label for="picker-alpha">Alpha</label>
+              <input id="picker-alpha" type="range" min="0" max="1000" value="1000" />
+            </div>
+            <div class="picker-readout">
+              <div class="picker-current" id="picker-current"></div>
+              <div class="picker-values">
+                <code id="picker-hex">#06101f</code>
+                <code id="picker-rgba">rgba(6, 16, 31, 1.000)</code>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section class="panel transitions-panel">
+        <label class="transitions-label">Átmenet</label>
+        <div class="transition-controls" id="transition-controls"></div>
+      </section>
+    </main>
+
+    <script>
+      const phaseLabels = {
+        night: "Night",
+        dawn: "Dawn",
+        morning: "Morning",
+        day: "Day",
+        "golden-hour": "Golden Hour",
+        dusk: "Dusk",
+      };
+
+      const STORAGE_KEY = "weather_widget_palettes_v1";
+
+      const palettes = [
+        { phase: "night",       t: 0,    blend: 1,   top: "#06101f", mid: "#123153", bottom: "#2f5175", tintTop: "rgba(73, 118, 184, 0.12)",  tintBottom: "rgba(255, 255, 255, 0.02)", poolA: "rgba(93, 128, 182, 0.12)",  poolB: "rgba(174, 205, 255, 0.08)", horizon: "rgba(106, 148, 197, 0.12)", vignetteTop: "rgba(0, 0, 0, 0.18)",       vignetteBottom: "rgba(0, 0, 0, 0.2)" },
+        { phase: "dawn",        t: 0.23, blend: 1,   top: "#355b8d", mid: "#d67eaf", bottom: "#f3b1c8", tintTop: "rgba(132, 163, 255, 0.12)", tintBottom: "rgba(255, 255, 255, 0.02)", poolA: "rgba(255, 178, 214, 0.18)", poolB: "rgba(255, 222, 241, 0.14)", horizon: "rgba(244, 175, 214, 0.22)", vignetteTop: "rgba(19, 32, 61, 0.08)",   vignetteBottom: "rgba(88, 48, 70, 0.12)" },
+        { phase: "morning",     t: 0.32, blend: 1,   top: "#2f7fcb", mid: "#63b9ea", bottom: "#a8e3f2", tintTop: "rgba(255, 255, 255, 0.03)", tintBottom: "rgba(255, 255, 255, 0)",    poolA: "rgba(176, 241, 255, 0.08)", poolB: "rgba(255, 255, 255, 0.1)",  horizon: "rgba(196, 246, 255, 0.18)", vignetteTop: "rgba(16, 28, 42, 0.035)", vignetteBottom: "rgba(16, 28, 42, 0.04)" },
+        { phase: "day",         t: 0.5,  blend: 1,   top: "#1d529d", mid: "#4478bb", bottom: "#86b0de", tintTop: "rgba(255, 255, 255, 0.015)", tintBottom: "rgba(255, 255, 255, 0)",   poolA: "rgba(228, 205, 162, 0.04)", poolB: "rgba(255, 255, 255, 0.06)", horizon: "rgba(180, 212, 242, 0.12)", vignetteTop: "rgba(13, 26, 44, 0.065)", vignetteBottom: "rgba(13, 26, 44, 0.05)" },
+        { phase: "golden-hour", t: 0.72, blend: 1,   top: "#4f77b3", mid: "#efa06d", bottom: "#e9ab7c", tintTop: "rgba(126, 151, 224, 0.1)",  tintBottom: "rgba(255, 205, 164, 0.06)", poolA: "rgba(255, 180, 98, 0.18)",  poolB: "rgba(255, 214, 179, 0.12)", horizon: "rgba(242, 166, 104, 0.24)", vignetteTop: "rgba(22, 28, 54, 0.06)",   vignetteBottom: "rgba(88, 44, 34, 0.14)" },
+        { phase: "dusk",        t: 0.8,  blend: 1,   top: "#66486d", mid: "#b05f77", bottom: "#e29a8a", tintTop: "rgba(214, 138, 178, 0.08)", tintBottom: "rgba(255, 214, 187, 0.06)", poolA: "rgba(255, 174, 120, 0.16)", poolB: "rgba(245, 194, 216, 0.08)", horizon: "rgba(255, 180, 138, 0.24)", vignetteTop: "rgba(34, 18, 24, 0.12)",   vignetteBottom: "rgba(36, 22, 28, 0.14)" },
+        { phase: "night",       t: 1,    blend: 1,   top: "#06101f", mid: "#123153", bottom: "#2f5175", tintTop: "rgba(73, 118, 184, 0.12)",  tintBottom: "rgba(255, 255, 255, 0.02)", poolA: "rgba(93, 128, 182, 0.12)",  poolB: "rgba(174, 205, 255, 0.08)", horizon: "rgba(106, 148, 197, 0.12)", vignetteTop: "rgba(0, 0, 0, 0.18)",       vignetteBottom: "rgba(0, 0, 0, 0.2)" },
+      ];
+      const defaultPalettes = JSON.parse(JSON.stringify(palettes));
+
+      const groups = [
+        ["top", "mid", "bottom"],
+        ["vignetteTop", "horizon", "vignetteBottom"],
+        ["tintTop", "tintBottom", "poolA", "poolB"],
+      ];
+
+      let activePhase = "night";
+      let activeKey = "top";
+      let pickerState = { h: 214, s: 0.81, v: 0.12, a: 1 };
+
+      function clonePalettes() {
+        return JSON.parse(JSON.stringify(palettes));
+      }
+
+      function hexToRgb(hex) {
+        const value = hex.replace("#", "");
+        return {
+          r: Number.parseInt(value.slice(0, 2), 16),
+          g: Number.parseInt(value.slice(2, 4), 16),
+          b: Number.parseInt(value.slice(4, 6), 16),
+        };
+      }
+
+      function parseRgba(input) {
+        const match = input.match(/rgba?\(([^)]+)\)/);
+        if (!match) return { r: 255, g: 255, b: 255, a: 1 };
+        const parts = match[1].split(",").map((part) => Number.parseFloat(part.trim()));
+        return { r: parts[0], g: parts[1], b: parts[2], a: parts[3] ?? 1 };
+      }
+
+      function rgbToHex({ r, g, b }) {
+        return `#${[r, g, b].map((v) => Math.round(v).toString(16).padStart(2, "0")).join("")}`;
+      }
+
+      function rgbaToHex(rgba) {
+        const { r, g, b } = parseRgba(rgba);
+        return rgbToHex({ r, g, b });
+      }
+
+      function rgbToHsv({ r, g, b }) {
+        const rn = r / 255;
+        const gn = g / 255;
+        const bn = b / 255;
+        const max = Math.max(rn, gn, bn);
+        const min = Math.min(rn, gn, bn);
+        const delta = max - min;
+        let h = 0;
+
+        if (delta !== 0) {
+          if (max === rn) h = 60 * (((gn - bn) / delta) % 6);
+          else if (max === gn) h = 60 * ((bn - rn) / delta + 2);
+          else h = 60 * ((rn - gn) / delta + 4);
+        }
+
+        if (h < 0) h += 360;
+
+        return {
+          h,
+          s: max === 0 ? 0 : delta / max,
+          v: max,
+        };
+      }
+
+      function hsvToRgb({ h, s, v }) {
+        const c = v * s;
+        const hh = (h % 360) / 60;
+        const x = c * (1 - Math.abs((hh % 2) - 1));
+        let r1 = 0;
+        let g1 = 0;
+        let b1 = 0;
+
+        if (hh >= 0 && hh < 1) [r1, g1, b1] = [c, x, 0];
+        else if (hh < 2) [r1, g1, b1] = [x, c, 0];
+        else if (hh < 3) [r1, g1, b1] = [0, c, x];
+        else if (hh < 4) [r1, g1, b1] = [0, x, c];
+        else if (hh < 5) [r1, g1, b1] = [x, 0, c];
+        else [r1, g1, b1] = [c, 0, x];
+
+        const m = v - c;
+        return {
+          r: Math.round((r1 + m) * 255),
+          g: Math.round((g1 + m) * 255),
+          b: Math.round((b1 + m) * 255),
+        };
+      }
+
+      function rgbaString({ r, g, b, a }) {
+        return `rgba(${r}, ${g}, ${b}, ${a.toFixed(3)})`;
+      }
+
+      function progressToTime(progress) {
+        const totalMinutes = Math.round(progress * 24 * 60);
+        const h = Math.floor(totalMinutes / 60) % 24;
+        const m = totalMinutes % 60;
+        return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+      }
+
+      function mixNumber(a, b, t) {
+        return a + (b - a) * t;
+      }
+
+      // Remaps a local segment t [0..1] so the actual blend only happens
+      // in the last `blend` fraction of the segment. Smoothstep within the zone.
+      function remapLocalT(localT, blend) {
+        const zone = Math.min(1, Math.max(0.01, blend));
+        const threshold = 1 - zone;
+        if (localT <= threshold) return 0;
+        const n = (localT - threshold) / zone;
+        return n * n * (3 - 2 * n); // smoothstep
+      }
+
+      function mixHex(a, b, t) {
+        const ca = hexToRgb(a);
+        const cb = hexToRgb(b);
+        const r = Math.round(mixNumber(ca.r, cb.r, t));
+        const g = Math.round(mixNumber(ca.g, cb.g, t));
+        const bValue = Math.round(mixNumber(ca.b, cb.b, t));
+        return `rgb(${r}, ${g}, ${bValue})`;
+      }
+
+      function mixRgba(a, b, t) {
+        const ca = parseRgba(a);
+        const cb = parseRgba(b);
+        const r = Math.round(mixNumber(ca.r, cb.r, t));
+        const g = Math.round(mixNumber(ca.g, cb.g, t));
+        const bValue = Math.round(mixNumber(ca.b, cb.b, t));
+        const alpha = mixNumber(ca.a, cb.a, t).toFixed(3);
+        return `rgba(${r}, ${g}, ${bValue}, ${alpha})`;
+      }
+
+      function getInterpolatedPalette(progress) {
+        const upperIndex = palettes.findIndex((stop) => stop.t >= progress);
+        if (upperIndex <= 0) return palettes[0];
+        if (upperIndex === -1) return palettes[palettes.length - 1];
+
+        const start = palettes[upperIndex - 1];
+        const end = palettes[upperIndex];
+        const range = end.t - start.t || 1;
+        const rawT = (progress - start.t) / range;
+        const t = remapLocalT(rawT, end.blend ?? 1);
+
+        return {
+          top: mixHex(start.top, end.top, t),
+          mid: mixHex(start.mid, end.mid, t),
+          bottom: mixHex(start.bottom, end.bottom, t),
+          tintTop: mixRgba(start.tintTop, end.tintTop, t),
+          tintBottom: mixRgba(start.tintBottom, end.tintBottom, t),
+          poolA: mixRgba(start.poolA, end.poolA, t),
+          poolB: mixRgba(start.poolB, end.poolB, t),
+          horizon: mixRgba(start.horizon, end.horizon, t),
+          vignetteTop: mixRgba(start.vignetteTop, end.vignetteTop, t),
+          vignetteBottom: mixRgba(start.vignetteBottom, end.vignetteBottom, t),
+        };
+      }
+
+      function setPreviewVars(target, phase) {
+        target.style.setProperty("--sky-top", phase.top);
+        target.style.setProperty("--sky-mid", phase.mid);
+        target.style.setProperty("--sky-bottom", phase.bottom);
+        target.style.setProperty("--tint-top", phase.tintTop);
+        target.style.setProperty("--tint-bottom", phase.tintBottom);
+        target.style.setProperty("--pool-a", phase.poolA);
+        target.style.setProperty("--pool-b", phase.poolB);
+        target.style.setProperty("--horizon", phase.horizon);
+        target.style.setProperty("--vignette-top", phase.vignetteTop);
+        target.style.setProperty("--vignette-bottom", phase.vignetteBottom);
+      }
+
+      function applyPalette(progress) {
+        const widget = document.getElementById("preview-widget");
+        setPreviewVars(widget, getInterpolatedPalette(progress));
+      }
+
+      function applyPhasePreview(phase) {
+        setPreviewVars(document.getElementById("preview-widget"), phase);
+      }
+
+      function renderPhaseButtons() {
+        document.getElementById("phase-buttons").innerHTML = palettes
+          .slice(0, -1)
+          .map((phase) => `<button type="button" class="${phase.phase === activePhase ? "is-active" : ""}" data-jump="${phase.phase}">${phaseLabels[phase.phase]}</button>`)
+          .join("");
+      }
+
+      function syncPickerPanel() {
+        const phase = palettes.find((entry) => entry.phase === activePhase);
+        if (!phase) return;
+        const rgb = groups[0].includes(activeKey)
+          ? hexToRgb(phase[activeKey])
+          : parseRgba(phase[activeKey]);
+        const hsv = rgbToHsv(rgb);
+        const alpha = groups[0].includes(activeKey) ? 1 : parseRgba(phase[activeKey]).a;
+        pickerState = { h: hsv.h, s: hsv.s, v: hsv.v, a: alpha };
+        document.getElementById("picker-title").textContent = activeKey;
+        document.getElementById("picker-phase").textContent = phaseLabels[phase.phase];
+        renderPickerPanel();
+      }
+
+      function renderPickerPanel() {
+        const surface = document.getElementById("picker-surface");
+        const handle = document.getElementById("picker-surface-handle");
+        const hueSlider = document.getElementById("picker-hue");
+        const alphaSlider = document.getElementById("picker-alpha");
+        const current = document.getElementById("picker-current");
+        const hex = document.getElementById("picker-hex");
+        const rgba = document.getElementById("picker-rgba");
+        const pureHue = hsvToRgb({ h: pickerState.h, s: 1, v: 1 });
+        const rgb = hsvToRgb(pickerState);
+
+        surface.style.background = `
+          linear-gradient(to top, black, transparent),
+          linear-gradient(to right, white, transparent),
+          rgb(${pureHue.r}, ${pureHue.g}, ${pureHue.b})
+        `;
+        handle.style.left = `${pickerState.s * 100}%`;
+        handle.style.top = `${(1 - pickerState.v) * 100}%`;
+        hueSlider.value = String(Math.round(pickerState.h));
+        alphaSlider.value = String(Math.round(pickerState.a * 1000));
+        current.style.background = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${pickerState.a.toFixed(3)})`;
+        hex.textContent = rgbToHex(rgb);
+        rgba.textContent = rgbaString({ ...rgb, a: pickerState.a });
+      }
+
+      function renderControls() {
+        const phase = palettes.find((entry) => entry.phase === activePhase);
+        if (!phase) return;
+
+        document.getElementById("active-phase-title").textContent = phaseLabels[phase.phase];
+
+        const grid = document.getElementById("phase-grid");
+        const maxRows = Math.max(...groups.map((keys) => keys.length));
+        grid.innerHTML = "";
+
+        for (let row = 0; row < maxRows; row += 1) {
+          groups.forEach((keys) => {
+            const key = keys[row];
+            const field = document.createElement("div");
+
+            if (!key) {
+              field.className = "field is-empty";
+              field.innerHTML = `<button type="button" class="color-swatch"></button><label></label>`;
+            } else {
+              const value = groups[0].includes(key) ? phase[key] : rgbaToHex(phase[key]);
+              field.className = "field";
+              field.innerHTML = `
+                <button type="button" class="color-swatch ${activeKey === key ? "is-active" : ""}" style="background:${value}" data-key="${key}"></button>
+                <label>${key}</label>
+              `;
+            }
+
+            grid.appendChild(field);
+          });
+        }
+
+        syncPickerPanel();
+      }
+
+      function loadSavedPalettes() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return false;
+          const parsed = JSON.parse(raw);
+          if (!Array.isArray(parsed) || parsed.length !== palettes.length) return false;
+          parsed.forEach((saved, index) => Object.assign(palettes[index], saved));
+          return true;
+        } catch (error) {
+          console.error("Failed to load saved palettes", error);
+          return false;
+        }
+      }
+
+      function savePalettes() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(clonePalettes()));
+      }
+
+      function resetActivePaletteToDefault() {
+        const phaseIndex = palettes.findIndex((entry) => entry.phase === activePhase);
+        if (phaseIndex === -1) return;
+        Object.assign(palettes[phaseIndex], JSON.parse(JSON.stringify(defaultPalettes[phaseIndex])));
+      }
+
+      function resetActiveColorToDefault() {
+        const phaseIndex = palettes.findIndex((entry) => entry.phase === activePhase);
+        if (phaseIndex === -1) return;
+        palettes[phaseIndex][activeKey] = JSON.parse(JSON.stringify(defaultPalettes[phaseIndex][activeKey]));
+      }
+
+      function setStatus(text) {
+        document.getElementById("save-status").textContent = text;
+      }
+
+      function renderTransitionControls() {
+        const container = document.getElementById("transition-controls");
+        // Transitions are INTO stops index 1..6 (skip index 0, the start night)
+        container.innerHTML = palettes.slice(1).map((stop, i) => {
+          const pct = Math.round((stop.blend ?? 1) * 100);
+          const label = phaseLabels[stop.phase] ?? stop.phase;
+          return `
+            <div class="transition-item">
+              <div class="transition-item-header">
+                <span>${label}</span>
+                <strong id="blend-val-${i + 1}">${pct}%</strong>
+              </div>
+              <input type="range" min="5" max="100" value="${pct}"
+                data-blend-index="${i + 1}" id="blend-slider-${i + 1}" />
+            </div>
+          `;
+        }).join("");
+      }
+
+      function bindEvents() {
+        const progress = document.getElementById("progress");
+        const progressLabel = document.getElementById("progress-label");
+        const pickerSurface = document.getElementById("picker-surface-wrap");
+        const hueSlider = document.getElementById("picker-hue");
+        const alphaSlider = document.getElementById("picker-alpha");
+
+        progress.addEventListener("input", () => {
+          const value = Number(progress.value) / 1000;
+          progressLabel.textContent = progressToTime(value);
+          applyPalette(value);
+        });
+
+        document.getElementById("phase-buttons").addEventListener("click", (event) => {
+          const target = event.target.closest("[data-jump]");
+          if (!target) return;
+          const phase = palettes.find((entry) => entry.phase === target.dataset.jump);
+          if (!phase) return;
+          activePhase = phase.phase;
+          activeKey = "top";
+          renderPhaseButtons();
+          renderControls();
+          progress.value = Math.round(phase.t * 1000);
+          progress.dispatchEvent(new Event("input"));
+        });
+
+        document.querySelector(".editor-panel").addEventListener("click", (event) => {
+          const swatch = event.target.closest(".color-swatch");
+          if (!swatch) return;
+          activeKey = swatch.dataset.key;
+          renderControls();
+          applyPhasePreview(palettes.find((entry) => entry.phase === activePhase));
+        });
+
+        function commitPickerChange() {
+          const phase = palettes.find((entry) => entry.phase === activePhase);
+          if (!phase) return;
+          const rgb = hsvToRgb(pickerState);
+
+          phase[activeKey] = groups[0].includes(activeKey)
+            ? rgbToHex(rgb)
+            : rgbaString({ ...rgb, a: pickerState.a });
+
+          renderControls();
+          applyPhasePreview(phase);
+          setStatus("Unsaved changes.");
+        }
+
+        function updateSurfacePointer(clientX, clientY) {
+          const rect = pickerSurface.getBoundingClientRect();
+          const x = Math.min(Math.max(clientX - rect.left, 0), rect.width);
+          const y = Math.min(Math.max(clientY - rect.top, 0), rect.height);
+          pickerState.s = rect.width === 0 ? 0 : x / rect.width;
+          pickerState.v = rect.height === 0 ? 0 : 1 - y / rect.height;
+          renderPickerPanel();
+          commitPickerChange();
+        }
+
+        let surfaceDragging = false;
+
+        pickerSurface.addEventListener("pointerdown", (event) => {
+          surfaceDragging = true;
+          pickerSurface.setPointerCapture(event.pointerId);
+          updateSurfacePointer(event.clientX, event.clientY);
+        });
+
+        pickerSurface.addEventListener("pointermove", (event) => {
+          if (!surfaceDragging) return;
+          updateSurfacePointer(event.clientX, event.clientY);
+        });
+
+        pickerSurface.addEventListener("pointerup", (event) => {
+          surfaceDragging = false;
+          pickerSurface.releasePointerCapture(event.pointerId);
+        });
+
+        hueSlider.addEventListener("input", () => {
+          pickerState.h = Number(hueSlider.value);
+          renderPickerPanel();
+          commitPickerChange();
+        });
+
+        alphaSlider.addEventListener("input", () => {
+          pickerState.a = Number(alphaSlider.value) / 1000;
+          renderPickerPanel();
+          commitPickerChange();
+        });
+
+        document.getElementById("save-palettes").addEventListener("click", () => {
+          const confirmed = window.confirm("Save the current gradient settings?");
+          if (!confirmed) return;
+          savePalettes();
+          setStatus("Saved.");
+        });
+
+        document.getElementById("reset-palette").addEventListener("click", () => {
+          const confirmed = window.confirm(`Reset all colors in ${phaseLabels[activePhase]} to their default values?`);
+          if (!confirmed) return;
+          resetActivePaletteToDefault();
+          renderControls();
+          applyPhasePreview(palettes.find((entry) => entry.phase === activePhase));
+          setStatus("Palette restored to default. Save if you want to keep it.");
+        });
+
+        document.getElementById("reset-color").addEventListener("click", () => {
+          const confirmed = window.confirm(`Reset ${activeKey} in ${phaseLabels[activePhase]} to its default color?`);
+          if (!confirmed) return;
+          resetActiveColorToDefault();
+          renderControls();
+          applyPhasePreview(palettes.find((entry) => entry.phase === activePhase));
+          setStatus("Color restored to default. Save if you want to keep it.");
+        });
+
+        document.getElementById("transition-controls").addEventListener("input", (event) => {
+          const slider = event.target.closest("input[data-blend-index]");
+          if (!slider) return;
+          const idx = Number(slider.dataset.blendIndex);
+          const pct = Number(slider.value);
+          palettes[idx].blend = pct / 100;
+          const label = document.getElementById(`blend-val-${idx}`);
+          if (label) label.textContent = `${pct}%`;
+          const progressValue = Number(document.getElementById("progress").value) / 1000;
+          applyPalette(progressValue);
+          setStatus("Unsaved changes.");
+        });
+      }
+
+      const hadSavedPalettes = loadSavedPalettes();
+      renderPhaseButtons();
+      renderControls();
+      renderTransitionControls();
+      bindEvents();
+      if (hadSavedPalettes) {
+        setStatus("Loaded saved settings.");
+      }
+      applyPhasePreview(palettes.find((entry) => entry.phase === "night"));
+      document.getElementById("progress").value = "0";
+      document.getElementById("progress").dispatchEvent(new Event("input"));
+    </script>
+  </body>
+</html>

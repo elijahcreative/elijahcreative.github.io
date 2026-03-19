@@ -199,6 +199,7 @@
       };
 
       const previewPhases = new Set(["dawn", "morning", "day", "golden-hour", "dusk", "night"]);
+      const STORAGE_KEY = "weather_widget_palettes_v1";
 
       const paletteStops = [
         { t: 0, phase: "night", top: "#06101f", mid: "#123153", bottom: "#2f5175", tintTop: "rgba(73, 118, 184, 0.12)", tintBottom: "rgba(255, 255, 255, 0.02)", poolA: "rgba(93, 128, 182, 0.12)", poolB: "rgba(174, 205, 255, 0.08)", horizon: "rgba(106, 148, 197, 0.12)", vignetteTop: "rgba(0, 0, 0, 0.18)", vignetteBottom: "rgba(0, 0, 0, 0.2)" },
@@ -209,6 +210,18 @@
         { t: 0.8, phase: "dusk", top: "#66486d", mid: "#b05f77", bottom: "#e29a8a", tintTop: "rgba(214, 138, 178, 0.08)", tintBottom: "rgba(255, 214, 187, 0.06)", poolA: "rgba(255, 174, 120, 0.16)", poolB: "rgba(245, 194, 216, 0.08)", horizon: "rgba(255, 180, 138, 0.24)", vignetteTop: "rgba(34, 18, 24, 0.12)", vignetteBottom: "rgba(36, 22, 28, 0.14)" },
         { t: 1, phase: "night", top: "#06101f", mid: "#123153", bottom: "#2f5175", tintTop: "rgba(73, 118, 184, 0.12)", tintBottom: "rgba(255, 255, 255, 0.02)", poolA: "rgba(93, 128, 182, 0.12)", poolB: "rgba(174, 205, 255, 0.08)", horizon: "rgba(106, 148, 197, 0.12)", vignetteTop: "rgba(0, 0, 0, 0.18)", vignetteBottom: "rgba(0, 0, 0, 0.2)" },
       ];
+
+      function loadSavedPalettes() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return;
+          const parsed = JSON.parse(raw);
+          if (!Array.isArray(parsed) || parsed.length !== paletteStops.length) return;
+          parsed.forEach((saved, index) => Object.assign(paletteStops[index], saved));
+        } catch (error) {
+          console.error("Failed to load saved palettes", error);
+        }
+      }
 
       function getParams() {
         const params = new URLSearchParams(window.location.search);
@@ -357,6 +370,7 @@
       }
 
       async function init() {
+        loadSavedPalettes();
         const params = getParams();
 
         if (params.previewPhase) {
