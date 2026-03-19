@@ -248,6 +248,20 @@
         accent-color: var(--accent);
       }
 
+      .blend-curve {
+        width: 100%;
+        height: 44px;
+        display: block;
+        border-radius: 6px;
+        overflow: hidden;
+        background: rgba(0, 0, 0, 0.25);
+        cursor: default;
+      }
+
+      .blend-handle {
+        cursor: ew-resize;
+      }
+
       .editor-panel {
         display: grid;
         grid-template-columns: minmax(0, 1fr) 220px;
@@ -537,13 +551,13 @@
       const STORAGE_KEY = "weather_widget_palettes_v1";
 
       const palettes = [
-        { phase: "night",       t: 0,    blend: 1,   top: "#06101f", mid: "#123153", bottom: "#2f5175", tintTop: "rgba(73, 118, 184, 0.12)",  tintBottom: "rgba(255, 255, 255, 0.02)", poolA: "rgba(93, 128, 182, 0.12)",  poolB: "rgba(174, 205, 255, 0.08)", horizon: "rgba(106, 148, 197, 0.12)", vignetteTop: "rgba(0, 0, 0, 0.18)",       vignetteBottom: "rgba(0, 0, 0, 0.2)" },
-        { phase: "dawn",        t: 0.23, blend: 1,   top: "#355b8d", mid: "#d67eaf", bottom: "#f3b1c8", tintTop: "rgba(132, 163, 255, 0.12)", tintBottom: "rgba(255, 255, 255, 0.02)", poolA: "rgba(255, 178, 214, 0.18)", poolB: "rgba(255, 222, 241, 0.14)", horizon: "rgba(244, 175, 214, 0.22)", vignetteTop: "rgba(19, 32, 61, 0.08)",   vignetteBottom: "rgba(88, 48, 70, 0.12)" },
-        { phase: "morning",     t: 0.32, blend: 1,   top: "#2f7fcb", mid: "#63b9ea", bottom: "#a8e3f2", tintTop: "rgba(255, 255, 255, 0.03)", tintBottom: "rgba(255, 255, 255, 0)",    poolA: "rgba(176, 241, 255, 0.08)", poolB: "rgba(255, 255, 255, 0.1)",  horizon: "rgba(196, 246, 255, 0.18)", vignetteTop: "rgba(16, 28, 42, 0.035)", vignetteBottom: "rgba(16, 28, 42, 0.04)" },
-        { phase: "day",         t: 0.5,  blend: 1,   top: "#1d529d", mid: "#4478bb", bottom: "#86b0de", tintTop: "rgba(255, 255, 255, 0.015)", tintBottom: "rgba(255, 255, 255, 0)",   poolA: "rgba(228, 205, 162, 0.04)", poolB: "rgba(255, 255, 255, 0.06)", horizon: "rgba(180, 212, 242, 0.12)", vignetteTop: "rgba(13, 26, 44, 0.065)", vignetteBottom: "rgba(13, 26, 44, 0.05)" },
-        { phase: "golden-hour", t: 0.72, blend: 1,   top: "#4f77b3", mid: "#efa06d", bottom: "#e9ab7c", tintTop: "rgba(126, 151, 224, 0.1)",  tintBottom: "rgba(255, 205, 164, 0.06)", poolA: "rgba(255, 180, 98, 0.18)",  poolB: "rgba(255, 214, 179, 0.12)", horizon: "rgba(242, 166, 104, 0.24)", vignetteTop: "rgba(22, 28, 54, 0.06)",   vignetteBottom: "rgba(88, 44, 34, 0.14)" },
-        { phase: "dusk",        t: 0.8,  blend: 1,   top: "#66486d", mid: "#b05f77", bottom: "#e29a8a", tintTop: "rgba(214, 138, 178, 0.08)", tintBottom: "rgba(255, 214, 187, 0.06)", poolA: "rgba(255, 174, 120, 0.16)", poolB: "rgba(245, 194, 216, 0.08)", horizon: "rgba(255, 180, 138, 0.24)", vignetteTop: "rgba(34, 18, 24, 0.12)",   vignetteBottom: "rgba(36, 22, 28, 0.14)" },
-        { phase: "night",       t: 1,    blend: 1,   top: "#06101f", mid: "#123153", bottom: "#2f5175", tintTop: "rgba(73, 118, 184, 0.12)",  tintBottom: "rgba(255, 255, 255, 0.02)", poolA: "rgba(93, 128, 182, 0.12)",  poolB: "rgba(174, 205, 255, 0.08)", horizon: "rgba(106, 148, 197, 0.12)", vignetteTop: "rgba(0, 0, 0, 0.18)",       vignetteBottom: "rgba(0, 0, 0, 0.2)" },
+        { phase: "night",       t: 0,    blend: 1, c1: 0.333, c2: 0.667, top: "#06101f", mid: "#123153", bottom: "#2f5175", tintTop: "rgba(73, 118, 184, 0.12)",  tintBottom: "rgba(255, 255, 255, 0.02)", poolA: "rgba(93, 128, 182, 0.12)",  poolB: "rgba(174, 205, 255, 0.08)", horizon: "rgba(106, 148, 197, 0.12)", vignetteTop: "rgba(0, 0, 0, 0.18)",       vignetteBottom: "rgba(0, 0, 0, 0.2)" },
+        { phase: "dawn",        t: 0.23, blend: 1, c1: 0.333, c2: 0.667, top: "#355b8d", mid: "#d67eaf", bottom: "#f3b1c8", tintTop: "rgba(132, 163, 255, 0.12)", tintBottom: "rgba(255, 255, 255, 0.02)", poolA: "rgba(255, 178, 214, 0.18)", poolB: "rgba(255, 222, 241, 0.14)", horizon: "rgba(244, 175, 214, 0.22)", vignetteTop: "rgba(19, 32, 61, 0.08)",   vignetteBottom: "rgba(88, 48, 70, 0.12)" },
+        { phase: "morning",     t: 0.32, blend: 1, c1: 0.333, c2: 0.667, top: "#2f7fcb", mid: "#63b9ea", bottom: "#a8e3f2", tintTop: "rgba(255, 255, 255, 0.03)", tintBottom: "rgba(255, 255, 255, 0)",    poolA: "rgba(176, 241, 255, 0.08)", poolB: "rgba(255, 255, 255, 0.1)",  horizon: "rgba(196, 246, 255, 0.18)", vignetteTop: "rgba(16, 28, 42, 0.035)", vignetteBottom: "rgba(16, 28, 42, 0.04)" },
+        { phase: "day",         t: 0.5,  blend: 1, c1: 0.333, c2: 0.667, top: "#1d529d", mid: "#4478bb", bottom: "#86b0de", tintTop: "rgba(255, 255, 255, 0.015)", tintBottom: "rgba(255, 255, 255, 0)",   poolA: "rgba(228, 205, 162, 0.04)", poolB: "rgba(255, 255, 255, 0.06)", horizon: "rgba(180, 212, 242, 0.12)", vignetteTop: "rgba(13, 26, 44, 0.065)", vignetteBottom: "rgba(13, 26, 44, 0.05)" },
+        { phase: "golden-hour", t: 0.72, blend: 1, c1: 0.333, c2: 0.667, top: "#4f77b3", mid: "#efa06d", bottom: "#e9ab7c", tintTop: "rgba(126, 151, 224, 0.1)",  tintBottom: "rgba(255, 205, 164, 0.06)", poolA: "rgba(255, 180, 98, 0.18)",  poolB: "rgba(255, 214, 179, 0.12)", horizon: "rgba(242, 166, 104, 0.24)", vignetteTop: "rgba(22, 28, 54, 0.06)",   vignetteBottom: "rgba(88, 44, 34, 0.14)" },
+        { phase: "dusk",        t: 0.8,  blend: 1, c1: 0.333, c2: 0.667, top: "#66486d", mid: "#b05f77", bottom: "#e29a8a", tintTop: "rgba(214, 138, 178, 0.08)", tintBottom: "rgba(255, 214, 187, 0.06)", poolA: "rgba(255, 174, 120, 0.16)", poolB: "rgba(245, 194, 216, 0.08)", horizon: "rgba(255, 180, 138, 0.24)", vignetteTop: "rgba(34, 18, 24, 0.12)",   vignetteBottom: "rgba(36, 22, 28, 0.14)" },
+        { phase: "night",       t: 1,    blend: 1, c1: 0.333, c2: 0.667, top: "#06101f", mid: "#123153", bottom: "#2f5175", tintTop: "rgba(73, 118, 184, 0.12)",  tintBottom: "rgba(255, 255, 255, 0.02)", poolA: "rgba(93, 128, 182, 0.12)",  poolB: "rgba(174, 205, 255, 0.08)", horizon: "rgba(106, 148, 197, 0.12)", vignetteTop: "rgba(0, 0, 0, 0.18)",       vignetteBottom: "rgba(0, 0, 0, 0.2)" },
       ];
       const defaultPalettes = JSON.parse(JSON.stringify(palettes));
 
@@ -648,14 +662,36 @@
         return a + (b - a) * t;
       }
 
-      // Remaps a local segment t [0..1] so the actual blend only happens
-      // in the last `blend` fraction of the segment. Smoothstep within the zone.
-      function remapLocalT(localT, blend) {
+      // Cubic bezier: P0=(0,0) P1=(c1,0) P2=(c2,1) P3=(1,1)
+      // By(t) is always smoothstep(t); c1/c2 control how x maps to t.
+      function bzX(t, c1, c2) {
+        const mt = 1 - t;
+        return 3 * mt * mt * t * c1 + 3 * mt * t * t * c2 + t * t * t;
+      }
+      function bzXd(t, c1, c2) {
+        const mt = 1 - t;
+        return 3 * (mt * mt * c1 + 2 * mt * t * (c2 - c1) + t * t * (1 - c2));
+      }
+      function bzY(t) { return t * t * (3 - 2 * t); }
+
+      function bezierEval(x, c1, c2) {
+        if (x <= 0) return 0;
+        if (x >= 1) return 1;
+        let t = x;
+        for (let i = 0; i < 8; i++) {
+          const d = bzXd(t, c1, c2);
+          if (Math.abs(d) < 1e-8) break;
+          t -= (bzX(t, c1, c2) - x) / d;
+          t = Math.max(0, Math.min(1, t));
+        }
+        return bzY(t);
+      }
+
+      function remapLocalT(localT, blend, c1 = 0.333, c2 = 0.667) {
         const zone = Math.min(1, Math.max(0.01, blend));
         const threshold = 1 - zone;
         if (localT <= threshold) return 0;
-        const n = (localT - threshold) / zone;
-        return n * n * (3 - 2 * n); // smoothstep
+        return bezierEval((localT - threshold) / zone, c1, c2);
       }
 
       function mixHex(a, b, t) {
@@ -686,7 +722,7 @@
         const end = palettes[upperIndex];
         const range = end.t - start.t || 1;
         const rawT = (progress - start.t) / range;
-        const t = remapLocalT(rawT, end.blend ?? 1);
+        const t = remapLocalT(rawT, end.blend ?? 1, end.c1 ?? 0.333, end.c2 ?? 0.667);
 
         return {
           top: mixHex(start.top, end.top, t),
@@ -838,23 +874,103 @@
         document.getElementById("save-status").textContent = text;
       }
 
+      function drawBlendCurve(svgEl, blend, c1, c2) {
+        const W = 100, TOP = 4, BOT = 40, CH = 36, N = 80;
+        const curvePts = [];
+        const areaPts = [`0,${BOT}`];
+
+        for (let i = 0; i <= N; i++) {
+          const t = i / N;
+          const sx = (bzX(t, c1, c2) * W).toFixed(2);
+          const sy = (TOP + (1 - bzY(t)) * CH).toFixed(2);
+          curvePts.push(`${sx},${sy}`);
+          areaPts.push(`${sx},${sy}`);
+        }
+        areaPts.push(`${W},${BOT}`);
+
+        const thX = ((1 - Math.min(1, Math.max(0.01, blend))) * W).toFixed(2);
+        const h1x = (c1 * W).toFixed(2);
+        const h2x = (c2 * W).toFixed(2);
+
+        svgEl.querySelector(".blend-area").setAttribute("points", areaPts.join(" "));
+        svgEl.querySelector(".blend-line").setAttribute("points", curvePts.join(" "));
+        svgEl.querySelector(".blend-zone-line").setAttribute("x1", thX);
+        svgEl.querySelector(".blend-zone-line").setAttribute("x2", thX);
+        svgEl.querySelector(".blend-guide-1").setAttribute("x2", h1x);
+        svgEl.querySelector(".blend-guide-2").setAttribute("x1", h2x);
+        svgEl.querySelector(".blend-handle-1").setAttribute("cx", h1x);
+        svgEl.querySelector(".blend-handle-2").setAttribute("cx", h2x);
+      }
+
       function renderTransitionControls() {
         const container = document.getElementById("transition-controls");
-        // Transitions are INTO stops index 1..6 (skip index 0, the start night)
         container.innerHTML = palettes.slice(1).map((stop, i) => {
+          const idx = i + 1;
           const pct = Math.round((stop.blend ?? 1) * 100);
           const label = phaseLabels[stop.phase] ?? stop.phase;
           return `
             <div class="transition-item">
               <div class="transition-item-header">
                 <span>${label}</span>
-                <strong id="blend-val-${i + 1}">${pct}%</strong>
+                <strong id="blend-val-${idx}">${pct}%</strong>
               </div>
               <input type="range" min="5" max="100" value="${pct}"
-                data-blend-index="${i + 1}" id="blend-slider-${i + 1}" />
+                data-blend-index="${idx}" id="blend-slider-${idx}" />
+              <svg id="blend-curve-${idx}" class="blend-curve"
+                viewBox="0 0 100 44" preserveAspectRatio="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="bcg-${idx}" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#67b7ff" stop-opacity="0.3"/>
+                    <stop offset="100%" stop-color="#67b7ff" stop-opacity="0.04"/>
+                  </linearGradient>
+                </defs>
+                <line class="blend-zone-line" x1="0" y1="0" x2="0" y2="44"
+                  stroke="rgba(255,255,255,0.18)" stroke-width="1" stroke-dasharray="2,2"/>
+                <line class="blend-guide-1" x1="0" y1="40" x2="33" y2="40"
+                  stroke="rgba(103,183,255,0.35)" stroke-width="1"/>
+                <line class="blend-guide-2" x1="67" y1="4" x2="100" y2="4"
+                  stroke="rgba(103,183,255,0.35)" stroke-width="1"/>
+                <polygon class="blend-area" points="" fill="url(#bcg-${idx})"/>
+                <polyline class="blend-line" points="" fill="none"
+                  stroke="#67b7ff" stroke-width="1.5"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+                <circle class="blend-handle blend-handle-1" cx="33" cy="40" r="4"
+                  fill="#67b7ff" stroke="rgba(255,255,255,0.5)" stroke-width="1"/>
+                <circle class="blend-handle blend-handle-2" cx="67" cy="4" r="4"
+                  fill="#67b7ff" stroke="rgba(255,255,255,0.5)" stroke-width="1"/>
+              </svg>
             </div>
           `;
         }).join("");
+
+        palettes.slice(1).forEach((stop, i) => {
+          const idx = i + 1;
+          const svg = document.getElementById(`blend-curve-${idx}`);
+          if (!svg) return;
+          drawBlendCurve(svg, stop.blend ?? 1, stop.c1 ?? 0.333, stop.c2 ?? 0.667);
+
+          let draggingHandle = null;
+          svg.addEventListener("pointerdown", (e) => {
+            const h = e.target.closest(".blend-handle");
+            if (!h) return;
+            draggingHandle = h;
+            svg.setPointerCapture(e.pointerId);
+          });
+          svg.addEventListener("pointermove", (e) => {
+            if (!draggingHandle) return;
+            const rect = svg.getBoundingClientRect();
+            const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+            const isH1 = draggingHandle.classList.contains("blend-handle-1");
+            if (isH1) palettes[idx].c1 = x;
+            else palettes[idx].c2 = x;
+            drawBlendCurve(svg, palettes[idx].blend, palettes[idx].c1, palettes[idx].c2);
+            applyPalette(Number(document.getElementById("progress").value) / 1000);
+            setStatus("Unsaved changes.");
+          });
+          svg.addEventListener("pointerup", () => { draggingHandle = null; });
+          svg.addEventListener("pointercancel", () => { draggingHandle = null; });
+        });
       }
 
       function bindEvents() {
@@ -978,6 +1094,8 @@
           palettes[idx].blend = pct / 100;
           const label = document.getElementById(`blend-val-${idx}`);
           if (label) label.textContent = `${pct}%`;
+          const svg = document.getElementById(`blend-curve-${idx}`);
+          if (svg) drawBlendCurve(svg, palettes[idx].blend, palettes[idx].c1, palettes[idx].c2);
           const progressValue = Number(document.getElementById("progress").value) / 1000;
           applyPalette(progressValue);
           setStatus("Unsaved changes.");
