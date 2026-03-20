@@ -510,7 +510,7 @@
         { phase: "day",         t: 0.5,  top: "#1d529d", mid: "#4478bb", bottom: "#86b0de", tintTop: "rgba(255, 255, 255, 0.015)", tintBottom: "rgba(255, 255, 255, 0)",   poolA: "rgba(228, 205, 162, 0.04)", poolB: "rgba(255, 255, 255, 0.06)", horizon: "rgba(180, 212, 242, 0.12)", vignetteTop: "rgba(13, 26, 44, 0.065)", vignetteBottom: "rgba(13, 26, 44, 0.05)" },
         { phase: "golden-hour", t: 0.72, top: "#4f77b3", mid: "#efa06d", bottom: "#e9ab7c", tintTop: "rgba(126, 151, 224, 0.1)",  tintBottom: "rgba(255, 205, 164, 0.06)", poolA: "rgba(255, 180, 98, 0.18)",  poolB: "rgba(255, 214, 179, 0.12)", horizon: "rgba(242, 166, 104, 0.24)", vignetteTop: "rgba(22, 28, 54, 0.06)",   vignetteBottom: "rgba(88, 44, 34, 0.14)" },
         { phase: "dusk",        t: 0.8,  top: "#66486d", mid: "#b05f77", bottom: "#e29a8a", tintTop: "rgba(214, 138, 178, 0.08)", tintBottom: "rgba(255, 214, 187, 0.06)", poolA: "rgba(255, 174, 120, 0.16)", poolB: "rgba(245, 194, 216, 0.08)", horizon: "rgba(255, 180, 138, 0.24)", vignetteTop: "rgba(34, 18, 24, 0.12)",   vignetteBottom: "rgba(36, 22, 28, 0.14)" },
-        { phase: "night",       t: 1,    top: "#06101f", mid: "#123153", bottom: "#2f5175", tintTop: "rgba(73, 118, 184, 0.12)",  tintBottom: "rgba(255, 255, 255, 0.02)", poolA: "rgba(93, 128, 182, 0.12)",  poolB: "rgba(174, 205, 255, 0.08)", horizon: "rgba(106, 148, 197, 0.12)", vignetteTop: "rgba(0, 0, 0, 0.18)",       vignetteBottom: "rgba(0, 0, 0, 0.2)" },
+        { phase: "night",       t: 0.854,top: "#06101f", mid: "#123153", bottom: "#2f5175", tintTop: "rgba(73, 118, 184, 0.12)",  tintBottom: "rgba(255, 255, 255, 0.02)", poolA: "rgba(93, 128, 182, 0.12)",  poolB: "rgba(174, 205, 255, 0.08)", horizon: "rgba(106, 148, 197, 0.12)", vignetteTop: "rgba(0, 0, 0, 0.18)",       vignetteBottom: "rgba(0, 0, 0, 0.2)" },
       ];
       const defaultPalettes = JSON.parse(JSON.stringify(palettes));
 
@@ -655,11 +655,17 @@
       function getInterpolatedPalette(progress) {
         const half = (transitionMinutes / 2) / 1440; // fraction of day
 
-        // Check each transition window (centred on each stop except the first)
         for (let i = 1; i < palettes.length; i++) {
           const c = palettes[i].t;
-          if (progress >= c - half && progress < c + half) {
-            const u = (progress - (c - half)) / (2 * half);
+          // The last stop (t=1, night) must be fully reached at exactly t=1.
+          // Shift its window to end at 1 instead of being centred at 1,
+          // otherwise the night colour can only ever reach 50% on the slider.
+          const isLast  = i === palettes.length - 1;
+          const winStart = isLast ? c - 2 * half : c - half;
+          const winEnd   = isLast ? c             : c + half;
+
+          if (progress >= winStart && progress < winEnd) {
+            const u = (progress - winStart) / (2 * half);
             const t = u * u * (3 - 2 * u); // smoothstep
             return mixPalettes(palettes[i - 1], palettes[i], t);
           }
@@ -668,7 +674,9 @@
         // Flat region — find the last stop whose window has fully passed
         let settled = palettes[0];
         for (let i = 1; i < palettes.length; i++) {
-          if (progress >= palettes[i].t + half) settled = palettes[i];
+          const isLast = i === palettes.length - 1;
+          const winEnd = isLast ? palettes[i].t : palettes[i].t + half;
+          if (progress >= winEnd) settled = palettes[i];
         }
         return mixPalettes(settled, settled, 0);
       }
@@ -775,13 +783,29 @@
         syncPickerPanel();
       }
 
+      const SETTINGS_KEY = "weather_widget_settings_v1";
+
       function loadSavedPalettes() {
         try {
+          // Load settings (transitionMinutes etc.)
+          const rawSettings = localStorage.getItem(SETTINGS_KEY);
+          if (rawSettings) {
+            const settings = JSON.parse(rawSettings);
+            if (settings.transitionMinutes) {
+              transitionMinutes = settings.transitionMinutes;
+              const input = document.getElementById('transition-length');
+              if (input) input.value = transitionMinutes;
+            }
+          }
+          // Load palettes
           const raw = localStorage.getItem(STORAGE_KEY);
           if (!raw) return false;
           const parsed = JSON.parse(raw);
           if (!Array.isArray(parsed) || parsed.length !== palettes.length) return false;
-          parsed.forEach((saved, index) => Object.assign(palettes[index], saved));
+          parsed.forEach((saved, index) => {
+            const { t, phase, ...colors } = saved; // never restore t/phase — they are structural
+            Object.assign(palettes[index], colors);
+          });
           return true;
         } catch (error) {
           console.error("Failed to load saved palettes", error);
@@ -791,6 +815,7 @@
 
       function savePalettes() {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(clonePalettes()));
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify({ transitionMinutes }));
       }
 
       function resetActivePaletteToDefault() {
@@ -809,243 +834,6 @@
         document.getElementById("save-status").textContent = text;
       }
 
-      // ── Spline Editor (wave display) ───────────────────────────────────
-      // Y_display = (2*blend − 1)²  →  1 at phase stops, 0 at blend=0.5
-      // mr[i] = departure speed (right handle, blue), ml[i] = arrival speed (left handle, purple)
-      // Both stored as cubic-Hermite M tangents in normalised-u space.
-      // Handle direction formula: dy/dx = 4 * M * H_wave / W_canvas  (cancels segment-L)
-
-      const SPAD   = { top: 16, right: 16, bottom: 38, left: 16 };
-      const HLEN   = 50;   // handle length in px
-      const MAX_M  = 20;   // max tangent magnitude
-      let splineDrag = null;
-
-      function waveR(W, H) {
-        return { l: SPAD.left, t: SPAD.top,
-                 r: W - SPAD.right, b: H - SPAD.bottom,
-                 w: W - SPAD.left - SPAD.right,
-                 h: H - SPAD.top  - SPAD.bottom };
-      }
-
-      function nodeXY(idx, r) {
-        return { x: r.l + palettes[idx].t * r.w, y: r.t }; // nodes always at top (Y_display=1)
-      }
-
-      function handleXY(idx, type, r) {
-        const n  = nodeXY(idx, r);
-        const M  = (palettes[idx][type] ?? 0);
-        // direction: right handle goes RIGHT+DOWN, left handle goes LEFT+DOWN
-        const dx = (type === 'mr' ? 1 : -1) * r.w * 0.5; // just for direction; normalised below
-        const dy = 4 * M * r.h;                            // downward = positive canvas-y
-        // use actual segment fraction for dx so handle angle reflects segment width
-        const segL = type === 'mr'
-          ? (idx < palettes.length - 1 ? palettes[idx+1].t - palettes[idx].t : 0)
-          : (idx > 0                   ? palettes[idx].t - palettes[idx-1].t  : 0);
-        const dxPx = (type === 'mr' ? 1 : -1) * segL * r.w;
-        const dyPx = 4 * M * r.h;
-        const mag  = Math.hypot(dxPx, dyPx) || Math.abs(dxPx) || 1;
-        const s    = HLEN / mag;
-        return { x: n.x + dxPx * s, y: n.y + dyPx * s };
-      }
-
-      function hitTest(px, py, W, H) {
-        const r = waveR(W, H), HIT = 11;
-        for (let i = 0; i < palettes.length; i++) {
-          if (i < palettes.length - 1) {
-            const h = handleXY(i, 'mr', r);
-            if (Math.hypot(px - h.x, py - h.y) < HIT) return { type: 'mr', idx: i };
-          }
-          if (i > 0) {
-            const h = handleXY(i, 'ml', r);
-            if (Math.hypot(px - h.x, py - h.y) < HIT) return { type: 'ml', idx: i };
-          }
-        }
-        // node hit for dblclick-reset
-        for (let i = 0; i < palettes.length; i++) {
-          const n = nodeXY(i, waveR(W, H));
-          if (Math.hypot(px - n.x, py - n.y) < 12) return { type: 'node', idx: i };
-        }
-        return null;
-      }
-
-      function drawSplineEditor() {
-        const canvas = document.getElementById('spline-canvas');
-        if (!canvas) return;
-        const dpr = window.devicePixelRatio || 1;
-        const W = canvas.clientWidth, H = canvas.clientHeight;
-        canvas.width = W * dpr; canvas.height = H * dpr;
-        const ctx = canvas.getContext('2d');
-        ctx.scale(dpr, dpr);
-        const r = waveR(W, H);
-
-        ctx.clearRect(0, 0, W, H);
-
-        // ── Phase vertical lines + labels ──
-        palettes.forEach((stop, i) => {
-          const x = r.l + stop.t * r.w;
-          ctx.strokeStyle = 'rgba(255,255,255,0.07)';
-          ctx.lineWidth = 1; ctx.setLineDash([3, 5]);
-          ctx.beginPath(); ctx.moveTo(x, r.t); ctx.lineTo(x, r.b); ctx.stroke();
-          ctx.setLineDash([]);
-          if (i < palettes.length - 1) {
-            ctx.fillStyle = 'rgba(159,176,201,0.6)';
-            ctx.font = '10px -apple-system,sans-serif'; ctx.textAlign = 'center';
-            ctx.fillText(phaseLabels[stop.phase] ?? stop.phase, x, r.b + 14);
-            const hh = Math.floor(stop.t * 24), mm = Math.floor((stop.t * 1440) % 60);
-            ctx.fillStyle = 'rgba(159,176,201,0.3)';
-            ctx.font = '9px -apple-system,sans-serif';
-            ctx.fillText(`${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`, x, r.b + 26);
-          }
-        });
-
-        // ── Baseline (valley floor) ──
-        ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-        ctx.lineWidth = 1; ctx.setLineDash([2, 6]);
-        ctx.beginPath(); ctx.moveTo(r.l, r.b); ctx.lineTo(r.r, r.b); ctx.stroke();
-        ctx.setLineDash([]);
-
-        // ── Current-time indicator ──
-        const prog = Number(document.getElementById('progress')?.value ?? 0) / 1000;
-        const timeX = r.l + prog * r.w;
-        ctx.strokeStyle = 'rgba(255,255,255,0.22)';
-        ctx.lineWidth = 1.5;
-        ctx.beginPath(); ctx.moveTo(timeX, r.t); ctx.lineTo(timeX, r.b); ctx.stroke();
-
-        // ── Collect wave points ──
-        const wavePts = [];
-        for (let i = 0; i < palettes.length - 1; i++) {
-          const L  = palettes[i+1].t - palettes[i].t;
-          const M0 = (palettes[i].mr   ?? 0) * L;
-          const M1 = (palettes[i+1].ml ?? 0) * L;
-          const N  = 80;
-          for (let s = (i === 0 ? 0 : 1); s <= N; s++) {
-            const u     = s / N;
-            const blend = Math.max(0, Math.min(1, cubicHermite(u, M0, M1)));
-            const yDisp = (2 * blend - 1) ** 2;          // 1→0→1 wave
-            wavePts.push({
-              x: r.l + (palettes[i].t + u * L) * r.w,
-              y: r.t + (1 - yDisp) * r.h
-            });
-          }
-        }
-
-        // ── Filled area under wave ──
-        if (wavePts.length) {
-          ctx.beginPath();
-          ctx.moveTo(wavePts[0].x, r.b);
-          wavePts.forEach(p => ctx.lineTo(p.x, p.y));
-          ctx.lineTo(wavePts[wavePts.length - 1].x, r.b);
-          ctx.closePath();
-          const grad = ctx.createLinearGradient(0, r.t, 0, r.b);
-          grad.addColorStop(0, 'rgba(103,183,255,0.12)');
-          grad.addColorStop(1, 'rgba(103,183,255,0.02)');
-          ctx.fillStyle = grad;
-          ctx.fill();
-        }
-
-        // ── Wave stroke ──
-        ctx.beginPath();
-        wavePts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
-        ctx.strokeStyle = '#67b7ff';
-        ctx.lineWidth = 2; ctx.lineJoin = 'round'; ctx.stroke();
-
-        // ── Handles + nodes ──
-        palettes.forEach((stop, i) => {
-          const n = nodeXY(i, r);
-
-          // Right handle (blue, departure)
-          if (i < palettes.length - 1) {
-            const h = handleXY(i, 'mr', r);
-            ctx.strokeStyle = 'rgba(103,183,255,0.5)'; ctx.lineWidth = 1.3;
-            ctx.beginPath(); ctx.moveTo(n.x, n.y); ctx.lineTo(h.x, h.y); ctx.stroke();
-            ctx.beginPath(); ctx.arc(h.x, h.y, 5, 0, Math.PI * 2);
-            ctx.fillStyle = '#67b7ff'; ctx.fill();
-            ctx.strokeStyle = 'rgba(255,255,255,0.55)'; ctx.lineWidth = 1; ctx.stroke();
-          }
-
-          // Left handle (purple, arrival)
-          if (i > 0) {
-            const h = handleXY(i, 'ml', r);
-            ctx.strokeStyle = 'rgba(167,139,250,0.5)'; ctx.lineWidth = 1.3;
-            ctx.beginPath(); ctx.moveTo(n.x, n.y); ctx.lineTo(h.x, h.y); ctx.stroke();
-            ctx.beginPath(); ctx.arc(h.x, h.y, 5, 0, Math.PI * 2);
-            ctx.fillStyle = '#a78bfa'; ctx.fill();
-            ctx.strokeStyle = 'rgba(255,255,255,0.55)'; ctx.lineWidth = 1; ctx.stroke();
-          }
-
-          // Node circle
-          ctx.beginPath(); ctx.arc(n.x, n.y, 5.5, 0, Math.PI * 2);
-          ctx.fillStyle = '#fff'; ctx.fill();
-          ctx.strokeStyle = 'rgba(103,183,255,0.7)'; ctx.lineWidth = 1.5; ctx.stroke();
-        });
-      }
-
-      function bindSplineEvents() {
-        const canvas = document.getElementById('spline-canvas');
-        if (!canvas) return;
-
-        canvas.addEventListener('pointerdown', (e) => {
-          const rect = canvas.getBoundingClientRect();
-          const hit  = hitTest(e.clientX - rect.left, e.clientY - rect.top,
-                               canvas.clientWidth, canvas.clientHeight);
-          if (!hit || hit.type === 'node') return;
-          splineDrag = hit;
-          canvas.setPointerCapture(e.pointerId);
-          canvas.style.cursor = 'grabbing';
-        });
-
-        canvas.addEventListener('pointermove', (e) => {
-          const rect = canvas.getBoundingClientRect();
-          const px = e.clientX - rect.left, py = e.clientY - rect.top;
-          const W  = canvas.clientWidth,    H  = canvas.clientHeight;
-          const r  = waveR(W, H);
-
-          if (!splineDrag) {
-            canvas.style.cursor = hitTest(px, py, W, H) ? 'grab' : 'default';
-            return;
-          }
-
-          const { type, idx } = splineDrag;
-          const n  = nodeXY(idx, r);
-          const dx = px - n.x, dy = py - n.y; // dy>0 = downward into valley ✓
-
-          // Slope formula: dy/dx_handle = 4*M*H / (segL*W)  →  M = dy*segL*W/(4*H*|dx|)
-          // But since both segL and |dx|/W≈segL cancel, simplify to: M = dy*W/(4*H*|dx|)
-          // (segment-length cancels in the ratio, giving a scale-independent result)
-          let M = 0;
-          if (type === 'mr' && dx > 2)
-            M = dy * r.w / (4 * r.h * dx);
-          else if (type === 'ml' && dx < -2)
-            M = dy * r.w / (4 * r.h * (-dx));
-          else return;
-
-          palettes[idx][type] = Math.max(0, Math.min(MAX_M, M));
-          drawSplineEditor();
-          applyPalette(Number(document.getElementById('progress').value) / 1000);
-          setStatus('Unsaved changes.');
-        });
-
-        canvas.addEventListener('pointerup',     () => { splineDrag = null; canvas.style.cursor = 'default'; });
-        canvas.addEventListener('pointercancel', () => { splineDrag = null; canvas.style.cursor = 'default'; });
-
-        // Double-click on node → reset tangents
-        canvas.addEventListener('dblclick', (e) => {
-          const rect = canvas.getBoundingClientRect();
-          const px = e.clientX - rect.left, py = e.clientY - rect.top;
-          const W = canvas.clientWidth, H = canvas.clientHeight;
-          const hit = hitTest(px, py, W, H);
-          if (!hit) return;
-          palettes[hit.idx].ml = 0;
-          palettes[hit.idx].mr = 0;
-          drawSplineEditor();
-          applyPalette(Number(document.getElementById('progress').value) / 1000);
-          setStatus('Node reset to smoothstep.');
-        });
-
-        document.getElementById('progress')?.addEventListener('input', drawSplineEditor);
-        new ResizeObserver(drawSplineEditor).observe(canvas);
-      }
-      // ── End Spline Editor ──────────────────────────────────────────────
 
       function bindEvents() {
         const progress = document.getElementById("progress");
@@ -1069,7 +857,12 @@
           activeKey = "top";
           renderPhaseButtons();
           renderControls();
-          progress.value = Math.round(phase.t * 1000);
+          // Jump to the settled region just after the blend window (t + half),
+          // so the preview shows the pure phase colour, not a mid-blend.
+          // Night at t=0 has no preceding window — stay at 0.
+          const half = (transitionMinutes / 2) / 1440;
+          const settledT = phase.t === 0 ? 0 : Math.min(1, phase.t + half);
+          progress.value = Math.round(settledT * 1000);
           progress.dispatchEvent(new Event("input"));
         });
 
@@ -1160,13 +953,20 @@
           setStatus("Color restored to default. Save if you want to keep it.");
         });
 
+        document.getElementById("transition-length").addEventListener("input", (e) => {
+          const val = Number(e.target.value);
+          if (!isNaN(val) && val >= 1) {
+            transitionMinutes = val;
+            applyPalette(Number(document.getElementById('progress').value) / 1000);
+            setStatus("Unsaved changes.");
+          }
+        });
+
       }
 
       const hadSavedPalettes = loadSavedPalettes();
       renderPhaseButtons();
       renderControls();
-      drawSplineEditor();
-      bindSplineEvents();
       bindEvents();
       if (hadSavedPalettes) {
         setStatus("Loaded saved settings.");
