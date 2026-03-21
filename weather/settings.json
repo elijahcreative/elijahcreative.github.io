@@ -1,0 +1,103 @@
+{
+  "transitionMinutes": 30,
+  "palettes": [
+    {
+      "phase": "night",
+      "t": 0,
+      "top": "#01040d",
+      "mid": "#0b1930",
+      "bottom": "#081a37",
+      "tintTop": "rgba(73, 118, 184, 0.12)",
+      "tintBottom": "rgba(255, 255, 255, 0.02)",
+      "poolA": "rgba(28, 77, 139, 0.120)",
+      "poolB": "rgba(45, 96, 179, 0.080)",
+      "horizon": "rgba(106, 148, 197, 0.12)",
+      "vignetteTop": "rgba(4, 8, 34, 0.180)",
+      "vignetteBottom": "rgba(11, 20, 66, 0.200)"
+    },
+    {
+      "phase": "dawn",
+      "t": 0.23,
+      "top": "#00102f",
+      "mid": "#5d3452",
+      "bottom": "#553349",
+      "tintTop": "rgba(132, 163, 255, 0.12)",
+      "tintBottom": "rgba(255, 255, 255, 0.02)",
+      "poolA": "rgba(255, 178, 214, 0.18)",
+      "poolB": "rgba(255, 222, 241, 0.14)",
+      "horizon": "rgba(244, 175, 214, 0.22)",
+      "vignetteTop": "rgba(5, 23, 54, 0.373)",
+      "vignetteBottom": "rgba(75, 32, 53, 0.453)"
+    },
+    {
+      "phase": "morning",
+      "t": 0.32,
+      "top": "#164775",
+      "mid": "#3697ba",
+      "bottom": "#3699a6",
+      "tintTop": "rgba(255, 255, 255, 0.03)",
+      "tintBottom": "rgba(255, 255, 255, 0)",
+      "poolA": "rgba(176, 241, 255, 0.08)",
+      "poolB": "rgba(255, 255, 255, 0.1)",
+      "horizon": "rgba(196, 246, 255, 0.18)",
+      "vignetteTop": "rgba(16, 28, 42, 0.239)",
+      "vignetteBottom": "rgba(8, 22, 45, 0.131)"
+    },
+    {
+      "phase": "day",
+      "t": 0.5,
+      "top": "#073578",
+      "mid": "#2c5a97",
+      "bottom": "#357cc0",
+      "tintTop": "rgba(255, 255, 255, 0.015)",
+      "tintBottom": "rgba(255, 255, 255, 0)",
+      "poolA": "rgba(228, 205, 162, 0.04)",
+      "poolB": "rgba(255, 255, 255, 0.06)",
+      "horizon": "rgba(180, 212, 242, 0.12)",
+      "vignetteTop": "rgba(13, 26, 44, 0.241)",
+      "vignetteBottom": "rgba(13, 26, 44, 0.062)"
+    },
+    {
+      "phase": "golden-hour",
+      "t": 0.72,
+      "top": "#041225",
+      "mid": "#5b4427",
+      "bottom": "#945e36",
+      "tintTop": "rgba(126, 151, 224, 0.1)",
+      "tintBottom": "rgba(255, 205, 164, 0.06)",
+      "poolA": "rgba(255, 180, 98, 0.067)",
+      "poolB": "rgba(255, 214, 179, 0.008)",
+      "horizon": "rgba(230, 144, 66, 0.082)",
+      "vignetteTop": "rgba(22, 28, 54, 0.330)",
+      "vignetteBottom": "rgba(88, 49, 34, 0.413)"
+    },
+    {
+      "phase": "dusk",
+      "t": 0.8,
+      "top": "#0c0620",
+      "mid": "#5e3441",
+      "bottom": "#733434",
+      "tintTop": "rgba(214, 138, 178, 0.08)",
+      "tintBottom": "rgba(255, 214, 187, 0.06)",
+      "poolA": "rgba(255, 174, 120, 0.16)",
+      "poolB": "rgba(245, 194, 216, 0.08)",
+      "horizon": "rgba(255, 180, 138, 0.24)",
+      "vignetteTop": "rgba(34, 18, 24, 0.689)",
+      "vignetteBottom": "rgba(36, 22, 28, 0.203)"
+    },
+    {
+      "phase": "night",
+      "t": 0.854,
+      "top": "#01040d",
+      "mid": "#0b1930",
+      "bottom": "#081a37",
+      "tintTop": "rgba(73, 118, 184, 0.12)",
+      "tintBottom": "rgba(255, 255, 255, 0.02)",
+      "poolA": "rgba(28, 77, 139, 0.120)",
+      "poolB": "rgba(45, 96, 179, 0.080)",
+      "horizon": "rgba(106, 148, 197, 0.12)",
+      "vignetteTop": "rgba(4, 8, 34, 0.180)",
+      "vignetteBottom": "rgba(11, 20, 66, 0.200)"
+    }
+  ]
+}

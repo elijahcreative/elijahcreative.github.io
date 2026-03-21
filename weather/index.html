@@ -199,8 +199,6 @@
       };
 
       const previewPhases = new Set(["dawn", "morning", "day", "golden-hour", "dusk", "night"]);
-      const STORAGE_KEY   = "weather_widget_palettes_v2";
-      const SETTINGS_KEY  = "weather_widget_settings_v1";
 
       const paletteStops = [
         { t: 0, phase: "night", top: "#06101f", mid: "#123153", bottom: "#2f5175", tintTop: "rgba(73, 118, 184, 0.12)", tintBottom: "rgba(255, 255, 255, 0.02)", poolA: "rgba(93, 128, 182, 0.12)", poolB: "rgba(174, 205, 255, 0.08)", horizon: "rgba(106, 148, 197, 0.12)", vignetteTop: "rgba(0, 0, 0, 0.18)", vignetteBottom: "rgba(0, 0, 0, 0.2)" },
@@ -214,23 +212,22 @@
 
       let transitionMinutes = 60;
 
-      function loadSavedPalettes() {
+      async function loadSettings() {
         try {
-          const rawSettings = localStorage.getItem(SETTINGS_KEY);
-          if (rawSettings) {
-            const settings = JSON.parse(rawSettings);
-            if (settings.transitionMinutes) transitionMinutes = settings.transitionMinutes;
+          const res = await fetch('settings.json');
+          if (!res.ok) return;
+          const settings = await res.json();
+          if (typeof settings.transitionMinutes === 'number') {
+            transitionMinutes = settings.transitionMinutes;
           }
-          const raw = localStorage.getItem(STORAGE_KEY);
-          if (!raw) return;
-          const parsed = JSON.parse(raw);
-          if (!Array.isArray(parsed) || parsed.length !== paletteStops.length) return;
-          parsed.forEach((saved, index) => {
-            const { t, phase, ...colors } = saved; // never restore t/phase — they are structural
-            Object.assign(paletteStops[index], colors);
-          });
-        } catch (error) {
-          console.error("Failed to load saved palettes", error);
+          if (Array.isArray(settings.palettes) && settings.palettes.length === paletteStops.length) {
+            settings.palettes.forEach((saved, index) => {
+              const { t, phase, ...colors } = saved;
+              Object.assign(paletteStops[index], colors);
+            });
+          }
+        } catch (e) {
+          // settings.json not found — use built-in defaults
         }
       }
 
@@ -397,7 +394,7 @@
       }
 
       async function init() {
-        loadSavedPalettes();
+        await loadSettings();
         const params = getParams();
 
         if (params.previewPhase) {
