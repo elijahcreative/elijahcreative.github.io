@@ -18,16 +18,16 @@
     {
       "phase": "dawn",
       "t": 0.23,
-      "top": "#00102f",
-      "mid": "#5d3452",
-      "bottom": "#553349",
+      "top": "#203c70",
+      "mid": "#40426d",
+      "bottom": "#4e2c6e",
       "tintTop": "rgba(132, 163, 255, 0.12)",
       "tintBottom": "rgba(255, 255, 255, 0.02)",
       "poolA": "rgba(255, 178, 214, 0.18)",
       "poolB": "rgba(255, 222, 241, 0.14)",
       "horizon": "rgba(244, 175, 214, 0.22)",
       "vignetteTop": "rgba(5, 23, 54, 0.373)",
-      "vignetteBottom": "rgba(75, 32, 53, 0.453)"
+      "vignetteBottom": "rgba(94, 76, 82, 0.453)"
     },
     {
       "phase": "morning",
@@ -60,30 +60,30 @@
     {
       "phase": "golden-hour",
       "t": 0.72,
-      "top": "#041225",
-      "mid": "#5b4427",
-      "bottom": "#945e36",
+      "top": "#123463",
+      "mid": "#373b57",
+      "bottom": "#6c6060",
       "tintTop": "rgba(126, 151, 224, 0.1)",
       "tintBottom": "rgba(255, 205, 164, 0.06)",
       "poolA": "rgba(255, 180, 98, 0.067)",
       "poolB": "rgba(255, 214, 179, 0.008)",
-      "horizon": "rgba(230, 144, 66, 0.082)",
+      "horizon": "rgba(127, 110, 93, 0.082)",
       "vignetteTop": "rgba(22, 28, 54, 0.330)",
-      "vignetteBottom": "rgba(88, 49, 34, 0.413)"
+      "vignetteBottom": "rgba(95, 70, 57, 0.413)"
     },
     {
       "phase": "dusk",
       "t": 0.8,
-      "top": "#0c0620",
-      "mid": "#5e3441",
-      "bottom": "#733434",
+      "top": "#122454",
+      "mid": "#323758",
+      "bottom": "#5a3131",
       "tintTop": "rgba(214, 138, 178, 0.08)",
       "tintBottom": "rgba(255, 214, 187, 0.06)",
       "poolA": "rgba(255, 174, 120, 0.16)",
       "poolB": "rgba(245, 194, 216, 0.08)",
       "horizon": "rgba(255, 180, 138, 0.24)",
       "vignetteTop": "rgba(34, 18, 24, 0.689)",
-      "vignetteBottom": "rgba(36, 22, 28, 0.203)"
+      "vignetteBottom": "rgba(41, 32, 32, 0.227)"
     },
     {
       "phase": "night",
