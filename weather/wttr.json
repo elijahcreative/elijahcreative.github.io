@@ -1,18 +1,18 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "15",
-      "FeelsLikeF": "60",
+      "FeelsLikeC": "14",
+      "FeelsLikeF": "57",
       "cloudcover": "0",
-      "humidity": "29",
-      "localObsDateTime": "2026-03-22 04:15 PM",
-      "observation_time": "03:15 PM",
+      "humidity": "33",
+      "localObsDateTime": "2026-03-22 05:00 PM",
+      "observation_time": "04:00 PM",
       "precipInches": "0.0",
       "precipMM": "0.0",
       "pressure": "1016",
       "pressureInches": "30",
-      "temp_C": "15",
-      "temp_F": "60",
+      "temp_C": "14",
+      "temp_F": "58",
       "uvIndex": "0",
       "visibility": "10",
       "visibilityMiles": "6",
@@ -28,9 +28,9 @@
         }
       ],
       "winddir16Point": "E",
-      "winddirDegree": "92",
-      "windspeedKmph": "13",
-      "windspeedMiles": "8"
+      "winddirDegree": "89",
+      "windspeedKmph": "12",
+      "windspeedMiles": "7"
     }
   ],
   "nearest_area": [
