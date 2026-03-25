@@ -1,36 +1,36 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "11",
-      "FeelsLikeF": "51",
+      "FeelsLikeC": "14",
+      "FeelsLikeF": "57",
       "cloudcover": "0",
-      "humidity": "47",
-      "localObsDateTime": "2026-03-25 09:48 AM",
-      "observation_time": "08:48 AM",
+      "humidity": "41",
+      "localObsDateTime": "2026-03-25 10:36 AM",
+      "observation_time": "09:36 AM",
       "precipInches": "0.0",
       "precipMM": "0.0",
       "pressure": "1011",
       "pressureInches": "30",
-      "temp_C": "11",
-      "temp_F": "52",
-      "uvIndex": "2",
+      "temp_C": "14",
+      "temp_F": "58",
+      "uvIndex": "3",
       "visibility": "10",
       "visibilityMiles": "6",
-      "weatherCode": "116",
+      "weatherCode": "122",
       "weatherDesc": [
         {
-          "value": "Partly cloudy"
+          "value": "Overcast"
         }
       ],
       "weatherIconUrl": [
         {
-          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0002_sunny_intervals.png"
+          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0004_black_low_cloud.png"
         }
       ],
       "winddir16Point": "SW",
-      "winddirDegree": "233",
-      "windspeedKmph": "6",
-      "windspeedMiles": "4"
+      "winddirDegree": "231",
+      "windspeedKmph": "9",
+      "windspeedMiles": "6"
     }
   ],
   "nearest_area": [
@@ -256,16 +256,16 @@
           "chanceofsunshine": "84",
           "chanceofthunder": "0",
           "chanceofwindy": "0",
-          "cloudcover": "0",
+          "cloudcover": "48",
           "diffRad": "113.6",
-          "humidity": "47",
+          "humidity": "46",
           "precipInches": "0.0",
           "precipMM": "0.0",
-          "pressure": "1011",
+          "pressure": "1012",
           "pressureInches": "30",
           "shortRad": "238.8",
-          "tempC": "11",
-          "tempF": "52",
+          "tempC": "12",
+          "tempF": "53",
           "time": "900",
           "uvIndex": "2",
           "visibility": "10",
