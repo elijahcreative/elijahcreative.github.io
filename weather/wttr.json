@@ -1,43 +1,43 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "0",
-      "FeelsLikeF": "33",
+      "FeelsLikeC": "-1",
+      "FeelsLikeF": "30",
       "cloudcover": "0",
-      "humidity": "75",
-      "localObsDateTime": "2026-03-25 12:14 AM",
-      "observation_time": "11:14 PM",
+      "humidity": "86",
+      "localObsDateTime": "2026-03-25 03:25 AM",
+      "observation_time": "02:25 AM",
       "precipInches": "0.0",
       "precipMM": "0.0",
-      "pressure": "1016",
+      "pressure": "1014",
       "pressureInches": "30",
-      "temp_C": "2",
-      "temp_F": "36",
+      "temp_C": "0",
+      "temp_F": "32",
       "uvIndex": "0",
       "visibility": "10",
       "visibilityMiles": "6",
-      "weatherCode": "116",
+      "weatherCode": "113",
       "weatherDesc": [
         {
-          "value": "Partly cloudy"
+          "value": "Clear"
         }
       ],
       "weatherIconUrl": [
         {
-          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0004_black_low_cloud.png"
+          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0008_clear_sky_night.png"
         }
       ],
-      "winddir16Point": "WNW",
-      "winddirDegree": "300",
-      "windspeedKmph": "6",
-      "windspeedMiles": "4"
+      "winddir16Point": "NW",
+      "winddirDegree": "313",
+      "windspeedKmph": "5",
+      "windspeedMiles": "3"
     }
   ],
   "nearest_area": [
     {
       "areaName": [
         {
-          "value": "Var"
+          "value": "Buda"
         }
       ],
       "country": [
@@ -45,8 +45,8 @@
           "value": "Hungary"
         }
       ],
-      "latitude": "47.517",
-      "longitude": "19.050",
+      "latitude": "47.500",
+      "longitude": "19.033",
       "population": "0",
       "region": [
         {
@@ -55,7 +55,7 @@
       ],
       "weatherUrl": [
         {
-          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.517,19.05"
+          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.5,19.033"
         }
       ]
     }
@@ -154,16 +154,16 @@
           "chanceofsunshine": "87",
           "chanceofthunder": "0",
           "chanceofwindy": "0",
-          "cloudcover": "23",
+          "cloudcover": "0",
           "diffRad": "0.0",
-          "humidity": "49",
+          "humidity": "86",
           "precipInches": "0.0",
           "precipMM": "0.0",
           "pressure": "1014",
           "pressureInches": "30",
           "shortRad": "0.0",
-          "tempC": "9",
-          "tempF": "49",
+          "tempC": "0",
+          "tempF": "32",
           "time": "300",
           "uvIndex": "0",
           "visibility": "10",
