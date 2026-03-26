@@ -1,36 +1,36 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "11",
-      "FeelsLikeF": "51",
+      "FeelsLikeC": "14",
+      "FeelsLikeF": "57",
       "cloudcover": "0",
-      "humidity": "54",
-      "localObsDateTime": "2026-03-26 12:12 PM",
-      "observation_time": "11:12 AM",
+      "humidity": "44",
+      "localObsDateTime": "2026-03-26 01:49 PM",
+      "observation_time": "12:49 PM",
       "precipInches": "0.0",
       "precipMM": "0.0",
       "pressure": "998",
       "pressureInches": "29",
-      "temp_C": "12",
-      "temp_F": "54",
-      "uvIndex": "3",
+      "temp_C": "14",
+      "temp_F": "58",
+      "uvIndex": "2",
       "visibility": "10",
       "visibilityMiles": "6",
-      "weatherCode": "176",
+      "weatherCode": "122",
       "weatherDesc": [
         {
-          "value": "Patchy rain nearby"
+          "value": "Overcast"
         }
       ],
       "weatherIconUrl": [
         {
-          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0009_light_rain_showers.png"
+          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0004_black_low_cloud.png"
         }
       ],
       "winddir16Point": "ENE",
-      "winddirDegree": "74",
-      "windspeedKmph": "12",
-      "windspeedMiles": "8"
+      "winddirDegree": "58",
+      "windspeedKmph": "10",
+      "windspeedMiles": "6"
     }
   ],
   "nearest_area": [
@@ -307,16 +307,16 @@
           "chanceofsunshine": "0",
           "chanceofthunder": "0",
           "chanceofwindy": "0",
-          "cloudcover": "0",
+          "cloudcover": "82",
           "diffRad": "157.1",
-          "humidity": "54",
+          "humidity": "52",
           "precipInches": "0.0",
           "precipMM": "0.0",
           "pressure": "998",
           "pressureInches": "29",
           "shortRad": "304.5",
-          "tempC": "12",
-          "tempF": "54",
+          "tempC": "13",
+          "tempF": "55",
           "time": "1200",
           "uvIndex": "3",
           "visibility": "10",
