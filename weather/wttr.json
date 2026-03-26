@@ -1,43 +1,43 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "12",
-      "FeelsLikeF": "54",
-      "cloudcover": "100",
-      "humidity": "58",
-      "localObsDateTime": "2026-03-26 05:48 PM",
-      "observation_time": "04:48 PM",
+      "FeelsLikeC": "8",
+      "FeelsLikeF": "46",
+      "cloudcover": "0",
+      "humidity": "82",
+      "localObsDateTime": "2026-03-26 07:23 PM",
+      "observation_time": "06:23 PM",
       "precipInches": "0.0",
-      "precipMM": "0.2",
-      "pressure": "999",
+      "precipMM": "0.3",
+      "pressure": "1000",
       "pressureInches": "30",
-      "temp_C": "12",
-      "temp_F": "54",
+      "temp_C": "10",
+      "temp_F": "50",
       "uvIndex": "0",
       "visibility": "10",
       "visibilityMiles": "6",
-      "weatherCode": "296",
+      "weatherCode": "353",
       "weatherDesc": [
         {
-          "value": "Light rain"
+          "value": "Light rain shower"
         }
       ],
       "weatherIconUrl": [
         {
-          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0017_cloudy_with_light_rain.png"
+          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0025_light_rain_showers_night.png"
         }
       ],
-      "winddir16Point": "WSW",
-      "winddirDegree": "259",
-      "windspeedKmph": "5",
-      "windspeedMiles": "3"
+      "winddir16Point": "NNE",
+      "winddirDegree": "23",
+      "windspeedKmph": "16",
+      "windspeedMiles": "10"
     }
   ],
   "nearest_area": [
     {
       "areaName": [
         {
-          "value": "Budapest"
+          "value": "Buda"
         }
       ],
       "country": [
@@ -46,8 +46,8 @@
         }
       ],
       "latitude": "47.500",
-      "longitude": "19.083",
-      "population": "1741041",
+      "longitude": "19.033",
+      "population": "0",
       "region": [
         {
           "value": "Budapest"
@@ -55,7 +55,7 @@
       ],
       "weatherUrl": [
         {
-          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.5,19.083"
+          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.5,19.033"
         }
       ]
     }
