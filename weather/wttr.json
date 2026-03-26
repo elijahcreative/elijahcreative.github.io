@@ -2,35 +2,35 @@
   "current_condition": [
     {
       "FeelsLikeC": "14",
-      "FeelsLikeF": "57",
+      "FeelsLikeF": "58",
       "cloudcover": "0",
       "humidity": "44",
-      "localObsDateTime": "2026-03-26 01:49 PM",
-      "observation_time": "12:49 PM",
+      "localObsDateTime": "2026-03-26 03:24 PM",
+      "observation_time": "02:24 PM",
       "precipInches": "0.0",
-      "precipMM": "0.0",
+      "precipMM": "0.1",
       "pressure": "998",
       "pressureInches": "29",
       "temp_C": "14",
       "temp_F": "58",
-      "uvIndex": "2",
+      "uvIndex": "0",
       "visibility": "10",
       "visibilityMiles": "6",
-      "weatherCode": "122",
+      "weatherCode": "176",
       "weatherDesc": [
         {
-          "value": "Overcast"
+          "value": "Patchy rain nearby"
         }
       ],
       "weatherIconUrl": [
         {
-          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0004_black_low_cloud.png"
+          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0009_light_rain_showers.png"
         }
       ],
-      "winddir16Point": "ENE",
-      "winddirDegree": "58",
-      "windspeedKmph": "10",
-      "windspeedMiles": "6"
+      "winddir16Point": "N",
+      "winddirDegree": "10",
+      "windspeedKmph": "6",
+      "windspeedMiles": "4"
     }
   ],
   "nearest_area": [
@@ -358,16 +358,16 @@
           "chanceofsunshine": "0",
           "chanceofthunder": "1",
           "chanceofwindy": "0",
-          "cloudcover": "55",
+          "cloudcover": "0",
           "diffRad": "154.3",
-          "humidity": "43",
+          "humidity": "44",
           "precipInches": "0.0",
           "precipMM": "0.1",
-          "pressure": "997",
+          "pressure": "998",
           "pressureInches": "29",
           "shortRad": "336.7",
-          "tempC": "15",
-          "tempF": "59",
+          "tempC": "14",
+          "tempF": "58",
           "time": "1500",
           "uvIndex": "0",
           "visibility": "10",
@@ -384,7 +384,7 @@
             }
           ],
           "winddir16Point": "N",
-          "winddirDegree": "0",
+          "winddirDegree": "10",
           "windspeedKmph": "6",
           "windspeedMiles": "4"
         },
