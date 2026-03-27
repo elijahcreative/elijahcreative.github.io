@@ -1,15 +1,15 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "8",
+      "FeelsLikeC": "9",
       "FeelsLikeF": "47",
       "cloudcover": "0",
       "humidity": "54",
-      "localObsDateTime": "2026-03-27 04:12 PM",
-      "observation_time": "03:12 PM",
+      "localObsDateTime": "2026-03-27 05:48 PM",
+      "observation_time": "04:48 PM",
       "precipInches": "0.0",
       "precipMM": "0.0",
-      "pressure": "1005",
+      "pressure": "1006",
       "pressureInches": "30",
       "temp_C": "11",
       "temp_F": "52",
@@ -28,8 +28,8 @@
         }
       ],
       "winddir16Point": "NNE",
-      "winddirDegree": "18",
-      "windspeedKmph": "25",
+      "winddirDegree": "15",
+      "windspeedKmph": "26",
       "windspeedMiles": "16"
     }
   ],
@@ -37,7 +37,7 @@
     {
       "areaName": [
         {
-          "value": "Gellert"
+          "value": "Budapest"
         }
       ],
       "country": [
@@ -45,9 +45,9 @@
           "value": "Hungary"
         }
       ],
-      "latitude": "47.483",
-      "longitude": "19.050",
-      "population": "0",
+      "latitude": "47.500",
+      "longitude": "19.083",
+      "population": "1741041",
       "region": [
         {
           "value": "Budapest"
@@ -55,7 +55,7 @@
       ],
       "weatherUrl": [
         {
-          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.483,19.05"
+          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.5,19.083"
         }
       ]
     }
