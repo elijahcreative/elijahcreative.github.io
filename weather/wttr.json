@@ -1,18 +1,18 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "9",
-      "FeelsLikeF": "49",
+      "FeelsLikeC": "11",
+      "FeelsLikeF": "52",
       "cloudcover": "75",
-      "humidity": "54",
-      "localObsDateTime": "2026-03-27 12:12 PM",
-      "observation_time": "11:12 AM",
+      "humidity": "47",
+      "localObsDateTime": "2026-03-27 01:48 PM",
+      "observation_time": "12:48 PM",
       "precipInches": "0.0",
       "precipMM": "0.0",
       "pressure": "1004",
       "pressureInches": "30",
-      "temp_C": "12",
-      "temp_F": "54",
+      "temp_C": "13",
+      "temp_F": "55",
       "uvIndex": "2",
       "visibility": "10",
       "visibilityMiles": "6",
@@ -28,9 +28,9 @@
         }
       ],
       "winddir16Point": "NNE",
-      "winddirDegree": "32",
-      "windspeedKmph": "27",
-      "windspeedMiles": "17"
+      "winddirDegree": "31",
+      "windspeedKmph": "24",
+      "windspeedMiles": "15"
     }
   ],
   "nearest_area": [
@@ -307,29 +307,29 @@
           "chanceofsunshine": "12",
           "chanceofthunder": "0",
           "chanceofwindy": "0",
-          "cloudcover": "75",
+          "cloudcover": "100",
           "diffRad": "132.3",
-          "humidity": "54",
+          "humidity": "52",
           "precipInches": "0.0",
           "precipMM": "0.0",
           "pressure": "1004",
           "pressureInches": "30",
           "shortRad": "248.3",
           "tempC": "12",
-          "tempF": "54",
+          "tempF": "53",
           "time": "1200",
           "uvIndex": "2",
           "visibility": "10",
           "visibilityMiles": "6",
-          "weatherCode": "116",
+          "weatherCode": "122",
           "weatherDesc": [
             {
-              "value": "Partly cloudy"
+              "value": "Overcast "
             }
           ],
           "weatherIconUrl": [
             {
-              "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0002_sunny_intervals.png"
+              "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0004_black_low_cloud.png"
             }
           ],
           "winddir16Point": "NNE",
