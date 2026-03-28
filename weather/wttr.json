@@ -1,36 +1,36 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "8",
-      "FeelsLikeF": "46",
-      "cloudcover": "0",
+      "FeelsLikeC": "9",
+      "FeelsLikeF": "48",
+      "cloudcover": "75",
       "humidity": "54",
-      "localObsDateTime": "2026-03-28 11:24 AM",
-      "observation_time": "10:24 AM",
+      "localObsDateTime": "2026-03-28 12:12 PM",
+      "observation_time": "11:12 AM",
       "precipInches": "0.0",
       "precipMM": "0.0",
-      "pressure": "1009",
+      "pressure": "1008",
       "pressureInches": "30",
-      "temp_C": "10",
-      "temp_F": "51",
+      "temp_C": "11",
+      "temp_F": "52",
       "uvIndex": "3",
       "visibility": "10",
       "visibilityMiles": "6",
-      "weatherCode": "119",
+      "weatherCode": "302",
       "weatherDesc": [
         {
-          "value": "Cloudy"
+          "value": "Rain shower"
         }
       ],
       "weatherIconUrl": [
         {
-          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0003_white_cloud.png"
+          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0018_cloudy_with_heavy_rain.png"
         }
       ],
       "winddir16Point": "N",
-      "winddirDegree": "355",
-      "windspeedKmph": "19",
-      "windspeedMiles": "12"
+      "winddirDegree": "359",
+      "windspeedKmph": "18",
+      "windspeedMiles": "11"
     }
   ],
   "nearest_area": [
@@ -307,29 +307,29 @@
           "chanceofsunshine": "9",
           "chanceofthunder": "0",
           "chanceofwindy": "0",
-          "cloudcover": "65",
+          "cloudcover": "75",
           "diffRad": "182.9",
-          "humidity": "52",
+          "humidity": "54",
           "precipInches": "0.0",
           "precipMM": "0.0",
-          "pressure": "1009",
+          "pressure": "1008",
           "pressureInches": "30",
           "shortRad": "377.1",
-          "tempC": "14",
-          "tempF": "57",
+          "tempC": "11",
+          "tempF": "52",
           "time": "1200",
           "uvIndex": "3",
           "visibility": "10",
           "visibilityMiles": "6",
-          "weatherCode": "119",
+          "weatherCode": "302",
           "weatherDesc": [
             {
-              "value": "Cloudy "
+              "value": "Moderate rain"
             }
           ],
           "weatherIconUrl": [
             {
-              "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0003_white_cloud.png"
+              "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0018_cloudy_with_heavy_rain.png"
             }
           ],
           "winddir16Point": "N",
