@@ -1,25 +1,25 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "5",
-      "FeelsLikeF": "42",
-      "cloudcover": "75",
-      "humidity": "81",
-      "localObsDateTime": "2026-03-29 08:25 PM",
-      "observation_time": "06:25 PM",
+      "FeelsLikeC": "4",
+      "FeelsLikeF": "39",
+      "cloudcover": "100",
+      "humidity": "93",
+      "localObsDateTime": "2026-03-29 09:13 PM",
+      "observation_time": "07:13 PM",
       "precipInches": "0.0",
-      "precipMM": "0.2",
+      "precipMM": "0.1",
       "pressure": "1016",
       "pressureInches": "30",
-      "temp_C": "8",
-      "temp_F": "47",
+      "temp_C": "7",
+      "temp_F": "45",
       "uvIndex": "0",
-      "visibility": "10",
-      "visibilityMiles": "6",
+      "visibility": "8",
+      "visibilityMiles": "4",
       "weatherCode": "296",
       "weatherDesc": [
         {
-          "value": "Light rain"
+          "value": "Rain, light rain"
         }
       ],
       "weatherIconUrl": [
@@ -37,7 +37,7 @@
     {
       "areaName": [
         {
-          "value": "Buda"
+          "value": "Var"
         }
       ],
       "country": [
@@ -45,8 +45,8 @@
           "value": "Hungary"
         }
       ],
-      "latitude": "47.500",
-      "longitude": "19.033",
+      "latitude": "47.517",
+      "longitude": "19.050",
       "population": "0",
       "region": [
         {
@@ -55,7 +55,7 @@
       ],
       "weatherUrl": [
         {
-          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.5,19.033"
+          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.517,19.05"
         }
       ]
     }
@@ -462,27 +462,27 @@
           "chanceofwindy": "0",
           "cloudcover": "100",
           "diffRad": "0.0",
-          "humidity": "80",
+          "humidity": "93",
           "precipInches": "0.0",
           "precipMM": "0.1",
-          "pressure": "1017",
+          "pressure": "1016",
           "pressureInches": "30",
           "shortRad": "0.0",
           "tempC": "7",
           "tempF": "45",
           "time": "2100",
           "uvIndex": "0",
-          "visibility": "10",
-          "visibilityMiles": "6",
-          "weatherCode": "176",
+          "visibility": "8",
+          "visibilityMiles": "4",
+          "weatherCode": "296",
           "weatherDesc": [
             {
-              "value": "Patchy rain nearby"
+              "value": "Light rain"
             }
           ],
           "weatherIconUrl": [
             {
-              "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0025_light_rain_showers_night.png"
+              "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0033_cloudy_with_light_rain_night.png"
             }
           ],
           "winddir16Point": "NW",
