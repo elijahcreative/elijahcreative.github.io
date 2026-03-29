@@ -4,18 +4,18 @@
       "FeelsLikeC": "7",
       "FeelsLikeF": "44",
       "cloudcover": "100",
-      "humidity": "87",
-      "localObsDateTime": "2026-03-29 05:12 PM",
-      "observation_time": "03:12 PM",
+      "humidity": "81",
+      "localObsDateTime": "2026-03-29 06:00 PM",
+      "observation_time": "04:00 PM",
       "precipInches": "0.0",
       "precipMM": "0.3",
       "pressure": "1014",
       "pressureInches": "30",
       "temp_C": "9",
-      "temp_F": "49",
+      "temp_F": "48",
       "uvIndex": "0",
-      "visibility": "9",
-      "visibilityMiles": "5",
+      "visibility": "10",
+      "visibilityMiles": "6",
       "weatherCode": "296",
       "weatherDesc": [
         {
@@ -37,7 +37,7 @@
     {
       "areaName": [
         {
-          "value": "Var"
+          "value": "Buda"
         }
       ],
       "country": [
@@ -45,8 +45,8 @@
           "value": "Hungary"
         }
       ],
-      "latitude": "47.517",
-      "longitude": "19.050",
+      "latitude": "47.500",
+      "longitude": "19.033",
       "population": "0",
       "region": [
         {
@@ -55,7 +55,7 @@
       ],
       "weatherUrl": [
         {
-          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.517,19.05"
+          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.5,19.033"
         }
       ]
     }
