@@ -1,15 +1,15 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "6",
+      "FeelsLikeC": "5",
       "FeelsLikeF": "42",
-      "cloudcover": "100",
-      "humidity": "87",
-      "localObsDateTime": "2026-03-29 06:49 PM",
-      "observation_time": "04:49 PM",
+      "cloudcover": "75",
+      "humidity": "81",
+      "localObsDateTime": "2026-03-29 08:25 PM",
+      "observation_time": "06:25 PM",
       "precipInches": "0.0",
       "precipMM": "0.2",
-      "pressure": "1014",
+      "pressure": "1016",
       "pressureInches": "30",
       "temp_C": "8",
       "temp_F": "47",
@@ -24,13 +24,13 @@
       ],
       "weatherIconUrl": [
         {
-          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0017_cloudy_with_light_rain.png"
+          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0033_cloudy_with_light_rain_night.png"
         }
       ],
-      "winddir16Point": "NNW",
-      "winddirDegree": "334",
-      "windspeedKmph": "15",
-      "windspeedMiles": "9"
+      "winddir16Point": "NW",
+      "winddirDegree": "320",
+      "windspeedKmph": "17",
+      "windspeedMiles": "11"
     }
   ],
   "nearest_area": [
@@ -411,22 +411,22 @@
           "chanceofwindy": "0",
           "cloudcover": "100",
           "diffRad": "38.7",
-          "humidity": "87",
+          "humidity": "72",
           "precipInches": "0.0",
           "precipMM": "0.2",
-          "pressure": "1014",
+          "pressure": "1015",
           "pressureInches": "30",
           "shortRad": "64.6",
-          "tempC": "8",
-          "tempF": "47",
+          "tempC": "10",
+          "tempF": "49",
           "time": "1800",
           "uvIndex": "0",
-          "visibility": "10",
-          "visibilityMiles": "6",
-          "weatherCode": "296",
+          "visibility": "2",
+          "visibilityMiles": "1",
+          "weatherCode": "266",
           "weatherDesc": [
             {
-              "value": "Light rain"
+              "value": "Light drizzle"
             }
           ],
           "weatherIconUrl": [
