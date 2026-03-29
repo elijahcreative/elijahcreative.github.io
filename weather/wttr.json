@@ -2,11 +2,11 @@
   "current_condition": [
     {
       "FeelsLikeC": "4",
-      "FeelsLikeF": "38",
+      "FeelsLikeF": "40",
       "cloudcover": "100",
       "humidity": "87",
-      "localObsDateTime": "2026-03-29 09:59 AM",
-      "observation_time": "07:59 AM",
+      "localObsDateTime": "2026-03-29 11:37 AM",
+      "observation_time": "09:37 AM",
       "precipInches": "0.0",
       "precipMM": "0.0",
       "pressure": "1011",
@@ -14,12 +14,12 @@
       "temp_C": "7",
       "temp_F": "45",
       "uvIndex": "1",
-      "visibility": "7",
-      "visibilityMiles": "4",
+      "visibility": "5",
+      "visibilityMiles": "3",
       "weatherCode": "296",
       "weatherDesc": [
         {
-          "value": "Light rain, rain"
+          "value": "Rain, light rain"
         }
       ],
       "weatherIconUrl": [
@@ -28,9 +28,9 @@
         }
       ],
       "winddir16Point": "NNW",
-      "winddirDegree": "327",
-      "windspeedKmph": "21",
-      "windspeedMiles": "13"
+      "winddirDegree": "343",
+      "windspeedKmph": "19",
+      "windspeedMiles": "12"
     }
   ],
   "nearest_area": [
@@ -256,29 +256,29 @@
           "chanceofsunshine": "70",
           "chanceofthunder": "0",
           "chanceofwindy": "0",
-          "cloudcover": "100",
+          "cloudcover": "34",
           "diffRad": "100.3",
-          "humidity": "87",
+          "humidity": "74",
           "precipInches": "0.0",
           "precipMM": "0.0",
-          "pressure": "1011",
+          "pressure": "1010",
           "pressureInches": "30",
           "shortRad": "215.1",
-          "tempC": "7",
-          "tempF": "45",
+          "tempC": "8",
+          "tempF": "47",
           "time": "900",
           "uvIndex": "1",
-          "visibility": "7",
-          "visibilityMiles": "4",
-          "weatherCode": "296",
+          "visibility": "10",
+          "visibilityMiles": "6",
+          "weatherCode": "116",
           "weatherDesc": [
             {
-              "value": "Light rain"
+              "value": "Partly Cloudy "
             }
           ],
           "weatherIconUrl": [
             {
-              "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0017_cloudy_with_light_rain.png"
+              "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0002_sunny_intervals.png"
             }
           ],
           "winddir16Point": "NNW",
