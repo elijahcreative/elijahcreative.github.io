@@ -1,36 +1,36 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "4",
-      "FeelsLikeF": "39",
+      "FeelsLikeC": "8",
+      "FeelsLikeF": "46",
       "cloudcover": "100",
-      "humidity": "87",
-      "localObsDateTime": "2026-03-30 12:24 PM",
-      "observation_time": "10:24 AM",
+      "humidity": "37",
+      "localObsDateTime": "2026-03-30 02:48 PM",
+      "observation_time": "12:48 PM",
       "precipInches": "0.0",
       "precipMM": "0.0",
       "pressure": "1013",
       "pressureInches": "30",
-      "temp_C": "7",
-      "temp_F": "45",
+      "temp_C": "11",
+      "temp_F": "52",
       "uvIndex": "1",
       "visibility": "10",
       "visibilityMiles": "6",
-      "weatherCode": "296",
+      "weatherCode": "122",
       "weatherDesc": [
         {
-          "value": "Light rain"
+          "value": "Overcast"
         }
       ],
       "weatherIconUrl": [
         {
-          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0017_cloudy_with_light_rain.png"
+          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0004_black_low_cloud.png"
         }
       ],
       "winddir16Point": "NW",
-      "winddirDegree": "324",
-      "windspeedKmph": "23",
-      "windspeedMiles": "15"
+      "winddirDegree": "321",
+      "windspeedKmph": "26",
+      "windspeedMiles": "16"
     }
   ],
   "nearest_area": [
@@ -309,27 +309,27 @@
           "chanceofwindy": "0",
           "cloudcover": "100",
           "diffRad": "100.3",
-          "humidity": "87",
+          "humidity": "47",
           "precipInches": "0.0",
           "precipMM": "0.0",
-          "pressure": "1013",
+          "pressure": "1015",
           "pressureInches": "30",
           "shortRad": "184.3",
-          "tempC": "7",
-          "tempF": "45",
+          "tempC": "9",
+          "tempF": "49",
           "time": "1200",
           "uvIndex": "1",
           "visibility": "10",
           "visibilityMiles": "6",
-          "weatherCode": "296",
+          "weatherCode": "122",
           "weatherDesc": [
             {
-              "value": "Light rain"
+              "value": "Overcast "
             }
           ],
           "weatherIconUrl": [
             {
-              "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0017_cloudy_with_light_rain.png"
+              "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0004_black_low_cloud.png"
             }
           ],
           "winddir16Point": "NW",
