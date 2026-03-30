@@ -1,8 +1,8 @@
 {
   "Podiums": [
     {
-      "Country": "🇨🇳 China",
-      "City": "Shanghai",
+      "Country": "🇯🇵 Japan",
+      "City": "Suzuka",
       "Message": "Race ?"
     },
     {
@@ -10,21 +10,21 @@
       "Name": "Antonelli",
       "Team": "Mercedes",
       "Points": "+25",
-      "Total": "47"
+      "Total": "72"
     },
     {
       "Place": "2",
-      "Name": "Russell",
-      "Team": "Mercedes",
+      "Name": "Piastri",
+      "Team": "McLaren",
       "Points": "+18",
-      "Total": "51"
+      "Total": "21"
     },
     {
       "Place": "3",
-      "Name": "Hamilton",
+      "Name": "Leclerc",
       "Team": "Ferrari",
       "Points": "+15",
-      "Total": "33"
+      "Total": "49"
     }
   ]
 }
