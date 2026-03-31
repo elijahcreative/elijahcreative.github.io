@@ -1,15 +1,15 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "5",
-      "FeelsLikeF": "42",
+      "FeelsLikeC": "6",
+      "FeelsLikeF": "43",
       "cloudcover": "100",
       "humidity": "87",
-      "localObsDateTime": "2026-03-31 08:24 PM",
-      "observation_time": "06:24 PM",
+      "localObsDateTime": "2026-03-31 09:59 PM",
+      "observation_time": "07:59 PM",
       "precipInches": "0.0",
-      "precipMM": "0.7",
-      "pressure": "1016",
+      "precipMM": "0.2",
+      "pressure": "1017",
       "pressureInches": "30",
       "temp_C": "6",
       "temp_F": "43",
@@ -19,7 +19,7 @@
       "weatherCode": "296",
       "weatherDesc": [
         {
-          "value": "Light rain"
+          "value": "Light rain, drizzle and rain"
         }
       ],
       "weatherIconUrl": [
@@ -27,17 +27,17 @@
           "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0033_cloudy_with_light_rain_night.png"
         }
       ],
-      "winddir16Point": "NE",
-      "winddirDegree": "50",
-      "windspeedKmph": "5",
-      "windspeedMiles": "3"
+      "winddir16Point": "NNE",
+      "winddirDegree": "15",
+      "windspeedKmph": "4",
+      "windspeedMiles": "2"
     }
   ],
   "nearest_area": [
     {
       "areaName": [
         {
-          "value": "Buda"
+          "value": "Var"
         }
       ],
       "country": [
@@ -45,8 +45,8 @@
           "value": "Hungary"
         }
       ],
-      "latitude": "47.500",
-      "longitude": "19.033",
+      "latitude": "47.517",
+      "longitude": "19.050",
       "population": "0",
       "region": [
         {
@@ -55,7 +55,7 @@
       ],
       "weatherUrl": [
         {
-          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.5,19.033"
+          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.517,19.05"
         }
       ]
     }
@@ -462,22 +462,22 @@
           "chanceofwindy": "0",
           "cloudcover": "100",
           "diffRad": "0.0",
-          "humidity": "90",
+          "humidity": "87",
           "precipInches": "0.0",
           "precipMM": "0.2",
           "pressure": "1017",
           "pressureInches": "30",
           "shortRad": "0.0",
-          "tempC": "7",
-          "tempF": "44",
+          "tempC": "6",
+          "tempF": "43",
           "time": "2100",
           "uvIndex": "0",
-          "visibility": "2",
-          "visibilityMiles": "1",
-          "weatherCode": "266",
+          "visibility": "10",
+          "visibilityMiles": "6",
+          "weatherCode": "296",
           "weatherDesc": [
             {
-              "value": "Light drizzle"
+              "value": "Light rain"
             }
           ],
           "weatherIconUrl": [
@@ -487,7 +487,7 @@
           ],
           "winddir16Point": "NNE",
           "winddirDegree": "15",
-          "windspeedKmph": "3",
+          "windspeedKmph": "4",
           "windspeedMiles": "2"
         }
       ],
