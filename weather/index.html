@@ -40,7 +40,6 @@
 
       .widget-shell {
         width: min(100%, var(--widget-width));
-        container-type: inline-size;
       }
 
       .weather-widget {
@@ -105,15 +104,17 @@
         z-index: 10;
         display: flex;
         align-items: stretch;
-        padding: 4cqi 4.5cqi;
+        /* font-size and padding set by JS via --dl-base custom property */
+        font-size: var(--dl-base, 13px);
+        padding: 0.85em 1em;
+        gap: 0.6em;
         font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
         color: #fff;
         pointer-events: none;
-        gap: 3cqi;
       }
 
       .data-layer * {
-        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.22);
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.28);
       }
 
       .weather-left {
@@ -125,7 +126,7 @@
       }
 
       .city-name {
-        font-size: max(9px, 2.2cqi);
+        font-size: 1em;
         font-weight: 500;
         letter-spacing: 0.01em;
         opacity: 0.92;
@@ -137,18 +138,18 @@
       .temp-group {
         display: flex;
         flex-direction: column;
-        gap: 0.2cqi;
+        gap: 0.15em;
       }
 
       .temperature {
-        font-size: max(34px, 13cqi);
+        font-size: 6em;
         font-weight: 200;
         letter-spacing: -0.03em;
         line-height: 1;
       }
 
       .condition {
-        font-size: max(9px, 2.1cqi);
+        font-size: 0.95em;
         font-weight: 400;
         opacity: 0.88;
         letter-spacing: 0.01em;
@@ -164,8 +165,8 @@
 
       .hl-temps {
         display: flex;
-        gap: 1.2cqi;
-        font-size: max(9px, 2.1cqi);
+        gap: 0.6em;
+        font-size: 0.95em;
         font-weight: 500;
         opacity: 0.9;
       }
@@ -173,7 +174,7 @@
       .detail-rows {
         display: flex;
         flex-direction: column;
-        gap: 0.9cqi;
+        gap: 0.5em;
         align-items: flex-end;
       }
 
@@ -185,7 +186,7 @@
       }
 
       .detail-row .label {
-        font-size: max(7px, 1.5cqi);
+        font-size: 0.68em;
         font-weight: 400;
         opacity: 0.6;
         text-transform: uppercase;
@@ -193,17 +194,9 @@
       }
 
       .detail-row .value {
-        font-size: max(9px, 2.1cqi);
+        font-size: 0.95em;
         font-weight: 500;
         opacity: 0.92;
-      }
-
-      .data-layer.loading .temperature,
-      .data-layer.loading .condition,
-      .data-layer.loading .city-name,
-      .data-layer.loading .hl-temps,
-      .data-layer.loading .value {
-        opacity: 0.35;
       }
 
       /* ── Sky phase tokens ── */
@@ -616,7 +609,17 @@
         applyPalette(getDaylightProgress(now, sunrise.toISOString(), sunset.toISOString()));
       }
 
+      function applyFontScale() {
+        const widget = document.getElementById("weather-widget");
+        const w = widget.offsetWidth || 329;
+        // base ≈ 2.2% of widget width, clamped between 9px and 15px
+        const base = Math.min(15, Math.max(9, w * 0.022));
+        widget.style.setProperty("--dl-base", base + "px");
+      }
+
       async function init() {
+        applyFontScale();
+        window.addEventListener("resize", applyFontScale);
         await loadSettings();
         const params = getParams();
 
