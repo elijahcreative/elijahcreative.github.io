@@ -40,6 +40,7 @@
 
       .widget-shell {
         width: min(100%, var(--widget-width));
+        container-type: inline-size;
       }
 
       .weather-widget {
@@ -95,6 +96,117 @@
           linear-gradient(180deg, var(--vignette-top), transparent 34%),
           linear-gradient(180deg, transparent 62%, var(--vignette-bottom) 100%);
       }
+
+      /* ── Data layer ── */
+
+      .data-layer {
+        position: absolute;
+        inset: 0;
+        z-index: 10;
+        display: flex;
+        align-items: stretch;
+        padding: 4cqi 4.5cqi;
+        font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+        color: #fff;
+        pointer-events: none;
+        gap: 3cqi;
+      }
+
+      .data-layer * {
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.22);
+      }
+
+      .weather-left {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-width: 0;
+      }
+
+      .city-name {
+        font-size: max(9px, 2.2cqi);
+        font-weight: 500;
+        letter-spacing: 0.01em;
+        opacity: 0.92;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .temp-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2cqi;
+      }
+
+      .temperature {
+        font-size: max(34px, 13cqi);
+        font-weight: 200;
+        letter-spacing: -0.03em;
+        line-height: 1;
+      }
+
+      .condition {
+        font-size: max(9px, 2.1cqi);
+        font-weight: 400;
+        opacity: 0.88;
+        letter-spacing: 0.01em;
+      }
+
+      .weather-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        justify-content: space-between;
+        flex-shrink: 0;
+      }
+
+      .hl-temps {
+        display: flex;
+        gap: 1.2cqi;
+        font-size: max(9px, 2.1cqi);
+        font-weight: 500;
+        opacity: 0.9;
+      }
+
+      .detail-rows {
+        display: flex;
+        flex-direction: column;
+        gap: 0.9cqi;
+        align-items: flex-end;
+      }
+
+      .detail-row {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        line-height: 1.15;
+      }
+
+      .detail-row .label {
+        font-size: max(7px, 1.5cqi);
+        font-weight: 400;
+        opacity: 0.6;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+      }
+
+      .detail-row .value {
+        font-size: max(9px, 2.1cqi);
+        font-weight: 500;
+        opacity: 0.92;
+      }
+
+      .data-layer.loading .temperature,
+      .data-layer.loading .condition,
+      .data-layer.loading .city-name,
+      .data-layer.loading .hl-temps,
+      .data-layer.loading .value {
+        opacity: 0.35;
+      }
+
+      /* ── Sky phase tokens ── */
 
       .weather-widget[data-phase="dawn"] {
         --sky-top: #355b8d;
@@ -190,6 +302,37 @@
         <div class="light-pool light-pool-b"></div>
         <div class="horizon-glow"></div>
         <div class="vignette"></div>
+
+        <!-- Apple Weather–style data layer -->
+        <div class="data-layer loading" id="data-layer">
+          <div class="weather-left">
+            <div class="city-name" id="city-name">—</div>
+            <div class="temp-group">
+              <div class="temperature" id="temperature">—</div>
+              <div class="condition" id="condition">—</div>
+            </div>
+          </div>
+          <div class="weather-right">
+            <div class="hl-temps">
+              <span id="temp-high">H: —</span>
+              <span id="temp-low">L: —</span>
+            </div>
+            <div class="detail-rows">
+              <div class="detail-row">
+                <span class="label">Érzett hőm.</span>
+                <span class="value" id="feels-like">—</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Páratartalom</span>
+                <span class="value" id="humidity">—</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Szél</span>
+                <span class="value" id="wind">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
     </main>
     <script>
@@ -211,6 +354,33 @@
       ];
 
       let transitionMinutes = 60;
+
+      const weatherConditions = {
+        0: 'Derült égbolt',
+        1: 'Főként derült',
+        2: 'Részben felhős',
+        3: 'Borult',
+        45: 'Köd',
+        48: 'Zúzmarás köd',
+        51: 'Enyhe szitálás',
+        53: 'Szitálás',
+        55: 'Erős szitálás',
+        61: 'Gyenge eső',
+        63: 'Eső',
+        65: 'Erős eső',
+        71: 'Gyenge hóesés',
+        73: 'Hóesés',
+        75: 'Erős hóesés',
+        77: 'Hószállingózás',
+        80: 'Záporeső',
+        81: 'Erős zápor',
+        82: 'Viharos zápor',
+        85: 'Hózápor',
+        86: 'Erős hózápor',
+        95: 'Zivatar',
+        96: 'Zivatar jégesővel',
+        99: 'Zivatar erős jégesővel',
+      };
 
       async function loadSettings() {
         try {
@@ -366,22 +536,77 @@
         widget.style.setProperty("--vignette-bottom", palette.vignetteBottom);
       }
 
-      async function fetchSunTimes() {
-        const params = getParams();
+      async function fetchSunTimes(lat, lon) {
         const url = new URL("https://api.open-meteo.com/v1/forecast");
-
-        url.searchParams.set("latitude", params.latitude);
-        url.searchParams.set("longitude", params.longitude);
+        url.searchParams.set("latitude", lat);
+        url.searchParams.set("longitude", lon);
         url.searchParams.set("daily", "sunrise,sunset");
         url.searchParams.set("timezone", "auto");
         url.searchParams.set("forecast_days", "1");
 
         const response = await fetch(url.toString());
-        if (!response.ok) {
-          throw new Error(`Sun request failed with status ${response.status}`);
-        }
-
+        if (!response.ok) throw new Error(`Sun request failed: ${response.status}`);
         return response.json();
+      }
+
+      async function fetchWeather(lat, lon) {
+        const url = new URL("https://api.open-meteo.com/v1/forecast");
+        url.searchParams.set("latitude", lat);
+        url.searchParams.set("longitude", lon);
+        url.searchParams.set("current", "temperature_2m,apparent_temperature,weather_code,relative_humidity_2m,wind_speed_10m");
+        url.searchParams.set("daily", "temperature_2m_max,temperature_2m_min");
+        url.searchParams.set("timezone", "auto");
+        url.searchParams.set("forecast_days", "1");
+        url.searchParams.set("wind_speed_unit", "kmh");
+
+        const response = await fetch(url.toString());
+        if (!response.ok) throw new Error(`Weather request failed: ${response.status}`);
+        return response.json();
+      }
+
+      async function fetchCityName(lat, lon) {
+        const url = new URL("https://nominatim.openstreetmap.org/reverse");
+        url.searchParams.set("lat", lat);
+        url.searchParams.set("lon", lon);
+        url.searchParams.set("format", "json");
+        url.searchParams.set("accept-language", "hu");
+        url.searchParams.set("zoom", "10");
+
+        const response = await fetch(url.toString(), {
+          headers: { "User-Agent": "weather-widget/1.0" },
+        });
+        if (!response.ok) return null;
+        const data = await response.json();
+        return data.address?.city
+          || data.address?.town
+          || data.address?.village
+          || data.address?.county
+          || null;
+      }
+
+      function formatTemp(celsius) {
+        return `${Math.round(celsius)}°`;
+      }
+
+      function populateDataLayer(weatherData, cityName) {
+        const c = weatherData.current;
+        const d = weatherData.daily;
+
+        document.getElementById("city-name").textContent =
+          cityName || `${weatherData.latitude.toFixed(2)}°, ${weatherData.longitude.toFixed(2)}°`;
+
+        document.getElementById("temperature").textContent = formatTemp(c.temperature_2m);
+        document.getElementById("condition").textContent =
+          weatherConditions[c.weather_code] ?? `Időjárás kód: ${c.weather_code}`;
+
+        document.getElementById("temp-high").textContent = `M: ${formatTemp(d.temperature_2m_max[0])}`;
+        document.getElementById("temp-low").textContent = `L: ${formatTemp(d.temperature_2m_min[0])}`;
+
+        document.getElementById("feels-like").textContent = formatTemp(c.apparent_temperature);
+        document.getElementById("humidity").textContent = `${Math.round(c.relative_humidity_2m)}%`;
+        document.getElementById("wind").textContent = `${Math.round(c.wind_speed_10m)} km/h`;
+
+        document.getElementById("data-layer").classList.remove("loading");
       }
 
       function applyFallbackPhase() {
@@ -399,20 +624,28 @@
 
         if (params.previewPhase) {
           applyPalette(getProgressForPhase(params.previewPhase));
-          return;
-        }
-
-        if (params.previewProgress !== null) {
+        } else if (params.previewProgress !== null) {
           applyPalette(params.previewProgress);
-          return;
+        } else {
+          try {
+            const sunData = await fetchSunTimes(params.latitude, params.longitude);
+            applyPalette(getDaylightProgress(new Date(), sunData.daily.sunrise[0], sunData.daily.sunset[0]));
+          } catch (err) {
+            console.error("Daylight gradient fallback activated.", err);
+            applyFallbackPhase();
+          }
         }
 
+        // Fetch weather data and city name in parallel
         try {
-          const data = await fetchSunTimes();
-          applyPalette(getDaylightProgress(new Date(), data.daily.sunrise[0], data.daily.sunset[0]));
-        } catch (error) {
-          console.error("Daylight gradient fallback activated.", error);
-          applyFallbackPhase();
+          const [weatherData, cityName] = await Promise.all([
+            fetchWeather(params.latitude, params.longitude),
+            fetchCityName(params.latitude, params.longitude),
+          ]);
+          populateDataLayer(weatherData, cityName);
+        } catch (err) {
+          console.error("Weather data fetch failed.", err);
+          document.getElementById("data-layer").classList.remove("loading");
         }
       }
 
