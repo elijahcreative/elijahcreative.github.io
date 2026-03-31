@@ -2,17 +2,17 @@
   "current_condition": [
     {
       "FeelsLikeC": "5",
-      "FeelsLikeF": "40",
-      "cloudcover": "75",
-      "humidity": "87",
-      "localObsDateTime": "2026-03-31 12:24 PM",
-      "observation_time": "10:24 AM",
+      "FeelsLikeF": "42",
+      "cloudcover": "100",
+      "humidity": "76",
+      "localObsDateTime": "2026-03-31 01:12 PM",
+      "observation_time": "11:12 AM",
       "precipInches": "0.0",
       "precipMM": "0.0",
-      "pressure": "1012",
+      "pressure": "1013",
       "pressureInches": "30",
-      "temp_C": "6",
-      "temp_F": "44",
+      "temp_C": "7",
+      "temp_F": "45",
       "uvIndex": "2",
       "visibility": "10",
       "visibilityMiles": "6",
@@ -27,8 +27,8 @@
           "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0004_black_low_cloud.png"
         }
       ],
-      "winddir16Point": "N",
-      "winddirDegree": "354",
+      "winddir16Point": "NNW",
+      "winddirDegree": "346",
       "windspeedKmph": "9",
       "windspeedMiles": "6"
     }
@@ -307,29 +307,29 @@
           "chanceofsunshine": "0",
           "chanceofthunder": "0",
           "chanceofwindy": "0",
-          "cloudcover": "75",
+          "cloudcover": "100",
           "diffRad": "147.2",
-          "humidity": "87",
+          "humidity": "52",
           "precipInches": "0.0",
           "precipMM": "0.0",
           "pressure": "1012",
           "pressureInches": "30",
           "shortRad": "308.2",
-          "tempC": "6",
-          "tempF": "44",
+          "tempC": "10",
+          "tempF": "49",
           "time": "1200",
           "uvIndex": "2",
           "visibility": "10",
           "visibilityMiles": "6",
-          "weatherCode": "122",
+          "weatherCode": "176",
           "weatherDesc": [
             {
-              "value": "Overcast"
+              "value": "Patchy rain nearby"
             }
           ],
           "weatherIconUrl": [
             {
-              "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0004_black_low_cloud.png"
+              "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0009_light_rain_showers.png"
             }
           ],
           "winddir16Point": "N",
