@@ -572,9 +572,7 @@
         url.searchParams.set("accept-language", "hu");
         url.searchParams.set("zoom", "10");
 
-        const response = await fetch(url.toString(), {
-          headers: { "User-Agent": "weather-widget/1.0" },
-        });
+        const response = await fetch(url.toString());
         if (!response.ok) return null;
         const data = await response.json();
         return data.address?.city
@@ -636,13 +634,16 @@
           }
         }
 
-        // Fetch weather data and city name in parallel
+        // Fetch weather data first (required), city name separately (optional)
         try {
-          const [weatherData, cityName] = await Promise.all([
-            fetchWeather(params.latitude, params.longitude),
-            fetchCityName(params.latitude, params.longitude),
-          ]);
-          populateDataLayer(weatherData, cityName);
+          const weatherData = await fetchWeather(params.latitude, params.longitude);
+          populateDataLayer(weatherData, null);
+
+          fetchCityName(params.latitude, params.longitude)
+            .then(cityName => {
+              if (cityName) document.getElementById("city-name").textContent = cityName;
+            })
+            .catch(() => {});
         } catch (err) {
           console.error("Weather data fetch failed.", err);
           document.getElementById("data-layer").classList.remove("loading");
