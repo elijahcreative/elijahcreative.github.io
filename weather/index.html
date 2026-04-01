@@ -103,21 +103,25 @@
         inset: 0;
         z-index: 10;
         display: flex;
-        align-items: stretch;
-        /* font-size and padding set by JS via --dl-base custom property */
+        flex-direction: column;
         font-size: var(--dl-base, 13px);
-        padding: 0.85em 1em;
-        gap: 0.6em;
         font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
         color: #fff;
         pointer-events: none;
       }
 
       .data-layer * {
-        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.28);
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.22);
       }
 
-      .weather-left {
+      /* Top section: city+temp left | icon+condition+hl right */
+      .dl-top {
+        flex: 1;
+        display: flex;
+        padding: 0.85em 1.1em 0.4em;
+      }
+
+      .dl-left {
         flex: 1;
         display: flex;
         flex-direction: column;
@@ -126,77 +130,84 @@
       }
 
       .city-name {
-        font-size: 1em;
-        font-weight: 500;
+        font-size: 1.15em;
+        font-weight: 600;
         letter-spacing: 0.01em;
-        opacity: 0.92;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
       }
 
-      .temp-group {
-        display: flex;
-        flex-direction: column;
-        gap: 0.15em;
-      }
-
       .temperature {
         font-size: 6em;
         font-weight: 200;
-        letter-spacing: -0.03em;
         line-height: 1;
+        letter-spacing: -0.03em;
       }
 
-      .condition {
-        font-size: 0.95em;
-        font-weight: 400;
-        opacity: 0.88;
-        letter-spacing: 0.01em;
-      }
-
-      .weather-right {
+      .dl-right {
         display: flex;
         flex-direction: column;
         align-items: flex-end;
         justify-content: space-between;
+        padding-left: 0.4em;
         flex-shrink: 0;
       }
 
-      .hl-temps {
+      .weather-icon {
+        font-size: 2.6em;
+        line-height: 1;
+      }
+
+      .dl-right-bottom {
         display: flex;
-        gap: 0.6em;
-        font-size: 0.95em;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.1em;
+      }
+
+      .condition {
+        font-size: 1.05em;
+        font-weight: 500;
+      }
+
+      .hl-temps {
+        font-size: 0.9em;
         font-weight: 500;
         opacity: 0.9;
+        white-space: nowrap;
       }
 
-      .detail-rows {
+      /* Bottom section: hourly strip */
+      .dl-bottom {
+        display: flex;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 0.5em 0.9em;
+        flex-shrink: 0;
+      }
+
+      .hour-slot {
+        flex: 1;
         display: flex;
         flex-direction: column;
-        gap: 0.5em;
-        align-items: flex-end;
+        align-items: center;
+        gap: 0.18em;
       }
 
-      .detail-row {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        line-height: 1.15;
-      }
-
-      .detail-row .label {
-        font-size: 0.68em;
-        font-weight: 400;
-        opacity: 0.6;
-        text-transform: uppercase;
-        letter-spacing: 0.07em;
-      }
-
-      .detail-row .value {
-        font-size: 0.95em;
+      .hour-time {
+        font-size: 0.78em;
         font-weight: 500;
-        opacity: 0.92;
+        opacity: 0.72;
+      }
+
+      .hour-icon {
+        font-size: 1.65em;
+        line-height: 1.1;
+      }
+
+      .hour-temp {
+        font-size: 0.82em;
+        font-weight: 600;
       }
 
       /* ── Sky phase tokens ── */
@@ -297,33 +308,22 @@
         <div class="vignette"></div>
 
         <!-- Apple Weather–style data layer -->
-        <div class="data-layer loading" id="data-layer">
-          <div class="weather-left">
-            <div class="city-name" id="city-name">—</div>
-            <div class="temp-group">
+        <div class="data-layer" id="data-layer">
+          <div class="dl-top">
+            <div class="dl-left">
+              <div class="city-name" id="city-name">—</div>
               <div class="temperature" id="temperature">—</div>
-              <div class="condition" id="condition">—</div>
+            </div>
+            <div class="dl-right">
+              <div class="weather-icon" id="weather-icon"></div>
+              <div class="dl-right-bottom">
+                <div class="condition" id="condition">—</div>
+                <div class="hl-temps" id="hl-temps">Max: — &nbsp;Min: —</div>
+              </div>
             </div>
           </div>
-          <div class="weather-right">
-            <div class="hl-temps">
-              <span id="temp-high">H: —</span>
-              <span id="temp-low">L: —</span>
-            </div>
-            <div class="detail-rows">
-              <div class="detail-row">
-                <span class="label">Érzett hőm.</span>
-                <span class="value" id="feels-like">—</span>
-              </div>
-              <div class="detail-row">
-                <span class="label">Páratartalom</span>
-                <span class="value" id="humidity">—</span>
-              </div>
-              <div class="detail-row">
-                <span class="label">Szél</span>
-                <span class="value" id="wind">—</span>
-              </div>
-            </div>
+          <div class="dl-bottom" id="hourly-strip">
+            <!-- filled by JS -->
           </div>
         </div>
       </section>
@@ -349,31 +349,30 @@
       let transitionMinutes = 60;
 
       const weatherConditions = {
-        0: 'Derült égbolt',
-        1: 'Főként derült',
-        2: 'Részben felhős',
-        3: 'Borult',
-        45: 'Köd',
-        48: 'Zúzmarás köd',
-        51: 'Enyhe szitálás',
-        53: 'Szitálás',
-        55: 'Erős szitálás',
-        61: 'Gyenge eső',
-        63: 'Eső',
-        65: 'Erős eső',
-        71: 'Gyenge hóesés',
-        73: 'Hóesés',
-        75: 'Erős hóesés',
-        77: 'Hószállingózás',
-        80: 'Záporeső',
-        81: 'Erős zápor',
-        82: 'Viharos zápor',
-        85: 'Hózápor',
-        86: 'Erős hózápor',
-        95: 'Zivatar',
-        96: 'Zivatar jégesővel',
-        99: 'Zivatar erős jégesővel',
+        0: 'Derült égbolt', 1: 'Főként derült', 2: 'Részben felhős', 3: 'Borult',
+        45: 'Köd', 48: 'Zúzmarás köd',
+        51: 'Enyhe szitálás', 53: 'Szitálás', 55: 'Erős szitálás',
+        61: 'Gyenge eső', 63: 'Eső', 65: 'Erős eső',
+        71: 'Gyenge hóesés', 73: 'Hóesés', 75: 'Erős hóesés', 77: 'Hószállingózás',
+        80: 'Záporeső', 81: 'Erős zápor', 82: 'Viharos zápor',
+        85: 'Hózápor', 86: 'Erős hózápor',
+        95: 'Zivatar', 96: 'Zivatar jégesővel', 99: 'Zivatar erős jégesővel',
       };
+
+      function getEmoji(code, isDay) {
+        const map = {
+          0:  ['☀️','🌙'], 1:  ['🌤️','🌙'], 2:  ['⛅','⛅'],  3:  ['☁️','☁️'],
+          45: ['🌫️','🌫️'], 48: ['🌫️','🌫️'],
+          51: ['🌦️','🌦️'], 53: ['🌦️','🌦️'], 55: ['🌧️','🌧️'],
+          61: ['🌧️','🌧️'], 63: ['🌧️','🌧️'], 65: ['🌧️','🌧️'],
+          71: ['🌨️','🌨️'], 73: ['🌨️','🌨️'], 75: ['❄️','❄️'], 77: ['🌨️','🌨️'],
+          80: ['🌧️','🌧️'], 81: ['🌧️','🌧️'], 82: ['🌧️','🌧️'],
+          85: ['🌨️','🌨️'], 86: ['❄️','❄️'],
+          95: ['⛈️','⛈️'], 96: ['⛈️','⛈️'], 99: ['⛈️','⛈️'],
+        };
+        const pair = map[code] || ['🌡️','🌡️'];
+        return pair[isDay ? 0 : 1];
+      }
 
       async function loadSettings() {
         try {
@@ -426,27 +425,16 @@
         return { r: parts[0], g: parts[1], b: parts[2], a: parts[3] ?? 1 };
       }
 
-      function mixNumber(a, b, t) {
-        return a + (b - a) * t;
-      }
+      function mixNumber(a, b, t) { return a + (b - a) * t; }
 
       function mixHex(a, b, t) {
-        const ca = hexToRgb(a);
-        const cb = hexToRgb(b);
-        const r = Math.round(mixNumber(ca.r, cb.r, t));
-        const g = Math.round(mixNumber(ca.g, cb.g, t));
-        const bValue = Math.round(mixNumber(ca.b, cb.b, t));
-        return `rgb(${r}, ${g}, ${bValue})`;
+        const ca = hexToRgb(a), cb = hexToRgb(b);
+        return `rgb(${Math.round(mixNumber(ca.r,cb.r,t))}, ${Math.round(mixNumber(ca.g,cb.g,t))}, ${Math.round(mixNumber(ca.b,cb.b,t))})`;
       }
 
       function mixRgba(a, b, t) {
-        const ca = parseRgba(a);
-        const cb = parseRgba(b);
-        const r = Math.round(mixNumber(ca.r, cb.r, t));
-        const g = Math.round(mixNumber(ca.g, cb.g, t));
-        const bValue = Math.round(mixNumber(ca.b, cb.b, t));
-        const alpha = mixNumber(ca.a, cb.a, t).toFixed(3);
-        return `rgba(${r}, ${g}, ${bValue}, ${alpha})`;
+        const ca = parseRgba(a), cb = parseRgba(b);
+        return `rgba(${Math.round(mixNumber(ca.r,cb.r,t))}, ${Math.round(mixNumber(ca.g,cb.g,t))}, ${Math.round(mixNumber(ca.b,cb.b,t))}, ${mixNumber(ca.a,cb.a,t).toFixed(3)})`;
       }
 
       function mixPalettes(A, B, t) {
@@ -466,25 +454,20 @@
 
       function getInterpolatedPalette(progress) {
         const half = (transitionMinutes / 2) / 1440;
-
         for (let i = 1; i < paletteStops.length; i++) {
           const c = paletteStops[i].t;
           const isLast   = i === paletteStops.length - 1;
           const winStart = isLast ? c - 2 * half : c - half;
           const winEnd   = isLast ? c             : c + half;
-
           if (progress >= winStart && progress < winEnd) {
             const u = (progress - winStart) / (2 * half);
-            const t = u * u * (3 - 2 * u); // smoothstep
-            return mixPalettes(paletteStops[i - 1], paletteStops[i], t);
+            return mixPalettes(paletteStops[i - 1], paletteStops[i], u * u * (3 - 2 * u));
           }
         }
-
         let settled = paletteStops[0];
         for (let i = 1; i < paletteStops.length; i++) {
           const isLast = i === paletteStops.length - 1;
-          const winEnd = isLast ? paletteStops[i].t : paletteStops[i].t + half;
-          if (progress >= winEnd) settled = paletteStops[i];
+          if (progress >= (isLast ? paletteStops[i].t : paletteStops[i].t + half)) settled = paletteStops[i];
         }
         return mixPalettes(settled, settled, 0);
       }
@@ -497,159 +480,203 @@
       function getDaylightProgress(now, sunriseIso, sunsetIso) {
         const current = now.getTime();
         const sunrise = new Date(sunriseIso).getTime();
-        const sunset = new Date(sunsetIso).getTime();
-
+        const sunset  = new Date(sunsetIso).getTime();
         if (current >= sunrise && current <= sunset) {
-          const dayProgress = (current - sunrise) / (sunset - sunrise || 1);
-          return 0.23 + dayProgress * (0.8 - 0.23);
+          return 0.23 + (current - sunrise) / (sunset - sunrise || 1) * (0.8 - 0.23);
         }
-
-        const dayMs = 24 * 60 * 60 * 1000;
+        const dayMs = 86400000;
         const previousSunset = current > sunset ? sunset : sunset - dayMs;
-        const nextSunrise = current < sunrise ? sunrise : sunrise + dayMs;
-        const nightProgress = (current - previousSunset) / (nextSunrise - previousSunset || 1);
-
-        if (current > sunset) return 0.8 + nightProgress * 0.2;
-        return nightProgress * 0.23;
+        const nextSunrise    = current < sunrise ? sunrise : sunrise + dayMs;
+        const nightProgress  = (current - previousSunset) / (nextSunrise - previousSunset || 1);
+        return current > sunset ? 0.8 + nightProgress * 0.2 : nightProgress * 0.23;
       }
 
       function applyPalette(progress) {
-        const widget = document.getElementById("weather-widget");
+        const widget  = document.getElementById("weather-widget");
         const palette = getInterpolatedPalette(progress);
-
-        widget.style.setProperty("--sky-top", palette.top);
-        widget.style.setProperty("--sky-mid", palette.mid);
-        widget.style.setProperty("--sky-bottom", palette.bottom);
-        widget.style.setProperty("--tint-top", palette.tintTop);
-        widget.style.setProperty("--tint-bottom", palette.tintBottom);
-        widget.style.setProperty("--pool-a", palette.poolA);
-        widget.style.setProperty("--pool-b", palette.poolB);
-        widget.style.setProperty("--horizon", palette.horizon);
-        widget.style.setProperty("--vignette-top", palette.vignetteTop);
-        widget.style.setProperty("--vignette-bottom", palette.vignetteBottom);
-      }
-
-      async function fetchSunTimes(lat, lon) {
-        const url = new URL("https://api.open-meteo.com/v1/forecast");
-        url.searchParams.set("latitude", lat);
-        url.searchParams.set("longitude", lon);
-        url.searchParams.set("daily", "sunrise,sunset");
-        url.searchParams.set("timezone", "auto");
-        url.searchParams.set("forecast_days", "1");
-
-        const response = await fetch(url.toString());
-        if (!response.ok) throw new Error(`Sun request failed: ${response.status}`);
-        return response.json();
-      }
-
-      async function fetchWeather(lat, lon) {
-        const url = new URL("https://api.open-meteo.com/v1/forecast");
-        url.searchParams.set("latitude", lat);
-        url.searchParams.set("longitude", lon);
-        url.searchParams.set("current", "temperature_2m,apparent_temperature,weather_code,relative_humidity_2m,wind_speed_10m");
-        url.searchParams.set("daily", "temperature_2m_max,temperature_2m_min");
-        url.searchParams.set("timezone", "auto");
-        url.searchParams.set("forecast_days", "1");
-        url.searchParams.set("wind_speed_unit", "kmh");
-
-        const response = await fetch(url.toString());
-        if (!response.ok) throw new Error(`Weather request failed: ${response.status}`);
-        return response.json();
-      }
-
-      async function fetchCityName(lat, lon) {
-        const url = new URL("https://nominatim.openstreetmap.org/reverse");
-        url.searchParams.set("lat", lat);
-        url.searchParams.set("lon", lon);
-        url.searchParams.set("format", "json");
-        url.searchParams.set("accept-language", "hu");
-        url.searchParams.set("zoom", "10");
-
-        const response = await fetch(url.toString());
-        if (!response.ok) return null;
-        const data = await response.json();
-        return data.address?.city
-          || data.address?.town
-          || data.address?.village
-          || data.address?.county
-          || null;
-      }
-
-      function formatTemp(celsius) {
-        return `${Math.round(celsius)}°`;
-      }
-
-      function populateDataLayer(weatherData, cityName) {
-        const c = weatherData.current;
-        const d = weatherData.daily;
-
-        document.getElementById("city-name").textContent =
-          cityName || `${weatherData.latitude.toFixed(2)}°, ${weatherData.longitude.toFixed(2)}°`;
-
-        document.getElementById("temperature").textContent = formatTemp(c.temperature_2m);
-        document.getElementById("condition").textContent =
-          weatherConditions[c.weather_code] ?? `Időjárás kód: ${c.weather_code}`;
-
-        document.getElementById("temp-high").textContent = `M: ${formatTemp(d.temperature_2m_max[0])}`;
-        document.getElementById("temp-low").textContent = `L: ${formatTemp(d.temperature_2m_min[0])}`;
-
-        document.getElementById("feels-like").textContent = formatTemp(c.apparent_temperature);
-        document.getElementById("humidity").textContent = `${Math.round(c.relative_humidity_2m)}%`;
-        document.getElementById("wind").textContent = `${Math.round(c.wind_speed_10m)} km/h`;
-
-        document.getElementById("data-layer").classList.remove("loading");
+        widget.style.setProperty("--sky-top",          palette.top);
+        widget.style.setProperty("--sky-mid",          palette.mid);
+        widget.style.setProperty("--sky-bottom",       palette.bottom);
+        widget.style.setProperty("--tint-top",         palette.tintTop);
+        widget.style.setProperty("--tint-bottom",      palette.tintBottom);
+        widget.style.setProperty("--pool-a",           palette.poolA);
+        widget.style.setProperty("--pool-b",           palette.poolB);
+        widget.style.setProperty("--horizon",          palette.horizon);
+        widget.style.setProperty("--vignette-top",     palette.vignetteTop);
+        widget.style.setProperty("--vignette-bottom",  palette.vignetteBottom);
       }
 
       function applyFallbackPhase() {
         const now = new Date();
-        const sunrise = new Date(now);
-        const sunset = new Date(now);
-        sunrise.setHours(6, 0, 0, 0);
-        sunset.setHours(18, 0, 0, 0);
-        applyPalette(getDaylightProgress(now, sunrise.toISOString(), sunset.toISOString()));
+        const sr = new Date(now); sr.setHours(6,  0, 0, 0);
+        const ss = new Date(now); ss.setHours(18, 0, 0, 0);
+        applyPalette(getDaylightProgress(now, sr.toISOString(), ss.toISOString()));
       }
 
       function applyFontScale() {
         const widget = document.getElementById("weather-widget");
         const w = widget.offsetWidth || 329;
-        // base ≈ 2.2% of widget width, clamped between 9px and 15px
-        const base = Math.min(15, Math.max(9, w * 0.022));
-        widget.style.setProperty("--dl-base", base + "px");
+        widget.style.setProperty("--dl-base", Math.min(17, Math.max(8, w * 0.026)) + "px");
+      }
+
+      async function fetchAllData(lat, lon) {
+        const url = new URL("https://api.open-meteo.com/v1/forecast");
+        url.searchParams.set("latitude",  lat);
+        url.searchParams.set("longitude", lon);
+        url.searchParams.set("current",   "temperature_2m,weather_code,is_day");
+        url.searchParams.set("hourly",    "temperature_2m,weather_code,is_day");
+        url.searchParams.set("daily",     "temperature_2m_max,temperature_2m_min,sunrise,sunset");
+        url.searchParams.set("timezone",  "auto");
+        url.searchParams.set("forecast_days", "2");
+        const res = await fetch(url.toString());
+        if (!res.ok) throw new Error(`API error ${res.status}`);
+        return res.json();
+      }
+
+      async function fetchCityName(lat, lon) {
+        const url = new URL("https://nominatim.openstreetmap.org/reverse");
+        url.searchParams.set("lat",             lat);
+        url.searchParams.set("lon",             lon);
+        url.searchParams.set("format",          "json");
+        url.searchParams.set("accept-language", "hu");
+        url.searchParams.set("zoom",            "10");
+        const res = await fetch(url.toString());
+        if (!res.ok) return null;
+        const data = await res.json();
+        return data.address?.city || data.address?.town || data.address?.village || data.address?.county || null;
+      }
+
+      function formatTemp(c) {
+        return `${Math.round(c)}°`;
+      }
+
+      // Parse "HH:MM" part of an ISO local-time string into fractional hours
+      function parseLocalHours(isoStr) {
+        if (!isoStr) return null;
+        const m = isoStr.match(/T(\d{2}):(\d{2})/);
+        return m ? parseInt(m[1]) + parseInt(m[2]) / 60 : null;
+      }
+
+      function buildHourlySlots(data) {
+        const now       = new Date();
+        const offsetMs  = (data.utc_offset_seconds || 0) * 1000;
+        const localMs   = now.getTime() + offsetMs;
+        const midnightMs = Math.floor(localMs / 86400000) * 86400000;
+        const curHour   = Math.floor((localMs - midnightMs) / 3600000); // 0-23
+
+        const temps = data.hourly.temperature_2m;
+        const codes = data.hourly.weather_code;
+        const isDay = data.hourly.is_day;
+
+        // Collect future special events (sunrise/sunset) as fractional hours from today midnight
+        const events = [];
+        for (let d = 0; d < 2; d++) {
+          const srH = parseLocalHours(data.daily.sunrise?.[d]);
+          const ssH = parseLocalHours(data.daily.sunset?.[d]);
+          if (srH !== null) events.push({ type: 'sunrise', h: d * 24 + srH });
+          if (ssH !== null) events.push({ type: 'sunset',  h: d * 24 + ssH });
+        }
+        // Only keep future events (after current local hour)
+        const futureEvents = events.filter(e => e.h > curHour).sort((a, b) => a.h - b.h);
+
+        const slots = [];
+        let ei = 0;
+
+        for (let h = curHour; slots.length < 6 && h < curHour + 12; h++) {
+          // Inject any event that falls before or during this hour
+          while (ei < futureEvents.length && futureEvents[ei].h <= h + 0.999) {
+            const ev = futureEvents[ei++];
+            if (slots.length < 6) {
+              const frac = ev.h % 24;
+              const hh   = Math.floor(frac);
+              const mm   = String(Math.round((frac % 1) * 60)).padStart(2, '0');
+              slots.push({
+                type:    ev.type,
+                label:   `${hh}:${mm}`,
+                temp:    temps[Math.floor(ev.h)] ?? null,
+              });
+            }
+          }
+          if (slots.length < 6 && h < temps.length) {
+            slots.push({
+              type:  h === curHour ? 'now' : 'hour',
+              label: h === curHour ? 'Most' : String(h % 24),
+              temp:  temps[h],
+              code:  codes[h],
+              isDay: isDay[h],
+            });
+          }
+        }
+
+        return slots.slice(0, 6);
+      }
+
+      function renderHourlyStrip(slots) {
+        const strip = document.getElementById('hourly-strip');
+        strip.innerHTML = '';
+        for (const s of slots) {
+          let icon;
+          if      (s.type === 'sunrise') icon = '🌅';
+          else if (s.type === 'sunset')  icon = '🌇';
+          else                           icon = getEmoji(s.code, s.isDay);
+
+          const el = document.createElement('div');
+          el.className = 'hour-slot';
+          el.innerHTML =
+            `<span class="hour-time">${s.label}</span>` +
+            `<span class="hour-icon">${icon}</span>` +
+            `<span class="hour-temp">${s.temp !== null && s.temp !== undefined ? formatTemp(s.temp) : '—'}</span>`;
+          strip.appendChild(el);
+        }
+      }
+
+      function populateDataLayer(data) {
+        const c = data.current;
+        const d = data.daily;
+
+        document.getElementById('temperature').textContent  = formatTemp(c.temperature_2m);
+        document.getElementById('weather-icon').textContent = getEmoji(c.weather_code, c.is_day);
+        document.getElementById('condition').textContent    = weatherConditions[c.weather_code] ?? '—';
+        document.getElementById('hl-temps').textContent    =
+          `Max: ${formatTemp(d.temperature_2m_max[0])}\u2002Min: ${formatTemp(d.temperature_2m_min[0])}`;
+
+        // Placeholder until city name loads
+        document.getElementById('city-name').textContent =
+          `${data.latitude.toFixed(1)}°\u2002${data.longitude.toFixed(1)}°`;
+
+        renderHourlyStrip(buildHourlySlots(data));
       }
 
       async function init() {
         applyFontScale();
-        window.addEventListener("resize", applyFontScale);
+        window.addEventListener('resize', applyFontScale);
         await loadSettings();
+
         const params = getParams();
 
         if (params.previewPhase) {
           applyPalette(getProgressForPhase(params.previewPhase));
-        } else if (params.previewProgress !== null) {
+          return;
+        }
+        if (params.previewProgress !== null) {
           applyPalette(params.previewProgress);
-        } else {
-          try {
-            const sunData = await fetchSunTimes(params.latitude, params.longitude);
-            applyPalette(getDaylightProgress(new Date(), sunData.daily.sunrise[0], sunData.daily.sunset[0]));
-          } catch (err) {
-            console.error("Daylight gradient fallback activated.", err);
-            applyFallbackPhase();
-          }
+          return;
         }
 
-        // Fetch weather data first (required), city name separately (optional)
+        applyFallbackPhase();
+
         try {
-          const weatherData = await fetchWeather(params.latitude, params.longitude);
-          populateDataLayer(weatherData, null);
+          const data = await fetchAllData(params.latitude, params.longitude);
+          applyPalette(getDaylightProgress(new Date(), data.daily.sunrise[0], data.daily.sunset[0]));
+          populateDataLayer(data);
 
           fetchCityName(params.latitude, params.longitude)
-            .then(cityName => {
-              if (cityName) document.getElementById("city-name").textContent = cityName;
+            .then(name => {
+              if (name) document.getElementById('city-name').textContent = name + ' \u2197';
             })
             .catch(() => {});
         } catch (err) {
-          console.error("Weather data fetch failed.", err);
-          document.getElementById("data-layer").classList.remove("loading");
+          console.error('Weather fetch failed:', err);
         }
       }
 
