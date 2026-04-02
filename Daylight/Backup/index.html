@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="hu">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daylight Map Widget</title>
+    <style>
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        background: #000;
+      }
+      body {
+        overflow: hidden;
+      }
+      .widget {
+        width: 100vw;
+        height: 100vh;
+        background: #000;
+        overflow: hidden;
+      }
+      #map {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="widget">
+      <canvas id="map" aria-label="Daylight map" role="img"></canvas>
+    </div>
+
+    <script>
+      const canvas = document.getElementById("map");
+      const ctx = canvas.getContext("2d", { alpha: true });
+
+      // Visual controls (single place to tweak alpha values)
+      const VISUAL = {
+        mapAlpha: 0.55,        // map layer opacity (0..1)
+        areaAlpha: 155,        // day/night area opacity (0..255)
+        lineAlpha: 0.4,        // area boundary line opacity (0..1)
+        lineCap: "butt",     // "butt" | "round" | "square"
+        lineJoin: "bevel",    // "miter" | "round" | "bevel"
+        lineShadowAlpha: 0.5, // 0..1
+        lineShadowBlur: 1,     // px
+      };
+
+      const params = new URLSearchParams(window.location.search);
+      const mapSources = [
+        params.get("map"),
+        "./world-map.svg",
+        "./world-map.png",
+        "https://upload.wikimedia.org/wikipedia/commons/c/c0/Equirectangular_projection_world_map_without_borders.svg",
+      ].filter(Boolean);
+
+      const mapImage = new Image();
+      let sourceIndex = 0;
+      let mapReady = false;
+
+      const landBuffer = document.createElement("canvas");
+      const landCtx = landBuffer.getContext("2d", { alpha: true });
+      const shadeBuffer = document.createElement("canvas");
+      const shadeCtx = shadeBuffer.getContext("2d", { alpha: true });
+      let mapRect = { x: 0, y: 0, w: 0, h: 0 };
+      let southClipY = Number.POSITIVE_INFINITY;
+
+      function clamp(v, min, max) {
+        return Math.min(max, Math.max(min, v));
+      }
+
+      function wrapLon(lon) {
+        return ((lon + 540) % 360) - 180;
+      }
+
+      function toRad(deg) {
+        return (deg * Math.PI) / 180;
+      }
+
+      function fromRad(rad) {
+        return (rad * 180) / Math.PI;
+      }
+
+      function solarPosition(date) {
+        const msPerDay = 86400000;
+        const jd = date.getTime() / msPerDay + 2440587.5;
+        const T = (jd - 2451545.0) / 36525.0;
+
+        const L0 = (280.46646 + T * (36000.76983 + T * 0.0003032)) % 360;
+        const M = 357.52911 + T * (35999.05029 - 0.0001537 * T);
+        const e = 0.016708634 - T * (0.000042037 + 0.0000001267 * T);
+
+        const Mrad = toRad(M);
+        const C =
+          Math.sin(Mrad) * (1.914602 - T * (0.004817 + 0.000014 * T)) +
+          Math.sin(2 * Mrad) * (0.019993 - 0.000101 * T) +
+          Math.sin(3 * Mrad) * 0.000289;
+
+        const trueLong = L0 + C;
+        const omega = 125.04 - 1934.136 * T;
+        const lambda = trueLong - 0.00569 - 0.00478 * Math.sin(toRad(omega));
+
+        const epsilon0 =
+          23 +
+          (26 +
+            (21.448 -
+              T *
+                (46.815 +
+                  T *
+                    (0.00059 -
+                      T * 0.001813))) /
+              60) /
+            60;
+        const epsilon = epsilon0 + 0.00256 * Math.cos(toRad(omega));
+
+        const decl = fromRad(
+          Math.asin(Math.sin(toRad(epsilon)) * Math.sin(toRad(lambda)))
+        );
+
+        const y = Math.tan(toRad(epsilon / 2)) ** 2;
+        const Etime =
+          4 *
+          fromRad(
+            y * Math.sin(2 * toRad(L0)) -
+              2 * e * Math.sin(Mrad) +
+              4 * e * y * Math.sin(Mrad) * Math.cos(2 * toRad(L0)) -
+              0.5 * y * y * Math.sin(4 * toRad(L0)) -
+              1.25 * e * e * Math.sin(2 * Mrad)
+          );
+
+        const utcMinutes =
+          date.getUTCHours() * 60 +
+          date.getUTCMinutes() +
+          date.getUTCSeconds() / 60 +
+          date.getUTCMilliseconds() / 60000;
+
+        const subsolarLon = wrapLon((720 - utcMinutes - Etime) / 4);
+        return { declination: decl, subsolarLon };
+      }
+
+      function resize() {
+        const ratio = window.devicePixelRatio || 1;
+        const ssParam = Number(params.get("ss") || "1");
+        const ss = Number.isFinite(ssParam) ? Math.min(3, Math.max(1, ssParam)) : 1;
+        const renderScale = ratio * ss;
+        const rect = canvas.getBoundingClientRect();
+        const w = Math.max(1, Math.round(rect.width));
+        const h = Math.max(1, Math.round(rect.height));
+
+        canvas.width = Math.round(w * renderScale);
+        canvas.height = Math.round(h * renderScale);
+        ctx.setTransform(renderScale, 0, 0, renderScale, 0, 0);
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
+
+        landBuffer.width = Math.max(1, w);
+        landBuffer.height = Math.max(1, h);
+
+        if (mapReady) {
+          buildLandLayer(w, h);
+        }
+      }
+
+      function buildLandLayer(w, h) {
+        landCtx.clearRect(0, 0, w, h);
+
+        const srcW = mapImage.naturalWidth;
+        const srcH = mapImage.naturalHeight;
+        const srcAspect = srcW / srcH;
+        const dstAspect = w / h;
+
+        const zoom = Number(params.get("z") || params.get("zoom") || "0.96");
+        const offsetY = Number(params.get("y") || params.get("offsetY") || "-0.12");
+        const southCutLat = Number(params.get("cut") || params.get("southCutLat") || "-60");
+        let drawW = w;
+        let drawH = h;
+
+        // Contain fit (zoomed out vs cover), with small adjustable scale.
+        if (srcAspect > dstAspect) {
+          drawW = w * zoom;
+          drawH = drawW / srcAspect;
+        } else {
+          drawH = h * zoom;
+          drawW = drawH * srcAspect;
+        }
+
+        mapRect = {
+          x: (w - drawW) * 0.5,
+          y: (h - drawH) * 0.5 + offsetY * h,
+          w: drawW,
+          h: drawH,
+        };
+
+        southClipY = mapRect.y + ((90 - southCutLat) / 180) * mapRect.h;
+
+        shadeBuffer.width = Math.max(2, Math.round(mapRect.w * 0.66));
+        shadeBuffer.height = Math.max(2, Math.round(mapRect.h * 0.66));
+
+        landCtx.drawImage(
+          mapImage,
+          0,
+          0,
+          srcW,
+          srcH,
+          mapRect.x,
+          mapRect.y,
+          mapRect.w,
+          mapRect.h
+        );
+
+        // Keep only map alpha and tint to light gray (continents).
+        landCtx.globalCompositeOperation = "source-in";
+        landCtx.fillStyle = "rgb(208, 212, 220)";
+        landCtx.fillRect(0, 0, w, h);
+        landCtx.globalCompositeOperation = "source-over";
+
+        // Hide Antarctica/south polar strip below selected latitude.
+        if (Number.isFinite(southClipY)) {
+          const clipY = Math.max(0, Math.min(h, southClipY));
+          landCtx.clearRect(0, clipY, w, h - clipY);
+        }
+      }
+
+      function drawDayNightMask(w, h, solar) {
+        const sw = shadeBuffer.width;
+        const sh = shadeBuffer.height;
+        const image = shadeCtx.createImageData(sw, sh);
+        const data = image.data;
+
+        const decl = toRad(solar.declination);
+        const lon0 = toRad(solar.subsolarLon);
+
+        function sinAltAt(lat, lon) {
+          return (
+            Math.sin(lat) * Math.sin(decl) +
+            Math.cos(lat) * Math.cos(decl) * Math.cos(lon - lon0)
+          );
+        }
+
+        for (let x = 0; x < sw; x++) {
+          const lon = toRad(((x + 0.5) / sw) * 360 - 180);
+          for (let y = 0; y < sh; y++) {
+            const lat = toRad(90 - ((y + 0.5) / sh) * 180);
+            const isNight = sinAltAt(lat, lon) < 0;
+
+            const i = (y * sw + x) * 4;
+            if (isNight) {
+              data[i] = 0;
+              data[i + 1] = 0;
+              data[i + 2] = 0;
+              data[i + 3] = VISUAL.areaAlpha;
+            } else {
+              data[i] = 0;
+              data[i + 1] = 0;
+              data[i + 2] = 0;
+              data[i + 3] = 0;
+            }
+          }
+        }
+
+        shadeCtx.putImageData(image, 0, 0);
+        ctx.drawImage(
+          shadeBuffer,
+          0,
+          0,
+          sw,
+          sh,
+          mapRect.x,
+          mapRect.y,
+          mapRect.w,
+          mapRect.h
+        );
+
+        // Draw the true spherical terminator circle projected onto the map.
+        function lonToMapX(lonDeg) {
+          return mapRect.x + ((lonDeg + 180) / 360) * mapRect.w;
+        }
+
+        function latToMapY(latRad) {
+          return mapRect.y + ((Math.PI / 2 - latRad) / Math.PI) * mapRect.h;
+        }
+
+        function normalize3(v) {
+          const len = Math.hypot(v[0], v[1], v[2]) || 1;
+          return [v[0] / len, v[1] / len, v[2] / len];
+        }
+
+        function cross3(a, b) {
+          return [
+            a[1] * b[2] - a[2] * b[1],
+            a[2] * b[0] - a[0] * b[2],
+            a[0] * b[1] - a[1] * b[0],
+          ];
+        }
+
+        function drawTerminatorCircle() {
+          const sun = [
+            Math.cos(decl) * Math.cos(lon0),
+            Math.cos(decl) * Math.sin(lon0),
+            Math.sin(decl),
+          ];
+
+          const ref = Math.abs(sun[2]) > 0.9 ? [1, 0, 0] : [0, 0, 1];
+          const axisA = normalize3(cross3(ref, sun));
+          const axisB = normalize3(cross3(sun, axisA));
+
+          const samples = 1440;
+          let started = false;
+          let prevX = null;
+
+          ctx.beginPath();
+          for (let i = 0; i <= samples; i++) {
+            const theta = (i / samples) * Math.PI * 2;
+            const point = [
+              axisA[0] * Math.cos(theta) + axisB[0] * Math.sin(theta),
+              axisA[1] * Math.cos(theta) + axisB[1] * Math.sin(theta),
+              axisA[2] * Math.cos(theta) + axisB[2] * Math.sin(theta),
+            ];
+
+            const lonDeg = wrapLon(fromRad(Math.atan2(point[1], point[0])));
+            const latRad = Math.asin(clamp(point[2], -1, 1));
+            const x = lonToMapX(lonDeg);
+            const y = latToMapY(latRad);
+
+            // Split the stroke where the equirectangular projection wraps.
+            if (prevX !== null && Math.abs(x - prevX) > mapRect.w * 0.5) {
+              started = false;
+            }
+
+            if (!started) {
+              ctx.moveTo(x, y);
+              started = true;
+            } else {
+              ctx.lineTo(x, y);
+            }
+            prevX = x;
+          }
+          ctx.stroke();
+        }
+
+        ctx.save();
+        ctx.strokeStyle = `rgba(215, 220, 232, ${VISUAL.lineAlpha})`;
+        ctx.lineWidth = Math.max(1.8, mapRect.h * 0.0036);
+        ctx.lineCap = VISUAL.lineCap;
+        ctx.lineJoin = VISUAL.lineJoin;
+        ctx.shadowColor = `rgba(215, 220, 232, ${VISUAL.lineShadowAlpha})`;
+        ctx.shadowBlur = VISUAL.lineShadowBlur;
+        drawTerminatorCircle();
+        ctx.restore();
+      }
+
+      function render() {
+        const w = canvas.clientWidth;
+        const h = canvas.clientHeight;
+
+        ctx.fillStyle = "#000";
+        ctx.fillRect(0, 0, w, h);
+
+        if (mapReady) {
+          ctx.save();
+          ctx.globalAlpha = VISUAL.mapAlpha;
+          ctx.drawImage(landBuffer, 0, 0, w, h);
+          ctx.restore();
+        }
+
+        drawDayNightMask(w, h, solarPosition(new Date()));
+      }
+
+      function loadNextMapSource() {
+        if (sourceIndex >= mapSources.length) {
+          mapReady = false;
+          render();
+          return;
+        }
+        mapImage.src = mapSources[sourceIndex++];
+      }
+
+      mapImage.onload = () => {
+        mapReady = true;
+        buildLandLayer(canvas.clientWidth || 1, canvas.clientHeight || 1);
+        render();
+      };
+
+      mapImage.onerror = () => {
+        loadNextMapSource();
+      };
+
+      const observer = new ResizeObserver(() => {
+        resize();
+        render();
+      });
+
+      observer.observe(canvas);
+      resize();
+      render();
+      loadNextMapSource();
+      setInterval(render, 1000);
+    </script>
+  </body>
+</html>
