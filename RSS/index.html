@@ -1,0 +1,2839 @@
+<!DOCTYPE html>
+<html lang="hu" data-theme="light" data-preset="default">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" id="themeColorMeta" content="#ffffff">
+  <script>
+  (function(){
+    var BG = {
+      default:    { light:'#ffffff', dark:'#111111' },
+      nord:       { light:'#eceff4', dark:'#2e3440' },
+      solarized:  { light:'#fdf6e3', dark:'#002b36' },
+      rose:       { light:'#fff1f2', dark:'#1a0a0e' },
+      mono:       { light:'#ffffff', dark:'#111111' }
+    };
+    try {
+      var s = JSON.parse(localStorage.getItem('flux_s') || '{}');
+      var preset = s.preset || 'default';
+      var theme  = s.theme  || 'auto';
+      var dark   = theme === 'dark' || (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      var bg = (BG[preset] || BG.default)[dark ? 'dark' : 'light'];
+      document.getElementById('themeColorMeta').content = bg;
+      document.documentElement.style.backgroundColor = bg;
+    } catch(e) {}
+  })();
+  </script>
+  <title>Flux</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='2' y='2' width='28' height='28' rx='7' fill='%232563eb'/><line x1='8' y1='11' x2='24' y2='11' stroke='%23ffffff' stroke-width='2.2' stroke-linecap='round'/><line x1='8' y1='16' x2='24' y2='16' stroke='%23ffffff' stroke-width='2.2' stroke-linecap='round'/><line x1='8' y1='21' x2='17' y2='21' stroke='%23ffffff' stroke-width='2.2' stroke-linecap='round'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    /* ── CSS Variables ─────────────────────────────────────── */
+    :root {
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      --font-size-base: 15px;
+      --header-height: 56px;
+      --radius: 10px;
+      --radius-sm: 6px;
+      --t: 150ms ease;
+    }
+
+    /* ── Light Theme ───────────────────────────────────────── */
+    [data-theme="light"] {
+      --bg:       #ffffff;
+      --bg2:      #f5f5f5;
+      --bg-card:  #ffffff;
+      --bg-hover: #f0f0f0;
+      --text:     #111111;
+      --text2:    #555555;
+      --muted:    #999999;
+      --border:   #e8e8e8;
+      --shadow:   0 1px 3px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.04);
+      --shadow-lg:0 4px 16px rgba(0,0,0,.10);
+    }
+
+    /* ── Dark Theme ────────────────────────────────────────── */
+    [data-theme="dark"] {
+      --bg:       #111111;
+      --bg2:      #1c1c1c;
+      --bg-card:  #1c1c1c;
+      --bg-hover: #252525;
+      --text:     #eeeeee;
+      --text2:    #aaaaaa;
+      --muted:    #666666;
+      --border:   #2c2c2c;
+      --shadow:   0 1px 3px rgba(0,0,0,.4);
+      --shadow-lg:0 4px 16px rgba(0,0,0,.5);
+    }
+
+    /* ── Preset Accents ────────────────────────────────────── */
+    [data-preset="default"]   { --ac:#2563eb; --ac2:#1d4ed8; --acl:#dbeafe; }
+    [data-preset="nord"]      { --ac:#5e81ac; --ac2:#4c6f94; --acl:#dce5f0; }
+    [data-preset="solarized"] { --ac:#268bd2; --ac2:#1a6fa8; --acl:#d0e8f5; }
+    [data-preset="rose"]      { --ac:#e11d48; --ac2:#be123c; --acl:#ffe4e6; }
+    [data-preset="mono"]      { --ac:#444444; --ac2:#222222; --acl:#e5e5e5; }
+
+    /* Nord dark override */
+    [data-theme="dark"][data-preset="nord"] {
+      --bg:#2e3440; --bg2:#3b4252; --bg-card:#3b4252; --bg-hover:#434c5e;
+      --text:#eceff4; --text2:#d8dee9; --muted:#636f84; --border:#434c5e;
+      --ac:#88c0d0; --ac2:#6db0c2; --acl:#3b4252;
+    }
+    [data-theme="dark"][data-preset="solarized"] {
+      --bg:#002b36; --bg2:#073642; --bg-card:#073642; --bg-hover:#0d4758;
+      --text:#eee8d5; --text2:#93a1a1; --muted:#586e75; --border:#0d4758;
+      --ac:#2aa198; --ac2:#229990; --acl:#073642;
+    }
+    [data-theme="dark"][data-preset="rose"] {
+      --bg:#1a0a0e; --bg2:#2d1420; --bg-card:#2d1420; --bg-hover:#3d1a2a;
+      --text:#fecdd3; --text2:#fda4af; --muted:#9f1239; --border:#3d1a2a;
+      --ac:#fb7185; --ac2:#f43f5e; --acl:#2d1420;
+    }
+    [data-theme="dark"][data-preset="mono"] {
+      --bg:#111111; --bg2:#1e1e1e; --bg-card:#1e1e1e; --bg-hover:#2a2a2a;
+      --text:#eeeeee; --text2:#aaaaaa; --muted:#555555; --border:#2a2a2a;
+      --ac:#888888; --ac2:#666666; --acl:#2a2a2a;
+    }
+
+    /* ── Reset ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: var(--font-size-base); }
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      transition: background .2s, color .2s;
+    }
+    a { color: var(--ac); }
+    button { font-family: inherit; }
+
+    /* ── Main ──────────────────────────────────────────────── */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+
+    /* ── Floating Navbar ──────────────────────────────────────── */
+    body {
+      position: relative;
+      display: block;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid transparent;
+      white-space: nowrap;
+      transition: background .25s, border-color .25s, backdrop-filter .25s;
+    }
+    .navbar.scrolled {
+      background: var(--bg-nav, var(--bg));
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border-bottom-color: var(--border);
+    }
+    .navbar-inner {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: stretch;
+      gap: 2px;
+    }
+    .nav-logo {
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: -.5px;
+      padding: 0 20px 0 0;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .nav-logo-mark {
+      width: 7px; height: 7px;
+      background: var(--ac);
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .nav-divider { display: none; }
+    .nav-feeds {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      overflow: hidden;
+      flex: 1;
+      min-width: 0;
+    }
+    .nav-feed {
+      padding: 0 12px;
+      border-radius: 0;
+      font-size: .84rem;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color var(--t), box-shadow var(--t);
+      white-space: nowrap;
+      background: none;
+      border: none;
+      font-family: inherit;
+      box-shadow: inset 0 -2px 0 transparent;
+      display: flex;
+      align-items: center;
+    }
+    .nav-feed:hover { color: var(--text); }
+    .nav-feed.active { color: var(--text); box-shadow: inset 0 -2px 0 var(--ac); }
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+      flex: 1;
+      justify-content: flex-end;
+      position: relative;
+    }
+    .layout-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0 12px;
+      border-radius: 0;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color var(--t), box-shadow var(--t);
+      box-shadow: inset 0 -2px 0 transparent;
+      overflow: hidden;
+      position: relative;
+    }
+    .layout-btn:hover { color: var(--text); }
+    .layout-btn.active { color: var(--ac); box-shadow: inset 0 -2px 0 var(--ac); }
+    /* Layout cycle icon animation */
+    @keyframes cycleOut { to   { transform: translateY(-7px); opacity: 0; } }
+    @keyframes cycleIn  { from { transform: translateY(7px);  opacity: 0; } }
+    .cycle-out { animation: cycleOut .13s ease forwards; }
+    .cycle-in  { animation: cycleIn  .13s ease forwards; }
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0 12px;
+      border-radius: 0;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      transition: color var(--t);
+    }
+    .icon-btn:hover { color: var(--text); }
+    .icon-btn.spinning svg { animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Weather widget ───────────────────────────────────── */
+    .nav-weather {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      cursor: default;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .nav-weather-icon { font-size: 1.25rem; line-height: 1; }
+    .nav-weather-temp { font-size: .95rem; font-weight: 700; color: var(--text); line-height: 1; }
+
+    /* ── Weather popup (iOS style) ─────────────────────────── */
+    .wx-popup {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      width: 300px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px 14px;
+      color: var(--text);
+      z-index: 300;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-8px);
+      transition: opacity .2s ease, transform .2s ease;
+      box-shadow: var(--shadow-lg);
+    }
+    .wx-popup.wx-open { opacity: 1; pointer-events: all; transform: translateY(0); }
+    .wx-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+    .wx-left { display: flex; flex-direction: column; justify-content: flex-start; }
+    .wx-big-temp { font-size: 3.2rem; font-weight: 200; line-height: 1; letter-spacing: -3px; color: var(--text); }
+    .wx-main-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+    .wx-big-icon { line-height: 1; }
+    .wx-condition { font-size: .9rem; font-weight: 600; color: var(--text); text-align: right; line-height: 1.3; }
+    .wx-bottom-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0 8px;
+      margin-top: 4px;
+    }
+    .wx-meta { display: flex; gap: 10px; font-size: .72rem; color: var(--muted); }
+    .wx-meta span { display: flex; align-items: center; gap: 4px; }
+    .wx-minmax { font-size: .7rem; color: var(--muted); text-align: right; line-height: 1.6; }
+    .wx-hourly {
+      display: flex;
+      justify-content: space-between;
+      margin: 0 -16px;
+      padding: 10px 8px 14px;
+      border-top: 1px solid var(--border);
+    }
+    .wx-hour { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+    .wx-hour-time { font-size: .75rem; color: var(--muted); font-weight: 500; }
+    .wx-hour-icon { line-height: 1; margin: 2px 0; }
+    .wx-hour-temp { font-size: .9rem; font-weight: 600; color: var(--text); }
+    .wx-forecast {
+      border-top: 1px solid var(--border);
+      padding: 8px 0 4px;
+    }
+    .wx-frow {
+      display: grid;
+      grid-template-columns: 1fr 22px auto 1fr 1fr;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 0;
+      font-size: .8rem;
+    }
+    .wx-fday  { color: var(--text); font-weight: 500; text-align: left; }
+    .wx-ficon { display: flex; justify-content: center; }
+    .wx-fcond { color: var(--text2); text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .wx-frain { color: var(--text2); text-align: right; font-size: .75rem; }
+    .wx-ftemp { text-align: right; white-space: nowrap; }
+    .wx-ftemp-min { color: #60a5fa; margin-right: 4px; }
+    .wx-ftemp-max { color: #f97316; }
+
+    /* ── Content ───────────────────────────────────────────── */
+
+    .content { width: 100%; height: 100vh; overflow-y: auto; padding: 62px 24px 24px; }
+    .content::-webkit-scrollbar { width: 5px; }
+    .content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ── States ────────────────────────────────────────────── */
+    .state-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      gap: 10px;
+      color: var(--muted);
+      text-align: center;
+    }
+    .state-box .icon { font-size: 2.4rem; }
+    .state-box .title { font-size: 1rem; font-weight: 600; color: var(--text2); }
+    .state-box .desc { font-size: .9rem; max-width: 260px; line-height: 1.5; }
+    .spinner { width: 30px; height: 30px; border: 2.5px solid var(--border); border-top-color: var(--ac); border-radius: 50%; animation: spin .7s linear infinite; }
+
+    /* ══════════════════════════════════════════════════════════
+       LAYOUTS
+    ══════════════════════════════════════════════════════════ */
+
+    /* ── Card Grid ─────────────────────────────────────────── */
+    .grid-layout {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 18px;
+    }
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow);
+      transition: transform var(--t), box-shadow var(--t);
+    }
+    .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+
+    .card-img { width: 100%; aspect-ratio: 16/9; object-fit: cover; background: var(--bg2); display: block; }
+    .card-no-img { width: 100%; aspect-ratio: 16/9; background: var(--bg2); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: var(--muted); }
+    .card-body { padding: 12px 14px; flex: 1; display: flex; flex-direction: column; gap: 5px; }
+    .card-source { font-size: .7rem; font-weight: 700; }
+    .card-meta { display: flex; align-items: center; gap: 5px; font-size: .68rem; color: var(--muted); margin-bottom: 2px; }
+    .card-title { font-size: 1.1rem; font-weight: 600; line-height: 1.4; color: var(--text); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .card-desc { font-size: .9rem; color: var(--text2); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; flex: 1; }
+
+    /* ── List ──────────────────────────────────────────────── */
+    .list-layout { display: flex; flex-direction: column; gap: 1px; }
+    .list-item {
+      display: flex;
+      gap: 14px;
+      padding: 12px 8px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background var(--t);
+      align-items: flex-start;
+    }
+    .list-item:hover { background: var(--bg-hover); }
+    .list-thumb { width: 110px; height: 74px; object-fit: cover; border-radius: var(--radius-sm); flex-shrink: 0; }
+    .list-no-thumb { width: 110px; height: 74px; border-radius: var(--radius-sm); flex-shrink: 0; background: var(--bg2); display: flex; align-items: center; justify-content: center; font-size: .95rem; color: var(--muted); }
+    .list-body { flex: 1; min-width: 0; }
+    .list-title { line-height: 1.35; font-size: 1.1rem; font-weight: 600; line-height: 1.4; color: var(--text); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .list-desc { font-size: .88rem; color: var(--text2); display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; margin-top: 2px; }
+    .list-meta { font-size: .7rem; color: var(--muted); margin-top: 4px; display: flex; gap: 5px; }
+    .list-source { font-weight: 700; }
+
+    /* ── Magazine (Index.hu stílus) ────────────────────────── */
+    .magazine-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      max-width: 1140px;
+      margin: 0 auto;
+    }
+
+    /* Forrás badge — kép bal alsó sarkában */
+    .ix-badge {
+      position: absolute;
+      bottom: 7px;
+      left: 7px;
+      background: var(--ac);
+      color: #fff;
+      font-size: .55rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      padding: 3px 8px;
+      border-radius: 5px;
+      line-height: 1.6;
+      pointer-events: none;
+    }
+    .ix-img-wrap {
+      position: relative;
+      display: block;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    .ix-img-wrap.hero-wrap { border-radius: var(--radius); }
+
+    /* Hero */
+    .ix-hero {
+      display: block;
+      cursor: pointer;
+      padding-bottom: 0;
+      margin-bottom: 28px;
+    }
+    .ix-hero:hover .ix-hero-title { color: var(--ac); }
+    .ix-hero-img {
+      width: 100%;
+      aspect-ratio: 16/7;
+      object-fit: cover;
+      display: block;
+    }
+    .ix-hero-nobg {
+      width: 100%;
+      aspect-ratio: 16/7;
+      background: var(--bg2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      color: var(--muted);
+    }
+    .ix-hero-body { padding: 12px 0 0; }
+    .ix-hero-title {
+      font-size: 2.2rem;
+      font-weight: 900;
+      line-height: 1.18;
+      color: var(--text);
+      letter-spacing: .01em;
+      margin-bottom: 8px;
+      transition: color var(--t);
+    }
+    .ix-hero-desc {
+      font-size: 1.05rem;
+      color: var(--text2);
+      line-height: 1.65;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .ix-hero-time { font-size: .65rem; color: var(--muted); margin-top: 8px; }
+
+    /* Sor-pár: 2/3 + 1/3 és 1/3 + 2/3 felváltva */
+    .ix-row {
+      display: grid;
+      gap: 28px 36px;
+      margin-bottom: 32px;
+    }
+    .ix-row.row-a { grid-template-columns: 2fr 1fr; }
+    .ix-row.row-b { grid-template-columns: 1fr 2fr; }
+
+    /* Kártya */
+    .ix-card {
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .ix-card:hover .ix-card-title { color: var(--ac); }
+    .ix-card-img {
+      width: 100%;
+      aspect-ratio: 3/2;
+      object-fit: cover;
+      display: block;
+    }
+    .ix-card-nobg {
+      width: 100%;
+      aspect-ratio: 3/2;
+      background: var(--bg2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: var(--muted);
+    }
+    .ix-card-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      line-height: 1.3;
+      letter-spacing: .01em;
+      color: var(--text);
+      transition: color var(--t);
+    }
+    .ix-card-desc {
+      font-size: 1rem;
+      color: var(--text2);
+      line-height: 1.55;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .ix-card-time { font-size: .63rem; color: var(--muted); }
+
+    /* Side column wrapper — image card + text fills */
+    .ix-col-side {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .ix-col-side .ix-card { flex: 0 0 auto; }
+
+    /* Text-only filler cards */
+    .ix-text-fill {
+      cursor: pointer;
+      padding: 12px 0;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 12px;
+    }
+    .ix-text-fill:first-of-type { margin-top: 8px; }
+    .ix-text-fill:hover .ix-tf-title { color: var(--ac); }
+    .ix-tf-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: .01em;
+      color: var(--text);
+      transition: color var(--t);
+    }
+    .ix-tf-desc {
+      font-size: .93rem;
+      color: var(--text2);
+      line-height: 1.55;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* 4-col thumbnail rács a maradéknak */
+    .ix-mini-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px 24px;
+      margin-bottom: 32px;
+    }
+    /* Első kártya 2 oszlopot foglal, szélesebb kép + nagyobb cím */
+    .ix-mini-grid .ix-mini:first-child {
+      grid-column: span 2;
+    }
+    .ix-mini-grid .ix-mini:first-child .ix-mini-img,
+    .ix-mini-grid .ix-mini:first-child .ix-mini-nobg {
+      aspect-ratio: 16/9;
+    }
+    .ix-mini-grid .ix-mini:first-child .ix-mini-title {
+      font-size: 1.35rem;
+      -webkit-line-clamp: 2;
+    }
+    .ix-mini {
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .ix-mini:hover .ix-mini-title { color: var(--ac); }
+    .ix-mini-img {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      display: block;
+    }
+    .ix-mini-nobg {
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: var(--bg2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      color: var(--muted);
+    }
+    .ix-mini-title {
+      font-size: 1.18rem;
+      font-weight: 700;
+      line-height: 1.35;
+      letter-spacing: .01em;
+      color: var(--text);
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      transition: color var(--t);
+    }
+    .ix-mini-time { font-size: .6rem; color: var(--muted); }
+
+    /* Spotlight — full-width horizontal card */
+    .ix-spotlight {
+      display: grid;
+      grid-template-columns: 45% 55%;
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+      background: var(--bg-card);
+      margin-bottom: 32px;
+    }
+    .ix-spotlight:hover .ix-spot-title { color: var(--ac); }
+    .ix-spot-img-side {
+      position: relative;
+      min-height: 220px;
+    }
+    .ix-spot-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .ix-spot-nobg {
+      width: 100%;
+      height: 100%;
+      min-height: 220px;
+      background: var(--bg2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: var(--muted);
+    }
+    .ix-spot-body {
+      padding: 28px 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 10px;
+    }
+    .ix-spot-source { font-size: .63rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--ac); }
+    .ix-spot-title {
+      font-size: 1.9rem;
+      font-weight: 800;
+      line-height: 1.2;
+      color: var(--text);
+      letter-spacing: .01em;
+      transition: color var(--t);
+    }
+    .ix-spot-desc {
+      font-size: .97rem;
+      color: var(--text2);
+      line-height: 1.6;
+      display: -webkit-box;
+      -webkit-line-clamp: 5;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .ix-spot-time { font-size: .63rem; color: var(--muted); }
+
+    /* Trio — 3 equal columns */
+    .ix-trio {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 28px 32px;
+      margin-bottom: 32px;
+    }
+
+    /* Reader strip — numbered compact list */
+    .ix-strip {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .ix-strip-col {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .ix-strip-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: background var(--t);
+    }
+    .ix-strip-item:hover { background: var(--bg-hover); }
+    .ix-strip-item:hover .ix-strip-title { color: var(--ac); }
+    .ix-strip-img {
+      width: 72px;
+      height: 52px;
+      object-fit: cover;
+      border-radius: var(--radius-sm);
+      flex-shrink: 0;
+    }
+    .ix-strip-num { font-size: .75rem; font-weight: 700; color: var(--ac); min-width: 18px; flex-shrink: 0; padding-top: 2px; }
+    .ix-strip-body { flex: 1; min-width: 0; }
+    .ix-strip-title {
+      font-size: .95rem;
+      font-weight: 700;
+      line-height: 1.35;
+      color: var(--text);
+      transition: color var(--t);
+    }
+    .ix-strip-meta { font-size: .65rem; color: var(--muted); margin-top: 3px; display: flex; gap: 5px; }
+    .ix-strip-source { font-weight: 600; }
+
+    @media (max-width: 900px) {
+      .ix-row.row-a, .ix-row.row-b { grid-template-columns: 1fr 1fr; }
+      .ix-trio { grid-template-columns: 1fr 1fr; }
+      .ix-mini-grid { grid-template-columns: repeat(2, 1fr); }
+      .ix-spotlight { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .ix-row.row-a, .ix-row.row-b { grid-template-columns: 1fr; }
+      .ix-mini-grid { grid-template-columns: repeat(2, 1fr); }
+      .ix-hero-title { font-size: 1.5rem; }
+    }
+
+    /* ── Reader ────────────────────────────────────────────── */
+    .reader-layout {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .reader-item { background: var(--bg-card); border-bottom: 1px solid var(--border); }
+    .reader-item:last-child { border-bottom: none; }
+    .reader-item-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      cursor: pointer;
+      transition: background var(--t);
+    }
+    .reader-item-head:hover { background: var(--bg-hover); }
+    .reader-item-info { flex: 1; min-width: 0; }
+    .reader-title { font-size: 1.1rem; font-weight: 600; color: var(--text); line-height: 1.4; }
+    .reader-meta { font-size: .7rem; color: var(--muted); margin-top: 2px; display: flex; gap: 5px; }
+    .reader-source { font-weight: 700; }
+    .chevron { color: var(--muted); transition: transform var(--t); flex-shrink: 0; }
+    .reader-item.open .chevron { transform: rotate(90deg); }
+    .reader-body { display: none; padding: 0 16px 16px; border-top: 1px solid var(--border); }
+    .reader-item.open .reader-body { display: block; }
+    .reader-content {
+      font-size: .9rem;
+      line-height: 1.85;
+      color: var(--text2);
+      padding-top: 16px;
+      max-width: 680px;
+    }
+    .reader-content img { max-width: 100%; border-radius: var(--radius-sm); margin: 8px 0; }
+    .reader-content a { color: var(--ac); }
+    .reader-ext {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 12px;
+      font-size: .78rem;
+      color: var(--ac);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .reader-ext:hover { text-decoration: underline; }
+
+    /* ══════════════════════════════════════════════════════════
+       OVERLAY & PANELS
+    ══════════════════════════════════════════════════════════ */
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.4);
+      z-index: 100;
+      display: none;
+      backdrop-filter: blur(2px);
+    }
+    .overlay.open { display: block; }
+
+    /* ── Settings Panel ────────────────────────────────────── */
+    .settings-panel {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: 300px;
+      max-height: calc(100vh - 80px);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-8px);
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    .settings-panel.open { opacity: 1; pointer-events: all; transform: translateY(0); }
+    .settings-body { flex: 1; overflow-y: auto; padding: 16px; }
+    .settings-body::-webkit-scrollbar { width: 3px; }
+    .settings-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .s-section { margin-bottom: 24px; }
+    .s-label {
+      font-size: .68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    /* Mode toggle */
+    .mode-bar { display: flex; background: var(--bg2); border-radius: var(--radius-sm); padding: 3px; gap: 2px; }
+    .mode-btn {
+      flex: 1;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 7px 8px;
+      border-radius: 5px;
+      font-size: .78rem;
+      font-weight: 500;
+      color: var(--muted);
+      transition: all var(--t);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+    .mode-btn:hover { color: var(--text); background: var(--bg-hover); }
+    .mode-btn.active { background: var(--bg-card); color: var(--text); box-shadow: var(--shadow); }
+
+    /* Preset grid */
+    .preset-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+    .preset-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .preset-card {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 7px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color var(--t), transform var(--t);
+    }
+    .preset-card:hover { transform: scale(1.06); }
+    .preset-card.active { border-color: var(--ac); }
+    .preset-preview { width: 100%; height: 100%; display: flex; flex-direction: column; }
+    .pp-top { flex: 1; }
+    .pp-bot { height: 35%; display: flex; gap: 2px; padding: 3px; }
+    .pp-dot { flex: 1; border-radius: 2px; }
+    .preset-name { font-size: .64rem; color: var(--muted); }
+
+    /* Accent swatches */
+    .swatch-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .swatch {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: transform var(--t), border-color var(--t);
+    }
+    .swatch:hover { transform: scale(1.2); }
+    .swatch.active { border-color: var(--text); }
+    input[type="color"] {
+      width: 30px;
+      height: 30px;
+      border: 2px solid var(--border);
+      border-radius: 50%;
+      cursor: pointer;
+      padding: 2px;
+      background: none;
+    }
+
+    /* Font slider */
+    .slider-row { display: flex; align-items: center; gap: 10px; }
+    .sl { font-size: .72rem; color: var(--muted); width: 22px; text-align: center; }
+    input[type="range"] {
+      flex: 1;
+      height: 3px;
+      -webkit-appearance: none;
+      background: var(--border);
+      border-radius: 2px;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: var(--ac);
+      cursor: pointer;
+    }
+
+    /* Settings layout switcher */
+    .s-layout-bar { display: flex; gap: 6px; }
+    .s-layout-btn {
+      flex: 1;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      padding: 10px 6px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      font-size: .68rem;
+      color: var(--muted);
+      transition: all var(--t);
+    }
+    .s-layout-btn:hover { color: var(--text); border-color: var(--ac); }
+    .s-layout-btn.active { color: var(--ac); border-color: var(--ac); background: var(--acl); }
+
+    /* Settings feeds */
+    .s-feed-list { display: flex; flex-direction: column; gap: 5px; }
+    .s-feed-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 10px;
+      background: var(--bg2);
+      border-radius: var(--radius-sm);
+    }
+    .s-feed-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; cursor: pointer; }
+    .s-feed-name {
+      flex: 1;
+      font-size: .83rem;
+      color: var(--text);
+      background: none;
+      border: none;
+      outline: none;
+      cursor: text;
+      font-family: inherit;
+    }
+    .s-feed-name:focus { background: var(--bg-card); border-radius: 3px; padding: 1px 5px; }
+    .s-feed-del { background: none; border: none; cursor: pointer; color: var(--muted); padding: 2px 4px; border-radius: 3px; font-size: .85rem; }
+    .s-feed-del:hover { background: #fee2e2; color: #dc2626; }
+    .s-feed-drag { color: var(--muted); cursor: grab; padding: 2px 4px; font-size: 1rem; line-height: 1; user-select: none; }
+    .s-feed-drag:active { cursor: grabbing; }
+    .s-feed-item.drag-over { outline: 2px solid var(--ac); border-radius: var(--radius-sm); }
+
+    /* ── Add Feed Modal ─────────────────────────────────────── */
+    .modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(.95);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      width: 400px;
+      max-width: 90vw;
+      z-index: 102;
+      box-shadow: var(--shadow-lg);
+      transition: transform .2s, opacity .2s;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .modal.open { transform: translate(-50%, -50%) scale(1); opacity: 1; pointer-events: all; }
+    .modal-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 16px; }
+    .form-group { margin-bottom: 12px; }
+    .form-label { display: block; font-size: .78rem; font-weight: 500; color: var(--text2); margin-bottom: 4px; }
+    .form-input {
+      width: 100%;
+      padding: 8px 11px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: .85rem;
+      color: var(--text);
+      outline: none;
+      font-family: inherit;
+      transition: border-color var(--t);
+    }
+    .form-input:focus { border-color: var(--ac); }
+    .form-hint { font-size: .7rem; color: var(--muted); margin-top: 4px; }
+    .suggestions { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+    .chip {
+      padding: 3px 9px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: .72rem;
+      cursor: pointer;
+      color: var(--text2);
+      transition: all var(--t);
+    }
+    .chip:hover { border-color: var(--ac); color: var(--ac); background: var(--acl); }
+
+    .color-row { display: flex; gap: 6px; flex-wrap: wrap; }
+    .color-opt {
+      width: 21px;
+      height: 21px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: transform var(--t), border-color var(--t);
+    }
+    .color-opt:hover { transform: scale(1.15); }
+    .color-opt.sel { border-color: var(--text); }
+
+    .err { font-size: .78rem; color: #dc2626; margin-top: 8px; display: none; }
+    .err.show { display: block; }
+
+    .modal-foot { display: flex; justify-content: flex-end; gap: 7px; margin-top: 18px; }
+    .btn { padding: 7px 15px; border-radius: var(--radius-sm); font-size: .85rem; font-weight: 500; cursor: pointer; border: none; transition: all var(--t); font-family: inherit; }
+    .btn-primary { background: var(--ac); color: #fff; }
+    .btn-primary:hover { background: var(--ac2); }
+    .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-ghost { background: none; color: var(--text2); border: 1px solid var(--border); }
+    .btn-ghost:hover { background: var(--bg-hover); }
+
+    /* ── Toast ─────────────────────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      background: var(--text);
+      color: var(--bg);
+      padding: 9px 16px;
+      border-radius: 10px;
+      font-size: .83rem;
+      font-weight: 500;
+      z-index: 200;
+      opacity: 0;
+      transition: all .3s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── Mobile ─────────────────────────────────────────────── */
+    @media (max-width: 720px) {
+      .navbar { padding: 4px 5px; gap: 1px; }
+      .nav-feeds { display: none; }
+      .content { padding: 72px 12px 16px; }
+      .grid-layout { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+      .settings-panel { width: 100%; }
+    }
+    /* ── Navbar article-mode edge buttons ───────────────────── */
+    .nav-back-btn, .nav-open-orig {
+      display: none; position: fixed; top: 0; z-index: 101;
+      height: var(--header-height); align-items: center; gap: 5px;
+      background: none; border: none; cursor: pointer; font-family: inherit;
+      font-size: .82rem; font-weight: 500; color: var(--text2);
+      padding: 0 16px; text-decoration: none;
+      transition: color var(--t), background var(--t);
+    }
+    .nav-back-btn { left: 0; }
+    .nav-open-orig { right: 0; }
+    .nav-back-btn:hover, .nav-open-orig:hover { color: var(--text); background: var(--bg-hover); }
+    body.article-open .nav-back-btn  { display: flex; }
+    body.article-open .nav-open-orig { display: flex; }
+
+    /* ── Article View ────────────────────────────────────────── */
+    .article-view {
+      position: fixed; top: var(--header-height); left: 0; right: 0; bottom: 0;
+      background: var(--bg); z-index: 150;
+      display: flex; flex-direction: column;
+      opacity: 0; pointer-events: none;
+      transition: opacity .18s ease;
+    }
+    .article-view.open { opacity: 1; pointer-events: all; }
+    .av-body { flex: 1; overflow: hidden; position: relative; }
+    .av-scroll { height: 100%; overflow-y: auto; }
+    .av-scroll::-webkit-scrollbar { width: 5px; }
+    .av-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    .av-frame { width: 100%; height: 100%; border: none; display: block; background: #fff; }
+    /* reading content */
+    .rd-content { max-width: 860px; margin: 0 auto; padding: 40px 32px 80px; }
+    .rd-title { font-size: 1.7rem; font-weight: 800; line-height: 1.28; letter-spacing: -.5px; color: var(--text); margin-bottom: 12px; }
+    .rd-byline { font-size: .78rem; color: var(--muted); margin-bottom: 28px; }
+    .rd-article { font-size: 1.05rem; line-height: 1.78; color: var(--text2); }
+    .rd-article h1,.rd-article h2,.rd-article h3 { color: var(--text); font-weight: 700; margin: 1.4em 0 .5em; line-height: 1.3; }
+    .rd-article h2 { font-size: 1.25rem; }
+    .rd-article h3 { font-size: 1.05rem; }
+    .rd-article p { margin-bottom: 1.1em; }
+    .rd-article a { color: var(--ac); }
+    .rd-article img { max-width: 100%; border-radius: var(--radius-sm); margin: 8px 0; display: block; }
+    .rd-article figure { margin: 1em 0; }
+    .rd-article figcaption { font-size: .78rem; color: var(--muted); margin-top: 4px; }
+    .rd-article blockquote { border-left: 3px solid var(--ac); margin: 1em 0; padding: .5em 1em; color: var(--muted); font-style: italic; }
+    .rd-article ul, .rd-article ol { padding-left: 1.4em; margin-bottom: 1em; }
+    .rd-article li { margin-bottom: .3em; }
+
+    /* ── Category strip ─────────────────────────────────────── */
+    .cat-strip {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 0 0 18px;
+      scrollbar-width: none;
+      flex-wrap: nowrap;
+    }
+    .cat-strip::-webkit-scrollbar { display: none; }
+    .cat-tag {
+      padding: 5px 13px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      font-size: .7rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--text2);
+      flex-shrink: 0;
+      transition: all var(--t);
+    }
+    .cat-tag:hover { border-color: var(--ac); color: var(--ac); background: var(--acl); }
+    .cat-tag.active { background: var(--ac); color: #fff; border-color: var(--ac); }
+
+    /* ── Entrance animations ────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .grid-layout > .card      { animation: fadeUp .35s ease both; }
+    .list-layout > .list-item { animation: fadeUp .3s ease both; }
+    .ix-hero     { animation: fadeUp .4s ease both; }
+    .ix-spotlight{ animation: fadeUp .38s .05s ease both; }
+    .ix-row      { animation: fadeUp .38s .08s ease both; }
+    .ix-trio     { animation: fadeUp .38s .1s ease both; }
+    .ix-mini-grid{ animation: fadeUp .38s .12s ease both; }
+    .ix-strip    { animation: fadeUp .38s .14s ease both; }
+    .reader-item { animation: fadeUp .28s ease both; }
+
+    /* Image zoom on hover */
+    .ix-img-wrap { overflow: hidden; }
+    .ix-img-wrap img { transition: transform .4s ease; }
+    .ix-hero:hover .ix-hero-img,
+    .ix-card:hover .ix-card-img,
+    .ix-spotlight:hover .ix-spot-img,
+    .ix-mini:hover .ix-mini-img { transform: scale(1.04); }
+    .card { overflow: hidden; }
+    .card-img { transition: transform .4s ease; }
+    .card:hover .card-img { transform: scale(1.04); }
+
+    /* ── F1 Widget ───────────────────────────────────────────── */
+    .nav-f1 {
+      display: flex; align-items: center; padding: 4px 8px;
+      border-radius: 4px; cursor: default; flex-shrink: 0; position: relative;
+    }
+    .f1-badge {
+      font-size: .82rem; font-weight: 500; color: var(--text2);
+      cursor: default; user-select: none;
+      display: flex; align-items: center; gap: 6px; white-space: nowrap;
+    }
+    .f1-badge-sep { opacity: .35; font-weight: 300; }
+    /* Popup — F1.com dark theme */
+    .f1-popup {
+      position: absolute; top: calc(100% + 10px); right: 0;
+      width: 300px; max-height: calc(100vh - 80px); overflow-y: auto;
+      background: #15151e; border-top: 3px solid #e10600;
+      border-radius: 0 0 4px 4px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.6); z-index: 200;
+      opacity: 0; pointer-events: none; transform: translateY(-6px);
+      transition: opacity .16s ease, transform .16s ease;
+      font-family: 'Arial Narrow', Arial, sans-serif;
+    }
+    .f1-popup.f1-open { opacity: 1; pointer-events: all; transform: translateY(0); }
+    .f1-popup::-webkit-scrollbar { width: 3px; }
+    .f1-popup::-webkit-scrollbar-thumb { background: #e10600; }
+    .f1-section { padding: 14px 16px; border-bottom: 1px solid #2a2a38; }
+    .f1-section:last-child { border-bottom: none; }
+    .f1-section-title {
+      font-size: .6rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .14em; color: #e10600; margin-bottom: 10px;
+      border-left: 2px solid #e10600; padding-left: 7px;
+    }
+    /* Next race */
+    .f1-next-name {
+      font-size: 1.1rem; font-weight: 900; color: #fff;
+      text-transform: uppercase; letter-spacing: -.2px; margin-bottom: 1px; line-height: 1.2;
+    }
+    .f1-next-circuit { font-size: .72rem; color: #888; margin-bottom: 10px; letter-spacing: .02em; }
+    .f1-countdown {
+      font-size: 2rem; font-weight: 900; color: #fff;
+      letter-spacing: -1px; line-height: 1; margin-bottom: 4px;
+    }
+    .f1-next-date { font-size: .7rem; color: #e10600; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+    /* Podium */
+    .f1-podium-row {
+      display: flex; align-items: center; gap: 0;
+      border-left: 3px solid transparent; padding: 5px 0 5px 8px; margin: 1px 0;
+    }
+    .f1-podium-row:nth-child(2) { border-left-color: #c9b33a; }
+    .f1-podium-row:nth-child(3) { border-left-color: #8e8e8e; }
+    .f1-podium-row:nth-child(4) { border-left-color: #8b5e3c; }
+    .f1-pos { font-size: .7rem; font-weight: 900; width: 22px; flex-shrink: 0; color: #888; letter-spacing: .05em; }
+    .f1-team-dot { width: 3px; height: 20px; border-radius: 1px; flex-shrink: 0; margin-right: 8px; }
+    .f1-driver { font-size: .92rem; font-weight: 700; color: #fff; flex: 1; text-transform: uppercase; letter-spacing: .02em; }
+    .f1-constructor { font-size: .65rem; color: #666; text-transform: uppercase; letter-spacing: .04em; }
+    /* Standings */
+    .f1-standing-row {
+      display: flex; align-items: center; gap: 0;
+      padding: 5px 0 5px 0; margin: 1px 0; border-bottom: 1px solid #1e1e2c;
+    }
+    .f1-standing-row:last-child { border-bottom: none; }
+    .f1-team-bar { width: 3px; height: 20px; border-radius: 1px; flex-shrink: 0; margin-right: 9px; }
+    .f1-standing-pos { font-size: .75rem; font-weight: 900; color: #555; width: 18px; flex-shrink: 0; }
+    .f1-standing-driver { font-size: .9rem; font-weight: 700; color: #fff; flex: 1; text-transform: uppercase; letter-spacing: .02em; }
+    .f1-standing-pts { font-size: .82rem; font-weight: 900; color: #e10600; letter-spacing: -.3px; }
+    /* Calendar */
+    .f1-cal-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 5px 0; border-bottom: 1px solid #1e1e2c;
+    }
+    .f1-cal-row:last-child { border-bottom: none; }
+    .f1-cal-dot { width: 5px; height: 5px; border-radius: 50%; background: #333; flex-shrink: 0; }
+    .f1-cal-name { font-size: .82rem; color: #aaa; flex: 1; text-transform: uppercase; letter-spacing: .02em; font-weight: 600; }
+    .f1-cal-date { font-size: .7rem; color: #555; white-space: nowrap; font-weight: 700; }
+    .f1-cal-row.f1-cal-next .f1-cal-dot { background: #e10600; width: 6px; height: 6px; }
+    .f1-cal-row.f1-cal-next .f1-cal-name { color: #fff; }
+    .f1-cal-row.f1-cal-next .f1-cal-date { color: #e10600; }
+    </style>
+</head>
+<body>
+
+<!-- Article-mode edge buttons (outside navbar-inner, absolutely positioned) -->
+<button class="nav-back-btn" id="navBackBtn" onclick="closeArticle()">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+  Vissza
+</button>
+<a class="nav-open-orig" id="navOpenOrig" href="#" target="_blank" rel="noopener">
+  Megnyitás böngészőben
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+</a>
+
+<!-- Floating Navbar -->
+<nav class="navbar" id="navbar">
+  <div class="navbar-inner">
+  <span class="nav-logo" onclick="document.querySelector('.content').scrollTo({top:0,behavior:'smooth'})" style="cursor:pointer">
+    <span class="nav-logo-mark"></span>Flux
+  </span>
+  <!-- Article-mode controls (hidden normally) -->
+  <div class="nav-feeds" id="feedList"></div>
+  <div class="nav-right">
+    <div class="nav-f1" id="navF1"><span class="f1-badge">F1</span></div>
+    <div class="nav-weather" id="navWeather" title=""></div>
+    <button class="layout-btn" id="layoutCycleBtn" title="Layout váltás"></button>
+    <button class="icon-btn" id="settingsBtn" title="Beállítások">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+    <aside class="settings-panel" id="settingsPanel">
+      <div class="settings-body">
+
+        <div class="s-section">
+          <div class="s-label">Mód</div>
+          <div class="mode-bar" id="modeBar">
+            <button class="mode-btn" data-mode="light">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+              Világos
+            </button>
+            <button class="mode-btn" data-mode="auto">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2v20M2 12h20" stroke-dasharray="4 2"/></svg>
+              Auto
+            </button>
+            <button class="mode-btn" data-mode="dark">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+              Sötét
+            </button>
+          </div>
+        </div>
+
+        <div class="s-section">
+          <div class="s-label">Téma</div>
+          <div class="preset-grid" id="presetGrid"></div>
+        </div>
+
+        <div class="s-section">
+          <div class="s-label">Kiemelő szín</div>
+          <div class="swatch-row" id="swatchRow"></div>
+        </div>
+
+        <div class="s-section">
+          <div class="s-label">Betűméret</div>
+          <div class="slider-row">
+            <span class="sl" style="font-size:.8rem">A</span>
+            <input type="range" id="fontSlider" min="13" max="20" step="1" value="15">
+            <span class="sl" style="font-size:1.1rem">A</span>
+          </div>
+        </div>
+
+        <div class="s-section">
+          <div class="s-label">Elrendezés</div>
+          <div class="s-layout-bar" id="sLayoutBar">
+            <button class="s-layout-btn" data-layout="grid">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>
+              Kártya
+            </button>
+            <button class="s-layout-btn" data-layout="list">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+              Lista
+            </button>
+            <button class="s-layout-btn" data-layout="magazine">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="12" height="12" rx="1"/><rect x="17" y="3" width="4" height="5" rx=".5"/><rect x="17" y="10" width="4" height="5" rx=".5"/><rect x="3" y="17" width="18" height="4" rx=".5"/></svg>
+              Magazine
+            </button>
+            <button class="s-layout-btn" data-layout="reader">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 10h16M4 14h10M4 18h7"/></svg>
+              Reader
+            </button>
+          </div>
+        </div>
+
+        <div class="s-section">
+          <div class="s-label">Feedek kezelése</div>
+          <div class="s-feed-list" id="sFeedList"></div>
+          <button class="btn btn-ghost" id="addFeedBtn" style="width:100%;margin-top:10px;justify-content:center;display:flex;gap:6px;align-items:center">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>
+            Feed hozzáadása
+          </button>
+        </div>
+
+      </div>
+    </aside>
+  </div>
+  </div>
+</nav>
+
+<!-- Content -->
+<div class="content" id="content">
+    <div class="state-box">
+      <div class="icon">📰</div>
+      <div class="title">Nincs feed hozzáadva</div>
+      <div class="desc">Kattints a "Feed hozzáadása" gombra.</div>
+    </div>
+  </div>
+
+<!-- Overlay (modal) -->
+<div class="overlay" id="overlay"></div>
+
+<!-- Article View -->
+<div class="article-view" id="articleView">
+  <div class="av-body" id="avBody"></div>
+</div>
+
+
+
+<!-- Add Feed Modal -->
+<div class="modal" id="addModal">
+  <div class="modal-title">Feed hozzáadása</div>
+  <div class="form-group">
+    <label class="form-label" for="feedUrl">RSS feed URL</label>
+    <input type="url" class="form-input" id="feedUrl" placeholder="https://telex.hu/rss">
+    <div class="form-hint">Gyors hozzáadás:</div>
+    <div class="suggestions" id="suggestions"></div>
+  </div>
+  <div class="form-group">
+    <label class="form-label" for="feedName">Név (opcionális)</label>
+    <input type="text" class="form-input" id="feedName" placeholder="Automatikusan töltődik ki">
+  </div>
+  <div class="form-group">
+    <label class="form-label">Szín</label>
+    <div class="color-row" id="colorRow"></div>
+  </div>
+  <div class="err" id="feedErr">Nem sikerült betölteni a feedet. Ellenőrizd az URL-t.</div>
+  <div class="modal-foot">
+    <button class="btn btn-ghost" id="cancelAdd">Mégse</button>
+    <button class="btn btn-primary" id="confirmAdd">Hozzáadás</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+
+/* ════════════════════════════════════════════════════════════
+   CONFIG
+════════════════════════════════════════════════════════════ */
+const RSS2JSON    = 'https://api.rss2json.com/v1/api.json?rss_url=';
+const ALLORIGINS  = 'https://api.allorigins.win/get?url=';
+const CORSPROXY   = 'https://corsproxy.io/?';
+const CACHE_TTL   = 5 * 60 * 1000; // 5 minutes
+
+const PRESETS = {
+  default: { name: 'Default',
+    light: { bg:'#ffffff', bg2:'#f5f5f5', card:'#ffffff', hover:'#f0f0f0', text:'#111111', text2:'#555555', muted:'#999999', border:'#e8e8e8', ac:'#2563eb', ac2:'#1d4ed8', acl:'#dbeafe' },
+    dark:  { bg:'#111111', bg2:'#1c1c1c', card:'#1c1c1c', hover:'#252525', text:'#eeeeee', text2:'#aaaaaa', muted:'#666666', border:'#2c2c2c', ac:'#3b82f6', ac2:'#2563eb', acl:'#1e3a6e' }
+  },
+  nord: { name: 'Nord',
+    light: { bg:'#eceff4', bg2:'#e5e9f0', card:'#ffffff', hover:'#dce5f0', text:'#2e3440', text2:'#4c566a', muted:'#9aa3b0', border:'#d8dee9', ac:'#5e81ac', ac2:'#4c6f94', acl:'#dce5f0' },
+    dark:  { bg:'#2e3440', bg2:'#3b4252', card:'#3b4252', hover:'#434c5e', text:'#eceff4', text2:'#d8dee9', muted:'#636f84', border:'#434c5e', ac:'#88c0d0', ac2:'#6db0c2', acl:'#3b4252' }
+  },
+  solarized: { name: 'Solar',
+    light: { bg:'#fdf6e3', bg2:'#eee8d5', card:'#fdf6e3', hover:'#e8e0ca', text:'#657b83', text2:'#586e75', muted:'#93a1a1', border:'#d4cdb0', ac:'#268bd2', ac2:'#1a6fa8', acl:'#d0e8f5' },
+    dark:  { bg:'#002b36', bg2:'#073642', card:'#073642', hover:'#0d4758', text:'#eee8d5', text2:'#93a1a1', muted:'#586e75', border:'#0d4758', ac:'#2aa198', ac2:'#229990', acl:'#073642' }
+  },
+  rose: { name: 'Rose',
+    light: { bg:'#fff1f2', bg2:'#ffe4e6', card:'#ffffff', hover:'#ffd6da', text:'#1e0a0c', text2:'#7b3040', muted:'#c08090', border:'#fecdd3', ac:'#e11d48', ac2:'#be123c', acl:'#ffe4e6' },
+    dark:  { bg:'#1a0a0e', bg2:'#2d1420', card:'#2d1420', hover:'#3d1a2a', text:'#fecdd3', text2:'#fda4af', muted:'#9f1239', border:'#3d1a2a', ac:'#fb7185', ac2:'#f43f5e', acl:'#2d1420' }
+  },
+  mono: { name: 'Mono',
+    light: { bg:'#ffffff', bg2:'#f0f0f0', card:'#ffffff', hover:'#e8e8e8', text:'#111111', text2:'#444444', muted:'#888888', border:'#dedede', ac:'#444444', ac2:'#222222', acl:'#e5e5e5' },
+    dark:  { bg:'#111111', bg2:'#1e1e1e', card:'#1e1e1e', hover:'#2a2a2a', text:'#eeeeee', text2:'#aaaaaa', muted:'#555555', border:'#2a2a2a', ac:'#888888', ac2:'#666666', acl:'#2a2a2a' }
+  }
+};
+
+const SWATCHES = ['#2563eb','#7c3aed','#db2777','#e11d48','#ea580c','#ca8a04','#16a34a','#0891b2'];
+const FEED_COLORS = ['#ef4444','#f97316','#eab308','#22c55e','#14b8a6','#3b82f6','#8b5cf6','#ec4899'];
+
+const DEFAULT_FEEDS = [
+  { url: 'https://telex.hu/rss',            name: 'Telex',     color: '#ef4444' },
+  { url: 'https://index.hu/24ora/rss',       name: 'Index',     color: '#f97316' },
+  { url: 'https://444.hu/feed',              name: '444',       color: '#3b82f6' },
+  { url: 'https://hvg.hu/rss',               name: 'HVG',       color: '#22c55e' }
+];
+
+const SUGGESTIONS = [
+  { label: 'Telex',     url: 'https://telex.hu/rss' },
+  { label: 'Index',     url: 'https://index.hu/24ora/rss' },
+  { label: '444',       url: 'https://444.hu/feed' },
+  { label: 'HVG',       url: 'https://hvg.hu/rss' },
+  { label: 'Portfolio', url: 'https://www.portfolio.hu/rss/all.xml' },
+  { label: 'G7',        url: 'https://g7.hu/feed' },
+  { label: 'Euronews',  url: 'https://feeds.euronews.com/euronews/hu/home' }
+];
+
+/* ════════════════════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════════════════════ */
+const S = {
+  feeds:        [],
+  articles:     [],
+  activeUrl:    null,
+  layout:       'reader',
+  theme:        'auto',
+  preset:       'default',
+  customAccent:    null,
+  fontSize:        15,
+  activeCategory:  null
+};
+
+// Article lookup by ID for safe event handling
+const articleMap = {};
+
+/* ════════════════════════════════════════════════════════════
+   PERSISTENCE
+════════════════════════════════════════════════════════════ */
+function saveSettings() {
+  localStorage.setItem('flux_s', JSON.stringify({
+    layout: S.layout, theme: S.theme, preset: S.preset,
+    customAccent: S.customAccent, fontSize: S.fontSize, activeUrl: S.activeUrl
+  }));
+}
+function saveFeeds()    { localStorage.setItem('flux_f', JSON.stringify(S.feeds)); }
+
+function loadStorage() {
+  try {
+    const s = JSON.parse(localStorage.getItem('flux_s') || '{}');
+    S.layout = s.layout || 'reader';
+    S.theme  = s.theme  || 'auto';
+    S.preset = s.preset || 'default';
+    S.customAccent = s.customAccent || null;
+    S.fontSize = s.fontSize || 15;
+    S.activeUrl = s.activeUrl || null;
+  } catch(e) {}
+
+  try {
+    const f = JSON.parse(localStorage.getItem('flux_f'));
+    S.feeds = (f && f.length) ? f : [...DEFAULT_FEEDS];
+  } catch(e) { S.feeds = [...DEFAULT_FEEDS]; }
+  if (!localStorage.getItem('flux_f')) saveFeeds();
+
+}
+
+/* ════════════════════════════════════════════════════════════
+   THEME
+════════════════════════════════════════════════════════════ */
+const Theme = {
+  apply() {
+    const dark = S.theme === 'dark' || (S.theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-preset', S.preset);
+
+    const root = document.documentElement;
+    const p = PRESETS[S.preset];
+    const c = dark ? p.dark : p.light;
+
+    // Full palette from preset
+    root.style.setProperty('--bg',       c.bg);
+    root.style.setProperty('--bg2',      c.bg2);
+    root.style.setProperty('--bg-card',  c.card);
+    root.style.setProperty('--bg-hover', c.hover);
+    root.style.setProperty('--text',     c.text);
+    root.style.setProperty('--text2',    c.text2);
+    root.style.setProperty('--muted',    c.muted);
+    root.style.setProperty('--border',   c.border);
+
+    // Accent: custom or preset
+    const ac  = S.customAccent || c.ac;
+    const ac2 = S.customAccent ? this._shade(S.customAccent, -20) : c.ac2;
+    const acl = S.customAccent ? this._shade(S.customAccent, 90)  : c.acl;
+    root.style.setProperty('--ac',  ac);
+    root.style.setProperty('--ac2', ac2);
+    root.style.setProperty('--acl', acl);
+
+    root.style.setProperty('--font-size-base', S.fontSize + 'px');
+
+    // Semi-transparent navbar bg for blur effect
+    const _hex = c.bg.replace('#','');
+    const _r = parseInt(_hex.slice(0,2),16), _g = parseInt(_hex.slice(2,4),16), _b = parseInt(_hex.slice(4,6),16);
+    root.style.setProperty('--bg-nav', `rgba(${_r},${_g},${_b},0.82)`);
+
+    // Set bg directly on html+body so Dia Browser can read it without resolving CSS vars
+    document.documentElement.style.backgroundColor = c.bg;
+    document.body.style.backgroundColor = c.bg;
+
+    // Also keep theme-color meta in sync (remove+re-insert for Chromium re-detection)
+    const oldTc = document.getElementById('themeColorMeta');
+    if (oldTc) oldTc.remove();
+    const newTc = document.createElement('meta');
+    newTc.name = 'theme-color';
+    newTc.id = 'themeColorMeta';
+    newTc.setAttribute('content', c.bg);
+    document.head.appendChild(newTc);
+
+    this._syncUI();
+    // Re-render weather icons with correct theme colors (uses cache, no API call)
+    if (typeof loadWeather === 'function') loadWeather();
+  },
+
+  _shade(hex, amt) {
+    const n = parseInt(hex.slice(1), 16);
+    let r = (n >> 16) + amt, g = ((n >> 8) & 0xff) + amt, b = (n & 0xff) + amt;
+    r = Math.max(0, Math.min(255, r));
+    g = Math.max(0, Math.min(255, g));
+    b = Math.max(0, Math.min(255, b));
+    return '#' + [r,g,b].map(v => v.toString(16).padStart(2,'0')).join('');
+  },
+
+  _syncUI() {
+    // Mode
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === S.theme));
+    // Presets
+    document.querySelectorAll('.preset-card').forEach(b => b.classList.toggle('active', b.dataset.preset === S.preset));
+    // Swatches
+    document.querySelectorAll('.swatch').forEach(b => b.classList.toggle('active', b.dataset.color === S.customAccent));
+    // Font slider
+    const sl = $('fontSlider'); if (sl) sl.value = S.fontSize;
+    // Layout buttons (all)
+    document.querySelectorAll('.layout-btn, .s-layout-btn').forEach(b => b.classList.toggle('active', b.dataset.layout === S.layout));
+  }
+};
+
+/* ════════════════════════════════════════════════════════════
+   FETCHER
+════════════════════════════════════════════════════════════ */
+const Fetcher = {
+  _cache: new Map(),
+
+  async get(url, bust = false) {
+    const cached = this._cache.get(url);
+    if (!bust && cached && Date.now() - cached.ts < CACHE_TTL) return cached.data;
+
+    const articles = await this._fetchAny(url, bust);
+    this._cache.set(url, { data: articles, ts: Date.now() });
+    return articles;
+  },
+
+  // Fire all proxies in parallel, resolve with first non-empty result
+  _fetchAny(url, bust) {
+    return new Promise(resolve => {
+      let settled = false;
+      let remaining = 3;
+      const done = (articles) => {
+        remaining--;
+        if (!settled && articles && articles.length) { settled = true; resolve(articles); return; }
+        if (!settled && remaining === 0) resolve([]);
+      };
+      this._viaCorsproxy(url, bust).then(done).catch(() => done(null));
+      this._viaAllorigins(url, bust).then(done).catch(() => done(null));
+      this._viaRss2json(url, bust).then(done).catch(() => done(null));
+    });
+  },
+
+  async _viaRss2json(url, bust = false) {
+    const cb = bust ? '&_=' + Date.now() : '';
+    const r = await fetch(RSS2JSON + encodeURIComponent(url) + cb, { cache: 'no-store' });
+    if (!r.ok) throw new Error('http');
+    const d = await r.json();
+    if (d.status !== 'ok') throw new Error(d.message);
+    return d.items.map(i => ({
+      id:         i.guid || i.link || i.title,
+      title:      i.title || '',
+      desc:       this._strip(i.description || '').slice(0, 500),
+      content:    i.content || i.description || '',
+      url:        i.link || '',
+      image:      i.thumbnail || i.enclosure?.link || this._img(i.content || i.description || ''),
+      date:       new Date(i.pubDate),
+      categories: i.categories || [],
+      feedUrl:    url
+    }));
+  },
+
+  async _viaCorsproxy(url, bust = false) {
+    const feedUrl = bust ? url + (url.includes('?') ? '&' : '?') + '_=' + Date.now() : url;
+    const r = await fetch(CORSPROXY + encodeURIComponent(feedUrl), { cache: 'no-store' });
+    if (!r.ok) throw new Error('http');
+    const xml = await r.text();
+    return this._parseXML(xml, url);
+  },
+
+  async _viaAllorigins(url, bust = false) {
+    const feedUrl = bust ? url + (url.includes('?') ? '&' : '?') + '_=' + Date.now() : url;
+    const r = await fetch(ALLORIGINS + encodeURIComponent(feedUrl), { cache: 'no-store' });
+    if (!r.ok) throw new Error('http');
+    const { contents } = await r.json();
+    return this._parseXML(contents, url);
+  },
+
+  _parseXML(xml, feedUrl) {
+    const doc = new DOMParser().parseFromString(xml, 'application/xml');
+    return [...doc.querySelectorAll('item, entry')].map(el => {
+      const qs = s => el.querySelector(s)?.textContent?.trim() || '';
+      const link = qs('link') || el.querySelector('link')?.getAttribute('href') || '';
+      const desc = qs('description') || qs('summary');
+      const content = qs('content\\:encoded') || qs('content') || desc;
+      const enc = el.querySelector('enclosure')?.getAttribute('url');
+      const media = el.querySelector('media\\:content, media\\:thumbnail')?.getAttribute('url');
+      return {
+        id:         qs('guid') || qs('id') || link,
+        title:      qs('title'),
+        desc:       this._strip(desc).slice(0, 500),
+        content:    content,
+        url:        link,
+        image:      enc || media || this._img(content || desc),
+        date:       new Date(qs('pubDate') || qs('published') || qs('updated')),
+        categories: [...el.querySelectorAll('category')].map(c => c.textContent.trim()).filter(Boolean),
+        feedUrl
+      };
+    });
+  },
+
+  _strip(html) {
+    const d = document.createElement('div');
+    d.innerHTML = html;
+    return d.textContent || '';
+  },
+
+  _img(html) {
+    const m = html.match(/<img[^>]+src=["']([^"']+)["']/i);
+    return m ? m[1] : null;
+  },
+
+  bust(url) { this._cache.delete(url); }
+};
+
+/* ════════════════════════════════════════════════════════════
+   RENDERER
+════════════════════════════════════════════════════════════ */
+const Renderer = {
+  render(articles) {
+    const el = $('content');
+    if (!articles.length) {
+      el.innerHTML = `<div class="state-box"><div class="icon">📭</div><div class="title">Nincsenek cikkek</div><div class="desc">A feed üres vagy nem töltődött be.</div></div>`;
+      return;
+    }
+    articles.forEach(a => { articleMap[aid(a)] = a; });
+
+    let layout = '';
+    switch (S.layout) {
+      case 'grid':     layout = this._grid(articles);     break;
+      case 'list':     layout = this._list(articles);     break;
+      case 'magazine': layout = this._magazine(articles); break;
+      case 'reader':   layout = this._reader(articles);   break;
+    }
+    el.innerHTML = layout;
+  },
+
+  _feedName(url)  { return S.feeds.find(f => f.url === url)?.name  || ''; },
+  _feedColor(url) { return S.feeds.find(f => f.url === url)?.color || '#888'; },
+
+  _age(d) {
+    if (!d || isNaN(d)) return '';
+    const s = (Date.now() - d) / 1000;
+    if (s < 60)   return 'most';
+    if (s < 3600) return `${Math.floor(s/60)}p`;
+    if (s < 86400)return `${Math.floor(s/3600)}ó`;
+    if (s < 604800)return `${Math.floor(s/86400)}n`;
+    return d.toLocaleDateString('hu-HU', { month:'short', day:'numeric' });
+  },
+
+  _meta(a) {
+    return `<span class="card-source">${e(this._feedName(a.feedUrl))}</span><span>·</span><span>${this._age(a.date)}</span>`;
+  },
+
+  _thumb(a, cls, noCls) {
+    return a.image
+      ? `<img class="${cls}" src="${e(a.image)}" alt="" loading="lazy" onerror="this.style.display='none'">`
+      : `<div class="${noCls}">📰</div>`;
+  },
+
+  _grid(articles) {
+    return `<div class="grid-layout">${articles.map((a, i) => {
+      const id = aid(a);
+      return `<div class="card" style="animation-delay:${Math.min(i*35,400)}ms" data-id="${id}" onclick="openArticle('${id}')">
+        ${this._thumb(a, 'card-img', 'card-no-img')}
+        <div class="card-body">
+          <div class="card-meta">${this._meta(a)}</div>
+          <div class="card-title">${e(a.title)}</div>
+          ${a.desc ? `<div class="card-desc">${e(a.desc)}</div>` : ''}
+        </div>
+      </div>`;
+    }).join('')}</div>`;
+  },
+
+  _list(articles) {
+    return `<div class="list-layout">${articles.map((a, i) => {
+      const id = aid(a);
+      return `<div class="list-item" style="animation-delay:${Math.min(i*25,400)}ms" data-id="${id}" onclick="openArticle('${id}')">
+        ${a.image
+          ? `<img class="list-thumb" src="${e(a.image)}" alt="" loading="lazy" onerror="this.style.display='none'">`
+          : `<div class="list-no-thumb">📰</div>`}
+        <div class="list-body">
+          <div class="list-title">${e(a.title)}</div>
+          ${a.desc ? `<div class="list-desc">${e(a.desc)}</div>` : ''}
+          <div class="list-meta">
+            <span class="list-source">${e(this._feedName(a.feedUrl))}</span>
+            <span>${this._age(a.date)}</span>
+          </div>
+        </div>
+      </div>`;
+    }).join('')}</div>`;
+  },
+
+  _magazine(articles) {
+    if (!articles.length) return '';
+
+    const badge = a => `<span class="ix-badge">${e(this._feedName(a.feedUrl))}</span>`;
+
+    const imgWrap = (a, imgCls, noCls, wrapCls='') =>
+      `<div class="ix-img-wrap${wrapCls ? ' ' + wrapCls : ''}">
+        ${a.image
+          ? `<img class="${imgCls}" src="${e(a.image)}" alt="" loading="lazy" onerror="this.parentNode.style.display='none'">`
+          : `<div class="${noCls}">📰</div>`}
+        ${badge(a)}
+      </div>`;
+
+    // Articles with images first, no-image demoted to last segment
+    const withImg = articles.filter(a => a.image);
+    const noImg   = articles.filter(a => !a.image);
+    let idx = 0;
+    const aa = [...withImg, ...noImg];
+    const take = n => { const s = aa.slice(idx, idx + n); idx += n; return s; };
+
+    // 1. Hero
+    const [a0] = take(1);
+    const hid = aid(a0);
+    const heroHtml = `<div class="ix-hero" data-id="${hid}" onclick="openArticle('${hid}')">
+      ${imgWrap(a0, 'ix-hero-img', 'ix-hero-nobg', 'hero-wrap')}
+      <div class="ix-hero-body">
+        <div class="ix-hero-title">${e(a0.title)}</div>
+        ${a0.desc ? `<div class="ix-hero-desc">${e(a0.desc)}</div>` : ''}
+        <div class="ix-hero-time">${this._age(a0.date)}</div>
+      </div>
+    </div>`;
+
+    // 2. Spotlight — horizontal full-width card
+    const [a1] = take(1);
+    const spotHtml = a1 ? (() => {
+      const sid = aid(a1);
+      return `<div class="ix-spotlight" data-id="${sid}" onclick="openArticle('${sid}')">
+        <div class="ix-spot-img-side">
+          ${a1.image ? `<img class="ix-spot-img" src="${e(a1.image)}" alt="" loading="lazy" onerror="this.parentNode.style.display='none'">` : `<div class="ix-spot-nobg">📰</div>`}
+          ${badge(a1)}
+        </div>
+        <div class="ix-spot-body">
+          <div class="ix-spot-source">${e(this._feedName(a1.feedUrl))}</div>
+          <div class="ix-spot-title">${e(a1.title)}</div>
+          ${a1.desc ? `<div class="ix-spot-desc">${e(a1.desc)}</div>` : ''}
+          <div class="ix-spot-time">${this._age(a1.date)}</div>
+        </div>
+      </div>`;
+    })() : '';
+
+    // 3. Two alternating rows (2/3+1/3, 1/3+2/3) — 4 articles each (1 big + 1 small + 2 text fills)
+    const mkCard = a => { const id = aid(a); return `<div class="ix-card" data-id="${id}" onclick="openArticle('${id}')">${imgWrap(a, 'ix-card-img', 'ix-card-nobg')}<div class="ix-card-title">${e(a.title)}</div>${a.desc ? `<div class="ix-card-desc">${e(a.desc)}</div>` : ''}<div class="ix-card-time">${this._age(a.date)}</div></div>`; };
+    const mkFill = a => { const id = aid(a); return `<div class="ix-text-fill" data-id="${id}" onclick="openArticle('${id}')"><div class="ix-tf-title">${e(a.title)}</div>${a.desc ? `<div class="ix-tf-desc">${e(a.desc)}</div>` : ''}</div>`; };
+    let rowsHtml = '';
+    for (let row = 0; row < 2; row++) {
+      const big = take(1)[0]; const small = take(1)[0]; const fills = take(2);
+      if (!big || !small) break;
+      const isA = row % 2 === 0;
+      const bigCard = mkCard(big);
+      const sideHtml = `<div class="ix-col-side">${mkCard(small)}${fills.map(mkFill).join('')}</div>`;
+      rowsHtml += `<div class="ix-row ${isA ? 'row-a' : 'row-b'}">${isA ? bigCard + sideHtml : sideHtml + bigCard}</div>`;
+    }
+
+    // 4. Trio — 3 equal columns
+    const trioItems = take(3);
+    const trioHtml = trioItems.length ? `<div class="ix-trio">
+      ${trioItems.map(a => {
+        const id = aid(a);
+        return `<div class="ix-card" data-id="${id}" onclick="openArticle('${id}')">
+          ${imgWrap(a, 'ix-card-img', 'ix-card-nobg')}
+          <div class="ix-card-title">${e(a.title)}</div>
+          ${a.desc ? `<div class="ix-card-desc">${e(a.desc)}</div>` : ''}
+          <div class="ix-card-time">${this._age(a.date)}</div>
+        </div>`;
+      }).join('')}
+    </div>` : '';
+
+    // 5. Mini grid — 4 items
+    const mini1Items = take(7);
+    const mini1Html = mini1Items.length ? `<div class="ix-mini-grid">
+      ${mini1Items.map(a => {
+        const id = aid(a);
+        return `<div class="ix-mini" data-id="${id}" onclick="openArticle('${id}')">
+          <div class="ix-img-wrap">
+            ${a.image ? `<img class="ix-mini-img" src="${e(a.image)}" alt="" loading="lazy" onerror="this.parentNode.style.display='none'">` : `<div class="ix-mini-nobg">📰</div>`}
+            ${badge(a)}
+          </div>
+          <div class="ix-mini-title">${e(a.title)}</div>
+          <div class="ix-mini-time">${this._age(a.date)}</div>
+        </div>`;
+      }).join('')}
+    </div>` : '';
+
+    // 6. Mini grid — remaining except last 10
+    // 7. Reader strip — last 10 articles
+    const remaining2 = aa.slice(idx);
+    const stripItems = remaining2.slice(-10);
+    const mini2PreItems = remaining2.slice(0, remaining2.length - 10);
+    const mini2PreHtml = mini2PreItems.length ? `<div class="ix-mini-grid">
+      ${mini2PreItems.map(a => {
+        const id = aid(a);
+        return `<div class="ix-mini" data-id="${id}" onclick="openArticle('${id}')">
+          <div class="ix-img-wrap">
+            ${a.image ? `<img class="ix-mini-img" src="${e(a.image)}" alt="" loading="lazy" onerror="this.parentNode.style.display='none'">` : `<div class="ix-mini-nobg">📰</div>`}
+            ${badge(a)}
+          </div>
+          <div class="ix-mini-title">${e(a.title)}</div>
+          <div class="ix-mini-time">${this._age(a.date)}</div>
+        </div>`;
+      }).join('')}
+    </div>` : '';
+    const mkStripItem = (a, withImg) => {
+      const id = aid(a);
+      return `<div class="ix-strip-item" data-id="${id}" onclick="openArticle('${id}')">
+        ${withImg && a.image ? `<img class="ix-strip-img" src="${e(a.image)}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}
+        <div class="ix-strip-body">
+          <div class="ix-strip-title">${e(a.title)}</div>
+          <div class="ix-strip-meta">
+            <span class="ix-strip-source">${e(this._feedName(a.feedUrl))}</span>
+            <span>${this._age(a.date)}</span>
+          </div>
+        </div>
+      </div>`;
+    };
+    const s = stripItems;
+    const col1 = s.slice(0, 4), col2 = s.slice(4, 7), col3 = s.slice(7, 10);
+    const stripHtml = s.length ? `<div class="ix-strip">
+      <div class="ix-strip-col">${col1.map(a => mkStripItem(a, true)).join('')}</div>
+      <div class="ix-strip-col">${col2.map(a => mkStripItem(a, false)).join('')}</div>
+      <div class="ix-strip-col">${col3.map(a => mkStripItem(a, false)).join('')}</div>
+    </div>` : '';
+
+    return `<div class="magazine-layout">${heroHtml}${spotHtml}${rowsHtml}${trioHtml}${mini1Html}${mini2PreHtml}${stripHtml}</div>`;
+  },
+    _reader(articles) {
+    return `<div class="reader-layout">${articles.map(a => {
+      const id = aid(a);
+      return `<div class="reader-item" data-id="${id}">
+        <div class="reader-item-head" onclick="toggleReader('${id}')">
+          <div class="reader-item-info">
+            <div class="reader-title">${e(a.title)}</div>
+            <div class="reader-meta">
+              <span class="reader-source" >${e(this._feedName(a.feedUrl))}</span>
+              <span>${this._age(a.date)}</span>
+            </div>
+          </div>
+          <svg class="chevron" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+        <div class="reader-body">
+          <div class="reader-content"></div>
+          <a class="reader-ext" href="${e(a.url)}" onclick="event.stopPropagation()">
+            Megnyitás az eredeti oldalon
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+          </a>
+        </div>
+      </div>`;
+    }).join('')}</div>`;
+  }
+};
+
+/* ════════════════════════════════════════════════════════════
+   GLOBAL HANDLERS (called from inline HTML)
+════════════════════════════════════════════════════════════ */
+function openArticle(id) {
+  const a = articleMap[id];
+  if (!a) return;
+
+  // Set navbar article-mode link
+  document.getElementById('navOpenOrig').href = a.url;
+
+  const body = document.getElementById('avBody');
+  const hasRich = a.content && a.content.length > 300;
+
+  if (hasRich) {
+    const dateStr = a.date
+      ? new Date(a.date).toLocaleDateString('hu-HU', {year:'numeric', month:'long', day:'numeric'})
+      : '';
+    body.innerHTML = `
+      <div class="av-scroll">
+        <div class="rd-content">
+          <div class="rd-title">${e(a.title)}</div>
+          ${dateStr ? `<div class="rd-byline">${e(dateStr)}</div>` : ''}
+          <div class="rd-article">${a.content}</div>
+        </div>
+      </div>`;
+  } else {
+    body.innerHTML = `<iframe class="av-frame" src="${a.url}"
+      sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation-by-user-activation"
+      referrerpolicy="no-referrer"></iframe>`;
+  }
+
+  document.getElementById('articleView').classList.add('open');
+  document.body.classList.add('article-open');
+}
+
+function closeArticle() {
+  document.getElementById('articleView').classList.remove('open');
+  document.body.classList.remove('article-open');
+  setTimeout(() => { document.getElementById('avBody').innerHTML = ''; }, 200);
+}
+
+function toggleReader(id) {
+  const item = document.querySelector('.reader-item[data-id="' + id + '"]');
+  if (!item) return;
+  const wasOpen = item.classList.contains('open');
+  document.querySelectorAll('.reader-item.open').forEach(el => el.classList.remove('open'));
+  if (!wasOpen) {
+    item.classList.add('open');
+    const contentEl = item.querySelector('.reader-content');
+    if (!contentEl.dataset.loaded) {
+      const a = articleMap[id];
+      if (a) {
+        contentEl.innerHTML = (a.content && a.content.length > 50) ? a.content : (a.desc ? '<p>' + a.desc + '</p>' : '<p>Nincs tartalom.</p>');
+      }
+      contentEl.dataset.loaded = '1';
+    }
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════════════════════════ */
+function $(id) { return document.getElementById(id); }
+
+function aid(a) {
+  // Stable short ID from url or title
+  const src = a.id || a.url || a.title || '';
+  let h = 0;
+  for (let i = 0; i < src.length; i++) { h = Math.imul(31, h) + src.charCodeAt(i) | 0; }
+  return 'a' + Math.abs(h).toString(36);
+}
+
+function e(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function toast(msg) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+/* ════════════════════════════════════════════════════════════
+   SIDEBAR / FEEDS
+════════════════════════════════════════════════════════════ */
+function renderSidebar() {
+  const all = S.activeUrl === null;
+  let html = `<button class="nav-feed${all?' active':''}" onclick="selectFeed(null)">Összes</button>`;
+  S.feeds.forEach(f => {
+    const active = S.activeUrl === f.url;
+    html += `<button class="nav-feed${active?' active':''}" onclick="selectFeed('${f.url}')">${e(f.name)}</button>`;
+  });
+  $('feedList').innerHTML = html;
+}
+
+function renderSFeeds() {
+  const c = $('sFeedList');
+  if (!S.feeds.length) { c.innerHTML = '<div style="font-size:.78rem;color:var(--muted)">Nincs feed.</div>'; return; }
+  c.innerHTML = S.feeds.map((f, i) => `
+    <div class="s-feed-item" draggable="true" data-url="${f.url}" data-idx="${i}">
+      <span class="s-feed-drag" title="Húzd át">⠿</span>
+      <div class="s-feed-dot" style="background:${f.color}" onclick="cycleFeedColor('${f.url}')" title="Szín"></div>
+      <input class="s-feed-name" value="${e(f.name)}" onblur="renameFeed('${f.url}',this.value)" onkeydown="if(event.key==='Enter')this.blur()">
+      <button class="s-feed-del" onclick="deleteFeed('${f.url}')">✕</button>
+    </div>`).join('');
+
+  // Drag-to-reorder
+  let dragIdx = null;
+  c.querySelectorAll('.s-feed-item').forEach(row => {
+    row.addEventListener('dragstart', ev => {
+      dragIdx = +row.dataset.idx;
+      ev.dataTransfer.effectAllowed = 'move';
+      setTimeout(() => row.style.opacity = '.4', 0);
+    });
+    row.addEventListener('dragend', () => row.style.opacity = '');
+    row.addEventListener('dragover', ev => {
+      ev.preventDefault();
+      ev.dataTransfer.dropEffect = 'move';
+      const overIdx = +row.dataset.idx;
+      c.querySelectorAll('.s-feed-item').forEach(r => r.classList.remove('drag-over'));
+      if (overIdx !== dragIdx) row.classList.add('drag-over');
+    });
+    row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
+    row.addEventListener('drop', ev => {
+      ev.preventDefault();
+      row.classList.remove('drag-over');
+      const toIdx = +row.dataset.idx;
+      if (dragIdx === null || dragIdx === toIdx) return;
+      const moved = S.feeds.splice(dragIdx, 1)[0];
+      S.feeds.splice(toIdx, 0, moved);
+      saveFeeds(); renderSFeeds(); renderSidebar(); renderArticles();
+    });
+  });
+}
+
+function moveFeed(url, dir) {
+  const i = S.feeds.findIndex(f => f.url === url);
+  if (i < 0) return;
+  const j = i + dir;
+  if (j < 0 || j >= S.feeds.length) return;
+  [S.feeds[i], S.feeds[j]] = [S.feeds[j], S.feeds[i]];
+  saveFeeds();
+  renderSFeeds();
+  renderSidebar();
+  renderArticles();
+}
+
+function selectFeed(url) {
+  S.activeUrl = url;
+  S.activeCategory = null;
+  saveSettings();
+  renderSidebar();
+  renderArticles();
+}
+
+function deleteFeed(url) {
+  S.feeds = S.feeds.filter(f => f.url !== url);
+  S.articles = S.articles.filter(a => a.feedUrl !== url);
+  Fetcher.bust(url);
+  if (S.activeUrl === url) S.activeUrl = null;
+  saveFeeds();
+  renderSidebar();
+  renderSFeeds();
+  renderArticles();
+  toast('Feed törölve.');
+}
+
+function renameFeed(url, name) {
+  const f = S.feeds.find(f => f.url === url);
+  if (f && name.trim()) { f.name = name.trim(); saveFeeds(); renderSidebar(); }
+}
+
+function cycleFeedColor(url) {
+  const f = S.feeds.find(f => f.url === url);
+  if (!f) return;
+  const i = FEED_COLORS.indexOf(f.color);
+  f.color = FEED_COLORS[(i + 1) % FEED_COLORS.length];
+  saveFeeds();
+  renderSidebar();
+  renderSFeeds();
+}
+
+/* ════════════════════════════════════════════════════════════
+   ARTICLES
+════════════════════════════════════════════════════════════ */
+function interleaveArticles(articles) {
+  const byFeed = {};
+  S.feeds.forEach(f => { byFeed[f.url] = []; });
+  articles.forEach(a => { if (byFeed[a.feedUrl]) byFeed[a.feedUrl].push(a); });
+  return S.feeds.flatMap(f => (byFeed[f.url] || []).sort((a, b) => b.date - a.date));
+}
+
+function selectCategory(cat) {
+  S.activeCategory = (S.activeCategory === cat) ? null : cat;
+  renderArticles();
+}
+
+function renderArticles() {
+  if (!S.feeds.length) {
+    $('content').innerHTML = `<div class="state-box"><div class="icon">📰</div><div class="title">Nincs feed hozzáadva</div><div class="desc">Kattints a "Feed hozzáadása" gombra.</div></div>`;
+    return;
+  }
+  let articles = S.activeUrl
+    ? S.articles.filter(a => a.feedUrl === S.activeUrl).sort((a,b) => b.date - a.date)
+    : interleaveArticles(S.articles);
+  if (S.activeCategory) {
+    articles = articles.filter(a => a.categories && a.categories.includes(S.activeCategory));
+  }
+  Renderer.render(articles);
+}
+
+const LAYOUT_ICONS = {
+  grid:     `<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>`,
+  list:     `<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="5" y1="4" x2="14" y2="4"/><line x1="5" y1="8" x2="14" y2="8"/><line x1="5" y1="12" x2="14" y2="12"/><circle cx="2" cy="4" r="1" fill="currentColor" stroke="none"/><circle cx="2" cy="8" r="1" fill="currentColor" stroke="none"/><circle cx="2" cy="12" r="1" fill="currentColor" stroke="none"/></svg>`,
+  magazine: `<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="9" height="9" rx="1.5"/><rect x="12" y="1" width="3" height="4" rx="1"/><rect x="12" y="7" width="3" height="3" rx="1"/><rect x="1" y="12" width="14" height="3" rx="1"/></svg>`,
+  reader:   `<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="4" x2="14" y2="4"/><line x1="2" y1="7" x2="14" y2="7"/><line x1="2" y1="10" x2="10" y2="10"/><line x1="2" y1="13" x2="7" y2="13"/></svg>`
+};
+const LAYOUT_ORDER = ['grid','list','magazine','reader'];
+
+function updateCycleBtn(animate) {
+  const btn = $('layoutCycleBtn');
+  if (!btn) return;
+  if (!animate) { btn.innerHTML = LAYOUT_ICONS[S.layout]; return; }
+  const old = btn.querySelector('svg');
+  if (old) old.classList.add('cycle-out');
+  setTimeout(() => {
+    btn.innerHTML = LAYOUT_ICONS[S.layout];
+    const svg = btn.querySelector('svg');
+    if (svg) { svg.classList.add('cycle-in'); setTimeout(() => svg.classList.remove('cycle-in'), 140); }
+  }, 130);
+}
+
+function setLayout(layout) {
+  S.layout = layout;
+  saveSettings();
+  document.querySelectorAll('.s-layout-btn').forEach(b => b.classList.toggle('active', b.dataset.layout === layout));
+  updateCycleBtn(true);
+  renderArticles();
+}
+
+async function refreshAll(bust = false) {
+  if (bust) S.feeds.forEach(f => Fetcher.bust(f.url));
+  setLoading(true);
+  await Promise.all(S.feeds.map(async f => {
+    const arts = await Fetcher.get(f.url, bust).catch(() => []);
+    S.articles = S.articles.filter(a => a.feedUrl !== f.url);
+    S.articles.push(...arts);
+  }));
+  S.articles.sort((a, b) => b.date - a.date);
+  setLoading(false);
+  renderArticles();
+}
+
+function setLoading(on) {
+  if (on) {
+    $('content').innerHTML = `<div class="state-box"><div class="spinner"></div></div>`;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   SETTINGS UI BUILD
+════════════════════════════════════════════════════════════ */
+function buildSettingsUI() {
+  // Presets
+  $('presetGrid').innerHTML = Object.entries(PRESETS).map(([k, p]) => `
+    <div class="preset-wrap">
+      <div class="preset-card${S.preset===k?' active':''}" data-preset="${k}">
+        <div class="preset-preview">
+          <div class="pp-top" style="background:${p.light.bg}"></div>
+          <div class="pp-bot" style="background:${p.light.card}">
+            <div class="pp-dot" style="background:${p.light.ac}"></div>
+            <div class="pp-dot" style="background:${p.light.bg}"></div>
+          </div>
+        </div>
+      </div>
+      <div class="preset-name">${p.name}</div>
+    </div>`).join('');
+
+  // Swatches
+  $('swatchRow').innerHTML = SWATCHES.map(c => `
+    <div class="swatch${S.customAccent===c?' active':''}" style="background:${c}" data-color="${c}"></div>
+  `).join('') + `<input type="color" id="accentPicker" title="Egyéni szín" value="${S.customAccent || '#2563eb'}">`;
+  $('accentPicker').addEventListener('input', ev => setAccent(ev.target.value));
+
+  // Font slider
+  $('fontSlider').value = S.fontSize;
+
+  // Suggestions
+  $('suggestions').innerHTML = SUGGESTIONS.map(s =>
+    `<span class="chip" onclick="$('feedUrl').value='${s.url}';$('feedName').value='${s.label}'">${s.label}</span>`
+  ).join('');
+
+  // Feed color picker in modal
+  $('colorRow').innerHTML = FEED_COLORS.map((c, i) =>
+    `<div class="color-opt${i===0?' sel':''}" style="background:${c}" data-color="${c}" onclick="pickFeedColor(this,'${c}')"></div>`
+  ).join('');
+}
+
+function setPreset(p) {
+  S.preset = p; S.customAccent = null; saveSettings(); Theme.apply(); buildSettingsUI();
+}
+function setAccent(c) {
+  S.customAccent = c; saveSettings(); Theme.apply(); Theme._syncUI();
+}
+
+function pickFeedColor(el, c) {
+  document.querySelectorAll('.color-opt').forEach(e => e.classList.remove('sel'));
+  el.classList.add('sel');
+  $('addModal')._pickedColor = c;
+}
+
+/* ════════════════════════════════════════════════════════════
+   ADD FEED MODAL
+════════════════════════════════════════════════════════════ */
+function openAddModal() {
+  $('feedUrl').value = '';
+  $('feedName').value = '';
+  $('feedErr').classList.remove('show');
+  $('confirmAdd').disabled = false;
+  $('confirmAdd').textContent = 'Hozzáadás';
+  $('addModal').classList.add('open');
+  $('overlay').classList.add('open');
+  setTimeout(() => $('feedUrl').focus(), 80);
+}
+function closeAddModal() {
+  $('addModal').classList.remove('open');
+  $('overlay').classList.remove('open');
+}
+
+async function submitAddFeed() {
+  let url = $('feedUrl').value.trim();
+  if (!url) return;
+  if (!url.startsWith('http')) url = 'https://' + url;
+
+  if (S.feeds.find(f => f.url === url)) { toast('Ez a feed már létezik.'); closeAddModal(); return; }
+
+  const btn = $('confirmAdd');
+  btn.disabled = true;
+  btn.textContent = 'Betöltés...';
+  $('feedErr').classList.remove('show');
+
+  const articles = await Fetcher.get(url).catch(() => []);
+
+  if (!articles.length) {
+    $('feedErr').classList.add('show');
+    btn.disabled = false; btn.textContent = 'Hozzáadás';
+    return;
+  }
+
+  let name = $('feedName').value.trim();
+  if (!name) {
+    try { name = new URL(url).hostname.replace(/^www\./,'').split('.')[0]; name = name[0].toUpperCase() + name.slice(1); }
+    catch(e) { name = url; }
+  }
+
+  const color = $('addModal')._pickedColor || FEED_COLORS[S.feeds.length % FEED_COLORS.length];
+  S.feeds.push({ url, name, color });
+  S.articles = S.articles.filter(a => a.feedUrl !== url);
+  S.articles.push(...articles);
+  S.articles.sort((a, b) => b.date - a.date);
+  saveFeeds();
+  renderSidebar();
+  renderSFeeds();
+  closeAddModal();
+  renderArticles();
+  toast(`"${name}" hozzáadva!`);
+}
+
+/* ════════════════════════════════════════════════════════════
+   EVENT BINDINGS
+══════════════════════════════════════════���═════════════════ */
+function bindEvents() {
+  // Layout cycle button
+  $('layoutCycleBtn').onclick = () => {
+    const i = LAYOUT_ORDER.indexOf(S.layout);
+    setLayout(LAYOUT_ORDER[(i + 1) % LAYOUT_ORDER.length]);
+  };
+  // ── Hover preview: Presets ───────────────────────────────
+  let _pP = undefined, _pA = undefined; // undefined = not previewing
+  const pg = $('presetGrid');
+  pg.addEventListener('mouseover', ev => {
+    const card = ev.target.closest('.preset-card[data-preset]');
+    if (!card) return;
+    if (_pP === undefined) { _pP = S.preset; _pA = S.customAccent; }
+    S.preset = card.dataset.preset; S.customAccent = null;
+    Theme.apply();
+    pg.querySelectorAll('.preset-card').forEach(c => c.classList.toggle('active', c.dataset.preset === S.preset));
+  });
+  pg.addEventListener('mouseleave', () => {
+    if (_pP === undefined) return;
+    S.preset = _pP; S.customAccent = _pA; _pP = _pA = undefined;
+    Theme.apply();
+    pg.querySelectorAll('.preset-card').forEach(c => c.classList.toggle('active', c.dataset.preset === S.preset));
+  });
+  pg.addEventListener('click', ev => {
+    const card = ev.target.closest('.preset-card[data-preset]');
+    if (!card) return;
+    _pP = _pA = undefined;
+    setPreset(card.dataset.preset);
+  });
+
+  // ── Hover preview: Accent swatches ───────────────────────
+  let _pC = undefined;
+  const sr = $('swatchRow');
+  sr.addEventListener('mouseover', ev => {
+    const sw = ev.target.closest('.swatch[data-color]');
+    if (!sw) return;
+    if (_pC === undefined) _pC = S.customAccent;
+    S.customAccent = sw.dataset.color;
+    Theme.apply();
+    sr.querySelectorAll('.swatch').forEach(s => s.classList.toggle('active', s.dataset.color === S.customAccent));
+  });
+  sr.addEventListener('mouseleave', () => {
+    if (_pC === undefined) return;
+    S.customAccent = _pC; _pC = undefined;
+    Theme.apply();
+    sr.querySelectorAll('.swatch').forEach(s => s.classList.toggle('active', s.dataset.color === S.customAccent));
+  });
+  sr.addEventListener('click', ev => {
+    const sw = ev.target.closest('.swatch[data-color]');
+    if (!sw) return;
+    _pC = undefined;
+    setAccent(sw.dataset.color);
+  });
+
+  // ── Hover preview: Layout ─────────────────────────────────
+  let _pL = undefined, _pLTimer;
+  const slb = $('sLayoutBar');
+  slb.addEventListener('mouseover', ev => {
+    const b = ev.target.closest('.s-layout-btn[data-layout]');
+    if (!b) return;
+    if (_pL === undefined) _pL = S.layout;
+    clearTimeout(_pLTimer);
+    _pLTimer = setTimeout(() => {
+      S.layout = b.dataset.layout;
+      slb.querySelectorAll('.s-layout-btn').forEach(x => x.classList.toggle('active', x.dataset.layout === S.layout));
+      updateCycleBtn(false);
+      renderArticles();
+    }, 80);
+  });
+  slb.addEventListener('mouseleave', () => {
+    clearTimeout(_pLTimer);
+    if (_pL === undefined) return;
+    S.layout = _pL; _pL = undefined;
+    slb.querySelectorAll('.s-layout-btn').forEach(x => x.classList.toggle('active', x.dataset.layout === S.layout));
+    updateCycleBtn(false);
+    renderArticles();
+  });
+  // Layout bar (settings) — click confirms
+  slb.addEventListener('click', ev => {
+    const b = ev.target.closest('.s-layout-btn');
+    if (!b) return;
+    _pL = undefined;
+    setLayout(b.dataset.layout);
+  });
+
+  // Settings dropdown — hover + click toggle
+  let _sTimer;
+  const _sBtn = $('settingsBtn'), _sPanel = $('settingsPanel');
+  const openSettings  = () => { clearTimeout(_sTimer); renderSFeeds(); _sPanel.classList.add('open'); };
+  const closeSettings = () => { _sTimer = setTimeout(() => _sPanel.classList.remove('open'), 150); };
+  _sBtn.addEventListener('mouseenter', openSettings);
+  _sBtn.addEventListener('mouseleave', closeSettings);
+  _sPanel.addEventListener('mouseenter', () => clearTimeout(_sTimer));
+  _sPanel.addEventListener('mouseleave', closeSettings);
+  _sBtn.addEventListener('click', () => _sPanel.classList.toggle('open') && renderSFeeds());
+
+  // Overlay click — only for add-feed modal now
+  $('overlay').onclick = () => { closeAddModal(); $('overlay').classList.remove('open'); };
+
+  // Close settings on outside click
+  document.addEventListener('click', ev => {
+    if (!_sBtn.contains(ev.target) && !_sPanel.contains(ev.target)) _sPanel.classList.remove('open');
+  });
+
+  // Add feed
+  $('addFeedBtn').onclick = openAddModal;
+  $('cancelAdd').onclick = closeAddModal;
+  $('confirmAdd').onclick = submitAddFeed;
+  $('feedUrl').addEventListener('keydown', ev => { if (ev.key === 'Enter') submitAddFeed(); });
+
+  // Mode toggle
+  $('modeBar').addEventListener('click', ev => {
+    const b = ev.target.closest('.mode-btn');
+    if (b) { S.theme = b.dataset.mode; saveSettings(); Theme.apply(); }
+  });
+
+  // Font slider
+  $('fontSlider').addEventListener('input', ev => {
+    S.fontSize = +ev.target.value;
+    document.documentElement.style.setProperty('--font-size-base', S.fontSize + 'px');
+  });
+  $('fontSlider').addEventListener('change', saveSettings);
+
+
+  // Auto dark/light
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if (S.theme === 'auto') Theme.apply();
+  });
+
+  // Escape closes article view
+  document.addEventListener('keydown', ev => {
+    if (ev.key === 'Escape' && document.getElementById('articleView').classList.contains('open')) {
+      closeArticle();
+    }
+  });
+
+}
+
+/* ════════════════════════════════════════════════════════════
+   WEATHER
+════════════════════════════════════════════════════════════ */
+const WX_CDN = 'https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/fill/all/';
+// [day-name, night-name]
+const WX_ICONS = {
+  0: ['clear-day','clear-night'],
+  1: ['partly-cloudy-day','partly-cloudy-night'],
+  2: ['partly-cloudy-day','partly-cloudy-night'],
+  3: ['overcast-day','overcast-night'],
+  45:['fog-day','fog-night'], 48:['fog-day','fog-night'],
+  51:['partly-cloudy-day-drizzle','partly-cloudy-night-drizzle'],
+  53:['drizzle','drizzle'], 55:['rain','rain'],
+  61:['partly-cloudy-day-rain','partly-cloudy-night-rain'],
+  63:['rain','rain'], 65:['rain','rain'],
+  71:['partly-cloudy-day-snow','partly-cloudy-night-snow'],
+  73:['snow','snow'], 75:['snow','snow'],
+  80:['partly-cloudy-day-rain','partly-cloudy-night-rain'],
+  81:['rain','rain'], 82:['thunderstorms-rain','thunderstorms-rain'],
+  95:['thunderstorms-day-rain','thunderstorms-night-rain'],
+  96:['thunderstorms-rain','thunderstorms-rain'],
+  99:['thunderstorms-rain','thunderstorms-rain']
+};
+const _wxSvgCache = {};
+let _wxUid = 0;
+async function _wxFetch(name) {
+  if (_wxSvgCache[name]) return _wxSvgCache[name];
+  try {
+    const r = await fetch(WX_CDN + name + '.svg');
+    _wxSvgCache[name] = await r.text();
+  } catch(e) { _wxSvgCache[name] = ''; }
+  return _wxSvgCache[name];
+}
+function wxInline(svgText, size) {
+  if (!svgText) return `<div style="width:${size}px;height:${size}px"></div>`;
+  // Make every inlined SVG's IDs unique to prevent gradient ID collisions
+  const p = 'wx' + (_wxUid++);
+  let svg = svgText
+    .replace(/\bid="([^"]+)"/g,    `id="${p}$1"`)
+    .replace(/url\(#([^)]+)\)/g,   `url(#${p}$1)`)
+    .replace(/href="#([^"]+)"/g,   `href="#${p}$1"`);
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  if (!dark) {
+    // Light bg: only near-white cloud colors need darkening
+    svg = svg
+      .replace(/#f3f7fe/gi, '#bfdbfe')  // cloud fill light  → blue-200
+      .replace(/#deeafb/gi, '#93c5fd')  // cloud fill darker → blue-300
+      .replace(/#e6effc/gi, '#93c5fd'); // cloud stroke      → blue-300
+  }
+  // Dark mode: original fill colors are perfect as-is
+  return svg.replace(/<svg\b/, `<svg width="${size}" height="${size}" style="display:block;flex-shrink:0;overflow:visible"`);
+}
+function wxIconName(code, isDay) {
+  const pair = WX_ICONS[code] || ['not-available','not-available'];
+  return pair[isDay ? 0 : 1];
+}
+const WX_LABELS = {
+  0:'Derült',1:'Enyhén felhős',2:'Változékony',3:'Borult',
+  45:'Köd',48:'Zúzmarás köd',
+  51:'Szitálás',53:'Szitálás',55:'Erős szitálás',
+  61:'Eső',63:'Eső',65:'Erős eső',
+  71:'Hószállingózás',73:'Havazás',75:'Erős havazás',
+  80:'Zápor',81:'Erős zápor',82:'Viharos zápor',
+  95:'Zivatar',96:'Zivatar jégesővel',99:'Zivatar jégesővel'
+};
+
+async function loadWeather() {
+  const el = document.getElementById('navWeather');
+  if (!el) return;
+  const WX_TTL = 30 * 60 * 1000; // 30 perc
+
+  async function renderWx(w) {
+    const label = WX_LABELS[w.code] || '';
+    const feels = w.feels    !== undefined ? w.feels    : '–';
+    const humid = w.humidity !== undefined ? w.humidity : '–';
+    const wind  = w.wind     !== undefined ? w.wind     : '–';
+
+    const h = new Date().getHours();
+    const isDay = h >= 6 && h < 21;
+
+    // Pre-fetch all needed icons in parallel
+    // Recompute isSunset dynamically from sunsetTime (handles stale cache)
+    const sunsetHourRx = w.sunsetTime ? parseInt(w.sunsetTime) : -1;
+    const hourSlots  = (w.hours || []).slice(1, 7).map(hr => ({
+      ...hr, isSunset: parseInt(hr.time) === sunsetHourRx
+    }));
+    const dayCodes   = (w.days  || []).map(d => wxIconName(d.code, true));
+    const uvName     = `uv-index-${Math.min(Math.max(w.uv, 1), 11)}`;
+    const hasSunset  = hourSlots.some(hr => hr.isSunset);
+    // Pre-fetch uses per-slot hrIsDay so night variants are also cached
+    const hourIconNames = hourSlots.map(hr => {
+      const hrIsDay = parseInt(hr.time) >= 6 && parseInt(hr.time) < 21;
+      return wxIconName(hr.code, hrIsDay);
+    });
+    const allNames   = [
+      wxIconName(w.code, isDay),
+      ...hourIconNames,
+      ...dayCodes,
+      uvName, 'wind', 'raindrop',
+      ...(hasSunset ? ['sunset'] : [])
+    ];
+    await Promise.all([...new Set(allNames)].map(n => _wxFetch(n)));
+
+    const ic = (name, size) => wxInline(_wxSvgCache[name] || '', size);
+
+    const mainSvg = ic(wxIconName(w.code, isDay), 52);
+    const navSvg  = ic(wxIconName(w.code, isDay), 22);
+
+    const hourlyHtml = hourSlots.map(hr => {
+      const hrIsDay = parseInt(hr.time) >= 6 && parseInt(hr.time) < 21;
+      if (hr.isSunset) {
+        return `<div class="wx-hour">
+          <span class="wx-hour-time" style="color:var(--ac);font-weight:600">${w.sunsetTime}</span>
+          <div class="wx-hour-icon">${ic('sunset', 24)}</div>
+          <span class="wx-hour-temp">${hr.temp}°</span>
+        </div>`;
+      }
+      return `<div class="wx-hour">
+        <span class="wx-hour-time">${hr.time || ''}</span>
+        <div class="wx-hour-icon">${ic(wxIconName(hr.code, hrIsDay), 24)}</div>
+        <span class="wx-hour-temp">${hr.temp}°</span>
+      </div>`;
+    }).join('');
+
+    el.innerHTML = `
+      <div class="nav-weather-icon">${navSvg}</div>
+      <span class="nav-weather-temp">${w.temp}°</span>
+      <div class="wx-popup" id="wxPopup">
+        <div class="wx-top">
+          <div class="wx-left">
+            <div class="wx-big-temp">${w.temp}°</div>
+          </div>
+          <div class="wx-main-right">
+            <div class="wx-big-icon">${mainSvg}</div>
+            <div class="wx-condition">${label}</div>
+          </div>
+        </div>
+        <div class="wx-bottom-row">
+          <div class="wx-meta">
+            ${w.precip0 > 0 ? `<span>${ic('raindrop', 14)}${w.precip0}%</span>` : ''}
+            <span>${ic(uvName, 14)}UV ${w.uv}</span>
+            <span>${ic('wind', 14)}${wind} km/h</span>
+          </div>
+          <div class="wx-minmax"><span style="color:#60a5fa">↓${w.tmin}°</span>&nbsp; <span style="color:#f97316">↑${w.tmax}°</span></div>
+        </div>
+        <div class="wx-hourly">${hourlyHtml}</div>
+        <div class="wx-forecast">${(w.days || []).map((day, i) => {
+          const HU = ['Vasárnap','Hétfő','Kedd','Szerda','Csütörtök','Péntek','Szombat'];
+          return `<div class="wx-frow">
+            <span class="wx-fday">${i === 0 ? 'Holnap' : HU[day.dow]}</span>
+            <span class="wx-ficon">${ic(wxIconName(day.code, true), 20)}</span>
+            <span class="wx-fcond">${WX_LABELS[day.code] || ''}</span>
+            <span class="wx-frain" style="display:flex;align-items:center;justify-content:flex-end;gap:2px">${day.precip > 0 ? `${day.precip}%${ic('raindrop', 11)}` : ''}</span>
+            <span class="wx-ftemp"><span class="wx-ftemp-min">${day.tmin}°</span><span class="wx-ftemp-max">${day.tmax}°</span></span>
+          </div>`;
+        }).join('')}</div>
+      </div>`;
+    el.title = '';
+
+    // JS hover with timer — mouse can move into popup without closing it
+    let _wxHTimer;
+    const wxOpen  = () => { clearTimeout(_wxHTimer); document.getElementById('wxPopup')?.classList.add('wx-open'); };
+    const wxClose = () => { _wxHTimer = setTimeout(() => document.getElementById('wxPopup')?.classList.remove('wx-open'), 150); };
+    el.addEventListener('mouseenter', wxOpen);
+    el.addEventListener('mouseleave', wxClose);
+    document.getElementById('wxPopup').addEventListener('mouseenter', wxOpen);
+    document.getElementById('wxPopup').addEventListener('mouseleave', wxClose);
+  }
+
+  // Cached adat elég friss? (és teljes — régi cache-t eldobjuk)
+  try {
+    const cached = JSON.parse(localStorage.getItem('flux_wx') || 'null');
+    const fresh = cached && Date.now() - cached.ts < WX_TTL && cached.uv !== undefined && cached.hours && cached.hours.length && cached.days && cached.days.length && cached.sunsetTime;
+    const newFormat = fresh && !String(cached.hours[0]?.time || '').includes(':');
+    if (fresh && newFormat) { renderWx(cached); return; }
+  } catch(e) {}
+
+  try {
+    // Koordináta: cache-ből vagy fresh geolocation
+    let lat, lon;
+    const cachedCoords = JSON.parse(localStorage.getItem('flux_wx_coords') || 'null');
+    if (cachedCoords) {
+      lat = cachedCoords.lat; lon = cachedCoords.lon;
+    } else {
+      const pos = await new Promise((res, rej) =>
+        navigator.geolocation.getCurrentPosition(res, rej, { timeout: 6000 })
+      );
+      lat = pos.coords.latitude; lon = pos.coords.longitude;
+      localStorage.setItem('flux_wx_coords', JSON.stringify({ lat, lon }));
+    }
+
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+      `&current=temperature_2m,weathercode,apparent_temperature,relative_humidity_2m,wind_speed_10m,uv_index` +
+      `&hourly=temperature_2m,weathercode` +
+      `&daily=temperature_2m_max,temperature_2m_min,weathercode,precipitation_probability_max,sunset` +
+      `&timezone=auto&forecast_days=7`;
+    const d = await fetch(url).then(r => r.json());
+
+    // Parse sunset time for today
+    const sunsetStr  = d.daily.sunset?.[0] || '';          // "2026-04-02T19:43"
+    const sunsetTime = sunsetStr.slice(11, 16);             // "19:43"
+    const sunsetHour = sunsetTime ? parseInt(sunsetTime)  : -1;
+
+    // Next 7 hours from current hour (slice(1) later gives 6 columns)
+    const nowH = new Date().getHours();
+    const hours = [];
+    for (let i = 0; i < 7; i++) {
+      const hi = nowH + i;
+      if (hi < (d.hourly.time || []).length) {
+        const hourOfDay = hi % 24;
+        hours.push({
+          time:     String(hourOfDay),
+          temp:     Math.round(d.hourly.temperature_2m[hi]),
+          code:     d.hourly.weathercode[hi],
+          isSunset: hourOfDay === sunsetHour
+        });
+      }
+    }
+
+    const w = {
+      temp:     Math.round(d.current.temperature_2m),
+      feels:    Math.round(d.current.apparent_temperature),
+      humidity: d.current.relative_humidity_2m,
+      wind:     Math.round(d.current.wind_speed_10m),
+      code:     d.current.weathercode,
+      uv:       Math.round(d.current.uv_index ?? 0),
+      precip0:  d.daily.precipitation_probability_max?.[0] ?? 0,
+      tmax:     Math.round(d.daily.temperature_2m_max[0]),
+      tmin:     Math.round(d.daily.temperature_2m_min[0]),
+      sunsetTime,
+      hours,
+      days: [1,2,3,4,5].map(i => ({
+        dow:    new Date((d.daily.time[i] || '') + 'T12:00:00').getDay(),
+        code:   d.daily.weathercode[i],
+        tmax:   Math.round(d.daily.temperature_2m_max[i]),
+        tmin:   Math.round(d.daily.temperature_2m_min[i]),
+        precip: d.daily.precipitation_probability_max?.[i] ?? 0
+      })).filter(x => !isNaN(x.tmax)),
+      ts:       Date.now()
+    };
+    localStorage.setItem('flux_wx', JSON.stringify(w));
+    renderWx(w);
+  } catch(e) {
+    el.style.display = 'none';
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   F1 WIDGET
+════════════════════════════════════════════════════════════ */
+const F1_TEAM_COLORS = {
+  'Mercedes':'#00D2BE','McLaren':'#FF8700','Ferrari':'#DC0000',
+  'Red Bull':'#3671C6','Williams':'#64C4FF','Aston Martin':'#358C75',
+  'Alpine':'#FF87BC','RB':'#6692FF','Haas F1 Team':'#B6BABD',
+  'Kick Sauber':'#52E252','Sauber':'#52E252'
+};
+const F1_HU = ['jan','feb','már','ápr','máj','jún','júl','aug','szep','okt','nov','dec'];
+const F1_BASE = 'https://api.jolpi.ca/ergast/f1';
+const F1_TTL  = 30 * 60 * 1000;
+
+function renderF1(f1) {
+  const el = document.getElementById('navF1');
+  if (!el) return;
+
+  const shortName = n => n.replace(' Grand Prix','').replace(' GP','') + ' GP';
+  const fmtDate  = d => { const dt = new Date(d+'T12:00:00'); return `${F1_HU[dt.getMonth()]} ${dt.getDate()}.`; };
+  const teamDot  = c => `<span class="f1-team-dot" style="background:${F1_TEAM_COLORS[c]||'#555'}"></span>`;
+  const teamBar  = c => `<span class="f1-team-bar" style="background:${F1_TEAM_COLORS[c]||'#555'}"></span>`;
+
+  // Countdown
+  let countdown = '';
+  if (f1.nextRace) {
+    const diff = new Date(f1.nextRace.dateTime) - Date.now();
+    if (diff > 0) {
+      const d = Math.floor(diff/86400000), h = Math.floor((diff%86400000)/3600000);
+      countdown = d > 0 ? `${d} nap` : h > 0 ? `${h} ó` : 'Ma!';
+    } else { countdown = 'Ma!'; }
+  }
+
+  const nextSection = f1.nextRace ? `
+    <div class="f1-section">
+      <div class="f1-section-title">Következő futam</div>
+      <div class="f1-next-name">${shortName(f1.nextRace.name)}</div>
+      <div class="f1-next-circuit">${f1.nextRace.circuit}</div>
+      <div class="f1-countdown">${countdown}</div>
+      <div class="f1-next-date">${new Date(f1.nextRace.dateTime).toLocaleString('hu-HU',{month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+    </div>` : '';
+
+  const podiumSection = f1.lastRace?.podium?.length ? `
+    <div class="f1-section">
+      <div class="f1-section-title">Utolsó futam · ${shortName(f1.lastRace.name)}</div>
+      ${f1.lastRace.podium.map(p => `
+        <div class="f1-podium-row">
+          <span class="f1-pos">P${p.pos}</span>
+          ${teamDot(p.constructor)}
+          <span class="f1-driver">${p.driver}</span>
+          <span class="f1-constructor">${p.constructor}</span>
+        </div>`).join('')}
+    </div>` : '';
+
+  const standingsSection = f1.standings?.length ? `
+    <div class="f1-section">
+      <div class="f1-section-title">Pilóta bajnokság</div>
+      ${f1.standings.map(s => `
+        <div class="f1-standing-row">
+          <span class="f1-standing-pos">${s.pos}</span>
+          ${teamBar(s.constructor)}
+          <span class="f1-standing-driver">${s.driver}</span>
+          <span class="f1-standing-pts">${s.points}</span>
+        </div>`).join('')}
+    </div>` : '';
+
+  const calSection = f1.upcoming?.length ? `
+    <div class="f1-section">
+      <div class="f1-section-title">Kövi futamok</div>
+      ${f1.upcoming.map((r,i) => `
+        <div class="f1-cal-row${i===0?' f1-cal-next':''}">
+          <span class="f1-cal-dot"></span>
+          <span class="f1-cal-name">${shortName(r.name)}</span>
+          <span class="f1-cal-date">${fmtDate(r.date)}</span>
+        </div>`).join('')}
+    </div>` : '';
+
+  const badgeLabel = f1.nextRace
+    ? `${shortName(f1.nextRace.name)}<span class="f1-badge-sep">|</span>${countdown}`
+    : `F1`;
+
+  el.innerHTML = `
+    <span class="f1-badge">${badgeLabel}</span>
+    <div class="f1-popup" id="f1Popup">
+      ${nextSection}${podiumSection}${standingsSection}${calSection}
+    </div>`;
+
+  let _f1T;
+  const f1Open  = () => { clearTimeout(_f1T); document.getElementById('f1Popup')?.classList.add('f1-open'); };
+  const f1Close = () => { _f1T = setTimeout(() => document.getElementById('f1Popup')?.classList.remove('f1-open'), 150); };
+  el.addEventListener('mouseenter', f1Open);
+  el.addEventListener('mouseleave', f1Close);
+  document.getElementById('f1Popup').addEventListener('mouseenter', f1Open);
+  document.getElementById('f1Popup').addEventListener('mouseleave', f1Close);
+}
+
+async function loadF1() {
+  try {
+    const cached = JSON.parse(localStorage.getItem('flux_f1') || 'null');
+    if (cached && Date.now() - cached.ts < F1_TTL) { renderF1(cached); return; }
+  } catch(e) {}
+  try {
+    const [schedJ, lastJ, standJ] = await Promise.all([
+      fetch(`${F1_BASE}/current.json`).then(r=>r.json()),
+      fetch(`${F1_BASE}/current/last/results.json`).then(r=>r.json()),
+      fetch(`${F1_BASE}/current/driverStandings.json`).then(r=>r.json())
+    ]);
+    const now   = Date.now();
+    const races = schedJ.MRData.RaceTable.Races;
+    const future = races.filter(r => new Date(r.date+'T'+(r.time||'12:00:00Z')) > now);
+    const next  = future[0];
+    const lastRaceData = lastJ.MRData.RaceTable.Races[0];
+    const f1 = {
+      nextRace: next ? {
+        name:     next.raceName,
+        circuit:  next.Circuit.circuitName,
+        dateTime: next.date+'T'+(next.time||'12:00:00Z')
+      } : null,
+      lastRace: {
+        name:   lastRaceData?.raceName || '',
+        podium: (lastRaceData?.Results||[]).slice(0,3).map(r=>({
+          pos: r.position, driver: r.Driver.familyName, constructor: r.Constructor.name
+        }))
+      },
+      standings: (standJ.MRData.StandingsTable.StandingsLists[0]?.DriverStandings||[]).slice(0,6).map(s=>({
+        pos: s.position, driver: s.Driver.familyName,
+        points: s.points, constructor: s.Constructors[0]?.name||''
+      })),
+      upcoming: future.slice(0,6).map(r=>({ name: r.raceName, date: r.date })),
+      ts: Date.now()
+    };
+    localStorage.setItem('flux_f1', JSON.stringify(f1));
+    renderF1(f1);
+  } catch(e) { console.warn('F1 load error', e); }
+}
+
+/* ════════════════════════════════════════════════════════════
+   BOOT
+════════════════════════════════════════════════════════════ */
+(async function init() {
+  loadStorage();
+  Theme.apply();
+  buildSettingsUI();
+  renderSidebar();
+  bindEvents();
+  updateCycleBtn(false);
+  loadWeather();
+  loadF1();
+
+  const contentEl = document.getElementById('content');
+  const navbar = document.getElementById('navbar');
+  contentEl.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', contentEl.scrollTop > 10);
+  }, { passive: true });
+
+  if (S.feeds.length) await refreshAll();
+})();
+
+</script>
+</body>
+</html>
