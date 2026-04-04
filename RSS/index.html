@@ -564,6 +564,88 @@
       overflow: hidden;
     }
 
+    /* Tighter composition when magazine content sits next to the YT rail */
+    .yt-wrap .ix-row { gap: 22px 24px; }
+    .yt-feature-block {
+      background: var(--ac);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 10px 24px color-mix(in srgb, var(--ac) 20%, transparent);
+      margin-bottom: 10px;
+    }
+    .yt-feature-block .ix-row { margin-bottom: 0; }
+    .yt-feature-block .ix-card:hover .ix-card-title,
+    .yt-feature-block .ix-text-fill:hover .ix-tf-title { color: #ffffff; opacity: .92; }
+    .yt-feature-block .ix-img-wrap {
+      padding: 12px;
+      background: color-mix(in srgb, white 12%, transparent);
+      border-radius: 16px;
+    }
+    .yt-feature-block .ix-card-img,
+    .yt-feature-block .ix-card-nobg,
+    .yt-feature-block .ix-mini-img,
+    .yt-feature-block .ix-mini-nobg {
+      border-radius: 12px;
+    }
+    .yt-feature-block .ix-card-title,
+    .yt-feature-block .ix-tf-title,
+    .yt-feature-block .ix-card-desc,
+    .yt-feature-block .ix-tf-desc,
+    .yt-feature-block .ix-card-time,
+    .yt-feature-block .ix-mini-time {
+      color: #ffffff;
+    }
+    .yt-feature-block .ix-card-desc,
+    .yt-feature-block .ix-tf-desc {
+      color: rgba(255,255,255,.82);
+    }
+    .yt-feature-block .ix-card-time { color: rgba(255,255,255,.7); }
+    .yt-feature-block .ix-text-fill {
+      border-top-color: rgba(255,255,255,.18);
+    }
+    .yt-feature-block .ix-badge {
+      background: rgba(255,255,255,.16);
+      color: #ffffff;
+      backdrop-filter: blur(6px);
+    }
+    .yt-wrap .ix-row.row-a { grid-template-columns: 1.35fr .95fr; }
+    .yt-wrap .ix-row.row-b { grid-template-columns: .95fr 1.35fr; }
+    .yt-wrap .ix-card { gap: 6px; }
+    .yt-wrap .ix-card-img,
+    .yt-wrap .ix-card-nobg { aspect-ratio: 16/10; }
+    .yt-wrap .ix-card-title { font-size: 1.22rem; line-height: 1.24; }
+    .yt-wrap .ix-card-desc {
+      font-size: .92rem;
+      line-height: 1.45;
+      -webkit-line-clamp: 3;
+    }
+    .yt-wrap .ix-col-side .ix-card-title { font-size: 1.08rem; }
+    .yt-wrap .ix-col-side .ix-card-desc {
+      font-size: .88rem;
+      line-height: 1.4;
+      -webkit-line-clamp: 2;
+    }
+    .yt-wrap .ix-row > .ix-card { gap: 8px; }
+    .yt-wrap .ix-row > .ix-card .ix-card-img,
+    .yt-wrap .ix-row > .ix-card .ix-card-nobg { aspect-ratio: 1/1; }
+    .yt-wrap .ix-row > .ix-card .ix-card-title { font-size: 1.34rem; line-height: 1.26; }
+    .yt-wrap .ix-row > .ix-card .ix-card-desc {
+      font-size: .95rem;
+      line-height: 1.48;
+      -webkit-line-clamp: 4;
+    }
+    .yt-wrap .ix-text-fill {
+      margin-top: 10px;
+      padding: 10px 0;
+      gap: 4px;
+    }
+    .yt-wrap .ix-tf-title { font-size: .96rem; line-height: 1.28; }
+    .yt-wrap .ix-tf-desc {
+      font-size: .84rem;
+      line-height: 1.42;
+      -webkit-line-clamp: 2;
+    }
+
     /* 4-col thumbnail rács a maradéknak */
     .ix-mini-grid {
       display: grid;
@@ -921,26 +1003,6 @@
       cursor: pointer;
     }
 
-    /* Settings layout switcher */
-    .s-layout-bar { display: flex; gap: 6px; }
-    .s-layout-btn {
-      flex: 1;
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      padding: 10px 6px 8px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 5px;
-      font-size: .68rem;
-      color: var(--muted);
-      transition: all var(--t);
-    }
-    .s-layout-btn:hover { color: var(--text); border-color: var(--ac); }
-    .s-layout-btn.active { color: var(--ac); border-color: var(--ac); background: var(--acl); }
-
     /* Settings feeds */
     .s-feed-list { display: flex; flex-direction: column; gap: 5px; }
     .s-feed-item {
@@ -1069,52 +1131,6 @@
       .grid-layout { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
       .settings-panel { width: 100%; }
     }
-    /* ── Navbar article-mode edge buttons ───────────────────── */
-    .nav-back-btn, .nav-open-orig {
-      display: none; position: fixed; top: 0; z-index: 101;
-      height: var(--header-height); align-items: center; gap: 5px;
-      background: none; border: none; cursor: pointer; font-family: inherit;
-      font-size: .82rem; font-weight: 500; color: var(--text2);
-      padding: 0 16px; text-decoration: none;
-      transition: color var(--t), background var(--t);
-    }
-    .nav-back-btn { left: 0; }
-    .nav-open-orig { right: 0; }
-    .nav-back-btn:hover, .nav-open-orig:hover { color: var(--text); background: var(--bg-hover); }
-    body.article-open .nav-back-btn  { display: flex; }
-    body.article-open .nav-open-orig { display: flex; }
-
-    /* ── Article View ────────────────────────────────────────── */
-    .article-view {
-      position: fixed; top: var(--header-height); left: 0; right: 0; bottom: 0;
-      background: var(--bg); z-index: 150;
-      display: flex; flex-direction: column;
-      opacity: 0; pointer-events: none;
-      transition: opacity .18s ease;
-    }
-    .article-view.open { opacity: 1; pointer-events: all; }
-    .av-body { flex: 1; overflow: hidden; position: relative; }
-    .av-scroll { height: 100%; overflow-y: auto; }
-    .av-scroll::-webkit-scrollbar { width: 5px; }
-    .av-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-    .av-frame { width: 100%; height: 100%; border: none; display: block; background: #fff; }
-    /* reading content */
-    .rd-content { max-width: 860px; margin: 0 auto; padding: 40px 32px 80px; }
-    .rd-title { font-size: 1.7rem; font-weight: 800; line-height: 1.28; letter-spacing: -.5px; color: var(--text); margin-bottom: 12px; }
-    .rd-byline { font-size: .78rem; color: var(--muted); margin-bottom: 28px; }
-    .rd-article { font-size: 1.05rem; line-height: 1.78; color: var(--text2); }
-    .rd-article h1,.rd-article h2,.rd-article h3 { color: var(--text); font-weight: 700; margin: 1.4em 0 .5em; line-height: 1.3; }
-    .rd-article h2 { font-size: 1.25rem; }
-    .rd-article h3 { font-size: 1.05rem; }
-    .rd-article p { margin-bottom: 1.1em; }
-    .rd-article a { color: var(--ac); }
-    .rd-article img { max-width: 100%; border-radius: var(--radius-sm); margin: 8px 0; display: block; }
-    .rd-article figure { margin: 1em 0; }
-    .rd-article figcaption { font-size: .78rem; color: var(--muted); margin-top: 4px; }
-    .rd-article blockquote { border-left: 3px solid var(--ac); margin: 1em 0; padding: .5em 1em; color: var(--muted); font-style: italic; }
-    .rd-article ul, .rd-article ol { padding-left: 1.4em; margin-bottom: 1em; }
-    .rd-article li { margin-bottom: .3em; }
-
     /* ── Category strip ─────────────────────────────────────── */
     .cat-strip {
       display: flex;
@@ -1246,19 +1262,128 @@
     .f1-cal-row.f1-cal-next .f1-cal-dot { background: #e10600; width: 6px; height: 6px; }
     .f1-cal-row.f1-cal-next .f1-cal-name { color: #fff; }
     .f1-cal-row.f1-cal-next .f1-cal-date { color: #e10600; }
+
+    /* ── YouTube Sidebar ────────────────────────────────────────── */
+    .yt-wrap {
+      display: grid;
+      grid-template-columns: 1fr 272px;
+      gap: 0 28px;
+      align-items: start;
+    }
+    .yt-section-divider {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 272px;
+      column-gap: 28px;
+      align-items: start;
+      width: 100%;
+      margin: 10px 0 28px;
+    }
+    .yt-divider-main {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      min-width: 0;
+    }
+    .yt-divider-main::before {
+      content: "";
+      width: 24px;
+      height: 24px;
+      background: var(--ac);
+      flex-shrink: 0;
+    }
+    .yt-divider-main::after {
+      content: "";
+      height: 24px;
+      flex: 1;
+      background: var(--bg2);
+      opacity: .95;
+      min-width: 0;
+      /* Reach through the inter-column gap so it visually meets the YT rule */
+      margin-right: -28px;
+    }
+    .yt-divider-side {
+      width: 100%;
+      height: 12px;
+      background: var(--bg2);
+      opacity: .95;
+      margin-top: 12px;
+    }
+    .yt-sidebar {
+      background: var(--bg2);
+      border-radius: var(--radius);
+      padding: 14px;
+      grid-column: 2;
+      overflow-y: auto;
+      min-height: 0;
+      margin-bottom: 10px;
+    }
+    .yt-sidebar::-webkit-scrollbar { width: 5px; }
+    .yt-sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
+    .yt-sidebar-heading {
+      font-size: .62rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .1em; color: var(--muted);
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      padding-bottom: 10px; margin-bottom: 2px;
+      border-bottom: 1px solid var(--border);
+    }
+    .yt-sidebar-heading-main {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+    .yt-refresh-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border: none;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color var(--t), background var(--t), transform var(--t);
+      flex-shrink: 0;
+    }
+    .yt-refresh-btn:hover {
+      color: var(--text);
+      background: var(--bg-hover);
+    }
+    .yt-refresh-btn.spinning svg { animation: spin .7s linear infinite; }
+    .yt-vcard {
+      display: flex; gap: 9px; padding: 9px 0; cursor: pointer;
+      border-bottom: 1px solid var(--border);
+    }
+    .yt-vcard:last-child { border-bottom: none; }
+    .yt-vcard:hover .yt-vcard-title { color: var(--ac); }
+    .yt-vcard-thumb {
+      width: 96px; height: 54px; border-radius: 4px;
+      object-fit: cover; flex-shrink: 0; background: var(--bg-hover); display: block;
+    }
+    .yt-vcard-body { flex: 1; min-width: 0; }
+    .yt-vcard-title {
+      font-size: .78rem; font-weight: 600; line-height: 1.35; color: var(--text);
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+      overflow: hidden; transition: color var(--t);
+    }
+    .yt-vcard-meta { font-size: .65rem; color: var(--muted); margin-top: 3px; }
+    .yt-vcard-channel { font-weight: 700; }
+    .yt-ch-group--sep { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+    .yt-ch-heading {
+      font-size: .72rem; font-weight: 700; color: var(--text2);
+      margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .yt-empty {
+      font-size: .78rem;
+      color: var(--muted);
+      line-height: 1.5;
+      padding-top: 10px;
+    }
     </style>
 </head>
 <body>
-
-<!-- Article-mode edge buttons (outside navbar-inner, absolutely positioned) -->
-<button class="nav-back-btn" id="navBackBtn" onclick="closeArticle()">
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-  Vissza
-</button>
-<a class="nav-open-orig" id="navOpenOrig" href="#" target="_blank" rel="noopener">
-  Megnyitás böngészőben
-  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
-</a>
 
 <!-- Floating Navbar -->
 <nav class="navbar" id="navbar">
@@ -1316,33 +1441,38 @@
         </div>
 
         <div class="s-section">
-          <div class="s-label">Elrendezés</div>
-          <div class="s-layout-bar" id="sLayoutBar">
-            <button class="s-layout-btn" data-layout="grid">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>
-              Kártya
-            </button>
-            <button class="s-layout-btn" data-layout="list">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
-              Lista
-            </button>
-            <button class="s-layout-btn" data-layout="magazine">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="12" height="12" rx="1"/><rect x="17" y="3" width="4" height="5" rx=".5"/><rect x="17" y="10" width="4" height="5" rx=".5"/><rect x="3" y="17" width="18" height="4" rx=".5"/></svg>
-              Magazine
-            </button>
-            <button class="s-layout-btn" data-layout="reader">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 10h16M4 14h10M4 18h7"/></svg>
-              Reader
-            </button>
-          </div>
-        </div>
-
-        <div class="s-section">
           <div class="s-label">Feedek kezelése</div>
           <div class="s-feed-list" id="sFeedList"></div>
           <button class="btn btn-ghost" id="addFeedBtn" style="width:100%;margin-top:10px;justify-content:center;display:flex;gap:6px;align-items:center">
             <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>
             Feed hozzáadása
+          </button>
+        </div>
+
+        <div class="s-section">
+          <div class="s-label">YouTube csatornák</div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span style="font-size:.78rem;color:var(--text2)">Max csatorna</span>
+              <div style="display:flex;align-items:center;gap:6px">
+                <button class="icon-btn" id="ytMaxMinus" style="padding:0 8px;font-size:1rem;line-height:1">−</button>
+                <span id="ytMaxVal" style="font-size:.9rem;font-weight:700;min-width:18px;text-align:center"></span>
+                <button class="icon-btn" id="ytMaxPlus"  style="padding:0 8px;font-size:1rem;line-height:1">+</button>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span style="font-size:.78rem;color:var(--text2)">Videó / csatorna</span>
+              <div style="display:flex;align-items:center;gap:6px">
+                <button class="icon-btn" id="ytPerMinus" style="padding:0 8px;font-size:1rem;line-height:1">−</button>
+                <span id="ytPerVal" style="font-size:.9rem;font-weight:700;min-width:18px;text-align:center"></span>
+                <button class="icon-btn" id="ytPerPlus"  style="padding:0 8px;font-size:1rem;line-height:1">+</button>
+              </div>
+            </div>
+          </div>
+          <div class="s-feed-list" id="sYtList"></div>
+          <button class="btn btn-ghost" id="addYtBtn" style="width:100%;margin-top:10px;justify-content:center;display:flex;gap:6px;align-items:center">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>
+            Csatorna hozzáadása
           </button>
         </div>
 
@@ -1363,13 +1493,6 @@
 
 <!-- Overlay (modal) -->
 <div class="overlay" id="overlay"></div>
-
-<!-- Article View -->
-<div class="article-view" id="articleView">
-  <div class="av-body" id="avBody"></div>
-</div>
-
-
 
 <!-- Add Feed Modal -->
 <div class="modal" id="addModal">
@@ -1392,6 +1515,21 @@
   <div class="modal-foot">
     <button class="btn btn-ghost" id="cancelAdd">Mégse</button>
     <button class="btn btn-primary" id="confirmAdd">Hozzáadás</button>
+  </div>
+</div>
+
+<!-- Add YouTube Channel Modal -->
+<div class="modal" id="addYtModal">
+  <div class="modal-title">YouTube csatorna hozzáadása</div>
+  <div class="form-group">
+    <label class="form-label" for="ytChannelInput">Channel URL vagy ID</label>
+    <input type="text" class="form-input" id="ytChannelInput" placeholder="youtube.com/channel/UCxxxxxx vagy youtube.com/watch?v=...">
+    <div class="form-hint">Pl. youtube.com/channel/UCxxxxxx, nyers UC… ID, vagy egy YouTube videó linkje</div>
+  </div>
+  <div class="err" id="ytErr">Nem sikerült betölteni. Adj meg érvényes channel URL-t vagy ID-t.</div>
+  <div class="modal-foot">
+    <button class="btn btn-ghost" id="cancelYt">Mégse</button>
+    <button class="btn btn-primary" id="confirmYt">Hozzáadás</button>
   </div>
 </div>
 
@@ -1462,11 +1600,29 @@ const S = {
   preset:       'default',
   customAccent:    null,
   fontSize:        15,
-  activeCategory:  null
+  activeCategory:  null,
+  ytChannels:    [],
+  ytPerChannel:  3,
+  ytMaxChannels: 5
 };
 
 // Article lookup by ID for safe event handling
 const articleMap = {};
+
+// YouTube video lookup by videoId
+let ytVideos = [];
+const ytVideoMap = {};
+let ytLoading = false;
+
+function ytCacheSignature() {
+  return JSON.stringify(
+    (S.ytChannels || []).map(ch => `${ch.idType || 'id'}:${ch.id}`).sort()
+  );
+}
+
+function ytChannelCountFromVideos(videos) {
+  return new Set((videos || []).map(v => v.channelId).filter(Boolean)).size;
+}
 
 /* ════════════════════════════════════════════════════════════
    PERSISTENCE
@@ -1474,10 +1630,12 @@ const articleMap = {};
 function saveSettings() {
   localStorage.setItem('flux_s', JSON.stringify({
     layout: S.layout, theme: S.theme, preset: S.preset,
-    customAccent: S.customAccent, fontSize: S.fontSize, activeUrl: S.activeUrl
+    customAccent: S.customAccent, fontSize: S.fontSize, activeUrl: S.activeUrl,
+    ytPerChannel: S.ytPerChannel, ytMaxChannels: S.ytMaxChannels
   }));
 }
-function saveFeeds()    { localStorage.setItem('flux_f', JSON.stringify(S.feeds)); }
+function saveFeeds()       { localStorage.setItem('flux_f', JSON.stringify(S.feeds)); }
+function saveYtChannels()  { localStorage.setItem('flux_yt', JSON.stringify(S.ytChannels)); }
 
 function loadStorage() {
   try {
@@ -1488,6 +1646,8 @@ function loadStorage() {
     S.customAccent = s.customAccent || null;
     S.fontSize = s.fontSize || 15;
     S.activeUrl = s.activeUrl || null;
+    S.ytPerChannel  = s.ytPerChannel  || 3;
+    S.ytMaxChannels = s.ytMaxChannels || 5;
   } catch(e) {}
 
   try {
@@ -1496,6 +1656,10 @@ function loadStorage() {
   } catch(e) { S.feeds = [...DEFAULT_FEEDS]; }
   if (!localStorage.getItem('flux_f')) saveFeeds();
 
+  try {
+    const yt = JSON.parse(localStorage.getItem('flux_yt') || '[]');
+    S.ytChannels = Array.isArray(yt) ? yt : [];
+  } catch(e) { S.ytChannels = []; }
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -1572,8 +1736,8 @@ const Theme = {
     document.querySelectorAll('.swatch').forEach(b => b.classList.toggle('active', b.dataset.color === S.customAccent));
     // Font slider
     const sl = $('fontSlider'); if (sl) sl.value = S.fontSize;
-    // Layout buttons (all)
-    document.querySelectorAll('.layout-btn, .s-layout-btn').forEach(b => b.classList.toggle('active', b.dataset.layout === S.layout));
+    // Layout button
+    document.querySelectorAll('.layout-btn').forEach(b => b.classList.toggle('active', b.dataset.layout === S.layout));
   }
 };
 
@@ -1895,8 +2059,8 @@ const Renderer = {
     _reader(articles) {
     return `<div class="reader-layout">${articles.map(a => {
       const id = aid(a);
-      return `<div class="reader-item" data-id="${id}">
-        <div class="reader-item-head" onclick="toggleReader('${id}')">
+      return `<div class="reader-item" data-id="${id}" onclick="openArticle('${id}')">
+        <div class="reader-item-head">
           <div class="reader-item-info">
             <div class="reader-title">${e(a.title)}</div>
             <div class="reader-meta">
@@ -1905,13 +2069,6 @@ const Renderer = {
             </div>
           </div>
           <svg class="chevron" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-        </div>
-        <div class="reader-body">
-          <div class="reader-content"></div>
-          <a class="reader-ext" href="${e(a.url)}" onclick="event.stopPropagation()">
-            Megnyitás az eredeti oldalon
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
-          </a>
         </div>
       </div>`;
     }).join('')}</div>`;
@@ -1924,57 +2081,11 @@ const Renderer = {
 function openArticle(id) {
   const a = articleMap[id];
   if (!a) return;
-
-  // Set navbar article-mode link
-  document.getElementById('navOpenOrig').href = a.url;
-
-  const body = document.getElementById('avBody');
-  const hasRich = a.content && a.content.length > 300;
-
-  if (hasRich) {
-    const dateStr = a.date
-      ? new Date(a.date).toLocaleDateString('hu-HU', {year:'numeric', month:'long', day:'numeric'})
-      : '';
-    body.innerHTML = `
-      <div class="av-scroll">
-        <div class="rd-content">
-          <div class="rd-title">${e(a.title)}</div>
-          ${dateStr ? `<div class="rd-byline">${e(dateStr)}</div>` : ''}
-          <div class="rd-article">${a.content}</div>
-        </div>
-      </div>`;
-  } else {
-    body.innerHTML = `<iframe class="av-frame" src="${a.url}"
-      sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation-by-user-activation"
-      referrerpolicy="no-referrer"></iframe>`;
-  }
-
-  document.getElementById('articleView').classList.add('open');
-  document.body.classList.add('article-open');
-}
-
-function closeArticle() {
-  document.getElementById('articleView').classList.remove('open');
-  document.body.classList.remove('article-open');
-  setTimeout(() => { document.getElementById('avBody').innerHTML = ''; }, 200);
+  window.open(a.url, '_blank', 'noopener');
 }
 
 function toggleReader(id) {
-  const item = document.querySelector('.reader-item[data-id="' + id + '"]');
-  if (!item) return;
-  const wasOpen = item.classList.contains('open');
-  document.querySelectorAll('.reader-item.open').forEach(el => el.classList.remove('open'));
-  if (!wasOpen) {
-    item.classList.add('open');
-    const contentEl = item.querySelector('.reader-content');
-    if (!contentEl.dataset.loaded) {
-      const a = articleMap[id];
-      if (a) {
-        contentEl.innerHTML = (a.content && a.content.length > 50) ? a.content : (a.desc ? '<p>' + a.desc + '</p>' : '<p>Nincs tartalom.</p>');
-      }
-      contentEl.dataset.loaded = '1';
-    }
-  }
+  openArticle(id);
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -2121,6 +2232,7 @@ function selectCategory(cat) {
 function renderArticles() {
   if (!S.feeds.length) {
     $('content').innerHTML = `<div class="state-box"><div class="icon">📰</div><div class="title">Nincs feed hozzáadva</div><div class="desc">Kattints a "Feed hozzáadása" gombra.</div></div>`;
+    injectYtSidebar();
     return;
   }
   let articles = S.activeUrl
@@ -2130,6 +2242,7 @@ function renderArticles() {
     articles = articles.filter(a => a.categories && a.categories.includes(S.activeCategory));
   }
   Renderer.render(articles);
+  injectYtSidebar();
 }
 
 const LAYOUT_ICONS = {
@@ -2346,50 +2459,32 @@ function bindEvents() {
     setAccent(sw.dataset.color);
   });
 
-  // ── Hover preview: Layout ─────────────────────────────────
-  let _pL = undefined, _pLTimer;
-  const slb = $('sLayoutBar');
-  slb.addEventListener('mouseover', ev => {
-    const b = ev.target.closest('.s-layout-btn[data-layout]');
-    if (!b) return;
-    if (_pL === undefined) _pL = S.layout;
-    clearTimeout(_pLTimer);
-    _pLTimer = setTimeout(() => {
-      S.layout = b.dataset.layout;
-      slb.querySelectorAll('.s-layout-btn').forEach(x => x.classList.toggle('active', x.dataset.layout === S.layout));
-      updateCycleBtn(false);
-      renderArticles();
-    }, 80);
-  });
-  slb.addEventListener('mouseleave', () => {
-    clearTimeout(_pLTimer);
-    if (_pL === undefined) return;
-    S.layout = _pL; _pL = undefined;
-    slb.querySelectorAll('.s-layout-btn').forEach(x => x.classList.toggle('active', x.dataset.layout === S.layout));
-    updateCycleBtn(false);
-    renderArticles();
-  });
-  // Layout bar (settings) — click confirms
-  slb.addEventListener('click', ev => {
-    const b = ev.target.closest('.s-layout-btn');
-    if (!b) return;
-    _pL = undefined;
-    setLayout(b.dataset.layout);
-  });
-
   // Settings dropdown — hover + click toggle
   let _sTimer;
   const _sBtn = $('settingsBtn'), _sPanel = $('settingsPanel');
-  const openSettings  = () => { clearTimeout(_sTimer); renderSFeeds(); _sPanel.classList.add('open'); };
+  const openSettings  = () => {
+    clearTimeout(_sTimer);
+    renderSFeeds(); renderSYtChannels();
+    const pv = $('ytPerVal'); if (pv) pv.textContent = S.ytPerChannel || 3;
+    const mv = $('ytMaxVal'); if (mv) mv.textContent = S.ytMaxChannels || 5;
+    _sPanel.classList.add('open');
+  };
   const closeSettings = () => { _sTimer = setTimeout(() => _sPanel.classList.remove('open'), 150); };
   _sBtn.addEventListener('mouseenter', openSettings);
   _sBtn.addEventListener('mouseleave', closeSettings);
   _sPanel.addEventListener('mouseenter', () => clearTimeout(_sTimer));
   _sPanel.addEventListener('mouseleave', closeSettings);
-  _sBtn.addEventListener('click', () => _sPanel.classList.toggle('open') && renderSFeeds());
+  _sBtn.addEventListener('click', () => {
+    const isOpen = _sPanel.classList.toggle('open');
+    if (isOpen) {
+      renderSFeeds(); renderSYtChannels();
+      const pv = $('ytPerVal'); if (pv) pv.textContent = S.ytPerChannel || 3;
+      const mv = $('ytMaxVal'); if (mv) mv.textContent = S.ytMaxChannels || 5;
+    }
+  });
 
-  // Overlay click — only for add-feed modal now
-  $('overlay').onclick = () => { closeAddModal(); $('overlay').classList.remove('open'); };
+  // Overlay click — close any open modal
+  $('overlay').onclick = () => { closeAddModal(); closeAddYtModal(); };
 
   // Close settings on outside click
   document.addEventListener('click', ev => {
@@ -2401,6 +2496,29 @@ function bindEvents() {
   $('cancelAdd').onclick = closeAddModal;
   $('confirmAdd').onclick = submitAddFeed;
   $('feedUrl').addEventListener('keydown', ev => { if (ev.key === 'Enter') submitAddFeed(); });
+
+  // YouTube steppers
+  const updateYtPer = delta => {
+    S.ytPerChannel = Math.max(1, Math.min(10, (S.ytPerChannel || 3) + delta));
+    $('ytPerVal').textContent = S.ytPerChannel;
+    saveSettings(); injectYtSidebar();
+  };
+  $('ytPerMinus').onclick = () => updateYtPer(-1);
+  $('ytPerPlus').onclick  = () => updateYtPer(+1);
+
+  const updateYtMax = delta => {
+    S.ytMaxChannels = Math.max(1, Math.min(10, (S.ytMaxChannels || 5) + delta));
+    $('ytMaxVal').textContent = S.ytMaxChannels;
+    saveSettings(); injectYtSidebar();
+  };
+  $('ytMaxMinus').onclick = () => updateYtMax(-1);
+  $('ytMaxPlus').onclick  = () => updateYtMax(+1);
+
+  // YouTube channel modal
+  $('addYtBtn').onclick = openAddYtModal;
+  $('cancelYt').onclick = closeAddYtModal;
+  $('confirmYt').onclick = submitAddYt;
+  $('ytChannelInput').addEventListener('keydown', ev => { if (ev.key === 'Enter') submitAddYt(); });
 
   // Mode toggle
   $('modeBar').addEventListener('click', ev => {
@@ -2419,13 +2537,6 @@ function bindEvents() {
   // Auto dark/light
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
     if (S.theme === 'auto') Theme.apply();
-  });
-
-  // Escape closes article view
-  document.addEventListener('keydown', ev => {
-    if (ev.key === 'Escape' && document.getElementById('articleView').classList.contains('open')) {
-      closeArticle();
-    }
   });
 
 }
@@ -2678,6 +2789,674 @@ async function loadWeather() {
 }
 
 /* ════════════════════════════════════════════════════════════
+   YOUTUBE
+════════════════════════════════════════════════════════════ */
+function extractYtChannelId(input) {
+  input = input.trim();
+  if (!input) return null;
+  input = input.replace(/\/+$/, '');
+
+  if (/^UC[A-Za-z0-9_\-]{22}$/.test(input)) return { type: 'id', value: input };
+  if (/^\@([A-Za-z0-9._\-]+)$/.test(input)) return { type: 'handle', value: input.slice(1) };
+
+  let parsedUrl = null;
+  try {
+    const urlish = /^[a-z]+:\/\//i.test(input) ? input : `https://${input}`;
+    parsedUrl = new URL(urlish);
+  } catch(e) {}
+
+  if (parsedUrl) {
+    const host = parsedUrl.hostname.replace(/^www\./, '').replace(/^m\./, '');
+    const path = parsedUrl.pathname.replace(/\/+$/, '');
+    const videoId = parsedUrl.searchParams.get('v');
+    if ((host === 'youtube.com' || host === 'youtu.be') && (videoId || host === 'youtu.be')) {
+      return { type: 'video', value: videoId || path.replace(/^\//, '') };
+    }
+    if (host === 'youtube.com') {
+      const m1 = path.match(/^\/channel\/(UC[A-Za-z0-9_\-]{22})$/);
+      if (m1) return { type: 'id', value: m1[1] };
+      const m2 = path.match(/^\/@([A-Za-z0-9._\-]+)$/);
+      if (m2) return { type: 'handle', value: m2[1] };
+      const m3 = path.match(/^\/user\/([A-Za-z0-9._\-]+)$/);
+      if (m3) return { type: 'user', value: m3[1] };
+      return { type: 'url', value: `${parsedUrl.origin}${path}` };
+    }
+  }
+
+  const m1 = input.match(/youtube\.com\/channel\/(UC[A-Za-z0-9_\-]{22})/);
+  if (m1) return { type: 'id', value: m1[1] };
+  const m2 = input.match(/(?:youtube\.com\/)?\@([A-Za-z0-9._\-]+)/);
+  if (m2) return { type: 'handle', value: m2[1] };
+  const m3 = input.match(/youtube\.com\/user\/([A-Za-z0-9._\-]+)/);
+  if (m3) return { type: 'user', value: m3[1] };
+  return null;
+}
+
+async function fetchJsonThroughProxies(url) {
+  try {
+    const r = await fetch(CORSPROXY + encodeURIComponent(url), { cache: 'no-store' });
+    if (r.ok) {
+      const text = await r.text();
+      try { return JSON.parse(text); } catch(e) {}
+    }
+  } catch(e) {}
+  try {
+    const r = await fetch(ALLORIGINS + encodeURIComponent(url), { cache: 'no-store' });
+    if (r.ok) {
+      const d = await r.json();
+      return JSON.parse(d.contents);
+    }
+  } catch(e) {}
+  return null;
+}
+
+async function resolveYtVideoToChannel(videoId) {
+  if (!videoId) return null;
+  const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+  const sources = [
+    `https://www.youtube.com/oembed?url=${encodeURIComponent(videoUrl)}&format=json`,
+    `https://noembed.com/embed?url=${encodeURIComponent(videoUrl)}`
+  ];
+  for (const src of sources) {
+    const data = await fetchJsonThroughProxies(src).catch(() => null);
+    const authorUrl = data?.author_url || '';
+    const authorName = data?.author_name || '';
+    if (!authorUrl) continue;
+    const parsed = extractYtChannelId(authorUrl);
+    if (!parsed) continue;
+    const resolved = await resolveYtInputToChannel(parsed).catch(() => null);
+    if (resolved) return { ...resolved, name: authorName || resolved.id };
+  }
+  return null;
+}
+
+async function fetchYtPage(pageUrl) {
+  let html = null;
+  try {
+    const r = await fetch(CORSPROXY + encodeURIComponent(pageUrl), { cache: 'no-store' });
+    if (r.ok) html = await r.text();
+  } catch(e) {}
+  if (!html) {
+    try {
+      const r = await fetch(ALLORIGINS + encodeURIComponent(pageUrl), { cache: 'no-store' });
+      if (r.ok) { const d = await r.json(); html = d.contents; }
+    } catch(e) {}
+  }
+  return html;
+}
+
+function extractChannelIdFromHtml(html) {
+  if (!html) return null;
+  const patterns = [
+    /window\['ytCommand'\]\s*=\s*\{[\s\S]*?"browseEndpoint":\{"browseId":"(UC[A-Za-z0-9_\-]{22})"/,
+    /"vanityChannelUrl":"[^"]+","externalId":"(UC[A-Za-z0-9_\-]{22})"/,
+    /"rssUrl":"https:\\\/\\\/www\.youtube\.com\\\/feeds\\\/videos\.xml\?channel_id=(UC[A-Za-z0-9_\-]{22})"/,
+    /"externalId":"(UC[A-Za-z0-9_\-]{22})"/,
+    /<link[^>]+rel="alternate"[^>]+type="application\/rss\+xml"[^>]+href="https:\/\/www\.youtube\.com\/feeds\/videos\.xml\?channel_id=(UC[A-Za-z0-9_\-]{22})"/i,
+    /<meta[^>]+itemprop="identifier"[^>]+content="(UC[A-Za-z0-9_\-]{22})"/i,
+    /"channelId":"(UC[A-Za-z0-9_\-]{22})"/,
+    /"browseId":"(UC[A-Za-z0-9_\-]{22})"/,
+    /\/channel\/(UC[A-Za-z0-9_\-]{22})"/,
+    /channel_id=(UC[A-Za-z0-9_\-]{22})/
+  ];
+  for (const pattern of patterns) {
+    const m = html.match(pattern);
+    if (m) return m[1];
+  }
+  return null;
+}
+
+async function resolveYtHandle(handle) {
+  const html = await fetchYtPage(`https://www.youtube.com/@${handle}`);
+  return extractChannelIdFromHtml(html);
+}
+
+async function resolveYtChannelUrl(url) {
+  const html = await fetchYtPage(url);
+  return extractChannelIdFromHtml(html);
+}
+
+async function resolveYtInputToChannel(parsed) {
+  if (!parsed) return null;
+  if (parsed.type === 'id') return { id: parsed.value, idType: 'id' };
+  if (parsed.type === 'handle') {
+    const id = await resolveYtHandle(parsed.value).catch(() => null);
+    return id ? { id, idType: 'id' } : null;
+  }
+  if (parsed.type === 'user') {
+    const id = await resolveYtChannelUrl(`https://www.youtube.com/user/${parsed.value}`).catch(() => null);
+    return id ? { id, idType: 'id' } : { id: parsed.value, idType: 'user' };
+  }
+  if (parsed.type === 'url') {
+    const id = await resolveYtChannelUrl(parsed.value).catch(() => null);
+    return id ? { id, idType: 'id' } : null;
+  }
+  if (parsed.type === 'video') {
+    return resolveYtVideoToChannel(parsed.value);
+  }
+  return null;
+}
+
+function parseYtVideosFromHtml(html, fallbackChannelId, fallbackChannelName) {
+  if (!html) return { videos: [], channelName: fallbackChannelName || fallbackChannelId };
+
+  const channelName =
+    html.match(/"ownerChannelName":"([^"]+)"/)?.[1] ||
+    html.match(/"channelMetadataRenderer":\{"title":"([^"]+)"/)?.[1] ||
+    fallbackChannelName ||
+    fallbackChannelId;
+
+  const seen = new Set();
+  const videos = [];
+  const patterns = [
+    /"videoId":"([A-Za-z0-9_-]{11})"[\s\S]{0,600}?"title":\{"runs":\[\{"text":"([^"]+)"/g,
+    /"gridVideoRenderer":\{[\s\S]{0,1200}?"videoId":"([A-Za-z0-9_-]{11})"[\s\S]{0,1200}?"title":\{"runs":\[\{"text":"([^"]+)"/g,
+    /"richItemRenderer":\{[\s\S]{0,1600}?"videoId":"([A-Za-z0-9_-]{11})"[\s\S]{0,1600}?"title":\{"runs":\[\{"text":"([^"]+)"/g
+  ];
+
+  for (const pattern of patterns) {
+    let m;
+    while ((m = pattern.exec(html)) && videos.length < 15) {
+      const videoId = m[1];
+      const title = m[2];
+      if (!videoId || seen.has(videoId)) continue;
+      seen.add(videoId);
+      videos.push({
+        videoId,
+        title,
+        date: new Date(),
+        thumb: `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`,
+        channelName,
+        channelId: fallbackChannelId
+      });
+    }
+    if (videos.length) break;
+  }
+
+  return { videos, channelName };
+}
+
+async function fetchYtVideosFromChannelPage(url, channelId, channelName) {
+  const html = await fetchYtPage(url);
+  return parseYtVideosFromHtml(html, channelId, channelName);
+}
+
+async function fetchYtChannelVideos(ch) {
+  if (ch.idType === 'handle') {
+    return fetchYtVideosFromChannelPage(`https://www.youtube.com/@${ch.id}/videos`, ch.id, ch.name);
+  }
+  if (ch.idType === 'url') {
+    return fetchYtVideosFromChannelPage(ch.id.replace(/\/+$/, '') + '/videos', ch.id, ch.name);
+  }
+
+  const param = ch.idType === 'id' ? `channel_id=${ch.id}` : `user=${ch.id}`;
+  const feedUrl = `https://www.youtube.com/feeds/videos.xml?${param}`;
+  try {
+    const r = await fetch(RSS2JSON + encodeURIComponent(feedUrl), { cache: 'no-store' });
+    if (r.ok) {
+      const d = await r.json();
+      if (d.status === 'ok' && Array.isArray(d.items) && d.items.length) {
+        const channelName = d.feed?.title || ch.name || ch.id;
+        const videos = d.items.slice(0, 15).map(i => {
+          const link = i.link || '';
+          const videoId = link.match(/[?&]v=([^&]+)/)?.[1] || '';
+          return {
+            videoId,
+            title: i.title || '',
+            date: new Date(i.pubDate),
+            thumb: i.thumbnail || (videoId ? `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg` : ''),
+            channelName,
+            channelId: ch.id
+          };
+        }).filter(v => v.videoId);
+        if (videos.length) return { videos, channelName };
+      }
+    }
+  } catch(e) {}
+
+  let xml = null;
+  try {
+    const r = await fetch(CORSPROXY + encodeURIComponent(feedUrl), { cache: 'no-store' });
+    if (r.ok) xml = await r.text();
+  } catch(e) {}
+  if (!xml) {
+    try {
+      const r = await fetch(ALLORIGINS + encodeURIComponent(feedUrl), { cache: 'no-store' });
+      if (r.ok) { const d = await r.json(); xml = d.contents; }
+    } catch(e) {}
+  }
+  if (!xml) return { videos: [], channelName: ch.name };
+
+  const doc = new DOMParser().parseFromString(xml, 'application/xml');
+  const entries = [...doc.querySelectorAll('entry')];
+  if (!entries.length) return { videos: [], channelName: ch.name };
+
+  const channelName = doc.querySelector('author > name')?.textContent?.trim() || ch.name || ch.id;
+  const videos = entries.slice(0, 15).map(el => {
+    const link = el.querySelector('link')?.getAttribute('href') || '';
+    const videoId = link.match(/[?&]v=([^&]+)/)?.[1] || '';
+    const title = el.querySelector('title')?.textContent?.trim() || '';
+    const published = el.querySelector('published')?.textContent || '';
+    const thumb = videoId ? `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg` : '';
+    return { videoId, title, date: new Date(published), thumb, channelName, channelId: ch.id };
+  }).filter(v => v.videoId);
+
+  return { videos, channelName };
+}
+
+async function loadYouTube(bust = false) {
+  if (!S.ytChannels.length) {
+    ytLoading = false;
+    ytVideos = [];
+    removeYtSidebar();
+    return;
+  }
+  const YT_TTL = 30 * 60 * 1000;
+  ytLoading = true;
+  injectYtSidebar();
+  let cached = null;
+  if (!bust) {
+    try {
+      cached = JSON.parse(localStorage.getItem('flux_yt_cache') || 'null');
+      if (
+        cached &&
+        cached.sig === ytCacheSignature() &&
+        Date.now() - cached.ts < YT_TTL &&
+        cached.videos?.length
+      ) {
+        ytVideos = cached.videos.map(v => ({ ...v, date: new Date(v.date) }));
+        ytVideos.forEach(v => { ytVideoMap[v.videoId] = v; });
+        ytLoading = false;
+        injectYtSidebar();
+        return;
+      }
+    } catch(e) {}
+  }
+  const results = await Promise.all(
+    S.ytChannels.map(ch => fetchYtChannelVideos(ch).catch(() => ({ videos: [], channelName: ch.name })))
+  );
+  results.forEach((r, i) => {
+    if (r.channelName && r.channelName !== S.ytChannels[i].id) S.ytChannels[i].name = r.channelName;
+  });
+  saveYtChannels();
+  const freshVideos = results.flatMap(r => r.videos).sort((a, b) => b.date - a.date);
+  const expectedChannels = S.ytChannels.length;
+  const freshChannelCount = ytChannelCountFromVideos(freshVideos);
+  const cachedVideos = (cached && cached.sig === ytCacheSignature() && cached.videos?.length)
+    ? cached.videos.map(v => ({ ...v, date: new Date(v.date) }))
+    : [];
+  const cachedChannelCount = ytChannelCountFromVideos(cachedVideos);
+
+  // If the first network pass only brings back a subset of channels,
+  // prefer an older fuller cache over replacing it with a partial snapshot.
+  ytVideos = freshVideos;
+  if (freshChannelCount < expectedChannels && cachedChannelCount > freshChannelCount) {
+    ytVideos = cachedVideos;
+  }
+  ytVideos.forEach(v => { ytVideoMap[v.videoId] = v; });
+  if (freshChannelCount >= expectedChannels || !cachedChannelCount) {
+    try {
+      localStorage.setItem('flux_yt_cache', JSON.stringify({
+        ts: Date.now(),
+        sig: ytCacheSignature(),
+        videos: freshVideos
+      }));
+    } catch(e) {}
+  }
+  ytLoading = false;
+  injectYtSidebar();
+}
+
+function ytAge(d) {
+  if (!d || isNaN(d)) return '';
+  const s = (Date.now() - d) / 1000;
+  if (s < 3600) return `${Math.floor(s/60)}p`;
+  if (s < 86400) return `${Math.floor(s/3600)}ó`;
+  if (s < 604800) return `${Math.floor(s/86400)}n`;
+  return d.toLocaleDateString('hu-HU', { month:'short', day:'numeric' });
+}
+
+function getYtSidebarGroups() {
+  const n = S.ytPerChannel || 3;
+  // Group videos by channel, preserving S.ytChannels order
+  const byChannel = {};
+  ytVideos.forEach(v => {
+    if (!byChannel[v.channelId]) byChannel[v.channelId] = [];
+    byChannel[v.channelId].push(v);
+  });
+
+  const maxCh = S.ytMaxChannels || 5;
+  const groups = S.ytChannels.slice(0, maxCh).map(ch => ({
+    name: ch.name || ch.id,
+    videos: (byChannel[ch.id] || []).slice(0, n)
+  })).filter(g => g.videos.length);
+  return groups;
+}
+
+function buildYtSidebarHtml() {
+  const ytIcon = `<svg width="12" height="12" viewBox="0 0 24 24" fill="#ff0000"><path d="M23 7s-.3-2-1.2-2.8C20.7 3 19.4 3 18.8 2.9 15.7 2.7 12 2.7 12 2.7s-3.7 0-6.8.2C4.6 3 3.3 3 2.2 4.2 1.3 5 1 7 1 7S.7 9.3.7 11.6v2.1c0 2.3.3 4.6.3 4.6s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2C7.9 22.5 12 22.5 12 22.5s3.7 0 6.8-.3c.6-.1 1.9-.1 3-1.3.9-.8 1.2-2.8 1.2-2.8s.3-2.3.3-4.6v-2.1C23.3 9.3 23 7 23 7zM9.7 15.5V9.2l6.6 3.2-6.6 3.1z"/></svg>`;
+  const refreshIcon = `<button class="yt-refresh-btn${ytLoading ? ' spinning' : ''}" type="button" title="YouTube frissítése" onclick="refreshYtFeed(event)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg></button>`;
+  const groups = getYtSidebarGroups();
+
+  if (!groups.length) {
+    const message = ytLoading
+      ? 'YouTube videók betöltése...'
+      : 'Még nincs megjeleníthető videó. Ellenőrizd a csatornákat vagy frissíts újra.';
+    return `<div class="yt-sidebar-heading"><div class="yt-sidebar-heading-main">${ytIcon} YouTube</div>${refreshIcon}</div><div class="yt-empty">${e(message)}</div>`;
+  }
+
+  const html = groups.map((g, gi) => {
+    const cards = g.videos.map(v => `
+      <div class="yt-vcard" onclick="openYtVideo('${e(v.videoId)}')">
+        <img class="yt-vcard-thumb" src="${e(v.thumb)}" alt="" loading="lazy" onerror="this.style.display='none'">
+        <div class="yt-vcard-body">
+          <div class="yt-vcard-title">${e(v.title)}</div>
+          <div class="yt-vcard-meta">${ytAge(v.date)}</div>
+        </div>
+      </div>`).join('');
+    return `<div class="yt-ch-group${gi > 0 ? ' yt-ch-group--sep' : ''}">
+      <div class="yt-ch-heading">${e(g.name)}</div>
+      ${cards}
+    </div>`;
+  }).join('');
+
+  return `<div class="yt-sidebar-heading"><div class="yt-sidebar-heading-main">${ytIcon} YouTube</div>${refreshIcon}</div>${html}`;
+}
+
+function refreshYtFeed(ev) {
+  if (ev) ev.stopPropagation();
+  try { localStorage.removeItem('flux_yt_cache'); } catch(e) {}
+  loadYouTube(true);
+}
+
+function mergeSplitLayouts(container) {
+  if (!container) return;
+  container.querySelectorAll('.yt-section-divider').forEach(el => el.remove());
+  ['grid-layout', 'list-layout', 'reader-layout'].forEach(cls => {
+    const nodes = [...container.children].filter(el => el.classList && el.classList.contains(cls));
+    if (nodes.length < 2) return;
+    const first = nodes[0];
+    nodes.slice(1).forEach(node => {
+      while (node.firstChild) first.appendChild(node.firstChild);
+      node.remove();
+    });
+  });
+}
+
+function getYtLeadCount(layout) {
+  if (layout === 'reader') return 8;
+  if (layout === 'list') return 6;
+  if (layout === 'grid') return 8;
+  if (layout === 'magazine') return 2;
+  return 0;
+}
+
+function syncYtSidebarHeight(sidebar, referenceEl) {
+  if (!sidebar || !referenceEl) return;
+  requestAnimationFrame(() => {
+    const h = referenceEl.offsetHeight;
+    const target = Math.max(0, h - 6);
+    sidebar.style.height = target > 0 ? `${target}px` : '';
+    sidebar.style.maxHeight = target > 0 ? `${target}px` : '';
+  });
+}
+
+function injectYtSplitLayout(content, sidebar, layoutClass) {
+  const layoutEl = content.querySelector(`.${layoutClass}`);
+  if (!layoutEl) return false;
+
+  const items = [...layoutEl.children];
+  const leadCount = Math.min(getYtLeadCount(S.layout), items.length);
+  if (!leadCount || leadCount >= items.length) return false;
+
+  const topLayout = layoutEl.cloneNode(false);
+  const bottomLayout = layoutEl.cloneNode(false);
+  items.forEach((item, idx) => {
+    (idx < leadCount ? topLayout : bottomLayout).appendChild(item);
+  });
+
+  const wrap = document.createElement('div');
+  wrap.className = 'yt-wrap';
+  const mainDiv = document.createElement('div');
+  mainDiv.style.cssText = 'min-width:0';
+  mainDiv.appendChild(topLayout);
+  wrap.appendChild(mainDiv);
+  wrap.appendChild(sidebar);
+  const divider = document.createElement('div');
+  divider.className = 'yt-section-divider';
+  divider.innerHTML = '<div class="yt-divider-main"></div><div class="yt-divider-side"></div>';
+
+  layoutEl.replaceWith(wrap);
+  if (bottomLayout.children.length) {
+    content.appendChild(divider);
+    content.appendChild(bottomLayout);
+  }
+  syncYtSidebarHeight(sidebar, topLayout);
+  return true;
+}
+
+function injectYtSplitMagazine(content, sidebar) {
+  const magLayout = content.querySelector('.magazine-layout');
+  if (!magLayout) return false;
+
+  const hero = magLayout.querySelector('.ix-hero');
+  const allChildren = [...magLayout.children];
+  const bodyChildren = allChildren.filter(el => el !== hero);
+  const leadCount = Math.min(getYtLeadCount('magazine'), bodyChildren.length);
+  if (!leadCount || leadCount >= bodyChildren.length) return false;
+
+  const topBody = document.createElement('div');
+  const bottomBody = document.createElement('div');
+  topBody.style.cssText = 'min-width:0';
+  bottomBody.style.cssText = 'min-width:0';
+
+  bodyChildren.forEach((child, idx) => {
+    (idx < leadCount ? topBody : bottomBody).appendChild(child);
+  });
+
+  const wrap = document.createElement('div');
+  wrap.className = 'yt-wrap';
+  wrap.appendChild(topBody);
+  wrap.appendChild(sidebar);
+  topBody.classList.add('yt-feature-block');
+  const divider = document.createElement('div');
+  divider.className = 'yt-section-divider';
+  divider.innerHTML = '<div class="yt-divider-main"></div><div class="yt-divider-side"></div>';
+
+  magLayout.innerHTML = '';
+  if (hero) magLayout.appendChild(hero);
+  magLayout.appendChild(wrap);
+  if (bottomBody.firstChild) {
+    magLayout.appendChild(divider);
+  }
+  while (bottomBody.firstChild) magLayout.appendChild(bottomBody.firstChild);
+  syncYtSidebarHeight(sidebar, topBody);
+  return true;
+}
+
+function removeYtSidebar() {
+  const content = $('content');
+  if (!content) return;
+
+  content.querySelectorAll('.yt-wrap').forEach(wrap => {
+    const parent = wrap.parentElement;
+    const mainDiv = wrap.firstElementChild;
+    if (mainDiv && (parent === content || parent?.classList.contains('magazine-layout'))) {
+      while (mainDiv.firstChild) parent.insertBefore(mainDiv.firstChild, wrap);
+    }
+    wrap.remove();
+  });
+
+  content.querySelectorAll('.yt-sidebar').forEach(sidebar => {
+    if (!sidebar.closest('.yt-wrap')) sidebar.remove();
+  });
+  mergeSplitLayouts(content);
+}
+
+function injectYtSidebar() {
+  const content = $('content');
+  if (!content) return;
+  if (!S.ytChannels.length) {
+    removeYtSidebar();
+    return;
+  }
+  if (content.querySelector('.spinner')) return;
+
+  const existing = content.querySelector('.yt-sidebar');
+  if (existing) removeYtSidebar();
+
+  const sidebar = document.createElement('aside');
+  sidebar.className = 'yt-sidebar';
+  sidebar.innerHTML = buildYtSidebarHtml();
+
+  if (S.layout === 'magazine') {
+    if (injectYtSplitMagazine(content, sidebar)) return;
+  }
+
+  if (S.layout === 'reader' && injectYtSplitLayout(content, sidebar, 'reader-layout')) return;
+  if (S.layout === 'list' && injectYtSplitLayout(content, sidebar, 'list-layout')) return;
+  if (S.layout === 'grid' && injectYtSplitLayout(content, sidebar, 'grid-layout')) return;
+
+  // Grid / list / reader: wrap all content + sidebar in .yt-wrap grid
+  const wrap = document.createElement('div');
+  wrap.className = 'yt-wrap';
+  const mainDiv = document.createElement('div');
+  mainDiv.style.cssText = 'min-width:0';
+  while (content.firstChild) mainDiv.appendChild(content.firstChild);
+  wrap.appendChild(mainDiv);
+  wrap.appendChild(sidebar);
+  content.appendChild(wrap);
+}
+
+function openYtVideo(videoId) {
+  const url = `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}`;
+  window.open(url, '_blank', 'noopener');
+}
+
+function renderSYtChannels() {
+  const c = $('sYtList');
+  if (!c) return;
+  if (!S.ytChannels.length) {
+    c.innerHTML = '<div style="font-size:.78rem;color:var(--muted);padding:4px 0">Nincs csatorna.</div>';
+    return;
+  }
+  const ytIcon = `<svg width="13" height="13" viewBox="0 0 24 24" fill="#ff0000" style="flex-shrink:0"><path d="M23 7s-.3-2-1.2-2.8C20.7 3 19.4 3 18.8 2.9 15.7 2.7 12 2.7 12 2.7s-3.7 0-6.8.2C4.6 3 3.3 3 2.2 4.2 1.3 5 1 7 1 7S.7 9.3.7 11.6v2.1c0 2.3.3 4.6.3 4.6s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2C7.9 22.5 12 22.5 12 22.5s3.7 0 6.8-.3c.6-.1 1.9-.1 3-1.3.9-.8 1.2-2.8 1.2-2.8s.3-2.3.3-4.6v-2.1C23.3 9.3 23 7 23 7zM9.7 15.5V9.2l6.6 3.2-6.6 3.1z"/></svg>`;
+  c.innerHTML = S.ytChannels.map((ch, i) => `
+    <div class="s-feed-item" data-idx="${i}">
+      ${ytIcon}
+      <span style="flex:1;font-size:.83rem;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-left:2px">${e(ch.name || ch.id)}</span>
+      <button class="s-feed-del" onclick="deleteYtChannel('${e(ch.id)}')">✕</button>
+    </div>`).join('');
+}
+
+function deleteYtChannel(id) {
+  S.ytChannels = S.ytChannels.filter(ch => ch.id !== id);
+  saveYtChannels();
+  ytVideos = ytVideos.filter(v => v.channelId !== id);
+  try { localStorage.removeItem('flux_yt_cache'); } catch(e) {}
+  renderSYtChannels();
+  injectYtSidebar();
+  toast('Csatorna törölve.');
+}
+
+function openAddYtModal() {
+  $('ytChannelInput').value = '';
+  $('ytErr').classList.remove('show');
+  $('confirmYt').disabled = false;
+  $('confirmYt').textContent = 'Hozzáadás';
+  $('addYtModal').classList.add('open');
+  $('overlay').classList.add('open');
+  setTimeout(() => $('ytChannelInput').focus(), 80);
+}
+
+function closeAddYtModal() {
+  $('addYtModal').classList.remove('open');
+  $('overlay').classList.remove('open');
+}
+
+async function submitAddYt() {
+  const input = $('ytChannelInput').value.trim();
+  if (!input) return;
+  const parsed = extractYtChannelId(input);
+  const debug = [];
+  if (!parsed) {
+    $('ytErr').textContent = 'Érvénytelen URL/ID. Adj meg channel URL-t, UC… ID-t, vagy YouTube videó linket.';
+    $('ytErr').classList.add('show');
+    return;
+  }
+  const btn = $('confirmYt');
+  btn.disabled = true; btn.textContent = 'Betöltés...';
+  $('ytErr').classList.remove('show');
+
+  const resolved = await resolveYtInputToChannel(parsed).catch(() => null);
+  debug.push(`parsed:${parsed.type}`);
+  debug.push(`resolved:${resolved ? resolved.idType : 'no'}`);
+  let idType = resolved?.idType || (
+    parsed.type === 'id' ? 'id' :
+    parsed.type === 'user' ? 'user' :
+    parsed.type === 'handle' ? 'handle' :
+    parsed.type === 'video' ? resolved?.idType || null :
+    parsed.type === 'url' ? 'url' :
+    null
+  );
+  let chId = resolved?.id || parsed.value;
+  let presetName = resolved?.name || '';
+
+  if (S.ytChannels.find(ch => ch.id === chId)) {
+    toast('Ez a csatorna már hozzáadva.'); closeAddYtModal(); return;
+  }
+
+  let videos = [];
+  let channelName = '';
+
+  if (idType) {
+    const tempCh = { id: chId, name: chId, idType };
+    const feedResult = await fetchYtChannelVideos(tempCh).catch(() => ({ videos: [], channelName: '' }));
+    videos = feedResult.videos;
+    channelName = feedResult.channelName || presetName;
+    debug.push(`feed:${videos.length}`);
+  }
+
+  if (!videos.length && parsed.type === 'handle') {
+    const pageResult = await fetchYtVideosFromChannelPage(`https://www.youtube.com/@${parsed.value}/videos`, chId, channelName || chId).catch(() => ({ videos: [], channelName: '' }));
+    videos = pageResult.videos;
+    channelName = pageResult.channelName || channelName;
+    debug.push(`handlePage:${videos.length}`);
+  }
+
+  if (!videos.length && parsed.type === 'url') {
+    const pageResult = await fetchYtVideosFromChannelPage(parsed.value.replace(/\/+$/, '') + '/videos', chId, channelName || chId).catch(() => ({ videos: [], channelName: '' }));
+    videos = pageResult.videos;
+    channelName = pageResult.channelName || channelName;
+    debug.push(`urlPage:${videos.length}`);
+  }
+
+  if (!videos.length) {
+    $('ytErr').textContent = `Nem sikerült betölteni. Debug: ${debug.join(', ')}`;
+    $('ytErr').classList.add('show');
+    btn.disabled = false; btn.textContent = 'Hozzáadás';
+    return;
+  }
+
+  const ch = { id: chId, name: channelName || presetName || chId, idType };
+  S.ytChannels.push(ch);
+  saveYtChannels();
+  videos.forEach(v => { ytVideoMap[v.videoId] = v; });
+  ytVideos = [...ytVideos, ...videos].sort((a, b) => b.date - a.date);
+  try {
+    localStorage.setItem('flux_yt_cache', JSON.stringify({
+      ts: Date.now(),
+      sig: ytCacheSignature(),
+      videos: ytVideos
+    }));
+  } catch(e) {}
+  renderSYtChannels();
+  closeAddYtModal();
+  injectYtSidebar();
+  toast(`"${ch.name}" csatorna hozzáadva!`);
+}
+
+/* ════════════════════════════════════════════════════════════
    F1 WIDGET
 ════════════════════════════════════════════════════════════ */
 const F1_TEAM_COLORS = {
@@ -2824,6 +3603,7 @@ async function loadF1() {
   updateCycleBtn(false);
   loadWeather();
   loadF1();
+  loadYouTube();
 
   const contentEl = document.getElementById('content');
   const navbar = document.getElementById('navbar');
