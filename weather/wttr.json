@@ -4,9 +4,9 @@
       "FeelsLikeC": "16",
       "FeelsLikeF": "61",
       "cloudcover": "0",
-      "humidity": "36",
-      "localObsDateTime": "2026-04-04 11:36 AM",
-      "observation_time": "09:36 AM",
+      "humidity": "34",
+      "localObsDateTime": "2026-04-04 12:24 PM",
+      "observation_time": "10:24 AM",
       "precipInches": "0.0",
       "precipMM": "0.0",
       "pressure": "1019",
@@ -16,21 +16,21 @@
       "uvIndex": "4",
       "visibility": "10",
       "visibilityMiles": "6",
-      "weatherCode": "113",
+      "weatherCode": "119",
       "weatherDesc": [
         {
-          "value": "Sunny"
+          "value": "Cloudy"
         }
       ],
       "weatherIconUrl": [
         {
-          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0001_sunny.png"
+          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0003_white_cloud.png"
         }
       ],
-      "winddir16Point": "WNW",
-      "winddirDegree": "303",
-      "windspeedKmph": "18",
-      "windspeedMiles": "11"
+      "winddir16Point": "NW",
+      "winddirDegree": "304",
+      "windspeedKmph": "19",
+      "windspeedMiles": "12"
     }
   ],
   "nearest_area": [
@@ -307,16 +307,16 @@
           "chanceofsunshine": "18",
           "chanceofthunder": "0",
           "chanceofwindy": "0",
-          "cloudcover": "82",
+          "cloudcover": "0",
           "diffRad": "103.8",
-          "humidity": "47",
+          "humidity": "34",
           "precipInches": "0.0",
           "precipMM": "0.0",
-          "pressure": "1020",
+          "pressure": "1019",
           "pressureInches": "30",
           "shortRad": "528.4",
-          "tempC": "15",
-          "tempF": "58",
+          "tempC": "16",
+          "tempF": "61",
           "time": "1200",
           "uvIndex": "4",
           "visibility": "10",
