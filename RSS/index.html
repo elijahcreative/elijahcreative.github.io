@@ -424,10 +424,9 @@
     .ix-img-wrap {
       position: relative;
       display: block;
-      border-radius: var(--radius-sm);
+      border-radius: var(--radius);
       overflow: hidden;
     }
-    .ix-img-wrap.hero-wrap { border-radius: var(--radius); }
 
     /* Hero */
     .ix-hero {
@@ -566,48 +565,6 @@
 
     /* Tighter composition when magazine content sits next to the YT rail */
     .yt-wrap .ix-row { gap: 22px 24px; }
-    .yt-feature-block {
-      background: var(--ac);
-      border-radius: 18px;
-      padding: 18px;
-      box-shadow: 0 10px 24px color-mix(in srgb, var(--ac) 20%, transparent);
-      margin-bottom: 10px;
-    }
-    .yt-feature-block .ix-row { margin-bottom: 0; }
-    .yt-feature-block .ix-card:hover .ix-card-title,
-    .yt-feature-block .ix-text-fill:hover .ix-tf-title { color: #ffffff; opacity: .92; }
-    .yt-feature-block .ix-img-wrap {
-      padding: 12px;
-      background: color-mix(in srgb, white 12%, transparent);
-      border-radius: 16px;
-    }
-    .yt-feature-block .ix-card-img,
-    .yt-feature-block .ix-card-nobg,
-    .yt-feature-block .ix-mini-img,
-    .yt-feature-block .ix-mini-nobg {
-      border-radius: 12px;
-    }
-    .yt-feature-block .ix-card-title,
-    .yt-feature-block .ix-tf-title,
-    .yt-feature-block .ix-card-desc,
-    .yt-feature-block .ix-tf-desc,
-    .yt-feature-block .ix-card-time,
-    .yt-feature-block .ix-mini-time {
-      color: #ffffff;
-    }
-    .yt-feature-block .ix-card-desc,
-    .yt-feature-block .ix-tf-desc {
-      color: rgba(255,255,255,.82);
-    }
-    .yt-feature-block .ix-card-time { color: rgba(255,255,255,.7); }
-    .yt-feature-block .ix-text-fill {
-      border-top-color: rgba(255,255,255,.18);
-    }
-    .yt-feature-block .ix-badge {
-      background: rgba(255,255,255,.16);
-      color: #ffffff;
-      backdrop-filter: blur(6px);
-    }
     .yt-wrap .ix-row.row-a { grid-template-columns: 1.35fr .95fr; }
     .yt-wrap .ix-row.row-b { grid-template-columns: .95fr 1.35fr; }
     .yt-wrap .ix-card { gap: 6px; }
@@ -709,8 +666,27 @@
       border-radius: var(--radius);
       overflow: hidden;
       cursor: pointer;
-      background: var(--bg-card);
+      background: var(--ac);
       margin-bottom: 32px;
+    }
+    [data-theme="dark"] .ix-spotlight {
+      background: color-mix(in srgb, var(--ac) 50%, transparent);
+    }
+    .ix-spot-source { color: rgba(255,255,255,.75) !important; }
+    .ix-spot-title  { color: #ffffff !important; }
+    .ix-spot-desc   { color: rgba(255,255,255,.82) !important; }
+    .ix-spot-time   { color: rgba(255,255,255,.65) !important; }
+    .ix-spotlight .ix-badge { display: none; }
+    .ix-spotlight .ix-spot-img-side { padding: 12px; }
+    .ix-spot-img-clip {
+      width: 100%; height: 100%;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    .ix-spot-img-clip .ix-spot-img { transition: transform .4s ease; }
+    .ix-spot-img-clip .ix-spot-img,
+    .ix-spot-img-clip .ix-spot-nobg {
+      border-radius: 0;
     }
     .ix-spotlight:hover .ix-spot-title { color: var(--ac); }
     .ix-spot-img-side {
@@ -777,7 +753,6 @@
       margin-bottom: 32px;
     }
     .ix-strip-col {
-      background: var(--bg-card);
       border-radius: var(--radius);
       overflow: hidden;
       display: flex;
@@ -813,10 +788,53 @@
     .ix-strip-source { font-weight: 600; }
 
     @media (max-width: 900px) {
-      .ix-row.row-a, .ix-row.row-b { grid-template-columns: 1fr 1fr; }
+      .ix-row.row-a, .ix-row.row-b { grid-template-columns: 1fr; }
       .ix-trio { grid-template-columns: 1fr 1fr; }
       .ix-mini-grid { grid-template-columns: repeat(2, 1fr); }
       .ix-spotlight { grid-template-columns: 1fr; }
+
+      /* 1. ix-col-side: 3 small cards in a row below the large card */
+      .ix-col-side { flex-direction: row; gap: 8px; }
+      .ix-col-side .ix-card { flex: 1 1 0; min-width: 0; }
+
+      /* Hero: taller + larger title */
+      .ix-hero-img, .ix-hero-nobg { aspect-ratio: 4/3; }
+      .ix-hero-title { font-size: 1.9rem; }
+
+      /* YT sidebar below content */
+      .yt-wrap { grid-template-columns: 1fr !important; }
+      .yt-sidebar {
+        grid-column: 1 !important;
+        height: auto !important;
+        max-height: none !important;
+        display: flex !important;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      /* YT horizontal scroll */
+      .yt-scroll-row {
+        display: flex !important; flex-direction: row;
+        gap: 10px; overflow-x: auto; overflow-y: hidden;
+        padding-bottom: 8px; scrollbar-width: thin;
+      }
+      .yt-scroll-row::-webkit-scrollbar { height: 3px; }
+      .yt-scroll-row::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
+      .yt-ch-group { flex-shrink: 0; width: 150px; }
+      .yt-ch-group--sep { border-top: none; padding-top: 0; border-left: 1px solid var(--border); padding-left: 10px; }
+      .yt-vcard { flex-direction: column; border-bottom: none; padding: 6px 0 0; gap: 0; }
+      .yt-vcard-thumb { width: 100%; height: auto; aspect-ratio: 16/9; margin-bottom: 5px; }
+      .yt-vcard-body { padding: 0; }
+
+      /* Widget popups centered */
+      .wx-popup, .f1-popup {
+        position: fixed !important;
+        top: 56px !important; left: 50% !important; right: auto !important;
+        transform: translateX(-50%) translateY(-8px) !important;
+        width: calc(100vw - 24px) !important; max-width: 340px;
+      }
+      .wx-popup.wx-open { transform: translateX(-50%) translateY(0) !important; }
+      .f1-popup.f1-open { transform: translateX(-50%) translateY(0) !important; }
     }
     @media (max-width: 600px) {
       .ix-row.row-a, .ix-row.row-b { grid-template-columns: 1fr; }
@@ -1130,6 +1148,7 @@
       .content { padding: 72px 12px 16px; }
       .grid-layout { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
       .settings-panel { width: 100%; }
+
     }
     /* ── Category strip ─────────────────────────────────────── */
     .cat-strip {
@@ -1179,7 +1198,7 @@
     .ix-img-wrap img { transition: transform .4s ease; }
     .ix-hero:hover .ix-hero-img,
     .ix-card:hover .ix-card-img,
-    .ix-spotlight:hover .ix-spot-img,
+    .ix-spotlight:hover .ix-spot-img-clip .ix-spot-img,
     .ix-mini:hover .ix-mini-img { transform: scale(1.04); }
     .card { overflow: hidden; }
     .card-img { transition: transform .4s ease; }
@@ -1196,71 +1215,125 @@
       display: flex; align-items: center; gap: 6px; white-space: nowrap;
     }
     .f1-badge-sep { opacity: .35; font-weight: 300; }
-    /* Popup — F1.com dark theme */
+    /* F1 popup — theme-adaptive, matches weather widget */
     .f1-popup {
       position: absolute; top: calc(100% + 10px); right: 0;
       width: 300px; max-height: calc(100vh - 80px); overflow-y: auto;
-      background: #15151e; border-top: 3px solid #e10600;
-      border-radius: 0 0 4px 4px;
-      box-shadow: 0 8px 32px rgba(0,0,0,.6); z-index: 200;
-      opacity: 0; pointer-events: none; transform: translateY(-6px);
-      transition: opacity .16s ease, transform .16s ease;
-      font-family: 'Arial Narrow', Arial, sans-serif;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg); z-index: 200;
+      opacity: 0; pointer-events: none; transform: translateY(-8px);
+      transition: opacity .2s ease, transform .2s ease;
     }
     .f1-popup.f1-open { opacity: 1; pointer-events: all; transform: translateY(0); }
     .f1-popup::-webkit-scrollbar { width: 3px; }
-    .f1-popup::-webkit-scrollbar-thumb { background: #e10600; }
-    .f1-section { padding: 14px 16px; border-bottom: 1px solid #2a2a38; }
+    .f1-popup::-webkit-scrollbar-thumb { background: var(--border); }
+    /* Next race card */
+    .f1-next-card {
+      position: relative; overflow: hidden;
+      border-radius: var(--radius) var(--radius) 0 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .f1-next-card-img {
+      position: absolute; inset: 0;
+      background-size: cover; background-position: center;
+      filter: brightness(.45);
+    }
+    .f1-next-card-body {
+      position: relative; z-index: 1;
+      padding: 14px 14px 12px;
+      min-height: 140px;
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .f1-next-bottom { display: flex; flex-direction: column; align-items: flex-end; }
+    .f1-next-card .f1-section-title { color: rgba(255,255,255,.65); }
+    .f1-next-card .f1-next-name {
+      color: #fff; text-shadow: 0 1px 8px rgba(0,0,0,.6);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .f1-flag-img { width: 1.2em; height: 1.2em; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+    .f1-next-card .f1-next-circuit { color: rgba(255,255,255,.6); }
+    .f1-next-card .f1-countdown { color: #fff; text-shadow: 0 1px 8px rgba(0,0,0,.6); }
+    .f1-next-card .f1-next-date {
+      display: inline-block; background: #e10600; color: #fff !important;
+      padding: 2px 7px; border-radius: 4px; margin-top: 3px;
+    }
+    .f1-section { padding: 10px 14px; border-bottom: 1px solid var(--border); }
     .f1-section:last-child { border-bottom: none; }
     .f1-section-title {
       font-size: .6rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: .14em; color: #e10600; margin-bottom: 10px;
-      border-left: 2px solid #e10600; padding-left: 7px;
+      letter-spacing: .14em; color: #e10600; margin-bottom: 8px;
     }
     /* Next race */
     .f1-next-name {
-      font-size: 1.1rem; font-weight: 900; color: #fff;
+      font-size: 1rem; font-weight: 800; color: var(--text);
       text-transform: uppercase; letter-spacing: -.2px; margin-bottom: 1px; line-height: 1.2;
     }
-    .f1-next-circuit { font-size: .72rem; color: #888; margin-bottom: 10px; letter-spacing: .02em; }
+    .f1-next-circuit { font-size: .7rem; color: var(--muted); margin-bottom: 8px; letter-spacing: .02em; }
     .f1-countdown {
-      font-size: 2rem; font-weight: 900; color: #fff;
-      letter-spacing: -1px; line-height: 1; margin-bottom: 4px;
+      font-size: 1.6rem; font-weight: 900; color: var(--text);
+      letter-spacing: -1px; line-height: 1; margin-bottom: 3px;
     }
-    .f1-next-date { font-size: .7rem; color: #e10600; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+    .f1-next-date { font-size: .68rem; color: #e10600; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
     /* Podium */
-    .f1-podium-row {
-      display: flex; align-items: center; gap: 0;
-      border-left: 3px solid transparent; padding: 5px 0 5px 8px; margin: 1px 0;
+    /* Podium cards */
+    .f1-podium-grid {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 5px;
+      padding: 8px 0 4px;
     }
-    .f1-podium-row:nth-child(2) { border-left-color: #c9b33a; }
-    .f1-podium-row:nth-child(3) { border-left-color: #8e8e8e; }
-    .f1-podium-row:nth-child(4) { border-left-color: #8b5e3c; }
-    .f1-pos { font-size: .7rem; font-weight: 900; width: 22px; flex-shrink: 0; color: #888; letter-spacing: .05em; }
-    .f1-team-dot { width: 3px; height: 20px; border-radius: 1px; flex-shrink: 0; margin-right: 8px; }
-    .f1-driver { font-size: .92rem; font-weight: 700; color: #fff; flex: 1; text-transform: uppercase; letter-spacing: .02em; }
-    .f1-constructor { font-size: .65rem; color: #666; text-transform: uppercase; letter-spacing: .04em; }
+    .f1-podium-card {
+      position: relative; border-radius: var(--radius-sm);
+      overflow: hidden; aspect-ratio: 2/3;
+      background: color-mix(in srgb, var(--border) 60%, var(--bg));
+      border: 1px solid #555;
+    }
+    .f1-podium-card-bg {
+      position: absolute; inset: 0;
+      background-size: cover; background-position: center top;
+    }
+    .f1-podium-card-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,.5) 30%, transparent 52%);
+    }
+    .f1-podium-pos {
+      position: absolute; top: 6px; right: 6px;
+      font-size: .6rem; font-weight: 900; color: #fff;
+      background: rgba(0,0,0,.45); border-radius: 4px;
+      padding: 2px 5px; letter-spacing: .04em;
+    }
+    .f1-podium-info {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 6px 7px;
+    }
+    .f1-podium-driver {
+      font-size: .7rem; font-weight: 800; color: #fff;
+      text-transform: uppercase; letter-spacing: .03em; line-height: 1.3;
+    }
+    .f1-podium-team {
+      font-size: .56rem; color: rgba(255,255,255,.65);
+      text-transform: uppercase; letter-spacing: .04em;
+    }
     /* Standings */
     .f1-standing-row {
       display: flex; align-items: center; gap: 0;
-      padding: 5px 0 5px 0; margin: 1px 0; border-bottom: 1px solid #1e1e2c;
+      padding: 3px 0; border-bottom: 1px solid color-mix(in srgb, var(--border) 35%, transparent);
     }
     .f1-standing-row:last-child { border-bottom: none; }
-    .f1-team-bar { width: 3px; height: 20px; border-radius: 1px; flex-shrink: 0; margin-right: 9px; }
-    .f1-standing-pos { font-size: .75rem; font-weight: 900; color: #555; width: 18px; flex-shrink: 0; }
-    .f1-standing-driver { font-size: .9rem; font-weight: 700; color: #fff; flex: 1; text-transform: uppercase; letter-spacing: .02em; }
-    .f1-standing-pts { font-size: .82rem; font-weight: 900; color: #e10600; letter-spacing: -.3px; }
+    .f1-team-bar { width: 3px; height: 16px; border-radius: 1px; flex-shrink: 0; margin-right: 9px; }
+    .f1-standing-pos { font-size: .7rem; font-weight: 900; color: var(--muted); width: 18px; flex-shrink: 0; }
+    .f1-standing-driver { font-size: .86rem; font-weight: 700; color: var(--text); flex: 1; text-transform: uppercase; letter-spacing: .02em; }
+    .f1-standing-pts { font-size: .62rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
     /* Calendar */
     .f1-cal-row {
       display: flex; align-items: center; gap: 10px;
-      padding: 5px 0; border-bottom: 1px solid #1e1e2c;
+      padding: 4px 0; border-bottom: 1px solid color-mix(in srgb, var(--border) 35%, transparent);
     }
     .f1-cal-row:last-child { border-bottom: none; }
-    .f1-cal-dot { width: 5px; height: 5px; border-radius: 50%; background: #333; flex-shrink: 0; }
-    .f1-cal-name { font-size: .82rem; color: #aaa; flex: 1; text-transform: uppercase; letter-spacing: .02em; font-weight: 600; }
-    .f1-cal-date { font-size: .7rem; color: #555; white-space: nowrap; font-weight: 700; }
+    .f1-cal-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
+    .f1-cal-name { font-size: .78rem; color: var(--text2); flex: 1; text-transform: uppercase; letter-spacing: .02em; font-weight: 600; }
+    .f1-cal-date { font-size: .62rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
     .f1-cal-row.f1-cal-next .f1-cal-dot { background: #e10600; width: 6px; height: 6px; }
-    .f1-cal-row.f1-cal-next .f1-cal-name { color: #fff; }
+    .f1-cal-row.f1-cal-next .f1-cal-name { color: var(--text); }
     .f1-cal-row.f1-cal-next .f1-cal-date { color: #e10600; }
 
     /* ── YouTube Sidebar ────────────────────────────────────────── */
@@ -1318,6 +1391,7 @@
       min-height: 0;
       margin-bottom: 10px;
     }
+    .yt-scroll-row { display: contents; }
     .yt-sidebar::-webkit-scrollbar { width: 5px; }
     .yt-sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
     .yt-sidebar-heading {
@@ -1359,7 +1433,7 @@
     .yt-vcard:last-child { border-bottom: none; }
     .yt-vcard:hover .yt-vcard-title { color: var(--ac); }
     .yt-vcard-thumb {
-      width: 96px; height: 54px; border-radius: 4px;
+      width: 96px; height: 54px; border-radius: var(--radius-sm);
       object-fit: cover; flex-shrink: 0; background: var(--bg-hover); display: block;
     }
     .yt-vcard-body { flex: 1; min-width: 0; }
@@ -1960,8 +2034,9 @@ const Renderer = {
       const sid = aid(a1);
       return `<div class="ix-spotlight" data-id="${sid}" onclick="openArticle('${sid}')">
         <div class="ix-spot-img-side">
-          ${a1.image ? `<img class="ix-spot-img" src="${e(a1.image)}" alt="" loading="lazy" onerror="this.parentNode.style.display='none'">` : `<div class="ix-spot-nobg">📰</div>`}
-          ${badge(a1)}
+          <div class="ix-spot-img-clip">
+            ${a1.image ? `<img class="ix-spot-img" src="${e(a1.image)}" alt="" loading="lazy" onerror="this.parentNode.style.display='none'">` : `<div class="ix-spot-nobg">📰</div>`}
+          </div>
         </div>
         <div class="ix-spot-body">
           <div class="ix-spot-source">${e(this._feedName(a1.feedUrl))}</div>
@@ -2289,7 +2364,11 @@ async function refreshAll(bust = false) {
 
 function setLoading(on) {
   if (on) {
-    $('content').innerHTML = `<div class="state-box"><div class="spinner"></div></div>`;
+    const content = $('content');
+    const hasContent = content.querySelector('.ix-article, .ix-card, .ix-text-fill, .ix-hero');
+    if (!hasContent) {
+      content.innerHTML = `<div class="state-box"><div class="spinner"></div></div>`;
+    }
   }
 }
 
@@ -3160,7 +3239,7 @@ function buildYtSidebarHtml() {
     </div>`;
   }).join('');
 
-  return `<div class="yt-sidebar-heading"><div class="yt-sidebar-heading-main">${ytIcon} YouTube</div>${refreshIcon}</div>${html}`;
+  return `<div class="yt-sidebar-heading"><div class="yt-sidebar-heading-main">${ytIcon} YouTube</div>${refreshIcon}</div><div class="yt-scroll-row">${html}</div>`;
 }
 
 function refreshYtFeed(ev) {
@@ -3258,7 +3337,6 @@ function injectYtSplitMagazine(content, sidebar) {
   wrap.className = 'yt-wrap';
   wrap.appendChild(topBody);
   wrap.appendChild(sidebar);
-  topBody.classList.add('yt-feature-block');
   const divider = document.createElement('div');
   divider.className = 'yt-section-divider';
   divider.innerHTML = '<div class="yt-divider-main"></div><div class="yt-divider-side"></div>';
@@ -3303,7 +3381,7 @@ function injectYtSidebar() {
   if (content.querySelector('.spinner')) return;
 
   const existing = content.querySelector('.yt-sidebar');
-  if (existing) removeYtSidebar();
+  if (existing) { existing.innerHTML = buildYtSidebarHtml(); return; }
 
   const sidebar = document.createElement('aside');
   sidebar.className = 'yt-sidebar';
@@ -3478,6 +3556,49 @@ function renderF1(f1) {
   const teamDot  = c => `<span class="f1-team-dot" style="background:${F1_TEAM_COLORS[c]||'#555'}"></span>`;
   const teamBar  = c => `<span class="f1-team-bar" style="background:${F1_TEAM_COLORS[c]||'#555'}"></span>`;
 
+  const F1_AVATAR_BASE = 'https://raw.githubusercontent.com/elijahcreative/elijahcreative.github.io/main/F1/Avatars';
+  const F1_AVATAR_MAP = {
+    'max_verstappen':'verstappen','verstappen':'verstappen',
+    'hamilton':'hamilton','leclerc':'leclerc',
+    'norris':'norris','piastri':'piastri',
+    'russell':'russell','hulkenberg':'hulkenberg',
+    'antonelli':'antonelli','andrea_kimi_antonelli':'antonelli'
+  };
+  const driverAvatar = (driverId, constructor) => {
+    const color = F1_TEAM_COLORS[constructor] || '#555';
+    const slug  = F1_AVATAR_MAP[driverId];
+    const inner = slug ? `<img src="${F1_AVATAR_BASE}/driver-${slug}.jpeg" alt="" onerror="this.remove()">` : '';
+    return `<span class="f1-driver-avatar" style="border-color:${color}">${inner}</span>`;
+  };
+
+  const F1_CARD_IMG_BASE = 'https://raw.githubusercontent.com/elijahcreative/elijahcreative.github.io/main/F1/Card';
+  const F1_CIRCUIT_MAP = {
+    'Abu Dhabi':'AbuDhabi', 'Australian':'Melbourne', 'Bahrain':'Sakhir',
+    'Azerbaijan':'Baku', 'Saudi Arabian':'Jeddah', 'Miami':'Miami',
+    'Emilia Romagna':'Imola', 'Monaco':'Monaco', 'Spanish':'Barcelona',
+    'Canadian':'Montreal', 'Austrian':'Spielberg', 'British':'Silverstone',
+    'Hungarian':'Mogyorod', 'Belgian':'Stavelot', 'Dutch':'Zandvoort',
+    'Italian':'Monza', 'Singapore':'MarinaBay', 'Japanese':'Suzuka',
+    'Qatar':'Doha', 'United States':'Austin', 'Mexico City':'MexicoCity',
+    'São Paulo':'SaoPaulo', 'Las Vegas':'LasVegas', 'Chinese':'Shanghai'
+  };
+  const circuitImg = name => {
+    const folder = Object.entries(F1_CIRCUIT_MAP).find(([k]) => name.includes(k))?.[1];
+    return folder ? `${F1_CARD_IMG_BASE}/${folder}/Day/Day01.png` : null;
+  };
+  const F1_FLAG_MAP = {
+    'Australian':'au','Bahrain':'bh','Saudi Arabian':'sa','Miami':'us',
+    'Chinese':'cn','Japanese':'jp','Azerbaijan':'az','Emilia Romagna':'it',
+    'Monaco':'mc','Spanish':'es','Canadian':'ca','Austrian':'at',
+    'British':'gb','Hungarian':'hu','Belgian':'be','Dutch':'nl',
+    'Italian':'it','Singapore':'sg','Qatar':'qa','United States':'us',
+    'Mexico City':'mx','São Paulo':'br','Las Vegas':'us','Abu Dhabi':'ae'
+  };
+  const circuitFlag = name => {
+    const cc = Object.entries(F1_FLAG_MAP).find(([k]) => name.includes(k))?.[1];
+    return cc ? `<img class="f1-flag-img" src="https://flagcdn.com/w40/${cc}.png" alt="">` : '';
+  };
+
   // Countdown
   let countdown = '';
   if (f1.nextRace) {
@@ -3488,25 +3609,42 @@ function renderF1(f1) {
     } else { countdown = 'Ma!'; }
   }
 
+  const nextImgUrl = f1.nextRace ? circuitImg(f1.nextRace.name) : null;
   const nextSection = f1.nextRace ? `
-    <div class="f1-section">
-      <div class="f1-section-title">Következő futam</div>
-      <div class="f1-next-name">${shortName(f1.nextRace.name)}</div>
-      <div class="f1-next-circuit">${f1.nextRace.circuit}</div>
-      <div class="f1-countdown">${countdown}</div>
-      <div class="f1-next-date">${new Date(f1.nextRace.dateTime).toLocaleString('hu-HU',{month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+    <div class="f1-next-card">
+      ${nextImgUrl ? `<div class="f1-next-card-img" style="background-image:url('${nextImgUrl}')"></div>` : ''}
+      <div class="f1-next-card-body">
+        <div>
+          <div class="f1-section-title">Következő futam</div>
+          <div class="f1-next-name">${circuitFlag(f1.nextRace.name)}${shortName(f1.nextRace.name)}</div>
+          <div class="f1-next-circuit">${f1.nextRace.circuit}</div>
+        </div>
+        <div class="f1-next-bottom">
+          <div class="f1-countdown">${countdown}</div>
+          <div class="f1-next-date">${new Date(f1.nextRace.dateTime).toLocaleString('hu-HU',{month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+        </div>
+      </div>
     </div>` : '';
 
   const podiumSection = f1.lastRace?.podium?.length ? `
     <div class="f1-section">
       <div class="f1-section-title">Utolsó futam · ${shortName(f1.lastRace.name)}</div>
-      ${f1.lastRace.podium.map(p => `
-        <div class="f1-podium-row">
-          <span class="f1-pos">P${p.pos}</span>
-          ${teamDot(p.constructor)}
-          <span class="f1-driver">${p.driver}</span>
-          <span class="f1-constructor">${p.constructor}</span>
-        </div>`).join('')}
+      <div class="f1-podium-grid">
+        ${f1.lastRace.podium.map(p => {
+          const slug = F1_AVATAR_MAP[p.driverId];
+          const imgUrl = slug ? `${F1_AVATAR_BASE}/driver-${slug}.jpeg` : null;
+          const teamColor = F1_TEAM_COLORS[p.constructor] || '#555';
+          return `<div class="f1-podium-card" style="border-color:${teamColor}">
+            ${imgUrl ? `<div class="f1-podium-card-bg" style="background-image:url('${imgUrl}')"></div>` : ''}
+            <div class="f1-podium-card-overlay"></div>
+            <span class="f1-podium-pos">P${p.pos}</span>
+            <div class="f1-podium-info">
+              <div class="f1-podium-driver">${p.driver}</div>
+              <div class="f1-podium-team">${p.constructor}</div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
     </div>` : '';
 
   const standingsSection = f1.standings?.length ? `
@@ -3576,11 +3714,13 @@ async function loadF1() {
       lastRace: {
         name:   lastRaceData?.raceName || '',
         podium: (lastRaceData?.Results||[]).slice(0,3).map(r=>({
-          pos: r.position, driver: r.Driver.familyName, constructor: r.Constructor.name
+          pos: r.position, driver: r.Driver.familyName,
+          driverId: r.Driver.driverId, constructor: r.Constructor.name
         }))
       },
       standings: (standJ.MRData.StandingsTable.StandingsLists[0]?.DriverStandings||[]).slice(0,6).map(s=>({
         pos: s.position, driver: s.Driver.familyName,
+        driverId: s.Driver.driverId,
         points: s.points, constructor: s.Constructors[0]?.name||''
       })),
       upcoming: future.slice(0,6).map(r=>({ name: r.raceName, date: r.date })),
