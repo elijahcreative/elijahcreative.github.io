@@ -1550,6 +1550,14 @@
           </button>
         </div>
 
+        <div class="s-section">
+          <div class="s-label">Config fájl</div>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-ghost" id="configSaveBtn" style="flex:1;justify-content:center">Mentés</button>
+            <button class="btn btn-ghost" id="configLoadBtn" style="flex:1;justify-content:center">Betöltés</button>
+          </div>
+        </div>
+
       </div>
     </aside>
   </div>
@@ -2546,6 +2554,7 @@ function bindEvents() {
     renderSFeeds(); renderSYtChannels();
     const pv = $('ytPerVal'); if (pv) pv.textContent = S.ytPerChannel || 3;
     const mv = $('ytMaxVal'); if (mv) mv.textContent = S.ytMaxChannels || 5;
+    updateConfigUI();
     _sPanel.classList.add('open');
   };
   const closeSettings = () => { _sTimer = setTimeout(() => _sPanel.classList.remove('open'), 150); };
@@ -2617,6 +2626,10 @@ function bindEvents() {
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
     if (S.theme === 'auto') Theme.apply();
   });
+
+  // Config file
+  $('configSaveBtn').onclick = () => Config.save();
+  $('configLoadBtn').onclick = () => Config.load();
 
 }
 
@@ -3734,6 +3747,63 @@ async function loadF1() {
 /* ════════════════════════════════════════════════════════════
    BOOT
 ════════════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════════
+   CONFIG FILE (File System Access API)
+════════════════════════════════════════════════════════════ */
+const Config = {
+  _toJSON() {
+    return JSON.stringify({
+      version: 1,
+      settings: {
+        theme: S.theme, preset: S.preset, customAccent: S.customAccent,
+        fontSize: S.fontSize, ytPerChannel: S.ytPerChannel, ytMaxChannels: S.ytMaxChannels
+      },
+      feeds: S.feeds,
+      ytChannels: S.ytChannels
+    }, null, 2);
+  },
+  _apply(data) {
+    if (!data || typeof data !== 'object') return;
+    if (data.settings) {
+      const d = data.settings;
+      if (d.theme)         S.theme         = d.theme;
+      if (d.preset)        S.preset        = d.preset;
+      if (d.customAccent !== undefined) S.customAccent = d.customAccent;
+      if (d.fontSize)      S.fontSize      = d.fontSize;
+      if (d.ytPerChannel)  S.ytPerChannel  = d.ytPerChannel;
+      if (d.ytMaxChannels) S.ytMaxChannels = d.ytMaxChannels;
+    }
+    if (Array.isArray(data.feeds) && data.feeds.length) S.feeds = data.feeds;
+    if (Array.isArray(data.ytChannels)) S.ytChannels = data.ytChannels;
+  },
+
+  save() {
+    const blob = new Blob([this._toJSON()], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'flux-config.json';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    toast('Config letöltve');
+  },
+
+  load() {
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = '.json';
+    input.onchange = async () => {
+      try {
+        const text = await input.files[0].text();
+        this._apply(JSON.parse(text));
+        saveSettings(); saveFeeds(); saveYtChannels();
+        Theme.apply(); renderSidebar(); renderArticles();
+        refreshAll();
+        toast('Config betöltve');
+      } catch(e) { toast('Hibás config fájl'); }
+    };
+    input.click();
+  }
+};
+
 (async function init() {
   loadStorage();
   Theme.apply();
