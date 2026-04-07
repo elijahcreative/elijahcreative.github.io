@@ -788,7 +788,8 @@
     .ix-strip-source { font-weight: 600; }
 
     @media (max-width: 900px) {
-      .ix-row.row-a, .ix-row.row-b { grid-template-columns: 1fr; }
+      .ix-row.row-a, .ix-row.row-b,
+      .yt-wrap .ix-row.row-a, .yt-wrap .ix-row.row-b { grid-template-columns: 1fr; }
       .ix-trio { grid-template-columns: 1fr 1fr; }
       .ix-mini-grid { grid-template-columns: repeat(2, 1fr); }
       .ix-spotlight { grid-template-columns: 1fr; }
@@ -807,9 +808,7 @@
         grid-column: 1 !important;
         height: auto !important;
         max-height: none !important;
-        display: flex !important;
-        flex-direction: column;
-        overflow: hidden;
+        overflow: visible;
       }
 
       /* YT horizontal scroll */
@@ -820,8 +819,8 @@
       }
       .yt-scroll-row::-webkit-scrollbar { height: 3px; }
       .yt-scroll-row::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
-      .yt-ch-group { flex-shrink: 0; width: 150px; }
-      .yt-ch-group--sep { border-top: none; padding-top: 0; border-left: 1px solid var(--border); padding-left: 10px; }
+      .yt-ch-group { flex: 0 0 150px; width: 150px; max-width: 150px; }
+      .yt-ch-group--sep { margin-top: 0; border-top: none; padding-top: 0; border-left: none; padding-left: 0; }
       .yt-vcard { flex-direction: column; border-bottom: none; padding: 6px 0 0; gap: 0; }
       .yt-vcard-thumb { width: 100%; height: auto; aspect-ratio: 16/9; margin-bottom: 5px; }
       .yt-vcard-body { padding: 0; }
@@ -898,14 +897,24 @@
       position: fixed;
       inset: 0;
       background: rgba(0,0,0,.4);
-      z-index: 100;
+      z-index: 340;
       display: none;
       backdrop-filter: blur(2px);
     }
     .overlay.open { display: block; }
 
-    /* ── Settings Panel ────────────────────────────────────── */
-    .settings-panel {
+    .confirm-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      backdrop-filter: blur(2px);
+      z-index: 400;
+      display: none;
+    }
+    .confirm-bg.open { display: block; }
+
+    /* ── View Panel ─────────────────────────────────────────── */
+    .view-panel {
       position: absolute;
       top: calc(100% + 8px);
       right: 0;
@@ -924,7 +933,7 @@
       transform: translateY(-8px);
       transition: opacity .18s ease, transform .18s ease;
     }
-    .settings-panel.open { opacity: 1; pointer-events: all; transform: translateY(0); }
+    .view-panel.open { opacity: 1; pointer-events: all; transform: translateY(0); }
     .settings-body { flex: 1; overflow-y: auto; padding: 16px; }
     .settings-body::-webkit-scrollbar { width: 3px; }
     .settings-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
@@ -980,24 +989,21 @@
     .preset-name { font-size: .64rem; color: var(--muted); }
 
     /* Accent swatches */
-    .swatch-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .swatch-row { display: flex; align-items: center; gap: 5px; }
     .swatch {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      cursor: pointer;
+      flex: 1; min-width: 0; aspect-ratio: 1;
+      border-radius: 6px; cursor: pointer;
       border: 2px solid transparent;
       transition: transform var(--t), border-color var(--t);
     }
-    .swatch:hover { transform: scale(1.2); }
-    .swatch.active { border-color: var(--text); }
+    .swatch:hover { transform: scale(1.08); }
+    .swatch.active { border-color: var(--text); box-shadow: 0 0 0 1px var(--bg); }
     input[type="color"] {
-      width: 30px;
-      height: 30px;
-      border: 2px solid var(--border);
-      border-radius: 50%;
+      width: 26px; height: 26px; flex-shrink: 0;
+      border: 1px solid var(--border);
+      border-radius: 6px;
       cursor: pointer;
-      padding: 2px;
+      padding: 1px;
       background: none;
     }
 
@@ -1022,30 +1028,38 @@
     }
 
     /* Settings feeds */
-    .s-feed-list { display: flex; flex-direction: column; gap: 5px; }
+    .s-feed-list { display: flex; flex-direction: column; gap: 8px; }
     .s-feed-item {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 8px;
-      padding: 9px 10px;
+      padding: 10px 10px;
       background: var(--bg2);
       border-radius: var(--radius-sm);
     }
-    .s-feed-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; cursor: pointer; }
     .s-feed-name {
       flex: 1;
-      font-size: .83rem;
+      font-size: .92rem;
       color: var(--text);
       background: none;
       border: none;
       outline: none;
       cursor: text;
       font-family: inherit;
+      line-height: 1.6;
     }
     .s-feed-name:focus { background: var(--bg-card); border-radius: 3px; padding: 1px 5px; }
-    .s-feed-del { background: none; border: none; cursor: pointer; color: var(--muted); padding: 2px 4px; border-radius: 3px; font-size: .85rem; }
+    .s-feed-url {
+      display: block; width: 100%; margin-top: 3px;
+      font-size: .76rem; color: var(--muted); font-family: monospace;
+      background: none; border: none; outline: none;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      cursor: text; line-height: 1.6;
+    }
+    .s-feed-url:focus { background: var(--bg-card); border-radius: 3px; padding: 2px 6px; color: var(--text); white-space: normal; overflow: visible; }
+    .s-feed-del { background: none; border: none; cursor: pointer; color: var(--muted); padding: 3px 5px; border-radius: 3px; font-size: .9rem; }
     .s-feed-del:hover { background: #fee2e2; color: #dc2626; }
-    .s-feed-drag { color: var(--muted); cursor: grab; padding: 2px 4px; font-size: 1rem; line-height: 1; user-select: none; }
+    .s-feed-drag { color: var(--muted); cursor: grab; padding: 3px 4px; font-size: 1rem; line-height: 1.6; user-select: none; }
     .s-feed-drag:active { cursor: grabbing; }
     .s-feed-item.drag-over { outline: 2px solid var(--ac); border-radius: var(--radius-sm); }
 
@@ -1061,7 +1075,7 @@
       padding: 22px;
       width: 400px;
       max-width: 90vw;
-      z-index: 102;
+      z-index: 350;
       box-shadow: var(--shadow-lg);
       transition: transform .2s, opacity .2s;
       opacity: 0;
@@ -1098,17 +1112,6 @@
     }
     .chip:hover { border-color: var(--ac); color: var(--ac); background: var(--acl); }
 
-    .color-row { display: flex; gap: 6px; flex-wrap: wrap; }
-    .color-opt {
-      width: 21px;
-      height: 21px;
-      border-radius: 50%;
-      cursor: pointer;
-      border: 2px solid transparent;
-      transition: transform var(--t), border-color var(--t);
-    }
-    .color-opt:hover { transform: scale(1.15); }
-    .color-opt.sel { border-color: var(--text); }
 
     .err { font-size: .78rem; color: #dc2626; margin-top: 8px; display: none; }
     .err.show { display: block; }
@@ -1119,6 +1122,8 @@
     .btn-primary:hover { background: var(--ac2); }
     .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
     .btn-ghost { background: none; color: var(--text2); border: 1px solid var(--border); }
+    .btn-danger { background: #dc2626; color: #fff; }
+    .btn-danger:hover { background: #b91c1c; }
     .btn-ghost:hover { background: var(--bg-hover); }
 
     /* ── Toast ─────────────────────────────────────────────── */
@@ -1143,12 +1148,54 @@
 
     /* ── Mobile ─────────────────────────────────────────────── */
     @media (max-width: 720px) {
-      .navbar { padding: 4px 5px; gap: 1px; }
+      .navbar-inner { padding: 0 12px; }
       .nav-feeds { display: none; }
+      .layout-btn, .icon-btn { padding: 0 8px; }
+      .nav-weather { padding: 4px 6px; gap: 5px; }
       .content { padding: 72px 12px 16px; }
       .grid-layout { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
-      .settings-panel { width: 100%; }
 
+      /* View panel: fixed to viewport on mobile */
+      .view-panel {
+        position: fixed;
+        top: 56px;
+        left: 8px;
+        right: 8px;
+        width: auto;
+        max-height: calc(100vh - 72px);
+        border-radius: var(--radius);
+      }
+
+      /* Reader layout: kisebb padding mobilon */
+      .reader-item-head { padding: 12px 14px; gap: 10px; }
+      .reader-title { font-size: 1rem; }
+
+      /* List layout: kisebb kép */
+      .list-thumb { width: 72px; height: 54px; }
+      .list-title { font-size: .9rem; }
+
+      /* Magazine: 1 oszlop mindenhol */
+      .ix-trio { grid-template-columns: 1fr; }
+      .ix-strip { grid-template-columns: 1fr; }
+      .ix-mini-grid { grid-template-columns: 1fr 1fr; }
+      .ix-col-side { flex-direction: column; gap: 0; }
+      .ix-col-side .ix-card { flex: 0 0 auto; }
+
+      /* Magazine kártyák kisebb font */
+      .ix-card-title { font-size: 1.15rem; }
+      .ix-hero-title { font-size: 1.4rem; }
+      .ix-card-desc, .ix-tf-desc { -webkit-line-clamp: 2; }
+
+      /* Spotlight: kisebb cím */
+      .ix-spot-title { font-size: 1.4rem; }
+      .ix-spot-body { padding: 20px; }
+    }
+
+    /* ── Kis telefon (≤480px) ────────────────────────────────── */
+    @media (max-width: 480px) {
+      /* F1 badge elrejtése — helyet ad az időjárásnak és gomboknak */
+      .nav-f1 { display: none; }
+      .nav-weather-temp { font-size: .88rem; }
     }
     /* ── Category strip ─────────────────────────────────────── */
     .cat-strip {
@@ -1444,7 +1491,9 @@
     }
     .yt-vcard-meta { font-size: .65rem; color: var(--muted); margin-top: 3px; }
     .yt-vcard-channel { font-weight: 700; }
-    .yt-ch-group--sep { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+    @media (min-width: 901px) {
+      .yt-ch-group--sep { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+    }
     .yt-ch-heading {
       font-size: .72rem; font-weight: 700; color: var(--text2);
       margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -1454,6 +1503,110 @@
       color: var(--muted);
       line-height: 1.5;
       padding-top: 10px;
+    }
+
+    /* ── View Panel Layout Buttons ──────────────────────────── */
+    .v-layout-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 5px; }
+    .v-layout-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 8px 4px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+      background: none; cursor: pointer; color: var(--text2);
+      font-size: .62rem; font-weight: 600; font-family: inherit;
+      transition: color var(--t), background var(--t), border-color var(--t);
+    }
+    .v-layout-btn:hover { color: var(--text); background: var(--bg-hover); }
+    .v-layout-btn.active { color: var(--ac); border-color: var(--ac); }
+
+    /* ── Settings Page ──────────────────────────────────────── */
+    .sp-page {
+      position: fixed; inset: 0; background: var(--bg); z-index: 300;
+      display: flex; flex-direction: column;
+      opacity: 0; pointer-events: none;
+      transform: translateY(6px);
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    .sp-page.open { opacity: 1; pointer-events: all; transform: translateY(0); }
+    .sp-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px; height: 56px;
+      border-bottom: 1px solid var(--border); flex-shrink: 0;
+    }
+    .sp-title { font-size: .92rem; font-weight: 700; color: var(--text); }
+    .sp-close {
+      background: none; border: none; cursor: pointer; color: var(--muted);
+      padding: 6px; border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      transition: color var(--t), background var(--t);
+    }
+    .sp-close:hover { color: var(--text); background: var(--bg-hover); }
+    .sp-body { display: flex; flex: 1; overflow: hidden; }
+    .sp-nav {
+      width: 190px; flex-shrink: 0;
+      border-right: 1px solid var(--border);
+      padding: 12px 0; overflow-y: auto;
+    }
+    .sp-nav-item {
+      display: flex; align-items: center; gap: 10px;
+      width: 100%; padding: 11px 20px;
+      background: none; border: none; text-align: left;
+      cursor: pointer; font-size: .85rem; font-weight: 500;
+      color: var(--text2); font-family: inherit;
+      transition: color var(--t), background var(--t);
+    }
+    .sp-nav-item:hover { background: var(--bg-hover); color: var(--text); }
+    .sp-nav-item.active { color: var(--ac); background: var(--bg-hover); font-weight: 700; }
+    .sp-content { flex: 1; overflow-y: auto; padding: 32px 36px; }
+    .sp-section { display: none; }
+    .sp-section.active { display: block; max-width: 580px; }
+    .sp-sect-header {
+      display: flex; align-items: flex-start; gap: 16px;
+      padding-bottom: 20px; margin-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sp-sect-icon {
+      width: 44px; height: 44px; border-radius: var(--radius);
+      background: var(--bg2); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; color: var(--ac);
+    }
+    .sp-sect-title { font-size: 1.15rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .sp-sect-desc { font-size: .8rem; color: var(--muted); line-height: 1.5; }
+    .sp-mini-label {
+      font-size: .65rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .07em; color: var(--muted);
+      margin: 20px 0 10px;
+    }
+    .sp-mini-label:first-child { margin-top: 0; }
+    .sp-stepper-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; background: var(--bg2);
+      border-radius: var(--radius-sm); margin-bottom: 6px;
+    }
+    .sp-stepper-label { font-size: .85rem; color: var(--text2); }
+    .sp-config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 4px; }
+    .sp-config-card {
+      border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 18px; display: flex; flex-direction: column; gap: 8px;
+      background: var(--bg-card);
+    }
+    .sp-config-card-icon { color: var(--ac); }
+    .sp-config-card-title { font-size: .9rem; font-weight: 700; color: var(--text); }
+    .sp-config-card-desc { font-size: .77rem; color: var(--muted); line-height: 1.5; flex: 1; }
+    @media (max-width: 600px) {
+      .sp-content { padding: 16px; }
+      .sp-section.active { max-width: 100%; }
+      .sp-config-grid { grid-template-columns: 1fr; }
+      .sp-sect-icon { width: 36px; height: 36px; }
+      .sp-sect-title { font-size: 1rem; }
+    }
+    @media (max-width: 600px) {
+      .sp-body { flex-direction: column; }
+      .sp-nav {
+        width: 100%; border-right: none; border-bottom: 1px solid var(--border);
+        padding: 0; display: flex; overflow-x: auto; overflow-y: hidden;
+      }
+      .sp-nav-item { padding: 12px 16px; white-space: nowrap; font-size: .8rem; flex-direction: column; gap: 3px; }
+      .sp-content { padding: 16px; }
     }
     </style>
 </head>
@@ -1470,11 +1623,10 @@
   <div class="nav-right">
     <div class="nav-f1" id="navF1"><span class="f1-badge">F1</span></div>
     <div class="nav-weather" id="navWeather" title=""></div>
-    <button class="layout-btn" id="layoutCycleBtn" title="Layout váltás"></button>
-    <button class="icon-btn" id="settingsBtn" title="Beállítások">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    <button class="icon-btn" id="viewBtn" title="Nézet">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
     </button>
-    <aside class="settings-panel" id="settingsPanel">
+    <aside class="view-panel" id="viewPanel">
       <div class="settings-body">
 
         <div class="s-section">
@@ -1515,54 +1667,145 @@
         </div>
 
         <div class="s-section">
-          <div class="s-label">Feedek kezelése</div>
-          <div class="s-feed-list" id="sFeedList"></div>
-          <button class="btn btn-ghost" id="addFeedBtn" style="width:100%;margin-top:10px;justify-content:center;display:flex;gap:6px;align-items:center">
-            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>
-            Feed hozzáadása
-          </button>
-        </div>
-
-        <div class="s-section">
-          <div class="s-label">YouTube csatornák</div>
-          <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">
-            <div style="display:flex;align-items:center;justify-content:space-between">
-              <span style="font-size:.78rem;color:var(--text2)">Max csatorna</span>
-              <div style="display:flex;align-items:center;gap:6px">
-                <button class="icon-btn" id="ytMaxMinus" style="padding:0 8px;font-size:1rem;line-height:1">−</button>
-                <span id="ytMaxVal" style="font-size:.9rem;font-weight:700;min-width:18px;text-align:center"></span>
-                <button class="icon-btn" id="ytMaxPlus"  style="padding:0 8px;font-size:1rem;line-height:1">+</button>
-              </div>
-            </div>
-            <div style="display:flex;align-items:center;justify-content:space-between">
-              <span style="font-size:.78rem;color:var(--text2)">Videó / csatorna</span>
-              <div style="display:flex;align-items:center;gap:6px">
-                <button class="icon-btn" id="ytPerMinus" style="padding:0 8px;font-size:1rem;line-height:1">−</button>
-                <span id="ytPerVal" style="font-size:.9rem;font-weight:700;min-width:18px;text-align:center"></span>
-                <button class="icon-btn" id="ytPerPlus"  style="padding:0 8px;font-size:1rem;line-height:1">+</button>
-              </div>
-            </div>
-          </div>
-          <div class="s-feed-list" id="sYtList"></div>
-          <button class="btn btn-ghost" id="addYtBtn" style="width:100%;margin-top:10px;justify-content:center;display:flex;gap:6px;align-items:center">
-            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>
-            Csatorna hozzáadása
-          </button>
-        </div>
-
-        <div class="s-section">
-          <div class="s-label">Config fájl</div>
-          <div style="display:flex;gap:6px">
-            <button class="btn btn-ghost" id="configSaveBtn" style="flex:1;justify-content:center">Mentés</button>
-            <button class="btn btn-ghost" id="configLoadBtn" style="flex:1;justify-content:center">Betöltés</button>
+          <div class="s-label">Nézet</div>
+          <div class="v-layout-row">
+            <button class="v-layout-btn" data-layout="magazine">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="9" height="9" rx="1.5"/><rect x="12" y="1" width="3" height="4" rx="1"/><rect x="12" y="7" width="3" height="3" rx="1"/><rect x="1" y="12" width="14" height="3" rx="1"/></svg>
+              Magazin
+            </button>
+            <button class="v-layout-btn" data-layout="grid">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+              Grid
+            </button>
+            <button class="v-layout-btn" data-layout="list">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="5" y1="4" x2="14" y2="4"/><line x1="5" y1="8" x2="14" y2="8"/><line x1="5" y1="12" x2="14" y2="12"/><circle cx="2" cy="4" r="1" fill="currentColor" stroke="none"/><circle cx="2" cy="8" r="1" fill="currentColor" stroke="none"/><circle cx="2" cy="12" r="1" fill="currentColor" stroke="none"/></svg>
+              Lista
+            </button>
+            <button class="v-layout-btn" data-layout="reader">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="2" width="12" height="12" rx="2"/><line x1="5" y1="6" x2="11" y2="6"/><line x1="5" y1="9" x2="9" y2="9"/></svg>
+              Olvasó
+            </button>
           </div>
         </div>
 
       </div>
     </aside>
+    <button class="icon-btn" id="settingsBtn" title="Beállítások">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
   </div>
   </div>
 </nav>
+
+<!-- Settings Page -->
+<div class="sp-page" id="settingsPage">
+  <div class="sp-header">
+    <span class="sp-title">Beállítások</span>
+    <button class="sp-close" id="spClose">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="sp-body">
+    <nav class="sp-nav" id="spNav">
+      <button class="sp-nav-item active" data-sp="feeds">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1" fill="currentColor" stroke="none"/></svg>
+        Feedek kezelése
+      </button>
+      <button class="sp-nav-item" data-sp="youtube">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor" stroke="none"/></svg>
+        YouTube csatornák
+      </button>
+      <button class="sp-nav-item" data-sp="config">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Config fájl
+      </button>
+    </nav>
+    <div class="sp-content">
+      <div class="sp-section active" id="sp-feeds">
+        <div class="sp-sect-header">
+          <div class="sp-sect-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1" fill="currentColor" stroke="none"/></svg>
+          </div>
+          <div>
+            <div class="sp-sect-title">Feedek kezelése</div>
+            <div class="sp-sect-desc">Adj hozzá RSS vagy Atom feedeket, rendezd át őket drag &amp; drop-pal, vagy töröld a feleslegeseket.</div>
+          </div>
+        </div>
+        <div class="sp-mini-label">Aktív feedek</div>
+        <div class="s-feed-list" id="sFeedList"></div>
+        <button class="btn btn-ghost" id="addFeedBtn" style="width:100%;margin-top:10px;justify-content:center;display:flex;gap:6px;align-items:center">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>
+          Feed hozzáadása
+        </button>
+      </div>
+
+      <div class="sp-section" id="sp-youtube">
+        <div class="sp-sect-header">
+          <div class="sp-sect-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="white"/></svg>
+          </div>
+          <div>
+            <div class="sp-sect-title">YouTube csatornák</div>
+            <div class="sp-sect-desc">Kövesd kedvenc csatornáidat közvetlenül az appban. A legújabb videók az oldalsávban jelennek meg.</div>
+          </div>
+        </div>
+        <div class="sp-mini-label">Megjelenítési korlátok</div>
+        <div class="sp-stepper-row">
+          <span class="sp-stepper-label">Max. csatorna megjelenítve</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <button class="icon-btn" id="ytMaxMinus" style="padding:0 8px;font-size:1rem;line-height:1">−</button>
+            <span id="ytMaxVal" style="font-size:.95rem;font-weight:700;min-width:20px;text-align:center"></span>
+            <button class="icon-btn" id="ytMaxPlus" style="padding:0 8px;font-size:1rem;line-height:1">+</button>
+          </div>
+        </div>
+        <div class="sp-stepper-row">
+          <span class="sp-stepper-label">Videó / csatorna</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <button class="icon-btn" id="ytPerMinus" style="padding:0 8px;font-size:1rem;line-height:1">−</button>
+            <span id="ytPerVal" style="font-size:.95rem;font-weight:700;min-width:20px;text-align:center"></span>
+            <button class="icon-btn" id="ytPerPlus" style="padding:0 8px;font-size:1rem;line-height:1">+</button>
+          </div>
+        </div>
+        <div class="sp-mini-label">Csatornák</div>
+        <div class="s-feed-list" id="sYtList"></div>
+        <button class="btn btn-ghost" id="addYtBtn" style="width:100%;margin-top:10px;justify-content:center;display:flex;gap:6px;align-items:center">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>
+          Csatorna hozzáadása
+        </button>
+      </div>
+
+      <div class="sp-section" id="sp-config">
+        <div class="sp-sect-header">
+          <div class="sp-sect-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+          </div>
+          <div>
+            <div class="sp-sect-title">Config fájl</div>
+            <div class="sp-sect-desc">Exportáld az összes beállítást, feedet és csatornát JSON-ba, vagy töltsd be egy korábbi mentésből.</div>
+          </div>
+        </div>
+        <div class="sp-config-grid">
+          <div class="sp-config-card">
+            <div class="sp-config-card-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <div class="sp-config-card-title">Exportálás</div>
+            <div class="sp-config-card-desc">Elmenti a teljes konfigurációt .json fájlként.</div>
+            <button class="btn btn-ghost" id="configSaveBtn" style="justify-content:center;margin-top:4px">Mentés</button>
+          </div>
+          <div class="sp-config-card">
+            <div class="sp-config-card-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </div>
+            <div class="sp-config-card-title">Importálás</div>
+            <div class="sp-config-card-desc">Betölt egy korábban mentett config fájlt.</div>
+            <button class="btn btn-ghost" id="configLoadBtn" style="justify-content:center;margin-top:4px">Betöltés</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Content -->
 <div class="content" id="content">
@@ -1589,10 +1832,6 @@
     <label class="form-label" for="feedName">Név (opcionális)</label>
     <input type="text" class="form-input" id="feedName" placeholder="Automatikusan töltődik ki">
   </div>
-  <div class="form-group">
-    <label class="form-label">Szín</label>
-    <div class="color-row" id="colorRow"></div>
-  </div>
   <div class="err" id="feedErr">Nem sikerült betölteni a feedet. Ellenőrizd az URL-t.</div>
   <div class="modal-foot">
     <button class="btn btn-ghost" id="cancelAdd">Mégse</button>
@@ -1615,6 +1854,17 @@
   </div>
 </div>
 
+<!-- Confirm Dialog -->
+<div class="confirm-bg" id="confirmBg"></div>
+<div class="modal" id="confirmModal" style="width:340px;max-width:90vw;z-index:401">
+  <div class="modal-title" id="confirmTitle" style="font-size:.95rem">Megerősítés</div>
+  <div id="confirmMsg" style="font-size:.85rem;color:var(--text2);line-height:1.5;margin-bottom:4px"></div>
+  <div class="modal-foot">
+    <button class="btn btn-ghost" id="confirmCancel">Mégse</button>
+    <button class="btn btn-danger" id="confirmOk">OK</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1626,6 +1876,12 @@ const RSS2JSON    = 'https://api.rss2json.com/v1/api.json?rss_url=';
 const ALLORIGINS  = 'https://api.allorigins.win/get?url=';
 const CORSPROXY   = 'https://corsproxy.io/?';
 const CACHE_TTL   = 5 * 60 * 1000; // 5 minutes
+
+function fetchT(url, opts = {}, ms = 8000) {
+  const ctrl = new AbortController();
+  const tid = setTimeout(() => ctrl.abort(), ms);
+  return fetch(url, { ...opts, signal: ctrl.signal }).finally(() => clearTimeout(tid));
+}
 
 const PRESETS = {
   default: { name: 'Default',
@@ -1677,7 +1933,7 @@ const S = {
   feeds:        [],
   articles:     [],
   activeUrl:    null,
-  layout:       'reader',
+  layout:       'magazine',
   theme:        'auto',
   preset:       'default',
   customAccent:    null,
@@ -1718,11 +1974,12 @@ function saveSettings() {
 }
 function saveFeeds()       { localStorage.setItem('flux_f', JSON.stringify(S.feeds)); }
 function saveYtChannels()  { localStorage.setItem('flux_yt', JSON.stringify(S.ytChannels)); }
+function saveArticles()    { try { localStorage.setItem('flux_art', JSON.stringify(S.articles)); } catch(e) {} }
 
 function loadStorage() {
   try {
     const s = JSON.parse(localStorage.getItem('flux_s') || '{}');
-    S.layout = s.layout || 'reader';
+    S.layout = s.layout || 'magazine';
     S.theme  = s.theme  || 'auto';
     S.preset = s.preset || 'default';
     S.customAccent = s.customAccent || null;
@@ -1742,6 +1999,11 @@ function loadStorage() {
     const yt = JSON.parse(localStorage.getItem('flux_yt') || '[]');
     S.ytChannels = Array.isArray(yt) ? yt : [];
   } catch(e) { S.ytChannels = []; }
+
+  try {
+    const arts = JSON.parse(localStorage.getItem('flux_art') || '[]');
+    S.articles = Array.isArray(arts) ? arts.map(a => ({ ...a, date: new Date(a.date) })) : [];
+  } catch(e) { S.articles = []; }
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -1818,8 +2080,8 @@ const Theme = {
     document.querySelectorAll('.swatch').forEach(b => b.classList.toggle('active', b.dataset.color === S.customAccent));
     // Font slider
     const sl = $('fontSlider'); if (sl) sl.value = S.fontSize;
-    // Layout button
-    document.querySelectorAll('.layout-btn').forEach(b => b.classList.toggle('active', b.dataset.layout === S.layout));
+    // Layout buttons
+    updateLayoutBtns();
   }
 };
 
@@ -1842,21 +2104,30 @@ const Fetcher = {
   _fetchAny(url, bust) {
     return new Promise(resolve => {
       let settled = false;
-      let remaining = 3;
+      let remaining = 4;
       const done = (articles) => {
         remaining--;
         if (!settled && articles && articles.length) { settled = true; resolve(articles); return; }
-        if (!settled && remaining === 0) resolve([]);
+        if (!settled && remaining === 0) resolve(null);
       };
+      this._direct(url, bust).then(done).catch(() => done(null));
       this._viaCorsproxy(url, bust).then(done).catch(() => done(null));
       this._viaAllorigins(url, bust).then(done).catch(() => done(null));
       this._viaRss2json(url, bust).then(done).catch(() => done(null));
     });
   },
 
+  async _direct(url, bust = false) {
+    const feedUrl = bust ? url + (url.includes('?') ? '&' : '?') + '_=' + Date.now() : url;
+    const r = await fetchT(feedUrl, { cache: 'no-store' });
+    if (!r.ok) throw new Error('http');
+    const xml = await r.text();
+    return this._parseXML(xml, url);
+  },
+
   async _viaRss2json(url, bust = false) {
     const cb = bust ? '&_=' + Date.now() : '';
-    const r = await fetch(RSS2JSON + encodeURIComponent(url) + cb, { cache: 'no-store' });
+    const r = await fetchT(RSS2JSON + encodeURIComponent(url) + cb, { cache: 'no-store' });
     if (!r.ok) throw new Error('http');
     const d = await r.json();
     if (d.status !== 'ok') throw new Error(d.message);
@@ -1875,7 +2146,7 @@ const Fetcher = {
 
   async _viaCorsproxy(url, bust = false) {
     const feedUrl = bust ? url + (url.includes('?') ? '&' : '?') + '_=' + Date.now() : url;
-    const r = await fetch(CORSPROXY + encodeURIComponent(feedUrl), { cache: 'no-store' });
+    const r = await fetchT(CORSPROXY + encodeURIComponent(feedUrl), { cache: 'no-store' });
     if (!r.ok) throw new Error('http');
     const xml = await r.text();
     return this._parseXML(xml, url);
@@ -1883,7 +2154,7 @@ const Fetcher = {
 
   async _viaAllorigins(url, bust = false) {
     const feedUrl = bust ? url + (url.includes('?') ? '&' : '?') + '_=' + Date.now() : url;
-    const r = await fetch(ALLORIGINS + encodeURIComponent(feedUrl), { cache: 'no-store' });
+    const r = await fetchT(ALLORIGINS + encodeURIComponent(feedUrl), { cache: 'no-store' });
     if (!r.ok) throw new Error('http');
     const { contents } = await r.json();
     return this._parseXML(contents, url);
@@ -1949,7 +2220,6 @@ const Renderer = {
   },
 
   _feedName(url)  { return S.feeds.find(f => f.url === url)?.name  || ''; },
-  _feedColor(url) { return S.feeds.find(f => f.url === url)?.color || '#888'; },
 
   _age(d) {
     if (!d || isNaN(d)) return '';
@@ -2164,7 +2434,7 @@ const Renderer = {
 function openArticle(id) {
   const a = articleMap[id];
   if (!a) return;
-  window.open(a.url, '_blank', 'noopener');
+  window.location.href = a.url;
 }
 
 function toggleReader(id) {
@@ -2216,8 +2486,10 @@ function renderSFeeds() {
   c.innerHTML = S.feeds.map((f, i) => `
     <div class="s-feed-item" draggable="true" data-url="${f.url}" data-idx="${i}">
       <span class="s-feed-drag" title="Húzd át">⠿</span>
-      <div class="s-feed-dot" style="background:${f.color}" onclick="cycleFeedColor('${f.url}')" title="Szín"></div>
-      <input class="s-feed-name" value="${e(f.name)}" onblur="renameFeed('${f.url}',this.value)" onkeydown="if(event.key==='Enter')this.blur()">
+      <div style="flex:1;min-width:0">
+        <input class="s-feed-name" value="${e(f.name)}" onblur="renameFeed('${f.url}',this.value)" onkeydown="if(event.key==='Enter')this.blur()">
+        <input class="s-feed-url" value="${e(f.url)}" onblur="renameFeedUrl('${e(f.url)}',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()" title="Feed URL — kattints a szerkesztéshez">
+      </div>
       <button class="s-feed-del" onclick="deleteFeed('${f.url}')">✕</button>
     </div>`).join('');
 
@@ -2270,16 +2542,34 @@ function selectFeed(url) {
   renderArticles();
 }
 
+function confirmDialog(message, onConfirm, onCancel, opts = {}) {
+  $('confirmTitle').textContent = opts.title || 'Megerősítés';
+  $('confirmOk').textContent = opts.okLabel || 'OK';
+  $('confirmOk').className = 'btn ' + (opts.danger !== false ? 'btn-danger' : 'btn-primary');
+  $('confirmMsg').textContent = message;
+  $('confirmModal').classList.add('open');
+  $('confirmBg').classList.add('open');
+  $('confirmOk').onclick = () => { closeConfirmModal(); onConfirm(); };
+  $('confirmCancel').onclick = () => { closeConfirmModal(); if (onCancel) onCancel(); };
+}
+function closeConfirmModal() {
+  $('confirmModal').classList.remove('open');
+  $('confirmBg').classList.remove('open');
+}
+
 function deleteFeed(url) {
-  S.feeds = S.feeds.filter(f => f.url !== url);
-  S.articles = S.articles.filter(a => a.feedUrl !== url);
-  Fetcher.bust(url);
-  if (S.activeUrl === url) S.activeUrl = null;
-  saveFeeds();
-  renderSidebar();
-  renderSFeeds();
-  renderArticles();
-  toast('Feed törölve.');
+  const f = S.feeds.find(f => f.url === url);
+  confirmDialog(`"${f?.name || url}" feed törlése visszavonhatatlan.`, () => {
+    S.feeds = S.feeds.filter(f => f.url !== url);
+    S.articles = S.articles.filter(a => a.feedUrl !== url);
+    Fetcher.bust(url);
+    if (S.activeUrl === url) S.activeUrl = null;
+    saveFeeds();
+    renderSidebar();
+    renderSFeeds();
+    renderArticles();
+    toast('Feed törölve.');
+  }, null, { title: 'Feed törlése', okLabel: 'Törlés' });
 }
 
 function renameFeed(url, name) {
@@ -2287,15 +2577,43 @@ function renameFeed(url, name) {
   if (f && name.trim()) { f.name = name.trim(); saveFeeds(); renderSidebar(); }
 }
 
-function cycleFeedColor(url) {
-  const f = S.feeds.find(f => f.url === url);
+function renameFeedUrl(oldUrl, newUrl, inputEl) {
+  newUrl = newUrl.trim();
+  if (!newUrl || newUrl === oldUrl) return;
+  const f = S.feeds.find(f => f.url === oldUrl);
   if (!f) return;
-  const i = FEED_COLORS.indexOf(f.color);
-  f.color = FEED_COLORS[(i + 1) % FEED_COLORS.length];
-  saveFeeds();
-  renderSidebar();
-  renderSFeeds();
+  confirmDialog(`URL módosítása erre:\n${newUrl}`, () => {
+    S.articles = S.articles.filter(a => a.feedUrl !== oldUrl);
+    f.url = newUrl;
+    saveFeeds(); renderSFeeds(); renderSidebar(); refreshAll();
+  }, () => {
+    if (inputEl) inputEl.value = oldUrl;
+  }, { title: 'URL módosítása', okLabel: 'Mentés', danger: false });
 }
+
+function renameYtChannelName(id, name) {
+  const ch = S.ytChannels.find(c => c.id === id);
+  if (ch && name.trim()) { ch.name = name.trim(); saveYtChannels(); }
+}
+
+function renameYtChannelUrl(oldId, newId, inputEl) {
+  newId = newId.trim();
+  if (!newId || newId === oldId) return;
+  const ch = S.ytChannels.find(c => c.id === oldId);
+  if (!ch) return;
+  confirmDialog(`Csatorna ID módosítása erre:\n${newId}`, () => {
+    if (newId.startsWith('http')) { ch.idType = 'url'; ch.id = newId; }
+    else if (newId.startsWith('@')) { ch.idType = 'handle'; ch.id = newId.slice(1); }
+    else if (/^UC[A-Za-z0-9_\-]{22}$/.test(newId)) { ch.idType = 'id'; ch.id = newId; }
+    else { ch.idType = 'handle'; ch.id = newId; }
+    saveYtChannels();
+    ytVideos = ytVideos.filter(v => v.channelId !== oldId);
+    renderSYtChannels(); refreshYtFeed();
+  }, () => {
+    if (inputEl) inputEl.value = oldId;
+  }, { title: 'Csatorna módosítása', okLabel: 'Mentés', danger: false });
+}
+
 
 /* ════════════════════════════════════════════════════════════
    ARTICLES
@@ -2334,40 +2652,37 @@ const LAYOUT_ICONS = {
   magazine: `<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="9" height="9" rx="1.5"/><rect x="12" y="1" width="3" height="4" rx="1"/><rect x="12" y="7" width="3" height="3" rx="1"/><rect x="1" y="12" width="14" height="3" rx="1"/></svg>`,
   reader:   `<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="4" x2="14" y2="4"/><line x1="2" y1="7" x2="14" y2="7"/><line x1="2" y1="10" x2="10" y2="10"/><line x1="2" y1="13" x2="7" y2="13"/></svg>`
 };
-const LAYOUT_ORDER = ['grid','list','magazine','reader'];
+const LAYOUT_ORDER = ['magazine','grid','list','reader'];
 
-function updateCycleBtn(animate) {
-  const btn = $('layoutCycleBtn');
-  if (!btn) return;
-  if (!animate) { btn.innerHTML = LAYOUT_ICONS[S.layout]; return; }
-  const old = btn.querySelector('svg');
-  if (old) old.classList.add('cycle-out');
-  setTimeout(() => {
-    btn.innerHTML = LAYOUT_ICONS[S.layout];
-    const svg = btn.querySelector('svg');
-    if (svg) { svg.classList.add('cycle-in'); setTimeout(() => svg.classList.remove('cycle-in'), 140); }
-  }, 130);
+function updateLayoutBtns() {
+  document.querySelectorAll('.v-layout-btn[data-layout]').forEach(b =>
+    b.classList.toggle('active', b.dataset.layout === S.layout)
+  );
 }
 
 function setLayout(layout) {
   S.layout = layout;
   saveSettings();
-  document.querySelectorAll('.s-layout-btn').forEach(b => b.classList.toggle('active', b.dataset.layout === layout));
-  updateCycleBtn(true);
+  updateLayoutBtns();
   renderArticles();
 }
 
 async function refreshAll(bust = false) {
   if (bust) S.feeds.forEach(f => Fetcher.bust(f.url));
+  const prevSig = S.articles.slice(0, 40).map(a => a.id).join('|');
   setLoading(true);
   await Promise.all(S.feeds.map(async f => {
-    const arts = await Fetcher.get(f.url, bust).catch(() => []);
-    S.articles = S.articles.filter(a => a.feedUrl !== f.url);
-    S.articles.push(...arts);
+    const arts = await Fetcher.get(f.url, bust).catch(() => null);
+    if (arts && arts.length) {
+      S.articles = S.articles.filter(a => a.feedUrl !== f.url);
+      S.articles.push(...arts);
+    }
   }));
   S.articles.sort((a, b) => b.date - a.date);
   setLoading(false);
-  renderArticles();
+  const newSig = S.articles.slice(0, 40).map(a => a.id).join('|');
+  if (bust || newSig !== prevSig) renderArticles();
+  saveArticles();
 }
 
 function setLoading(on) {
@@ -2413,10 +2728,6 @@ function buildSettingsUI() {
     `<span class="chip" onclick="$('feedUrl').value='${s.url}';$('feedName').value='${s.label}'">${s.label}</span>`
   ).join('');
 
-  // Feed color picker in modal
-  $('colorRow').innerHTML = FEED_COLORS.map((c, i) =>
-    `<div class="color-opt${i===0?' sel':''}" style="background:${c}" data-color="${c}" onclick="pickFeedColor(this,'${c}')"></div>`
-  ).join('');
 }
 
 function setPreset(p) {
@@ -2426,11 +2737,6 @@ function setAccent(c) {
   S.customAccent = c; saveSettings(); Theme.apply(); Theme._syncUI();
 }
 
-function pickFeedColor(el, c) {
-  document.querySelectorAll('.color-opt').forEach(e => e.classList.remove('sel'));
-  el.classList.add('sel');
-  $('addModal')._pickedColor = c;
-}
 
 /* ════════════════════════════════════════════════════════════
    ADD FEED MODAL
@@ -2476,8 +2782,7 @@ async function submitAddFeed() {
     catch(e) { name = url; }
   }
 
-  const color = $('addModal')._pickedColor || FEED_COLORS[S.feeds.length % FEED_COLORS.length];
-  S.feeds.push({ url, name, color });
+  S.feeds.push({ url, name });
   S.articles = S.articles.filter(a => a.feedUrl !== url);
   S.articles.push(...articles);
   S.articles.sort((a, b) => b.date - a.date);
@@ -2493,11 +2798,6 @@ async function submitAddFeed() {
    EVENT BINDINGS
 ══════════════════════════════════════════���═════════════════ */
 function bindEvents() {
-  // Layout cycle button
-  $('layoutCycleBtn').onclick = () => {
-    const i = LAYOUT_ORDER.indexOf(S.layout);
-    setLayout(LAYOUT_ORDER[(i + 1) % LAYOUT_ORDER.length]);
-  };
   // ── Hover preview: Presets ───────────────────────────────
   let _pP = undefined, _pA = undefined; // undefined = not previewing
   const pg = $('presetGrid');
@@ -2546,37 +2846,46 @@ function bindEvents() {
     setAccent(sw.dataset.color);
   });
 
-  // Settings dropdown — hover + click toggle
-  let _sTimer;
-  const _sBtn = $('settingsBtn'), _sPanel = $('settingsPanel');
-  const openSettings  = () => {
-    clearTimeout(_sTimer);
+  // View panel — hover + click toggle (hold ikon)
+  let _vTimer;
+  const _vBtn = $('viewBtn'), _vPanel = $('viewPanel');
+  const openView  = () => { clearTimeout(_vTimer); _vPanel.classList.add('open'); };
+  const closeView = () => { _vTimer = setTimeout(() => _vPanel.classList.remove('open'), 150); };
+  _vBtn.addEventListener('mouseenter', openView);
+  _vBtn.addEventListener('mouseleave', closeView);
+  _vPanel.addEventListener('mouseenter', () => clearTimeout(_vTimer));
+  _vPanel.addEventListener('mouseleave', closeView);
+  _vBtn.addEventListener('click', () => _vPanel.classList.toggle('open'));
+  _vPanel.addEventListener('click', ev => {
+    const btn = ev.target.closest('.v-layout-btn[data-layout]');
+    if (btn) { setLayout(btn.dataset.layout); _vPanel.classList.remove('open'); }
+  });
+
+  // Settings page — hamburger gomb
+  const _spPage = $('settingsPage');
+  const openSettingsPage = () => {
     renderSFeeds(); renderSYtChannels();
     const pv = $('ytPerVal'); if (pv) pv.textContent = S.ytPerChannel || 3;
     const mv = $('ytMaxVal'); if (mv) mv.textContent = S.ytMaxChannels || 5;
-    updateConfigUI();
-    _sPanel.classList.add('open');
+    _spPage.classList.add('open');
   };
-  const closeSettings = () => { _sTimer = setTimeout(() => _sPanel.classList.remove('open'), 150); };
-  _sBtn.addEventListener('mouseenter', openSettings);
-  _sBtn.addEventListener('mouseleave', closeSettings);
-  _sPanel.addEventListener('mouseenter', () => clearTimeout(_sTimer));
-  _sPanel.addEventListener('mouseleave', closeSettings);
-  _sBtn.addEventListener('click', () => {
-    const isOpen = _sPanel.classList.toggle('open');
-    if (isOpen) {
-      renderSFeeds(); renderSYtChannels();
-      const pv = $('ytPerVal'); if (pv) pv.textContent = S.ytPerChannel || 3;
-      const mv = $('ytMaxVal'); if (mv) mv.textContent = S.ytMaxChannels || 5;
-    }
+  $('settingsBtn').addEventListener('click', openSettingsPage);
+  $('spClose').addEventListener('click', () => _spPage.classList.remove('open'));
+  $('spNav').addEventListener('click', ev => {
+    const item = ev.target.closest('.sp-nav-item[data-sp]');
+    if (!item) return;
+    document.querySelectorAll('.sp-nav-item').forEach(b => b.classList.remove('active'));
+    item.classList.add('active');
+    document.querySelectorAll('.sp-section').forEach(s => s.classList.remove('active'));
+    $('sp-' + item.dataset.sp).classList.add('active');
   });
 
   // Overlay click — close any open modal
   $('overlay').onclick = () => { closeAddModal(); closeAddYtModal(); };
 
-  // Close settings on outside click
+  // Close view panel on outside click
   document.addEventListener('click', ev => {
-    if (!_sBtn.contains(ev.target) && !_sPanel.contains(ev.target)) _sPanel.classList.remove('open');
+    if (!_vBtn.contains(ev.target) && !_vPanel.contains(ev.target)) _vPanel.classList.remove('open');
   });
 
   // Add feed
@@ -2829,7 +3138,7 @@ async function loadWeather() {
       `&hourly=temperature_2m,weathercode` +
       `&daily=temperature_2m_max,temperature_2m_min,weathercode,precipitation_probability_max,sunset` +
       `&timezone=auto&forecast_days=7`;
-    const d = await fetch(url).then(r => r.json());
+    const d = await fetchT(url, {}, 10000).then(r => r.json());
 
     // Parse sunset time for today
     const sunsetStr  = d.daily.sunset?.[0] || '';          // "2026-04-02T19:43"
@@ -2876,7 +3185,11 @@ async function loadWeather() {
     localStorage.setItem('flux_wx', JSON.stringify(w));
     renderWx(w);
   } catch(e) {
-    el.style.display = 'none';
+    // Geolocation vagy API hiba: próbáljuk a stale cache-t, különben csendben nem töltünk
+    try {
+      const stale = JSON.parse(localStorage.getItem('flux_wx') || 'null');
+      if (stale && stale.temp !== undefined) renderWx(stale);
+    } catch(e2) {}
   }
 }
 
@@ -2926,14 +3239,14 @@ function extractYtChannelId(input) {
 
 async function fetchJsonThroughProxies(url) {
   try {
-    const r = await fetch(CORSPROXY + encodeURIComponent(url), { cache: 'no-store' });
+    const r = await fetchT(CORSPROXY + encodeURIComponent(url), { cache: 'no-store' });
     if (r.ok) {
       const text = await r.text();
       try { return JSON.parse(text); } catch(e) {}
     }
   } catch(e) {}
   try {
-    const r = await fetch(ALLORIGINS + encodeURIComponent(url), { cache: 'no-store' });
+    const r = await fetchT(ALLORIGINS + encodeURIComponent(url), { cache: 'no-store' });
     if (r.ok) {
       const d = await r.json();
       return JSON.parse(d.contents);
@@ -2963,18 +3276,15 @@ async function resolveYtVideoToChannel(videoId) {
 }
 
 async function fetchYtPage(pageUrl) {
-  let html = null;
-  try {
-    const r = await fetch(CORSPROXY + encodeURIComponent(pageUrl), { cache: 'no-store' });
-    if (r.ok) html = await r.text();
-  } catch(e) {}
-  if (!html) {
-    try {
-      const r = await fetch(ALLORIGINS + encodeURIComponent(pageUrl), { cache: 'no-store' });
-      if (r.ok) { const d = await r.json(); html = d.contents; }
-    } catch(e) {}
+  const proxies = [
+    () => fetchT(CORSPROXY + encodeURIComponent(pageUrl), { cache: 'no-store' }, 10000).then(r => r.ok ? r.text() : Promise.reject()),
+    () => fetchT(ALLORIGINS + encodeURIComponent(pageUrl), { cache: 'no-store' }, 10000).then(r => r.ok ? r.json().then(d => d.contents) : Promise.reject()),
+    () => fetchT('https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(pageUrl), { cache: 'no-store' }, 10000).then(r => r.ok ? r.text() : Promise.reject()),
+  ];
+  for (const attempt of proxies) {
+    try { const html = await attempt(); if (html) return html; } catch(e) {}
   }
-  return html;
+  return null;
 }
 
 function extractChannelIdFromHtml(html) {
@@ -3084,7 +3394,7 @@ async function fetchYtChannelVideos(ch) {
   const param = ch.idType === 'id' ? `channel_id=${ch.id}` : `user=${ch.id}`;
   const feedUrl = `https://www.youtube.com/feeds/videos.xml?${param}`;
   try {
-    const r = await fetch(RSS2JSON + encodeURIComponent(feedUrl), { cache: 'no-store' });
+    const r = await fetchT(RSS2JSON + encodeURIComponent(feedUrl), { cache: 'no-store' });
     if (r.ok) {
       const d = await r.json();
       if (d.status === 'ok' && Array.isArray(d.items) && d.items.length) {
@@ -3108,12 +3418,12 @@ async function fetchYtChannelVideos(ch) {
 
   let xml = null;
   try {
-    const r = await fetch(CORSPROXY + encodeURIComponent(feedUrl), { cache: 'no-store' });
+    const r = await fetchT(CORSPROXY + encodeURIComponent(feedUrl), { cache: 'no-store' });
     if (r.ok) xml = await r.text();
   } catch(e) {}
   if (!xml) {
     try {
-      const r = await fetch(ALLORIGINS + encodeURIComponent(feedUrl), { cache: 'no-store' });
+      const r = await fetchT(ALLORIGINS + encodeURIComponent(feedUrl), { cache: 'no-store' });
       if (r.ok) { const d = await r.json(); xml = d.contents; }
     } catch(e) {}
   }
@@ -3433,21 +3743,54 @@ function renderSYtChannels() {
   }
   const ytIcon = `<svg width="13" height="13" viewBox="0 0 24 24" fill="#ff0000" style="flex-shrink:0"><path d="M23 7s-.3-2-1.2-2.8C20.7 3 19.4 3 18.8 2.9 15.7 2.7 12 2.7 12 2.7s-3.7 0-6.8.2C4.6 3 3.3 3 2.2 4.2 1.3 5 1 7 1 7S.7 9.3.7 11.6v2.1c0 2.3.3 4.6.3 4.6s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2C7.9 22.5 12 22.5 12 22.5s3.7 0 6.8-.3c.6-.1 1.9-.1 3-1.3.9-.8 1.2-2.8 1.2-2.8s.3-2.3.3-4.6v-2.1C23.3 9.3 23 7 23 7zM9.7 15.5V9.2l6.6 3.2-6.6 3.1z"/></svg>`;
   c.innerHTML = S.ytChannels.map((ch, i) => `
-    <div class="s-feed-item" data-idx="${i}">
-      ${ytIcon}
-      <span style="flex:1;font-size:.83rem;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-left:2px">${e(ch.name || ch.id)}</span>
-      <button class="s-feed-del" onclick="deleteYtChannel('${e(ch.id)}')">✕</button>
+    <div class="s-feed-item" draggable="true" data-ytid="${e(ch.id)}" data-idx="${i}">
+      <span class="s-feed-drag" title="Húzd át">⠿</span>
+      <span style="flex-shrink:0;padding-top:3px">${ytIcon}</span>
+      <div style="flex:1;min-width:0">
+        <input class="s-feed-name" value="${e(ch.name || ch.id)}" onblur="renameYtChannelName('${e(ch.id)}',this.value)" onkeydown="if(event.key==='Enter')this.blur()">
+        <input class="s-feed-url" value="${e(ch.id)}" onblur="renameYtChannelUrl('${e(ch.id)}',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()" title="Csatorna handle / ID — kattints a szerkesztéshez" placeholder="@handle vagy channel ID">
+      </div>
+      <button class="s-feed-del" onclick="deleteYtChannel('${e(ch.id)}')" style="margin-top:1px">✕</button>
     </div>`).join('');
+
+  let dragIdx = null;
+  c.querySelectorAll('.s-feed-item').forEach(row => {
+    row.addEventListener('dragstart', ev => {
+      dragIdx = +row.dataset.idx;
+      ev.dataTransfer.effectAllowed = 'move';
+      setTimeout(() => row.style.opacity = '.4', 0);
+    });
+    row.addEventListener('dragend', () => row.style.opacity = '');
+    row.addEventListener('dragover', ev => {
+      ev.preventDefault(); ev.dataTransfer.dropEffect = 'move';
+      const overIdx = +row.dataset.idx;
+      c.querySelectorAll('.s-feed-item').forEach(r => r.classList.remove('drag-over'));
+      if (overIdx !== dragIdx) row.classList.add('drag-over');
+    });
+    row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
+    row.addEventListener('drop', ev => {
+      ev.preventDefault();
+      row.classList.remove('drag-over');
+      const toIdx = +row.dataset.idx;
+      if (dragIdx === null || dragIdx === toIdx) return;
+      const moved = S.ytChannels.splice(dragIdx, 1)[0];
+      S.ytChannels.splice(toIdx, 0, moved);
+      saveYtChannels(); renderSYtChannels(); injectYtSidebar();
+    });
+  });
 }
 
 function deleteYtChannel(id) {
-  S.ytChannels = S.ytChannels.filter(ch => ch.id !== id);
-  saveYtChannels();
-  ytVideos = ytVideos.filter(v => v.channelId !== id);
-  try { localStorage.removeItem('flux_yt_cache'); } catch(e) {}
-  renderSYtChannels();
-  injectYtSidebar();
-  toast('Csatorna törölve.');
+  const ch = S.ytChannels.find(c => c.id === id);
+  confirmDialog(`"${ch?.name || id}" csatorna törlése visszavonhatatlan.`, () => {
+    S.ytChannels = S.ytChannels.filter(c => c.id !== id);
+    saveYtChannels();
+    ytVideos = ytVideos.filter(v => v.channelId !== id);
+    try { localStorage.removeItem('flux_yt_cache'); } catch(e) {}
+    renderSYtChannels();
+    injectYtSidebar();
+    toast('Csatorna törölve.');
+  }, null, { title: 'Csatorna törlése', okLabel: 'Törlés' });
 }
 
 function openAddYtModal() {
@@ -3795,7 +4138,7 @@ const Config = {
         const text = await input.files[0].text();
         this._apply(JSON.parse(text));
         saveSettings(); saveFeeds(); saveYtChannels();
-        Theme.apply(); renderSidebar(); renderArticles();
+        Theme.apply(); renderSidebar(); renderSFeeds(); renderSYtChannels(); renderArticles();
         refreshAll();
         toast('Config betöltve');
       } catch(e) { toast('Hibás config fájl'); }
@@ -3810,7 +4153,7 @@ const Config = {
   buildSettingsUI();
   renderSidebar();
   bindEvents();
-  updateCycleBtn(false);
+  updateLayoutBtns();
   loadWeather();
   loadF1();
   loadYouTube();
@@ -3821,7 +4164,10 @@ const Config = {
     navbar.classList.toggle('scrolled', contentEl.scrollTop > 10);
   }, { passive: true });
 
-  if (S.feeds.length) await refreshAll();
+  if (S.feeds.length) {
+    renderArticles(); // azonnali megjelenítés cache-ből
+    refreshAll();     // háttérben frissítés, nem blokkol
+  }
 })();
 
 </script>
