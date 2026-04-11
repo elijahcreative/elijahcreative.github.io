@@ -1,34 +1,34 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "-1",
-      "FeelsLikeF": "30",
+      "FeelsLikeC": "-2",
+      "FeelsLikeF": "28",
       "cloudcover": "0",
-      "humidity": "80",
-      "localObsDateTime": "2026-04-11 05:19 AM",
-      "observation_time": "03:19 AM",
+      "humidity": "86",
+      "localObsDateTime": "2026-04-11 06:59 AM",
+      "observation_time": "04:59 AM",
       "precipInches": "0.0",
       "precipMM": "0.0",
       "pressure": "1018",
       "pressureInches": "30",
-      "temp_C": "1",
-      "temp_F": "34",
+      "temp_C": "0",
+      "temp_F": "32",
       "uvIndex": "0",
-      "visibility": "10",
-      "visibilityMiles": "6",
-      "weatherCode": "116",
+      "visibility": "9",
+      "visibilityMiles": "5",
+      "weatherCode": "113",
       "weatherDesc": [
         {
-          "value": "Partly cloudy"
+          "value": "Clear"
         }
       ],
       "weatherIconUrl": [
         {
-          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0004_black_low_cloud.png"
+          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0008_clear_sky_night.png"
         }
       ],
       "winddir16Point": "WNW",
-      "winddirDegree": "298",
+      "winddirDegree": "302",
       "windspeedKmph": "8",
       "windspeedMiles": "5"
     }
@@ -205,20 +205,20 @@
           "chanceofsunshine": "94",
           "chanceofthunder": "0",
           "chanceofwindy": "0",
-          "cloudcover": "14",
+          "cloudcover": "0",
           "diffRad": "0.0",
-          "humidity": "76",
+          "humidity": "86",
           "precipInches": "0.0",
           "precipMM": "0.0",
-          "pressure": "1019",
+          "pressure": "1018",
           "pressureInches": "30",
           "shortRad": "0.0",
-          "tempC": "6",
-          "tempF": "42",
+          "tempC": "0",
+          "tempF": "32",
           "time": "600",
           "uvIndex": "0",
-          "visibility": "10",
-          "visibilityMiles": "6",
+          "visibility": "9",
+          "visibilityMiles": "5",
           "weatherCode": "113",
           "weatherDesc": [
             {
