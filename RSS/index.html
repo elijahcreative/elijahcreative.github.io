@@ -1,0 +1,4175 @@
+<!DOCTYPE html>
+<html lang="hu" data-theme="light" data-preset="default">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" id="themeColorMeta" content="#ffffff">
+  <script>
+  (function(){
+    var BG = {
+      default:    { light:'#ffffff', dark:'#111111' },
+      nord:       { light:'#eceff4', dark:'#2e3440' },
+      solarized:  { light:'#fdf6e3', dark:'#002b36' },
+      rose:       { light:'#fff1f2', dark:'#1a0a0e' },
+      mono:       { light:'#ffffff', dark:'#111111' }
+    };
+    try {
+      var s = JSON.parse(localStorage.getItem('flux_s') || '{}');
+      var preset = s.preset || 'default';
+      var theme  = s.theme  || 'auto';
+      var dark   = theme === 'dark' || (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      var bg = (BG[preset] || BG.default)[dark ? 'dark' : 'light'];
+      document.getElementById('themeColorMeta').content = bg;
+      document.documentElement.style.backgroundColor = bg;
+    } catch(e) {}
+  })();
+  </script>
+  <title>Flux</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='2' y='2' width='28' height='28' rx='7' fill='%232563eb'/><line x1='8' y1='11' x2='24' y2='11' stroke='%23ffffff' stroke-width='2.2' stroke-linecap='round'/><line x1='8' y1='16' x2='24' y2='16' stroke='%23ffffff' stroke-width='2.2' stroke-linecap='round'/><line x1='8' y1='21' x2='17' y2='21' stroke='%23ffffff' stroke-width='2.2' stroke-linecap='round'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    /* ── CSS Variables ─────────────────────────────────────── */
+    :root {
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      --font-size-base: 15px;
+      --header-height: 56px;
+      --radius: 10px;
+      --radius-sm: 6px;
+      --t: 150ms ease;
+    }
+
+    /* ── Light Theme ───────────────────────────────────────── */
+    [data-theme="light"] {
+      --bg:       #ffffff;
+      --bg2:      #f5f5f5;
+      --bg-card:  #ffffff;
+      --bg-hover: #f0f0f0;
+      --text:     #111111;
+      --text2:    #555555;
+      --muted:    #999999;
+      --border:   #e8e8e8;
+      --shadow:   0 1px 3px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.04);
+      --shadow-lg:0 4px 16px rgba(0,0,0,.10);
+    }
+
+    /* ── Dark Theme ────────────────────────────────────────── */
+    [data-theme="dark"] {
+      --bg:       #111111;
+      --bg2:      #1c1c1c;
+      --bg-card:  #1c1c1c;
+      --bg-hover: #252525;
+      --text:     #eeeeee;
+      --text2:    #aaaaaa;
+      --muted:    #666666;
+      --border:   #2c2c2c;
+      --shadow:   0 1px 3px rgba(0,0,0,.4);
+      --shadow-lg:0 4px 16px rgba(0,0,0,.5);
+    }
+
+    /* ── Preset Accents ────────────────────────────────────── */
+    [data-preset="default"]   { --ac:#2563eb; --ac2:#1d4ed8; --acl:#dbeafe; }
+    [data-preset="nord"]      { --ac:#5e81ac; --ac2:#4c6f94; --acl:#dce5f0; }
+    [data-preset="solarized"] { --ac:#268bd2; --ac2:#1a6fa8; --acl:#d0e8f5; }
+    [data-preset="rose"]      { --ac:#e11d48; --ac2:#be123c; --acl:#ffe4e6; }
+    [data-preset="mono"]      { --ac:#444444; --ac2:#222222; --acl:#e5e5e5; }
+
+    /* Nord dark override */
+    [data-theme="dark"][data-preset="nord"] {
+      --bg:#2e3440; --bg2:#3b4252; --bg-card:#3b4252; --bg-hover:#434c5e;
+      --text:#eceff4; --text2:#d8dee9; --muted:#636f84; --border:#434c5e;
+      --ac:#88c0d0; --ac2:#6db0c2; --acl:#3b4252;
+    }
+    [data-theme="dark"][data-preset="solarized"] {
+      --bg:#002b36; --bg2:#073642; --bg-card:#073642; --bg-hover:#0d4758;
+      --text:#eee8d5; --text2:#93a1a1; --muted:#586e75; --border:#0d4758;
+      --ac:#2aa198; --ac2:#229990; --acl:#073642;
+    }
+    [data-theme="dark"][data-preset="rose"] {
+      --bg:#1a0a0e; --bg2:#2d1420; --bg-card:#2d1420; --bg-hover:#3d1a2a;
+      --text:#fecdd3; --text2:#fda4af; --muted:#9f1239; --border:#3d1a2a;
+      --ac:#fb7185; --ac2:#f43f5e; --acl:#2d1420;
+    }
+    [data-theme="dark"][data-preset="mono"] {
+      --bg:#111111; --bg2:#1e1e1e; --bg-card:#1e1e1e; --bg-hover:#2a2a2a;
+      --text:#eeeeee; --text2:#aaaaaa; --muted:#555555; --border:#2a2a2a;
+      --ac:#888888; --ac2:#666666; --acl:#2a2a2a;
+    }
+
+    /* ── Reset ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: var(--font-size-base); }
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      transition: background .2s, color .2s;
+    }
+    a { color: var(--ac); }
+    button { font-family: inherit; }
+
+    /* ── Main ──────────────────────────────────────────────── */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+
+    /* ── Floating Navbar ──────────────────────────────────────── */
+    body {
+      position: relative;
+      display: block;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid transparent;
+      white-space: nowrap;
+      transition: background .25s, border-color .25s, backdrop-filter .25s;
+    }
+    .navbar.scrolled {
+      background: var(--bg-nav, var(--bg));
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border-bottom-color: var(--border);
+    }
+    .navbar-inner {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: stretch;
+      gap: 2px;
+    }
+    .nav-logo {
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: -.5px;
+      padding: 0 20px 0 0;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .nav-logo-mark {
+      width: 7px; height: 7px;
+      background: var(--ac);
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .nav-divider { display: none; }
+    .nav-feeds {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      overflow: hidden;
+      flex: 1;
+      min-width: 0;
+    }
+    .nav-feed {
+      padding: 0 12px;
+      border-radius: 0;
+      font-size: .84rem;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color var(--t), box-shadow var(--t);
+      white-space: nowrap;
+      background: none;
+      border: none;
+      font-family: inherit;
+      box-shadow: inset 0 -2px 0 transparent;
+      display: flex;
+      align-items: center;
+    }
+    .nav-feed:hover { color: var(--text); }
+    .nav-feed.active { color: var(--text); box-shadow: inset 0 -2px 0 var(--ac); }
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+      flex: 1;
+      justify-content: flex-end;
+      position: relative;
+    }
+    .layout-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0 12px;
+      border-radius: 0;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color var(--t), box-shadow var(--t);
+      box-shadow: inset 0 -2px 0 transparent;
+      overflow: hidden;
+      position: relative;
+    }
+    .layout-btn:hover { color: var(--text); }
+    .layout-btn.active { color: var(--ac); box-shadow: inset 0 -2px 0 var(--ac); }
+    /* Layout cycle icon animation */
+    @keyframes cycleOut { to   { transform: translateY(-7px); opacity: 0; } }
+    @keyframes cycleIn  { from { transform: translateY(7px);  opacity: 0; } }
+    .cycle-out { animation: cycleOut .13s ease forwards; }
+    .cycle-in  { animation: cycleIn  .13s ease forwards; }
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0 12px;
+      border-radius: 0;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      transition: color var(--t);
+    }
+    .icon-btn:hover { color: var(--text); }
+    .icon-btn.spinning svg { animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Weather widget ───────────────────────────────────── */
+    .nav-weather {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      cursor: default;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .nav-weather-icon { font-size: 1.25rem; line-height: 1; }
+    .nav-weather-temp { font-size: .95rem; font-weight: 700; color: var(--text); line-height: 1; }
+
+    /* ── Weather popup (iOS style) ─────────────────────────── */
+    .wx-popup {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      width: 300px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px 14px;
+      color: var(--text);
+      z-index: 300;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-8px);
+      transition: opacity .2s ease, transform .2s ease;
+      box-shadow: var(--shadow-lg);
+    }
+    .wx-popup.wx-open { opacity: 1; pointer-events: all; transform: translateY(0); }
+    .wx-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+    .wx-left { display: flex; flex-direction: column; justify-content: flex-start; }
+    .wx-big-temp { font-size: 3.2rem; font-weight: 200; line-height: 1; letter-spacing: -3px; color: var(--text); }
+    .wx-main-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+    .wx-big-icon { line-height: 1; }
+    .wx-condition { font-size: .9rem; font-weight: 600; color: var(--text); text-align: right; line-height: 1.3; }
+    .wx-bottom-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0 8px;
+      margin-top: 4px;
+    }
+    .wx-meta { display: flex; gap: 10px; font-size: .72rem; color: var(--muted); }
+    .wx-meta span { display: flex; align-items: center; gap: 4px; }
+    .wx-minmax { font-size: .7rem; color: var(--muted); text-align: right; line-height: 1.6; }
+    .wx-hourly {
+      display: flex;
+      justify-content: space-between;
+      margin: 0 -16px;
+      padding: 10px 8px 14px;
+      border-top: 1px solid var(--border);
+    }
+    .wx-hour { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+    .wx-hour-time { font-size: .75rem; color: var(--muted); font-weight: 500; }
+    .wx-hour-icon { line-height: 1; margin: 2px 0; }
+    .wx-hour-temp { font-size: .9rem; font-weight: 600; color: var(--text); }
+    .wx-forecast {
+      border-top: 1px solid var(--border);
+      padding: 8px 0 4px;
+    }
+    .wx-frow {
+      display: grid;
+      grid-template-columns: 1fr 22px auto 1fr 1fr;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 0;
+      font-size: .8rem;
+    }
+    .wx-fday  { color: var(--text); font-weight: 500; text-align: left; }
+    .wx-ficon { display: flex; justify-content: center; }
+    .wx-fcond { color: var(--text2); text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .wx-frain { color: var(--text2); text-align: right; font-size: .75rem; }
+    .wx-ftemp { text-align: right; white-space: nowrap; }
+    .wx-ftemp-min { color: #60a5fa; margin-right: 4px; }
+    .wx-ftemp-max { color: #f97316; }
+
+    /* ── Content ───────────────────────────────────────────── */
+
+    .content { width: 100%; height: 100vh; overflow-y: auto; padding: 62px 24px 24px; }
+    .content::-webkit-scrollbar { width: 5px; }
+    .content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ── States ────────────────────────────────────────────── */
+    .state-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      gap: 10px;
+      color: var(--muted);
+      text-align: center;
+    }
+    .state-box .icon { font-size: 2.4rem; }
+    .state-box .title { font-size: 1rem; font-weight: 600; color: var(--text2); }
+    .state-box .desc { font-size: .9rem; max-width: 260px; line-height: 1.5; }
+    .spinner { width: 30px; height: 30px; border: 2.5px solid var(--border); border-top-color: var(--ac); border-radius: 50%; animation: spin .7s linear infinite; }
+
+    /* ══════════════════════════════════════════════════════════
+       LAYOUTS
+    ══════════════════════════════════════════════════════════ */
+
+    /* ── Card Grid ─────────────────────────────────────────── */
+    .grid-layout {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 18px;
+    }
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow);
+      transition: transform var(--t), box-shadow var(--t);
+    }
+    .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+
+    .card-img { width: 100%; aspect-ratio: 16/9; object-fit: cover; background: var(--bg2); display: block; }
+    .card-no-img { width: 100%; aspect-ratio: 16/9; background: var(--bg2); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: var(--muted); }
+    .card-body { padding: 12px 14px; flex: 1; display: flex; flex-direction: column; gap: 5px; }
+    .card-source { font-size: .7rem; font-weight: 700; }
+    .card-meta { display: flex; align-items: center; gap: 5px; font-size: .68rem; color: var(--muted); margin-bottom: 2px; }
+    .card-title { font-size: 1.1rem; font-weight: 600; line-height: 1.4; color: var(--text); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .card-desc { font-size: .9rem; color: var(--text2); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; flex: 1; }
+
+    /* ── List ──────────────────────────────────────────────── */
+    .list-layout { display: flex; flex-direction: column; gap: 1px; }
+    .list-item {
+      display: flex;
+      gap: 14px;
+      padding: 12px 8px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background var(--t);
+      align-items: flex-start;
+    }
+    .list-item:hover { background: var(--bg-hover); }
+    .list-thumb { width: 110px; height: 74px; object-fit: cover; border-radius: var(--radius-sm); flex-shrink: 0; }
+    .list-no-thumb { width: 110px; height: 74px; border-radius: var(--radius-sm); flex-shrink: 0; background: var(--bg2); display: flex; align-items: center; justify-content: center; font-size: .95rem; color: var(--muted); }
+    .list-body { flex: 1; min-width: 0; }
+    .list-title { line-height: 1.35; font-size: 1.1rem; font-weight: 600; line-height: 1.4; color: var(--text); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .list-desc { font-size: .88rem; color: var(--text2); display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; margin-top: 2px; }
+    .list-meta { font-size: .7rem; color: var(--muted); margin-top: 4px; display: flex; gap: 5px; }
+    .list-source { font-weight: 700; }
+
+    /* ── Magazine (Index.hu stílus) ────────────────────────── */
+    .magazine-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      max-width: 1140px;
+      margin: 0 auto;
+    }
+
+    /* Forrás badge — kép bal alsó sarkában */
+    .ix-badge {
+      position: absolute;
+      bottom: 7px;
+      left: 7px;
+      background: var(--ac);
+      color: #fff;
+      font-size: .55rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      padding: 3px 8px;
+      border-radius: 5px;
+      line-height: 1.6;
+      pointer-events: none;
+    }
+    .ix-img-wrap {
+      position: relative;
+      display: block;
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    /* Hero */
+    .ix-hero {
+      display: block;
+      cursor: pointer;
+      padding-bottom: 0;
+      margin-bottom: 28px;
+    }
+    .ix-hero:hover .ix-hero-title { color: var(--ac); }
+    .ix-hero-img {
+      width: 100%;
+      aspect-ratio: 16/7;
+      object-fit: cover;
+      display: block;
+    }
+    .ix-hero-nobg {
+      width: 100%;
+      aspect-ratio: 16/7;
+      background: var(--bg2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      color: var(--muted);
+    }
+    .ix-hero-body { padding: 12px 0 0; }
+    .ix-hero-title {
+      font-size: 2.2rem;
+      font-weight: 900;
+      line-height: 1.18;
+      color: var(--text);
+      letter-spacing: .01em;
+      margin-bottom: 8px;
+      transition: color var(--t);
+    }
+    .ix-hero-desc {
+      font-size: 1.05rem;
+      color: var(--text2);
+      line-height: 1.65;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .ix-hero-time { font-size: .65rem; color: var(--muted); margin-top: 8px; }
+
+    /* Sor-pár: 2/3 + 1/3 és 1/3 + 2/3 felváltva */
+    .ix-row {
+      display: grid;
+      gap: 28px 36px;
+      margin-bottom: 32px;
+    }
+    .ix-row.row-a { grid-template-columns: 2fr 1fr; }
+    .ix-row.row-b { grid-template-columns: 1fr 2fr; }
+
+    /* Kártya */
+    .ix-card {
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .ix-card:hover .ix-card-title { color: var(--ac); }
+    .ix-card-img {
+      width: 100%;
+      aspect-ratio: 3/2;
+      object-fit: cover;
+      display: block;
+    }
+    .ix-card-nobg {
+      width: 100%;
+      aspect-ratio: 3/2;
+      background: var(--bg2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: var(--muted);
+    }
+    .ix-card-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      line-height: 1.3;
+      letter-spacing: .01em;
+      color: var(--text);
+      transition: color var(--t);
+    }
+    .ix-card-desc {
+      font-size: 1rem;
+      color: var(--text2);
+      line-height: 1.55;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .ix-card-time { font-size: .63rem; color: var(--muted); }
+
+    /* Side column wrapper — image card + text fills */
+    .ix-col-side {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .ix-col-side .ix-card { flex: 0 0 auto; }
+
+    /* Text-only filler cards */
+    .ix-text-fill {
+      cursor: pointer;
+      padding: 12px 0;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 12px;
+    }
+    .ix-text-fill:first-of-type { margin-top: 8px; }
+    .ix-text-fill:hover .ix-tf-title { color: var(--ac); }
+    .ix-tf-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: .01em;
+      color: var(--text);
+      transition: color var(--t);
+    }
+    .ix-tf-desc {
+      font-size: .93rem;
+      color: var(--text2);
+      line-height: 1.55;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Tighter composition when magazine content sits next to the YT rail */
+    .yt-wrap .ix-row { gap: 22px 24px; }
+    .yt-wrap .ix-row.row-a { grid-template-columns: 1.35fr .95fr; }
+    .yt-wrap .ix-row.row-b { grid-template-columns: .95fr 1.35fr; }
+    .yt-wrap .ix-card { gap: 6px; }
+    .yt-wrap .ix-card-img,
+    .yt-wrap .ix-card-nobg { aspect-ratio: 16/10; }
+    .yt-wrap .ix-card-title { font-size: 1.22rem; line-height: 1.24; }
+    .yt-wrap .ix-card-desc {
+      font-size: .92rem;
+      line-height: 1.45;
+      -webkit-line-clamp: 3;
+    }
+    .yt-wrap .ix-col-side .ix-card-title { font-size: 1.08rem; }
+    .yt-wrap .ix-col-side .ix-card-desc {
+      font-size: .88rem;
+      line-height: 1.4;
+      -webkit-line-clamp: 2;
+    }
+    .yt-wrap .ix-row > .ix-card { gap: 8px; }
+    .yt-wrap .ix-row > .ix-card .ix-card-img,
+    .yt-wrap .ix-row > .ix-card .ix-card-nobg { aspect-ratio: 1/1; }
+    .yt-wrap .ix-row > .ix-card .ix-card-title { font-size: 1.34rem; line-height: 1.26; }
+    .yt-wrap .ix-row > .ix-card .ix-card-desc {
+      font-size: .95rem;
+      line-height: 1.48;
+      -webkit-line-clamp: 4;
+    }
+    .yt-wrap .ix-text-fill {
+      margin-top: 10px;
+      padding: 10px 0;
+      gap: 4px;
+    }
+    .yt-wrap .ix-tf-title { font-size: .96rem; line-height: 1.28; }
+    .yt-wrap .ix-tf-desc {
+      font-size: .84rem;
+      line-height: 1.42;
+      -webkit-line-clamp: 2;
+    }
+
+    /* 4-col thumbnail rács a maradéknak */
+    .ix-mini-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px 24px;
+      margin-bottom: 32px;
+    }
+    /* Első kártya 2 oszlopot foglal, szélesebb kép + nagyobb cím */
+    .ix-mini-grid .ix-mini:first-child {
+      grid-column: span 2;
+    }
+    .ix-mini-grid .ix-mini:first-child .ix-mini-img,
+    .ix-mini-grid .ix-mini:first-child .ix-mini-nobg {
+      aspect-ratio: 16/9;
+    }
+    .ix-mini-grid .ix-mini:first-child .ix-mini-title {
+      font-size: 1.35rem;
+      -webkit-line-clamp: 2;
+    }
+    .ix-mini {
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .ix-mini:hover .ix-mini-title { color: var(--ac); }
+    .ix-mini-img {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      display: block;
+    }
+    .ix-mini-nobg {
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: var(--bg2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      color: var(--muted);
+    }
+    .ix-mini-title {
+      font-size: 1.18rem;
+      font-weight: 700;
+      line-height: 1.35;
+      letter-spacing: .01em;
+      color: var(--text);
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      transition: color var(--t);
+    }
+    .ix-mini-time { font-size: .6rem; color: var(--muted); }
+
+    /* Spotlight — full-width horizontal card */
+    .ix-spotlight {
+      display: grid;
+      grid-template-columns: 45% 55%;
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+      background: var(--ac);
+      margin-bottom: 32px;
+    }
+    [data-theme="dark"] .ix-spotlight {
+      background: color-mix(in srgb, var(--ac) 50%, transparent);
+    }
+    .ix-spot-source { color: rgba(255,255,255,.75) !important; }
+    .ix-spot-title  { color: #ffffff !important; }
+    .ix-spot-desc   { color: rgba(255,255,255,.82) !important; }
+    .ix-spot-time   { color: rgba(255,255,255,.65) !important; }
+    .ix-spotlight .ix-badge { display: none; }
+    .ix-spotlight .ix-spot-img-side { padding: 12px; }
+    .ix-spot-img-clip {
+      width: 100%; height: 100%;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    .ix-spot-img-clip .ix-spot-img { transition: transform .4s ease; }
+    .ix-spot-img-clip .ix-spot-img,
+    .ix-spot-img-clip .ix-spot-nobg {
+      border-radius: 0;
+    }
+    .ix-spotlight:hover .ix-spot-title { color: var(--ac); }
+    .ix-spot-img-side {
+      position: relative;
+      min-height: 220px;
+    }
+    .ix-spot-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .ix-spot-nobg {
+      width: 100%;
+      height: 100%;
+      min-height: 220px;
+      background: var(--bg2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: var(--muted);
+    }
+    .ix-spot-body {
+      padding: 28px 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 10px;
+    }
+    .ix-spot-source { font-size: .63rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--ac); }
+    .ix-spot-title {
+      font-size: 1.9rem;
+      font-weight: 800;
+      line-height: 1.2;
+      color: var(--text);
+      letter-spacing: .01em;
+      transition: color var(--t);
+    }
+    .ix-spot-desc {
+      font-size: .97rem;
+      color: var(--text2);
+      line-height: 1.6;
+      display: -webkit-box;
+      -webkit-line-clamp: 5;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .ix-spot-time { font-size: .63rem; color: var(--muted); }
+
+    /* Trio — 3 equal columns */
+    .ix-trio {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 28px 32px;
+      margin-bottom: 32px;
+    }
+
+    /* Reader strip — numbered compact list */
+    .ix-strip {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .ix-strip-col {
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .ix-strip-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: background var(--t);
+    }
+    .ix-strip-item:hover { background: var(--bg-hover); }
+    .ix-strip-item:hover .ix-strip-title { color: var(--ac); }
+    .ix-strip-img {
+      width: 72px;
+      height: 52px;
+      object-fit: cover;
+      border-radius: var(--radius-sm);
+      flex-shrink: 0;
+    }
+    .ix-strip-num { font-size: .75rem; font-weight: 700; color: var(--ac); min-width: 18px; flex-shrink: 0; padding-top: 2px; }
+    .ix-strip-body { flex: 1; min-width: 0; }
+    .ix-strip-title {
+      font-size: .95rem;
+      font-weight: 700;
+      line-height: 1.35;
+      color: var(--text);
+      transition: color var(--t);
+    }
+    .ix-strip-meta { font-size: .65rem; color: var(--muted); margin-top: 3px; display: flex; gap: 5px; }
+    .ix-strip-source { font-weight: 600; }
+
+    @media (max-width: 900px) {
+      .ix-row.row-a, .ix-row.row-b,
+      .yt-wrap .ix-row.row-a, .yt-wrap .ix-row.row-b { grid-template-columns: 1fr; }
+      .ix-trio { grid-template-columns: 1fr 1fr; }
+      .ix-mini-grid { grid-template-columns: repeat(2, 1fr); }
+      .ix-spotlight { grid-template-columns: 1fr; }
+
+      /* 1. ix-col-side: 3 small cards in a row below the large card */
+      .ix-col-side { flex-direction: row; gap: 8px; }
+      .ix-col-side .ix-card { flex: 1 1 0; min-width: 0; }
+
+      /* Hero: taller + larger title */
+      .ix-hero-img, .ix-hero-nobg { aspect-ratio: 4/3; }
+      .ix-hero-title { font-size: 1.9rem; }
+
+      /* YT sidebar below content */
+      .yt-wrap { grid-template-columns: 1fr !important; }
+      .yt-sidebar {
+        grid-column: 1 !important;
+        height: auto !important;
+        max-height: none !important;
+        overflow: visible;
+      }
+
+      /* YT horizontal scroll */
+      .yt-scroll-row {
+        display: flex !important; flex-direction: row;
+        gap: 10px; overflow-x: auto; overflow-y: hidden;
+        padding-bottom: 8px; scrollbar-width: thin;
+      }
+      .yt-scroll-row::-webkit-scrollbar { height: 3px; }
+      .yt-scroll-row::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
+      .yt-ch-group { flex: 0 0 150px; width: 150px; max-width: 150px; }
+      .yt-ch-group--sep { margin-top: 0; border-top: none; padding-top: 0; border-left: none; padding-left: 0; }
+      .yt-vcard { flex-direction: column; border-bottom: none; padding: 6px 0 0; gap: 0; }
+      .yt-vcard-thumb { width: 100%; height: auto; aspect-ratio: 16/9; margin-bottom: 5px; }
+      .yt-vcard-body { padding: 0; }
+
+      /* Widget popups centered */
+      .wx-popup, .f1-popup {
+        position: fixed !important;
+        top: 56px !important; left: 50% !important; right: auto !important;
+        transform: translateX(-50%) translateY(-8px) !important;
+        width: calc(100vw - 24px) !important; max-width: 340px;
+      }
+      .wx-popup.wx-open { transform: translateX(-50%) translateY(0) !important; }
+      .f1-popup.f1-open { transform: translateX(-50%) translateY(0) !important; }
+    }
+    @media (max-width: 600px) {
+      .ix-row.row-a, .ix-row.row-b { grid-template-columns: 1fr; }
+      .ix-mini-grid { grid-template-columns: repeat(2, 1fr); }
+      .ix-hero-title { font-size: 1.5rem; }
+    }
+
+    /* ── Reader ────────────────────────────────────────────── */
+    .reader-layout {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .reader-item { background: var(--bg-card); border-bottom: 1px solid var(--border); }
+    .reader-item:last-child { border-bottom: none; }
+    .reader-item-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      cursor: pointer;
+      transition: background var(--t);
+    }
+    .reader-item-head:hover { background: var(--bg-hover); }
+    .reader-item-info { flex: 1; min-width: 0; }
+    .reader-title { font-size: 1.1rem; font-weight: 600; color: var(--text); line-height: 1.4; }
+    .reader-meta { font-size: .7rem; color: var(--muted); margin-top: 2px; display: flex; gap: 5px; }
+    .reader-source { font-weight: 700; }
+    .chevron { color: var(--muted); transition: transform var(--t); flex-shrink: 0; }
+    .reader-item.open .chevron { transform: rotate(90deg); }
+    .reader-body { display: none; padding: 0 16px 16px; border-top: 1px solid var(--border); }
+    .reader-item.open .reader-body { display: block; }
+    .reader-content {
+      font-size: .9rem;
+      line-height: 1.85;
+      color: var(--text2);
+      padding-top: 16px;
+      max-width: 680px;
+    }
+    .reader-content img { max-width: 100%; border-radius: var(--radius-sm); margin: 8px 0; }
+    .reader-content a { color: var(--ac); }
+    .reader-ext {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 12px;
+      font-size: .78rem;
+      color: var(--ac);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .reader-ext:hover { text-decoration: underline; }
+
+    /* ══════════════════════════════════════════════════════════
+       OVERLAY & PANELS
+    ══════════════════════════════════════════════════════════ */
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.4);
+      z-index: 340;
+      display: none;
+      backdrop-filter: blur(2px);
+    }
+    .overlay.open { display: block; }
+
+    .confirm-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      backdrop-filter: blur(2px);
+      z-index: 400;
+      display: none;
+    }
+    .confirm-bg.open { display: block; }
+
+    /* ── View Panel ─────────────────────────────────────────── */
+    .view-panel {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: 300px;
+      max-height: calc(100vh - 80px);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-8px);
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    .view-panel.open { opacity: 1; pointer-events: all; transform: translateY(0); }
+    .settings-body { flex: 1; overflow-y: auto; padding: 16px; }
+    .settings-body::-webkit-scrollbar { width: 3px; }
+    .settings-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .s-section { margin-bottom: 24px; }
+    .s-label {
+      font-size: .68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    /* Mode toggle */
+    .mode-bar { display: flex; background: var(--bg2); border-radius: var(--radius-sm); padding: 3px; gap: 2px; }
+    .mode-btn {
+      flex: 1;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 7px 8px;
+      border-radius: 5px;
+      font-size: .78rem;
+      font-weight: 500;
+      color: var(--muted);
+      transition: all var(--t);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+    .mode-btn:hover { color: var(--text); background: var(--bg-hover); }
+    .mode-btn.active { background: var(--bg-card); color: var(--text); box-shadow: var(--shadow); }
+
+    /* Preset grid */
+    .preset-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+    .preset-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .preset-card {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 7px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color var(--t), transform var(--t);
+    }
+    .preset-card:hover { transform: scale(1.06); }
+    .preset-card.active { border-color: var(--ac); }
+    .preset-preview { width: 100%; height: 100%; display: flex; flex-direction: column; }
+    .pp-top { flex: 1; }
+    .pp-bot { height: 35%; display: flex; gap: 2px; padding: 3px; }
+    .pp-dot { flex: 1; border-radius: 2px; }
+    .preset-name { font-size: .64rem; color: var(--muted); }
+
+    /* Accent swatches */
+    .swatch-row { display: flex; align-items: center; gap: 5px; }
+    .swatch {
+      flex: 1; min-width: 0; aspect-ratio: 1;
+      border-radius: 6px; cursor: pointer;
+      border: 2px solid transparent;
+      transition: transform var(--t), border-color var(--t);
+    }
+    .swatch:hover { transform: scale(1.08); }
+    .swatch.active { border-color: var(--text); box-shadow: 0 0 0 1px var(--bg); }
+    input[type="color"] {
+      width: 26px; height: 26px; flex-shrink: 0;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      padding: 1px;
+      background: none;
+    }
+
+    /* Font slider */
+    .slider-row { display: flex; align-items: center; gap: 10px; }
+    .sl { font-size: .72rem; color: var(--muted); width: 22px; text-align: center; }
+    input[type="range"] {
+      flex: 1;
+      height: 3px;
+      -webkit-appearance: none;
+      background: var(--border);
+      border-radius: 2px;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: var(--ac);
+      cursor: pointer;
+    }
+
+    /* Settings feeds */
+    .s-feed-list { display: flex; flex-direction: column; gap: 8px; }
+    .s-feed-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 10px 10px;
+      background: var(--bg2);
+      border-radius: var(--radius-sm);
+    }
+    .s-feed-name {
+      flex: 1;
+      font-size: .92rem;
+      color: var(--text);
+      background: none;
+      border: none;
+      outline: none;
+      cursor: text;
+      font-family: inherit;
+      line-height: 1.6;
+    }
+    .s-feed-name:focus { background: var(--bg-card); border-radius: 3px; padding: 1px 5px; }
+    .s-feed-url {
+      display: block; width: 100%; margin-top: 3px;
+      font-size: .76rem; color: var(--muted); font-family: monospace;
+      background: none; border: none; outline: none;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      cursor: text; line-height: 1.6;
+    }
+    .s-feed-url:focus { background: var(--bg-card); border-radius: 3px; padding: 2px 6px; color: var(--text); white-space: normal; overflow: visible; }
+    .s-feed-del { background: none; border: none; cursor: pointer; color: var(--muted); padding: 3px 5px; border-radius: 3px; font-size: .9rem; }
+    .s-feed-del:hover { background: #fee2e2; color: #dc2626; }
+    .s-feed-drag { color: var(--muted); cursor: grab; padding: 3px 4px; font-size: 1rem; line-height: 1.6; user-select: none; }
+    .s-feed-drag:active { cursor: grabbing; }
+    .s-feed-item.drag-over { outline: 2px solid var(--ac); border-radius: var(--radius-sm); }
+
+    /* ── Add Feed Modal ─────────────────────────────────────── */
+    .modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(.95);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      width: 400px;
+      max-width: 90vw;
+      z-index: 350;
+      box-shadow: var(--shadow-lg);
+      transition: transform .2s, opacity .2s;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .modal.open { transform: translate(-50%, -50%) scale(1); opacity: 1; pointer-events: all; }
+    .modal-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 16px; }
+    .form-group { margin-bottom: 12px; }
+    .form-label { display: block; font-size: .78rem; font-weight: 500; color: var(--text2); margin-bottom: 4px; }
+    .form-input {
+      width: 100%;
+      padding: 8px 11px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: .85rem;
+      color: var(--text);
+      outline: none;
+      font-family: inherit;
+      transition: border-color var(--t);
+    }
+    .form-input:focus { border-color: var(--ac); }
+    .form-hint { font-size: .7rem; color: var(--muted); margin-top: 4px; }
+    .suggestions { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+    .chip {
+      padding: 3px 9px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: .72rem;
+      cursor: pointer;
+      color: var(--text2);
+      transition: all var(--t);
+    }
+    .chip:hover { border-color: var(--ac); color: var(--ac); background: var(--acl); }
+
+
+    .err { font-size: .78rem; color: #dc2626; margin-top: 8px; display: none; }
+    .err.show { display: block; }
+
+    .modal-foot { display: flex; justify-content: flex-end; gap: 7px; margin-top: 18px; }
+    .btn { padding: 7px 15px; border-radius: var(--radius-sm); font-size: .85rem; font-weight: 500; cursor: pointer; border: none; transition: all var(--t); font-family: inherit; }
+    .btn-primary { background: var(--ac); color: #fff; }
+    .btn-primary:hover { background: var(--ac2); }
+    .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-ghost { background: none; color: var(--text2); border: 1px solid var(--border); }
+    .btn-danger { background: #dc2626; color: #fff; }
+    .btn-danger:hover { background: #b91c1c; }
+    .btn-ghost:hover { background: var(--bg-hover); }
+
+    /* ── Toast ─────────────────────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      background: var(--text);
+      color: var(--bg);
+      padding: 9px 16px;
+      border-radius: 10px;
+      font-size: .83rem;
+      font-weight: 500;
+      z-index: 200;
+      opacity: 0;
+      transition: all .3s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── Mobile ─────────────────────────────────────────────── */
+    @media (max-width: 720px) {
+      .navbar-inner { padding: 0 12px; }
+      .nav-feeds { display: none; }
+      .layout-btn, .icon-btn { padding: 0 8px; }
+      .nav-weather { padding: 4px 6px; gap: 5px; }
+      .content { padding: 72px 12px 16px; }
+      .grid-layout { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+
+      /* View panel: fixed to viewport on mobile */
+      .view-panel {
+        position: fixed;
+        top: 56px;
+        left: 8px;
+        right: 8px;
+        width: auto;
+        max-height: calc(100vh - 72px);
+        border-radius: var(--radius);
+      }
+
+      /* Reader layout: kisebb padding mobilon */
+      .reader-item-head { padding: 12px 14px; gap: 10px; }
+      .reader-title { font-size: 1rem; }
+
+      /* List layout: kisebb kép */
+      .list-thumb { width: 72px; height: 54px; }
+      .list-title { font-size: .9rem; }
+
+      /* Magazine: 1 oszlop mindenhol */
+      .ix-trio { grid-template-columns: 1fr; }
+      .ix-strip { grid-template-columns: 1fr; }
+      .ix-mini-grid { grid-template-columns: 1fr 1fr; }
+      .ix-col-side { flex-direction: column; gap: 0; }
+      .ix-col-side .ix-card { flex: 0 0 auto; }
+
+      /* Magazine kártyák kisebb font */
+      .ix-card-title { font-size: 1.15rem; }
+      .ix-hero-title { font-size: 1.4rem; }
+      .ix-card-desc, .ix-tf-desc { -webkit-line-clamp: 2; }
+
+      /* Spotlight: kisebb cím */
+      .ix-spot-title { font-size: 1.4rem; }
+      .ix-spot-body { padding: 20px; }
+    }
+
+    /* ── Kis telefon (≤480px) ────────────────────────────────── */
+    @media (max-width: 480px) {
+      /* F1 badge elrejtése — helyet ad az időjárásnak és gomboknak */
+      .nav-f1 { display: none; }
+      .nav-weather-temp { font-size: .88rem; }
+    }
+    /* ── Category strip ─────────────────────────────────────── */
+    .cat-strip {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 0 0 18px;
+      scrollbar-width: none;
+      flex-wrap: nowrap;
+    }
+    .cat-strip::-webkit-scrollbar { display: none; }
+    .cat-tag {
+      padding: 5px 13px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      font-size: .7rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--text2);
+      flex-shrink: 0;
+      transition: all var(--t);
+    }
+    .cat-tag:hover { border-color: var(--ac); color: var(--ac); background: var(--acl); }
+    .cat-tag.active { background: var(--ac); color: #fff; border-color: var(--ac); }
+
+    /* ── Entrance animations ────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .grid-layout > .card      { animation: fadeUp .35s ease both; }
+    .list-layout > .list-item { animation: fadeUp .3s ease both; }
+    .ix-hero     { animation: fadeUp .4s ease both; }
+    .ix-spotlight{ animation: fadeUp .38s .05s ease both; }
+    .ix-row      { animation: fadeUp .38s .08s ease both; }
+    .ix-trio     { animation: fadeUp .38s .1s ease both; }
+    .ix-mini-grid{ animation: fadeUp .38s .12s ease both; }
+    .ix-strip    { animation: fadeUp .38s .14s ease both; }
+    .reader-item { animation: fadeUp .28s ease both; }
+
+    /* Image zoom on hover */
+    .ix-img-wrap { overflow: hidden; }
+    .ix-img-wrap img { transition: transform .4s ease; }
+    .ix-hero:hover .ix-hero-img,
+    .ix-card:hover .ix-card-img,
+    .ix-spotlight:hover .ix-spot-img-clip .ix-spot-img,
+    .ix-mini:hover .ix-mini-img { transform: scale(1.04); }
+    .card { overflow: hidden; }
+    .card-img { transition: transform .4s ease; }
+    .card:hover .card-img { transform: scale(1.04); }
+
+    /* ── F1 Widget ───────────────────────────────────────────── */
+    .nav-f1 {
+      display: flex; align-items: center; padding: 4px 8px;
+      border-radius: 4px; cursor: default; flex-shrink: 0; position: relative;
+    }
+    .f1-badge {
+      font-size: .82rem; font-weight: 500; color: var(--text2);
+      cursor: default; user-select: none;
+      display: flex; align-items: center; gap: 6px; white-space: nowrap;
+    }
+    .f1-badge-sep { opacity: .35; font-weight: 300; }
+    /* F1 popup — theme-adaptive, matches weather widget */
+    .f1-popup {
+      position: absolute; top: calc(100% + 10px); right: 0;
+      width: 300px; max-height: calc(100vh - 80px); overflow-y: auto;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg); z-index: 200;
+      opacity: 0; pointer-events: none; transform: translateY(-8px);
+      transition: opacity .2s ease, transform .2s ease;
+    }
+    .f1-popup.f1-open { opacity: 1; pointer-events: all; transform: translateY(0); }
+    .f1-popup::-webkit-scrollbar { width: 3px; }
+    .f1-popup::-webkit-scrollbar-thumb { background: var(--border); }
+    /* Next race card */
+    .f1-next-card {
+      position: relative; overflow: hidden;
+      border-radius: var(--radius) var(--radius) 0 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .f1-next-card-img {
+      position: absolute; inset: 0;
+      background-size: cover; background-position: center;
+      filter: brightness(.45);
+    }
+    .f1-next-card-body {
+      position: relative; z-index: 1;
+      padding: 14px 14px 12px;
+      min-height: 140px;
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .f1-next-bottom { display: flex; flex-direction: column; align-items: flex-end; }
+    .f1-next-card .f1-section-title { color: rgba(255,255,255,.65); }
+    .f1-next-card .f1-next-name {
+      color: #fff; text-shadow: 0 1px 8px rgba(0,0,0,.6);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .f1-flag-img { width: 1.2em; height: 1.2em; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+    .f1-next-card .f1-next-circuit { color: rgba(255,255,255,.6); }
+    .f1-next-card .f1-countdown { color: #fff; text-shadow: 0 1px 8px rgba(0,0,0,.6); }
+    .f1-next-card .f1-next-date {
+      display: inline-block; background: #e10600; color: #fff !important;
+      padding: 2px 7px; border-radius: 4px; margin-top: 3px;
+    }
+    .f1-section { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+    .f1-section:last-child { border-bottom: none; }
+    .f1-section-title {
+      font-size: .6rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .14em; color: #e10600; margin-bottom: 8px;
+    }
+    /* Next race */
+    .f1-next-name {
+      font-size: 1rem; font-weight: 800; color: var(--text);
+      text-transform: uppercase; letter-spacing: -.2px; margin-bottom: 1px; line-height: 1.2;
+    }
+    .f1-next-circuit { font-size: .7rem; color: var(--muted); margin-bottom: 8px; letter-spacing: .02em; }
+    .f1-countdown {
+      font-size: 1.6rem; font-weight: 900; color: var(--text);
+      letter-spacing: -1px; line-height: 1; margin-bottom: 3px;
+    }
+    .f1-next-date { font-size: .68rem; color: #e10600; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+    /* Podium */
+    /* Podium cards */
+    .f1-podium-grid {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 5px;
+      padding: 8px 0 4px;
+    }
+    .f1-podium-card {
+      position: relative; border-radius: var(--radius-sm);
+      overflow: hidden; aspect-ratio: 2/3;
+      background: color-mix(in srgb, var(--border) 60%, var(--bg));
+      border: 1px solid #555;
+    }
+    .f1-podium-card-bg {
+      position: absolute; inset: 0;
+      background-size: cover; background-position: center top;
+    }
+    .f1-podium-card-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,.5) 30%, transparent 52%);
+    }
+    .f1-podium-pos {
+      position: absolute; top: 6px; right: 6px;
+      font-size: .6rem; font-weight: 900; color: #fff;
+      background: rgba(0,0,0,.45); border-radius: 4px;
+      padding: 2px 5px; letter-spacing: .04em;
+    }
+    .f1-podium-info {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 6px 7px;
+    }
+    .f1-podium-driver {
+      font-size: .7rem; font-weight: 800; color: #fff;
+      text-transform: uppercase; letter-spacing: .03em; line-height: 1.3;
+    }
+    .f1-podium-team {
+      font-size: .56rem; color: rgba(255,255,255,.65);
+      text-transform: uppercase; letter-spacing: .04em;
+    }
+    /* Standings */
+    .f1-standing-row {
+      display: flex; align-items: center; gap: 0;
+      padding: 3px 0; border-bottom: 1px solid color-mix(in srgb, var(--border) 35%, transparent);
+    }
+    .f1-standing-row:last-child { border-bottom: none; }
+    .f1-team-bar { width: 3px; height: 16px; border-radius: 1px; flex-shrink: 0; margin-right: 9px; }
+    .f1-standing-pos { font-size: .7rem; font-weight: 900; color: var(--muted); width: 18px; flex-shrink: 0; }
+    .f1-standing-driver { font-size: .86rem; font-weight: 700; color: var(--text); flex: 1; text-transform: uppercase; letter-spacing: .02em; }
+    .f1-standing-pts { font-size: .62rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+    /* Calendar */
+    .f1-cal-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 4px 0; border-bottom: 1px solid color-mix(in srgb, var(--border) 35%, transparent);
+    }
+    .f1-cal-row:last-child { border-bottom: none; }
+    .f1-cal-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
+    .f1-cal-name { font-size: .78rem; color: var(--text2); flex: 1; text-transform: uppercase; letter-spacing: .02em; font-weight: 600; }
+    .f1-cal-date { font-size: .62rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
+    .f1-cal-row.f1-cal-next .f1-cal-dot { background: #e10600; width: 6px; height: 6px; }
+    .f1-cal-row.f1-cal-next .f1-cal-name { color: var(--text); }
+    .f1-cal-row.f1-cal-next .f1-cal-date { color: #e10600; }
+
+    /* ── YouTube Sidebar ────────────────────────────────────────── */
+    .yt-wrap {
+      display: grid;
+      grid-template-columns: 1fr 272px;
+      gap: 0 28px;
+      align-items: start;
+    }
+    .yt-section-divider {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 272px;
+      column-gap: 28px;
+      align-items: start;
+      width: 100%;
+      margin: 10px 0 28px;
+    }
+    .yt-divider-main {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      min-width: 0;
+    }
+    .yt-divider-main::before {
+      content: "";
+      width: 24px;
+      height: 24px;
+      background: var(--ac);
+      flex-shrink: 0;
+    }
+    .yt-divider-main::after {
+      content: "";
+      height: 24px;
+      flex: 1;
+      background: var(--bg2);
+      opacity: .95;
+      min-width: 0;
+      /* Reach through the inter-column gap so it visually meets the YT rule */
+      margin-right: -28px;
+    }
+    .yt-divider-side {
+      width: 100%;
+      height: 12px;
+      background: var(--bg2);
+      opacity: .95;
+      margin-top: 12px;
+    }
+    .yt-sidebar {
+      background: var(--bg2);
+      border-radius: var(--radius);
+      padding: 14px;
+      grid-column: 2;
+      overflow-y: auto;
+      min-height: 0;
+      margin-bottom: 10px;
+    }
+    .yt-scroll-row { display: contents; }
+    .yt-sidebar::-webkit-scrollbar { width: 5px; }
+    .yt-sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
+    .yt-sidebar-heading {
+      font-size: .62rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .1em; color: var(--muted);
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      padding-bottom: 10px; margin-bottom: 2px;
+      border-bottom: 1px solid var(--border);
+    }
+    .yt-sidebar-heading-main {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+    .yt-refresh-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border: none;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color var(--t), background var(--t), transform var(--t);
+      flex-shrink: 0;
+    }
+    .yt-refresh-btn:hover {
+      color: var(--text);
+      background: var(--bg-hover);
+    }
+    .yt-refresh-btn.spinning svg { animation: spin .7s linear infinite; }
+    .yt-vcard {
+      display: flex; gap: 9px; padding: 9px 0; cursor: pointer;
+      border-bottom: 1px solid var(--border);
+    }
+    .yt-vcard:last-child { border-bottom: none; }
+    .yt-vcard:hover .yt-vcard-title { color: var(--ac); }
+    .yt-vcard-thumb {
+      width: 96px; height: 54px; border-radius: var(--radius-sm);
+      object-fit: cover; flex-shrink: 0; background: var(--bg-hover); display: block;
+    }
+    .yt-vcard-body { flex: 1; min-width: 0; }
+    .yt-vcard-title {
+      font-size: .78rem; font-weight: 600; line-height: 1.35; color: var(--text);
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+      overflow: hidden; transition: color var(--t);
+    }
+    .yt-vcard-meta { font-size: .65rem; color: var(--muted); margin-top: 3px; }
+    .yt-vcard-channel { font-weight: 700; }
+    @media (min-width: 901px) {
+      .yt-ch-group--sep { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+    }
+    .yt-ch-heading {
+      font-size: .72rem; font-weight: 700; color: var(--text2);
+      margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .yt-empty {
+      font-size: .78rem;
+      color: var(--muted);
+      line-height: 1.5;
+      padding-top: 10px;
+    }
+
+    /* ── View Panel Layout Buttons ──────────────────────────── */
+    .v-layout-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 5px; }
+    .v-layout-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 8px 4px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+      background: none; cursor: pointer; color: var(--text2);
+      font-size: .62rem; font-weight: 600; font-family: inherit;
+      transition: color var(--t), background var(--t), border-color var(--t);
+    }
+    .v-layout-btn:hover { color: var(--text); background: var(--bg-hover); }
+    .v-layout-btn.active { color: var(--ac); border-color: var(--ac); }
+
+    /* ── Settings Page ──────────────────────────────────────── */
+    .sp-page {
+      position: fixed; inset: 0; background: var(--bg); z-index: 300;
+      display: flex; flex-direction: column;
+      opacity: 0; pointer-events: none;
+      transform: translateY(6px);
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    .sp-page.open { opacity: 1; pointer-events: all; transform: translateY(0); }
+    .sp-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px; height: 56px;
+      border-bottom: 1px solid var(--border); flex-shrink: 0;
+    }
+    .sp-title { font-size: .92rem; font-weight: 700; color: var(--text); }
+    .sp-close {
+      background: none; border: none; cursor: pointer; color: var(--muted);
+      padding: 6px; border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      transition: color var(--t), background var(--t);
+    }
+    .sp-close:hover { color: var(--text); background: var(--bg-hover); }
+    .sp-body { display: flex; flex: 1; overflow: hidden; }
+    .sp-nav {
+      width: 190px; flex-shrink: 0;
+      border-right: 1px solid var(--border);
+      padding: 12px 0; overflow-y: auto;
+    }
+    .sp-nav-item {
+      display: flex; align-items: center; gap: 10px;
+      width: 100%; padding: 11px 20px;
+      background: none; border: none; text-align: left;
+      cursor: pointer; font-size: .85rem; font-weight: 500;
+      color: var(--text2); font-family: inherit;
+      transition: color var(--t), background var(--t);
+    }
+    .sp-nav-item:hover { background: var(--bg-hover); color: var(--text); }
+    .sp-nav-item.active { color: var(--ac); background: var(--bg-hover); font-weight: 700; }
+    .sp-content { flex: 1; overflow-y: auto; padding: 32px 36px; }
+    .sp-section { display: none; }
+    .sp-section.active { display: block; max-width: 580px; }
+    .sp-sect-header {
+      display: flex; align-items: flex-start; gap: 16px;
+      padding-bottom: 20px; margin-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sp-sect-icon {
+      width: 44px; height: 44px; border-radius: var(--radius);
+      background: var(--bg2); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; color: var(--ac);
+    }
+    .sp-sect-title { font-size: 1.15rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .sp-sect-desc { font-size: .8rem; color: var(--muted); line-height: 1.5; }
+    .sp-mini-label {
+      font-size: .65rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .07em; color: var(--muted);
+      margin: 20px 0 10px;
+    }
+    .sp-mini-label:first-child { margin-top: 0; }
+    .sp-stepper-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; background: var(--bg2);
+      border-radius: var(--radius-sm); margin-bottom: 6px;
+    }
+    .sp-stepper-label { font-size: .85rem; color: var(--text2); }
+    .sp-config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 4px; }
+    .sp-config-card {
+      border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 18px; display: flex; flex-direction: column; gap: 8px;
+      background: var(--bg-card);
+    }
+    .sp-config-card-icon { color: var(--ac); }
+    .sp-config-card-title { font-size: .9rem; font-weight: 700; color: var(--text); }
+    .sp-config-card-desc { font-size: .77rem; color: var(--muted); line-height: 1.5; flex: 1; }
+    @media (max-width: 600px) {
+      .sp-content { padding: 16px; }
+      .sp-section.active { max-width: 100%; }
+      .sp-config-grid { grid-template-columns: 1fr; }
+      .sp-sect-icon { width: 36px; height: 36px; }
+      .sp-sect-title { font-size: 1rem; }
+    }
+    @media (max-width: 600px) {
+      .sp-body { flex-direction: column; }
+      .sp-nav {
+        width: 100%; border-right: none; border-bottom: 1px solid var(--border);
+        padding: 0; display: flex; overflow-x: auto; overflow-y: hidden;
+      }
+      .sp-nav-item { padding: 12px 16px; white-space: nowrap; font-size: .8rem; flex-direction: column; gap: 3px; }
+      .sp-content { padding: 16px; }
+    }
+    </style>
+</head>
+<body>
+
+<!-- Floating Navbar -->
+<nav class="navbar" id="navbar">
+  <div class="navbar-inner">
+  <span class="nav-logo" onclick="document.querySelector('.content').scrollTo({top:0,behavior:'smooth'})" style="cursor:pointer">
+    <span class="nav-logo-mark"></span>Flux
+  </span>
+  <!-- Article-mode controls (hidden normally) -->
+  <div class="nav-feeds" id="feedList"></div>
+  <div class="nav-right">
+    <div class="nav-f1" id="navF1"><span class="f1-badge">F1</span></div>
+    <div class="nav-weather" id="navWeather" title=""></div>
+    <button class="icon-btn" id="viewBtn" title="Nézet">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+    <aside class="view-panel" id="viewPanel">
+      <div class="settings-body">
+
+        <div class="s-section">
+          <div class="s-label">Mód</div>
+          <div class="mode-bar" id="modeBar">
+            <button class="mode-btn" data-mode="light">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+              Világos
+            </button>
+            <button class="mode-btn" data-mode="auto">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2v20M2 12h20" stroke-dasharray="4 2"/></svg>
+              Auto
+            </button>
+            <button class="mode-btn" data-mode="dark">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+              Sötét
+            </button>
+          </div>
+        </div>
+
+        <div class="s-section">
+          <div class="s-label">Téma</div>
+          <div class="preset-grid" id="presetGrid"></div>
+        </div>
+
+        <div class="s-section">
+          <div class="s-label">Kiemelő szín</div>
+          <div class="swatch-row" id="swatchRow"></div>
+        </div>
+
+        <div class="s-section">
+          <div class="s-label">Betűméret</div>
+          <div class="slider-row">
+            <span class="sl" style="font-size:.8rem">A</span>
+            <input type="range" id="fontSlider" min="13" max="20" step="1" value="15">
+            <span class="sl" style="font-size:1.1rem">A</span>
+          </div>
+        </div>
+
+        <div class="s-section">
+          <div class="s-label">Nézet</div>
+          <div class="v-layout-row">
+            <button class="v-layout-btn" data-layout="magazine">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="9" height="9" rx="1.5"/><rect x="12" y="1" width="3" height="4" rx="1"/><rect x="12" y="7" width="3" height="3" rx="1"/><rect x="1" y="12" width="14" height="3" rx="1"/></svg>
+              Magazin
+            </button>
+            <button class="v-layout-btn" data-layout="grid">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+              Grid
+            </button>
+            <button class="v-layout-btn" data-layout="list">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="5" y1="4" x2="14" y2="4"/><line x1="5" y1="8" x2="14" y2="8"/><line x1="5" y1="12" x2="14" y2="12"/><circle cx="2" cy="4" r="1" fill="currentColor" stroke="none"/><circle cx="2" cy="8" r="1" fill="currentColor" stroke="none"/><circle cx="2" cy="12" r="1" fill="currentColor" stroke="none"/></svg>
+              Lista
+            </button>
+            <button class="v-layout-btn" data-layout="reader">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="2" width="12" height="12" rx="2"/><line x1="5" y1="6" x2="11" y2="6"/><line x1="5" y1="9" x2="9" y2="9"/></svg>
+              Olvasó
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+    <button class="icon-btn" id="settingsBtn" title="Beállítások">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+  </div>
+</nav>
+
+<!-- Settings Page -->
+<div class="sp-page" id="settingsPage">
+  <div class="sp-header">
+    <span class="sp-title">Beállítások</span>
+    <button class="sp-close" id="spClose">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="sp-body">
+    <nav class="sp-nav" id="spNav">
+      <button class="sp-nav-item active" data-sp="feeds">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1" fill="currentColor" stroke="none"/></svg>
+        Feedek kezelése
+      </button>
+      <button class="sp-nav-item" data-sp="youtube">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor" stroke="none"/></svg>
+        YouTube csatornák
+      </button>
+      <button class="sp-nav-item" data-sp="config">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Config fájl
+      </button>
+    </nav>
+    <div class="sp-content">
+      <div class="sp-section active" id="sp-feeds">
+        <div class="sp-sect-header">
+          <div class="sp-sect-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1" fill="currentColor" stroke="none"/></svg>
+          </div>
+          <div>
+            <div class="sp-sect-title">Feedek kezelése</div>
+            <div class="sp-sect-desc">Adj hozzá RSS vagy Atom feedeket, rendezd át őket drag &amp; drop-pal, vagy töröld a feleslegeseket.</div>
+          </div>
+        </div>
+        <div class="sp-mini-label">Aktív feedek</div>
+        <div class="s-feed-list" id="sFeedList"></div>
+        <button class="btn btn-ghost" id="addFeedBtn" style="width:100%;margin-top:10px;justify-content:center;display:flex;gap:6px;align-items:center">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>
+          Feed hozzáadása
+        </button>
+      </div>
+
+      <div class="sp-section" id="sp-youtube">
+        <div class="sp-sect-header">
+          <div class="sp-sect-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="white"/></svg>
+          </div>
+          <div>
+            <div class="sp-sect-title">YouTube csatornák</div>
+            <div class="sp-sect-desc">Kövesd kedvenc csatornáidat közvetlenül az appban. A legújabb videók az oldalsávban jelennek meg.</div>
+          </div>
+        </div>
+        <div class="sp-mini-label">Megjelenítési korlátok</div>
+        <div class="sp-stepper-row">
+          <span class="sp-stepper-label">Max. csatorna megjelenítve</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <button class="icon-btn" id="ytMaxMinus" style="padding:0 8px;font-size:1rem;line-height:1">−</button>
+            <span id="ytMaxVal" style="font-size:.95rem;font-weight:700;min-width:20px;text-align:center"></span>
+            <button class="icon-btn" id="ytMaxPlus" style="padding:0 8px;font-size:1rem;line-height:1">+</button>
+          </div>
+        </div>
+        <div class="sp-stepper-row">
+          <span class="sp-stepper-label">Videó / csatorna</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <button class="icon-btn" id="ytPerMinus" style="padding:0 8px;font-size:1rem;line-height:1">−</button>
+            <span id="ytPerVal" style="font-size:.95rem;font-weight:700;min-width:20px;text-align:center"></span>
+            <button class="icon-btn" id="ytPerPlus" style="padding:0 8px;font-size:1rem;line-height:1">+</button>
+          </div>
+        </div>
+        <div class="sp-mini-label">Csatornák</div>
+        <div class="s-feed-list" id="sYtList"></div>
+        <button class="btn btn-ghost" id="addYtBtn" style="width:100%;margin-top:10px;justify-content:center;display:flex;gap:6px;align-items:center">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>
+          Csatorna hozzáadása
+        </button>
+      </div>
+
+      <div class="sp-section" id="sp-config">
+        <div class="sp-sect-header">
+          <div class="sp-sect-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+          </div>
+          <div>
+            <div class="sp-sect-title">Config fájl</div>
+            <div class="sp-sect-desc">Exportáld az összes beállítást, feedet és csatornát JSON-ba, vagy töltsd be egy korábbi mentésből.</div>
+          </div>
+        </div>
+        <div class="sp-config-grid">
+          <div class="sp-config-card">
+            <div class="sp-config-card-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <div class="sp-config-card-title">Exportálás</div>
+            <div class="sp-config-card-desc">Elmenti a teljes konfigurációt .json fájlként.</div>
+            <button class="btn btn-ghost" id="configSaveBtn" style="justify-content:center;margin-top:4px">Mentés</button>
+          </div>
+          <div class="sp-config-card">
+            <div class="sp-config-card-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </div>
+            <div class="sp-config-card-title">Importálás</div>
+            <div class="sp-config-card-desc">Betölt egy korábban mentett config fájlt.</div>
+            <button class="btn btn-ghost" id="configLoadBtn" style="justify-content:center;margin-top:4px">Betöltés</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Content -->
+<div class="content" id="content">
+    <div class="state-box">
+      <div class="icon">📰</div>
+      <div class="title">Nincs feed hozzáadva</div>
+      <div class="desc">Kattints a "Feed hozzáadása" gombra.</div>
+    </div>
+  </div>
+
+<!-- Overlay (modal) -->
+<div class="overlay" id="overlay"></div>
+
+<!-- Add Feed Modal -->
+<div class="modal" id="addModal">
+  <div class="modal-title">Feed hozzáadása</div>
+  <div class="form-group">
+    <label class="form-label" for="feedUrl">RSS feed URL</label>
+    <input type="url" class="form-input" id="feedUrl" placeholder="https://telex.hu/rss">
+    <div class="form-hint">Gyors hozzáadás:</div>
+    <div class="suggestions" id="suggestions"></div>
+  </div>
+  <div class="form-group">
+    <label class="form-label" for="feedName">Név (opcionális)</label>
+    <input type="text" class="form-input" id="feedName" placeholder="Automatikusan töltődik ki">
+  </div>
+  <div class="err" id="feedErr">Nem sikerült betölteni a feedet. Ellenőrizd az URL-t.</div>
+  <div class="modal-foot">
+    <button class="btn btn-ghost" id="cancelAdd">Mégse</button>
+    <button class="btn btn-primary" id="confirmAdd">Hozzáadás</button>
+  </div>
+</div>
+
+<!-- Add YouTube Channel Modal -->
+<div class="modal" id="addYtModal">
+  <div class="modal-title">YouTube csatorna hozzáadása</div>
+  <div class="form-group">
+    <label class="form-label" for="ytChannelInput">Channel URL vagy ID</label>
+    <input type="text" class="form-input" id="ytChannelInput" placeholder="youtube.com/channel/UCxxxxxx vagy youtube.com/watch?v=...">
+    <div class="form-hint">Pl. youtube.com/channel/UCxxxxxx, nyers UC… ID, vagy egy YouTube videó linkje</div>
+  </div>
+  <div class="err" id="ytErr">Nem sikerült betölteni. Adj meg érvényes channel URL-t vagy ID-t.</div>
+  <div class="modal-foot">
+    <button class="btn btn-ghost" id="cancelYt">Mégse</button>
+    <button class="btn btn-primary" id="confirmYt">Hozzáadás</button>
+  </div>
+</div>
+
+<!-- Confirm Dialog -->
+<div class="confirm-bg" id="confirmBg"></div>
+<div class="modal" id="confirmModal" style="width:340px;max-width:90vw;z-index:401">
+  <div class="modal-title" id="confirmTitle" style="font-size:.95rem">Megerősítés</div>
+  <div id="confirmMsg" style="font-size:.85rem;color:var(--text2);line-height:1.5;margin-bottom:4px"></div>
+  <div class="modal-foot">
+    <button class="btn btn-ghost" id="confirmCancel">Mégse</button>
+    <button class="btn btn-danger" id="confirmOk">OK</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+
+/* ════════════════════════════════════════════════════════════
+   CONFIG
+════════════════════════════════════════════════════════════ */
+const RSS2JSON    = 'https://api.rss2json.com/v1/api.json?rss_url=';
+const ALLORIGINS  = 'https://api.allorigins.win/get?url=';
+const CORSPROXY   = 'https://corsproxy.io/?';
+const CACHE_TTL   = 5 * 60 * 1000; // 5 minutes
+
+function fetchT(url, opts = {}, ms = 8000) {
+  const ctrl = new AbortController();
+  const tid = setTimeout(() => ctrl.abort(), ms);
+  return fetch(url, { ...opts, signal: ctrl.signal }).finally(() => clearTimeout(tid));
+}
+
+const PRESETS = {
+  default: { name: 'Default',
+    light: { bg:'#ffffff', bg2:'#f5f5f5', card:'#ffffff', hover:'#f0f0f0', text:'#111111', text2:'#555555', muted:'#999999', border:'#e8e8e8', ac:'#2563eb', ac2:'#1d4ed8', acl:'#dbeafe' },
+    dark:  { bg:'#111111', bg2:'#1c1c1c', card:'#1c1c1c', hover:'#252525', text:'#eeeeee', text2:'#aaaaaa', muted:'#666666', border:'#2c2c2c', ac:'#3b82f6', ac2:'#2563eb', acl:'#1e3a6e' }
+  },
+  nord: { name: 'Nord',
+    light: { bg:'#eceff4', bg2:'#e5e9f0', card:'#ffffff', hover:'#dce5f0', text:'#2e3440', text2:'#4c566a', muted:'#9aa3b0', border:'#d8dee9', ac:'#5e81ac', ac2:'#4c6f94', acl:'#dce5f0' },
+    dark:  { bg:'#2e3440', bg2:'#3b4252', card:'#3b4252', hover:'#434c5e', text:'#eceff4', text2:'#d8dee9', muted:'#636f84', border:'#434c5e', ac:'#88c0d0', ac2:'#6db0c2', acl:'#3b4252' }
+  },
+  solarized: { name: 'Solar',
+    light: { bg:'#fdf6e3', bg2:'#eee8d5', card:'#fdf6e3', hover:'#e8e0ca', text:'#657b83', text2:'#586e75', muted:'#93a1a1', border:'#d4cdb0', ac:'#268bd2', ac2:'#1a6fa8', acl:'#d0e8f5' },
+    dark:  { bg:'#002b36', bg2:'#073642', card:'#073642', hover:'#0d4758', text:'#eee8d5', text2:'#93a1a1', muted:'#586e75', border:'#0d4758', ac:'#2aa198', ac2:'#229990', acl:'#073642' }
+  },
+  rose: { name: 'Rose',
+    light: { bg:'#fff1f2', bg2:'#ffe4e6', card:'#ffffff', hover:'#ffd6da', text:'#1e0a0c', text2:'#7b3040', muted:'#c08090', border:'#fecdd3', ac:'#e11d48', ac2:'#be123c', acl:'#ffe4e6' },
+    dark:  { bg:'#1a0a0e', bg2:'#2d1420', card:'#2d1420', hover:'#3d1a2a', text:'#fecdd3', text2:'#fda4af', muted:'#9f1239', border:'#3d1a2a', ac:'#fb7185', ac2:'#f43f5e', acl:'#2d1420' }
+  },
+  mono: { name: 'Mono',
+    light: { bg:'#ffffff', bg2:'#f0f0f0', card:'#ffffff', hover:'#e8e8e8', text:'#111111', text2:'#444444', muted:'#888888', border:'#dedede', ac:'#444444', ac2:'#222222', acl:'#e5e5e5' },
+    dark:  { bg:'#111111', bg2:'#1e1e1e', card:'#1e1e1e', hover:'#2a2a2a', text:'#eeeeee', text2:'#aaaaaa', muted:'#555555', border:'#2a2a2a', ac:'#888888', ac2:'#666666', acl:'#2a2a2a' }
+  }
+};
+
+const SWATCHES = ['#2563eb','#7c3aed','#db2777','#e11d48','#ea580c','#ca8a04','#16a34a','#0891b2'];
+const FEED_COLORS = ['#ef4444','#f97316','#eab308','#22c55e','#14b8a6','#3b82f6','#8b5cf6','#ec4899'];
+
+const DEFAULT_FEEDS = [
+  { url: 'https://telex.hu/rss',            name: 'Telex',     color: '#ef4444' },
+  { url: 'https://index.hu/24ora/rss',       name: 'Index',     color: '#f97316' },
+  { url: 'https://444.hu/feed',              name: '444',       color: '#3b82f6' },
+  { url: 'https://hvg.hu/rss',               name: 'HVG',       color: '#22c55e' }
+];
+
+const SUGGESTIONS = [
+  { label: 'Telex',     url: 'https://telex.hu/rss' },
+  { label: 'Index',     url: 'https://index.hu/24ora/rss' },
+  { label: '444',       url: 'https://444.hu/feed' },
+  { label: 'HVG',       url: 'https://hvg.hu/rss' },
+  { label: 'Portfolio', url: 'https://www.portfolio.hu/rss/all.xml' },
+  { label: 'G7',        url: 'https://g7.hu/feed' },
+  { label: 'Euronews',  url: 'https://feeds.euronews.com/euronews/hu/home' }
+];
+
+/* ════════════════════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════════════════════ */
+const S = {
+  feeds:        [],
+  articles:     [],
+  activeUrl:    null,
+  layout:       'magazine',
+  theme:        'auto',
+  preset:       'default',
+  customAccent:    null,
+  fontSize:        15,
+  activeCategory:  null,
+  ytChannels:    [],
+  ytPerChannel:  3,
+  ytMaxChannels: 5
+};
+
+// Article lookup by ID for safe event handling
+const articleMap = {};
+
+// YouTube video lookup by videoId
+let ytVideos = [];
+const ytVideoMap = {};
+let ytLoading = false;
+
+function ytCacheSignature() {
+  return JSON.stringify(
+    (S.ytChannels || []).map(ch => `${ch.idType || 'id'}:${ch.id}`).sort()
+  );
+}
+
+function ytChannelCountFromVideos(videos) {
+  return new Set((videos || []).map(v => v.channelId).filter(Boolean)).size;
+}
+
+/* ════════════════════════════════════════════════════════════
+   PERSISTENCE
+════════════════════════════════════════════════════════════ */
+function saveSettings() {
+  localStorage.setItem('flux_s', JSON.stringify({
+    layout: S.layout, theme: S.theme, preset: S.preset,
+    customAccent: S.customAccent, fontSize: S.fontSize, activeUrl: S.activeUrl,
+    ytPerChannel: S.ytPerChannel, ytMaxChannels: S.ytMaxChannels
+  }));
+}
+function saveFeeds()       { localStorage.setItem('flux_f', JSON.stringify(S.feeds)); }
+function saveYtChannels()  { localStorage.setItem('flux_yt', JSON.stringify(S.ytChannels)); }
+function saveArticles()    { try { localStorage.setItem('flux_art', JSON.stringify(S.articles)); } catch(e) {} }
+
+function loadStorage() {
+  try {
+    const s = JSON.parse(localStorage.getItem('flux_s') || '{}');
+    S.layout = s.layout || 'magazine';
+    S.theme  = s.theme  || 'auto';
+    S.preset = s.preset || 'default';
+    S.customAccent = s.customAccent || null;
+    S.fontSize = s.fontSize || 15;
+    S.activeUrl = s.activeUrl || null;
+    S.ytPerChannel  = s.ytPerChannel  || 3;
+    S.ytMaxChannels = s.ytMaxChannels || 5;
+  } catch(e) {}
+
+  try {
+    const f = JSON.parse(localStorage.getItem('flux_f'));
+    S.feeds = (f && f.length) ? f : [...DEFAULT_FEEDS];
+  } catch(e) { S.feeds = [...DEFAULT_FEEDS]; }
+  if (!localStorage.getItem('flux_f')) saveFeeds();
+
+  try {
+    const yt = JSON.parse(localStorage.getItem('flux_yt') || '[]');
+    S.ytChannels = Array.isArray(yt) ? yt : [];
+  } catch(e) { S.ytChannels = []; }
+
+  try {
+    const arts = JSON.parse(localStorage.getItem('flux_art') || '[]');
+    S.articles = Array.isArray(arts) ? arts.map(a => ({ ...a, date: new Date(a.date) })) : [];
+  } catch(e) { S.articles = []; }
+}
+
+/* ════════════════════════════════════════════════════════════
+   THEME
+════════════════════════════════════════════════════════════ */
+const Theme = {
+  apply() {
+    const dark = S.theme === 'dark' || (S.theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-preset', S.preset);
+
+    const root = document.documentElement;
+    const p = PRESETS[S.preset];
+    const c = dark ? p.dark : p.light;
+
+    // Full palette from preset
+    root.style.setProperty('--bg',       c.bg);
+    root.style.setProperty('--bg2',      c.bg2);
+    root.style.setProperty('--bg-card',  c.card);
+    root.style.setProperty('--bg-hover', c.hover);
+    root.style.setProperty('--text',     c.text);
+    root.style.setProperty('--text2',    c.text2);
+    root.style.setProperty('--muted',    c.muted);
+    root.style.setProperty('--border',   c.border);
+
+    // Accent: custom or preset
+    const ac  = S.customAccent || c.ac;
+    const ac2 = S.customAccent ? this._shade(S.customAccent, -20) : c.ac2;
+    const acl = S.customAccent ? this._shade(S.customAccent, 90)  : c.acl;
+    root.style.setProperty('--ac',  ac);
+    root.style.setProperty('--ac2', ac2);
+    root.style.setProperty('--acl', acl);
+
+    root.style.setProperty('--font-size-base', S.fontSize + 'px');
+
+    // Semi-transparent navbar bg for blur effect
+    const _hex = c.bg.replace('#','');
+    const _r = parseInt(_hex.slice(0,2),16), _g = parseInt(_hex.slice(2,4),16), _b = parseInt(_hex.slice(4,6),16);
+    root.style.setProperty('--bg-nav', `rgba(${_r},${_g},${_b},0.82)`);
+
+    // Set bg directly on html+body so Dia Browser can read it without resolving CSS vars
+    document.documentElement.style.backgroundColor = c.bg;
+    document.body.style.backgroundColor = c.bg;
+
+    // Also keep theme-color meta in sync (remove+re-insert for Chromium re-detection)
+    const oldTc = document.getElementById('themeColorMeta');
+    if (oldTc) oldTc.remove();
+    const newTc = document.createElement('meta');
+    newTc.name = 'theme-color';
+    newTc.id = 'themeColorMeta';
+    newTc.setAttribute('content', c.bg);
+    document.head.appendChild(newTc);
+
+    this._syncUI();
+    // Re-render weather icons with correct theme colors (uses cache, no API call)
+    if (typeof loadWeather === 'function') loadWeather();
+  },
+
+  _shade(hex, amt) {
+    const n = parseInt(hex.slice(1), 16);
+    let r = (n >> 16) + amt, g = ((n >> 8) & 0xff) + amt, b = (n & 0xff) + amt;
+    r = Math.max(0, Math.min(255, r));
+    g = Math.max(0, Math.min(255, g));
+    b = Math.max(0, Math.min(255, b));
+    return '#' + [r,g,b].map(v => v.toString(16).padStart(2,'0')).join('');
+  },
+
+  _syncUI() {
+    // Mode
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === S.theme));
+    // Presets
+    document.querySelectorAll('.preset-card').forEach(b => b.classList.toggle('active', b.dataset.preset === S.preset));
+    // Swatches
+    document.querySelectorAll('.swatch').forEach(b => b.classList.toggle('active', b.dataset.color === S.customAccent));
+    // Font slider
+    const sl = $('fontSlider'); if (sl) sl.value = S.fontSize;
+    // Layout buttons
+    updateLayoutBtns();
+  }
+};
+
+/* ════════════════════════════════════════════════════════════
+   FETCHER
+════════════════════════════════════════════════════════════ */
+const Fetcher = {
+  _cache: new Map(),
+
+  async get(url, bust = false) {
+    const cached = this._cache.get(url);
+    if (!bust && cached && Date.now() - cached.ts < CACHE_TTL) return cached.data;
+
+    const articles = await this._fetchAny(url, bust);
+    this._cache.set(url, { data: articles, ts: Date.now() });
+    return articles;
+  },
+
+  // Fire all proxies in parallel, resolve with first non-empty result
+  _fetchAny(url, bust) {
+    return new Promise(resolve => {
+      let settled = false;
+      let remaining = 4;
+      const done = (articles) => {
+        remaining--;
+        if (!settled && articles && articles.length) { settled = true; resolve(articles); return; }
+        if (!settled && remaining === 0) resolve(null);
+      };
+      this._direct(url, bust).then(done).catch(() => done(null));
+      this._viaCorsproxy(url, bust).then(done).catch(() => done(null));
+      this._viaAllorigins(url, bust).then(done).catch(() => done(null));
+      this._viaRss2json(url, bust).then(done).catch(() => done(null));
+    });
+  },
+
+  async _direct(url, bust = false) {
+    const feedUrl = bust ? url + (url.includes('?') ? '&' : '?') + '_=' + Date.now() : url;
+    const r = await fetchT(feedUrl, { cache: 'no-store' });
+    if (!r.ok) throw new Error('http');
+    const xml = await r.text();
+    return this._parseXML(xml, url);
+  },
+
+  async _viaRss2json(url, bust = false) {
+    const cb = bust ? '&_=' + Date.now() : '';
+    const r = await fetchT(RSS2JSON + encodeURIComponent(url) + cb, { cache: 'no-store' });
+    if (!r.ok) throw new Error('http');
+    const d = await r.json();
+    if (d.status !== 'ok') throw new Error(d.message);
+    return d.items.map(i => ({
+      id:         i.guid || i.link || i.title,
+      title:      i.title || '',
+      desc:       this._strip(i.description || '').slice(0, 500),
+      content:    i.content || i.description || '',
+      url:        i.link || '',
+      image:      i.thumbnail || i.enclosure?.link || this._img(i.content || i.description || ''),
+      date:       new Date(i.pubDate),
+      categories: i.categories || [],
+      feedUrl:    url
+    }));
+  },
+
+  async _viaCorsproxy(url, bust = false) {
+    const feedUrl = bust ? url + (url.includes('?') ? '&' : '?') + '_=' + Date.now() : url;
+    const r = await fetchT(CORSPROXY + encodeURIComponent(feedUrl), { cache: 'no-store' });
+    if (!r.ok) throw new Error('http');
+    const xml = await r.text();
+    return this._parseXML(xml, url);
+  },
+
+  async _viaAllorigins(url, bust = false) {
+    const feedUrl = bust ? url + (url.includes('?') ? '&' : '?') + '_=' + Date.now() : url;
+    const r = await fetchT(ALLORIGINS + encodeURIComponent(feedUrl), { cache: 'no-store' });
+    if (!r.ok) throw new Error('http');
+    const { contents } = await r.json();
+    return this._parseXML(contents, url);
+  },
+
+  _parseXML(xml, feedUrl) {
+    const doc = new DOMParser().parseFromString(xml, 'application/xml');
+    return [...doc.querySelectorAll('item, entry')].map(el => {
+      const qs = s => el.querySelector(s)?.textContent?.trim() || '';
+      const link = qs('link') || el.querySelector('link')?.getAttribute('href') || '';
+      const desc = qs('description') || qs('summary');
+      const content = qs('content\\:encoded') || qs('content') || desc;
+      const enc = el.querySelector('enclosure')?.getAttribute('url');
+      const media = el.querySelector('media\\:content, media\\:thumbnail')?.getAttribute('url');
+      return {
+        id:         qs('guid') || qs('id') || link,
+        title:      qs('title'),
+        desc:       this._strip(desc).slice(0, 500),
+        content:    content,
+        url:        link,
+        image:      enc || media || this._img(content || desc),
+        date:       new Date(qs('pubDate') || qs('published') || qs('updated')),
+        categories: [...el.querySelectorAll('category')].map(c => c.textContent.trim()).filter(Boolean),
+        feedUrl
+      };
+    });
+  },
+
+  _strip(html) {
+    const d = document.createElement('div');
+    d.innerHTML = html;
+    return d.textContent || '';
+  },
+
+  _img(html) {
+    const m = html.match(/<img[^>]+src=["']([^"']+)["']/i);
+    return m ? m[1] : null;
+  },
+
+  bust(url) { this._cache.delete(url); }
+};
+
+/* ════════════════════════════════════════════════════════════
+   RENDERER
+════════════════════════════════════════════════════════════ */
+const Renderer = {
+  render(articles) {
+    const el = $('content');
+    if (!articles.length) {
+      el.innerHTML = `<div class="state-box"><div class="icon">📭</div><div class="title">Nincsenek cikkek</div><div class="desc">A feed üres vagy nem töltődött be.</div></div>`;
+      return;
+    }
+    articles.forEach(a => { articleMap[aid(a)] = a; });
+
+    let layout = '';
+    switch (S.layout) {
+      case 'grid':     layout = this._grid(articles);     break;
+      case 'list':     layout = this._list(articles);     break;
+      case 'magazine': layout = this._magazine(articles); break;
+      case 'reader':   layout = this._reader(articles);   break;
+    }
+    el.innerHTML = layout;
+  },
+
+  _feedName(url)  { return S.feeds.find(f => f.url === url)?.name  || ''; },
+
+  _age(d) {
+    if (!d || isNaN(d)) return '';
+    const s = (Date.now() - d) / 1000;
+    if (s < 60)   return 'most';
+    if (s < 3600) return `${Math.floor(s/60)}p`;
+    if (s < 86400)return `${Math.floor(s/3600)}ó`;
+    if (s < 604800)return `${Math.floor(s/86400)}n`;
+    return d.toLocaleDateString('hu-HU', { month:'short', day:'numeric' });
+  },
+
+  _meta(a) {
+    return `<span class="card-source">${e(this._feedName(a.feedUrl))}</span><span>·</span><span>${this._age(a.date)}</span>`;
+  },
+
+  _thumb(a, cls, noCls) {
+    return a.image
+      ? `<img class="${cls}" src="${e(a.image)}" alt="" loading="lazy" onerror="this.style.display='none'">`
+      : `<div class="${noCls}">📰</div>`;
+  },
+
+  _grid(articles) {
+    return `<div class="grid-layout">${articles.map((a, i) => {
+      const id = aid(a);
+      return `<div class="card" style="animation-delay:${Math.min(i*35,400)}ms" data-id="${id}" onclick="openArticle('${id}')">
+        ${this._thumb(a, 'card-img', 'card-no-img')}
+        <div class="card-body">
+          <div class="card-meta">${this._meta(a)}</div>
+          <div class="card-title">${e(a.title)}</div>
+          ${a.desc ? `<div class="card-desc">${e(a.desc)}</div>` : ''}
+        </div>
+      </div>`;
+    }).join('')}</div>`;
+  },
+
+  _list(articles) {
+    return `<div class="list-layout">${articles.map((a, i) => {
+      const id = aid(a);
+      return `<div class="list-item" style="animation-delay:${Math.min(i*25,400)}ms" data-id="${id}" onclick="openArticle('${id}')">
+        ${a.image
+          ? `<img class="list-thumb" src="${e(a.image)}" alt="" loading="lazy" onerror="this.style.display='none'">`
+          : `<div class="list-no-thumb">📰</div>`}
+        <div class="list-body">
+          <div class="list-title">${e(a.title)}</div>
+          ${a.desc ? `<div class="list-desc">${e(a.desc)}</div>` : ''}
+          <div class="list-meta">
+            <span class="list-source">${e(this._feedName(a.feedUrl))}</span>
+            <span>${this._age(a.date)}</span>
+          </div>
+        </div>
+      </div>`;
+    }).join('')}</div>`;
+  },
+
+  _magazine(articles) {
+    if (!articles.length) return '';
+
+    const badge = a => `<span class="ix-badge">${e(this._feedName(a.feedUrl))}</span>`;
+
+    const imgWrap = (a, imgCls, noCls, wrapCls='') =>
+      `<div class="ix-img-wrap${wrapCls ? ' ' + wrapCls : ''}">
+        ${a.image
+          ? `<img class="${imgCls}" src="${e(a.image)}" alt="" loading="lazy" onerror="this.parentNode.style.display='none'">`
+          : `<div class="${noCls}">📰</div>`}
+        ${badge(a)}
+      </div>`;
+
+    // Articles with images first, no-image demoted to last segment
+    const withImg = articles.filter(a => a.image);
+    const noImg   = articles.filter(a => !a.image);
+    let idx = 0;
+    const aa = [...withImg, ...noImg];
+    const take = n => { const s = aa.slice(idx, idx + n); idx += n; return s; };
+
+    // 1. Hero
+    const [a0] = take(1);
+    const hid = aid(a0);
+    const heroHtml = `<div class="ix-hero" data-id="${hid}" onclick="openArticle('${hid}')">
+      ${imgWrap(a0, 'ix-hero-img', 'ix-hero-nobg', 'hero-wrap')}
+      <div class="ix-hero-body">
+        <div class="ix-hero-title">${e(a0.title)}</div>
+        ${a0.desc ? `<div class="ix-hero-desc">${e(a0.desc)}</div>` : ''}
+        <div class="ix-hero-time">${this._age(a0.date)}</div>
+      </div>
+    </div>`;
+
+    // 2. Spotlight — horizontal full-width card
+    const [a1] = take(1);
+    const spotHtml = a1 ? (() => {
+      const sid = aid(a1);
+      return `<div class="ix-spotlight" data-id="${sid}" onclick="openArticle('${sid}')">
+        <div class="ix-spot-img-side">
+          <div class="ix-spot-img-clip">
+            ${a1.image ? `<img class="ix-spot-img" src="${e(a1.image)}" alt="" loading="lazy" onerror="this.parentNode.style.display='none'">` : `<div class="ix-spot-nobg">📰</div>`}
+          </div>
+        </div>
+        <div class="ix-spot-body">
+          <div class="ix-spot-source">${e(this._feedName(a1.feedUrl))}</div>
+          <div class="ix-spot-title">${e(a1.title)}</div>
+          ${a1.desc ? `<div class="ix-spot-desc">${e(a1.desc)}</div>` : ''}
+          <div class="ix-spot-time">${this._age(a1.date)}</div>
+        </div>
+      </div>`;
+    })() : '';
+
+    // 3. Two alternating rows (2/3+1/3, 1/3+2/3) — 4 articles each (1 big + 1 small + 2 text fills)
+    const mkCard = a => { const id = aid(a); return `<div class="ix-card" data-id="${id}" onclick="openArticle('${id}')">${imgWrap(a, 'ix-card-img', 'ix-card-nobg')}<div class="ix-card-title">${e(a.title)}</div>${a.desc ? `<div class="ix-card-desc">${e(a.desc)}</div>` : ''}<div class="ix-card-time">${this._age(a.date)}</div></div>`; };
+    const mkFill = a => { const id = aid(a); return `<div class="ix-text-fill" data-id="${id}" onclick="openArticle('${id}')"><div class="ix-tf-title">${e(a.title)}</div>${a.desc ? `<div class="ix-tf-desc">${e(a.desc)}</div>` : ''}</div>`; };
+    let rowsHtml = '';
+    for (let row = 0; row < 2; row++) {
+      const big = take(1)[0]; const small = take(1)[0]; const fills = take(2);
+      if (!big || !small) break;
+      const isA = row % 2 === 0;
+      const bigCard = mkCard(big);
+      const sideHtml = `<div class="ix-col-side">${mkCard(small)}${fills.map(mkFill).join('')}</div>`;
+      rowsHtml += `<div class="ix-row ${isA ? 'row-a' : 'row-b'}">${isA ? bigCard + sideHtml : sideHtml + bigCard}</div>`;
+    }
+
+    // 4. Trio — 3 equal columns
+    const trioItems = take(3);
+    const trioHtml = trioItems.length ? `<div class="ix-trio">
+      ${trioItems.map(a => {
+        const id = aid(a);
+        return `<div class="ix-card" data-id="${id}" onclick="openArticle('${id}')">
+          ${imgWrap(a, 'ix-card-img', 'ix-card-nobg')}
+          <div class="ix-card-title">${e(a.title)}</div>
+          ${a.desc ? `<div class="ix-card-desc">${e(a.desc)}</div>` : ''}
+          <div class="ix-card-time">${this._age(a.date)}</div>
+        </div>`;
+      }).join('')}
+    </div>` : '';
+
+    // 5. Mini grid — 4 items
+    const mini1Items = take(7);
+    const mini1Html = mini1Items.length ? `<div class="ix-mini-grid">
+      ${mini1Items.map(a => {
+        const id = aid(a);
+        return `<div class="ix-mini" data-id="${id}" onclick="openArticle('${id}')">
+          <div class="ix-img-wrap">
+            ${a.image ? `<img class="ix-mini-img" src="${e(a.image)}" alt="" loading="lazy" onerror="this.parentNode.style.display='none'">` : `<div class="ix-mini-nobg">📰</div>`}
+            ${badge(a)}
+          </div>
+          <div class="ix-mini-title">${e(a.title)}</div>
+          <div class="ix-mini-time">${this._age(a.date)}</div>
+        </div>`;
+      }).join('')}
+    </div>` : '';
+
+    // 6. Mini grid — remaining except last 10
+    // 7. Reader strip — last 10 articles
+    const remaining2 = aa.slice(idx);
+    const stripItems = remaining2.slice(-10);
+    const mini2PreItems = remaining2.slice(0, remaining2.length - 10);
+    const mini2PreHtml = mini2PreItems.length ? `<div class="ix-mini-grid">
+      ${mini2PreItems.map(a => {
+        const id = aid(a);
+        return `<div class="ix-mini" data-id="${id}" onclick="openArticle('${id}')">
+          <div class="ix-img-wrap">
+            ${a.image ? `<img class="ix-mini-img" src="${e(a.image)}" alt="" loading="lazy" onerror="this.parentNode.style.display='none'">` : `<div class="ix-mini-nobg">📰</div>`}
+            ${badge(a)}
+          </div>
+          <div class="ix-mini-title">${e(a.title)}</div>
+          <div class="ix-mini-time">${this._age(a.date)}</div>
+        </div>`;
+      }).join('')}
+    </div>` : '';
+    const mkStripItem = (a, withImg) => {
+      const id = aid(a);
+      return `<div class="ix-strip-item" data-id="${id}" onclick="openArticle('${id}')">
+        ${withImg && a.image ? `<img class="ix-strip-img" src="${e(a.image)}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}
+        <div class="ix-strip-body">
+          <div class="ix-strip-title">${e(a.title)}</div>
+          <div class="ix-strip-meta">
+            <span class="ix-strip-source">${e(this._feedName(a.feedUrl))}</span>
+            <span>${this._age(a.date)}</span>
+          </div>
+        </div>
+      </div>`;
+    };
+    const s = stripItems;
+    const col1 = s.slice(0, 4), col2 = s.slice(4, 7), col3 = s.slice(7, 10);
+    const stripHtml = s.length ? `<div class="ix-strip">
+      <div class="ix-strip-col">${col1.map(a => mkStripItem(a, true)).join('')}</div>
+      <div class="ix-strip-col">${col2.map(a => mkStripItem(a, false)).join('')}</div>
+      <div class="ix-strip-col">${col3.map(a => mkStripItem(a, false)).join('')}</div>
+    </div>` : '';
+
+    return `<div class="magazine-layout">${heroHtml}${spotHtml}${rowsHtml}${trioHtml}${mini1Html}${mini2PreHtml}${stripHtml}</div>`;
+  },
+    _reader(articles) {
+    return `<div class="reader-layout">${articles.map(a => {
+      const id = aid(a);
+      return `<div class="reader-item" data-id="${id}" onclick="openArticle('${id}')">
+        <div class="reader-item-head">
+          <div class="reader-item-info">
+            <div class="reader-title">${e(a.title)}</div>
+            <div class="reader-meta">
+              <span class="reader-source" >${e(this._feedName(a.feedUrl))}</span>
+              <span>${this._age(a.date)}</span>
+            </div>
+          </div>
+          <svg class="chevron" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+      </div>`;
+    }).join('')}</div>`;
+  }
+};
+
+/* ════════════════════════════════════════════════════════════
+   GLOBAL HANDLERS (called from inline HTML)
+════════════════════════════════════════════════════════════ */
+function openArticle(id) {
+  const a = articleMap[id];
+  if (!a) return;
+  window.location.href = a.url;
+}
+
+function toggleReader(id) {
+  openArticle(id);
+}
+
+/* ════════════════════════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════════════════════════ */
+function $(id) { return document.getElementById(id); }
+
+function aid(a) {
+  // Stable short ID from url or title
+  const src = a.id || a.url || a.title || '';
+  let h = 0;
+  for (let i = 0; i < src.length; i++) { h = Math.imul(31, h) + src.charCodeAt(i) | 0; }
+  return 'a' + Math.abs(h).toString(36);
+}
+
+function e(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function toast(msg) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+/* ════════════════════════════════════════════════════════════
+   SIDEBAR / FEEDS
+════════════════════════════════════════════════════════════ */
+function renderSidebar() {
+  const all = S.activeUrl === null;
+  let html = `<button class="nav-feed${all?' active':''}" onclick="selectFeed(null)">Összes</button>`;
+  S.feeds.forEach(f => {
+    const active = S.activeUrl === f.url;
+    html += `<button class="nav-feed${active?' active':''}" onclick="selectFeed('${f.url}')">${e(f.name)}</button>`;
+  });
+  $('feedList').innerHTML = html;
+}
+
+function renderSFeeds() {
+  const c = $('sFeedList');
+  if (!S.feeds.length) { c.innerHTML = '<div style="font-size:.78rem;color:var(--muted)">Nincs feed.</div>'; return; }
+  c.innerHTML = S.feeds.map((f, i) => `
+    <div class="s-feed-item" draggable="true" data-url="${f.url}" data-idx="${i}">
+      <span class="s-feed-drag" title="Húzd át">⠿</span>
+      <div style="flex:1;min-width:0">
+        <input class="s-feed-name" value="${e(f.name)}" onblur="renameFeed('${f.url}',this.value)" onkeydown="if(event.key==='Enter')this.blur()">
+        <input class="s-feed-url" value="${e(f.url)}" onblur="renameFeedUrl('${e(f.url)}',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()" title="Feed URL — kattints a szerkesztéshez">
+      </div>
+      <button class="s-feed-del" onclick="deleteFeed('${f.url}')">✕</button>
+    </div>`).join('');
+
+  // Drag-to-reorder
+  let dragIdx = null;
+  c.querySelectorAll('.s-feed-item').forEach(row => {
+    row.addEventListener('dragstart', ev => {
+      dragIdx = +row.dataset.idx;
+      ev.dataTransfer.effectAllowed = 'move';
+      setTimeout(() => row.style.opacity = '.4', 0);
+    });
+    row.addEventListener('dragend', () => row.style.opacity = '');
+    row.addEventListener('dragover', ev => {
+      ev.preventDefault();
+      ev.dataTransfer.dropEffect = 'move';
+      const overIdx = +row.dataset.idx;
+      c.querySelectorAll('.s-feed-item').forEach(r => r.classList.remove('drag-over'));
+      if (overIdx !== dragIdx) row.classList.add('drag-over');
+    });
+    row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
+    row.addEventListener('drop', ev => {
+      ev.preventDefault();
+      row.classList.remove('drag-over');
+      const toIdx = +row.dataset.idx;
+      if (dragIdx === null || dragIdx === toIdx) return;
+      const moved = S.feeds.splice(dragIdx, 1)[0];
+      S.feeds.splice(toIdx, 0, moved);
+      saveFeeds(); renderSFeeds(); renderSidebar(); renderArticles();
+    });
+  });
+}
+
+function moveFeed(url, dir) {
+  const i = S.feeds.findIndex(f => f.url === url);
+  if (i < 0) return;
+  const j = i + dir;
+  if (j < 0 || j >= S.feeds.length) return;
+  [S.feeds[i], S.feeds[j]] = [S.feeds[j], S.feeds[i]];
+  saveFeeds();
+  renderSFeeds();
+  renderSidebar();
+  renderArticles();
+}
+
+function selectFeed(url) {
+  S.activeUrl = url;
+  S.activeCategory = null;
+  saveSettings();
+  renderSidebar();
+  renderArticles();
+}
+
+function confirmDialog(message, onConfirm, onCancel, opts = {}) {
+  $('confirmTitle').textContent = opts.title || 'Megerősítés';
+  $('confirmOk').textContent = opts.okLabel || 'OK';
+  $('confirmOk').className = 'btn ' + (opts.danger !== false ? 'btn-danger' : 'btn-primary');
+  $('confirmMsg').textContent = message;
+  $('confirmModal').classList.add('open');
+  $('confirmBg').classList.add('open');
+  $('confirmOk').onclick = () => { closeConfirmModal(); onConfirm(); };
+  $('confirmCancel').onclick = () => { closeConfirmModal(); if (onCancel) onCancel(); };
+}
+function closeConfirmModal() {
+  $('confirmModal').classList.remove('open');
+  $('confirmBg').classList.remove('open');
+}
+
+function deleteFeed(url) {
+  const f = S.feeds.find(f => f.url === url);
+  confirmDialog(`"${f?.name || url}" feed törlése visszavonhatatlan.`, () => {
+    S.feeds = S.feeds.filter(f => f.url !== url);
+    S.articles = S.articles.filter(a => a.feedUrl !== url);
+    Fetcher.bust(url);
+    if (S.activeUrl === url) S.activeUrl = null;
+    saveFeeds();
+    renderSidebar();
+    renderSFeeds();
+    renderArticles();
+    toast('Feed törölve.');
+  }, null, { title: 'Feed törlése', okLabel: 'Törlés' });
+}
+
+function renameFeed(url, name) {
+  const f = S.feeds.find(f => f.url === url);
+  if (f && name.trim()) { f.name = name.trim(); saveFeeds(); renderSidebar(); }
+}
+
+function renameFeedUrl(oldUrl, newUrl, inputEl) {
+  newUrl = newUrl.trim();
+  if (!newUrl || newUrl === oldUrl) return;
+  const f = S.feeds.find(f => f.url === oldUrl);
+  if (!f) return;
+  confirmDialog(`URL módosítása erre:\n${newUrl}`, () => {
+    S.articles = S.articles.filter(a => a.feedUrl !== oldUrl);
+    f.url = newUrl;
+    saveFeeds(); renderSFeeds(); renderSidebar(); refreshAll();
+  }, () => {
+    if (inputEl) inputEl.value = oldUrl;
+  }, { title: 'URL módosítása', okLabel: 'Mentés', danger: false });
+}
+
+function renameYtChannelName(id, name) {
+  const ch = S.ytChannels.find(c => c.id === id);
+  if (ch && name.trim()) { ch.name = name.trim(); saveYtChannels(); }
+}
+
+function renameYtChannelUrl(oldId, newId, inputEl) {
+  newId = newId.trim();
+  if (!newId || newId === oldId) return;
+  const ch = S.ytChannels.find(c => c.id === oldId);
+  if (!ch) return;
+  confirmDialog(`Csatorna ID módosítása erre:\n${newId}`, () => {
+    if (newId.startsWith('http')) { ch.idType = 'url'; ch.id = newId; }
+    else if (newId.startsWith('@')) { ch.idType = 'handle'; ch.id = newId.slice(1); }
+    else if (/^UC[A-Za-z0-9_\-]{22}$/.test(newId)) { ch.idType = 'id'; ch.id = newId; }
+    else { ch.idType = 'handle'; ch.id = newId; }
+    saveYtChannels();
+    ytVideos = ytVideos.filter(v => v.channelId !== oldId);
+    renderSYtChannels(); refreshYtFeed();
+  }, () => {
+    if (inputEl) inputEl.value = oldId;
+  }, { title: 'Csatorna módosítása', okLabel: 'Mentés', danger: false });
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   ARTICLES
+════════════════════════════════════════════════════════════ */
+function interleaveArticles(articles) {
+  const byFeed = {};
+  S.feeds.forEach(f => { byFeed[f.url] = []; });
+  articles.forEach(a => { if (byFeed[a.feedUrl]) byFeed[a.feedUrl].push(a); });
+  return S.feeds.flatMap(f => (byFeed[f.url] || []).sort((a, b) => b.date - a.date));
+}
+
+function selectCategory(cat) {
+  S.activeCategory = (S.activeCategory === cat) ? null : cat;
+  renderArticles();
+}
+
+function renderArticles() {
+  if (!S.feeds.length) {
+    $('content').innerHTML = `<div class="state-box"><div class="icon">📰</div><div class="title">Nincs feed hozzáadva</div><div class="desc">Kattints a "Feed hozzáadása" gombra.</div></div>`;
+    injectYtSidebar();
+    return;
+  }
+  let articles = S.activeUrl
+    ? S.articles.filter(a => a.feedUrl === S.activeUrl).sort((a,b) => b.date - a.date)
+    : interleaveArticles(S.articles);
+  if (S.activeCategory) {
+    articles = articles.filter(a => a.categories && a.categories.includes(S.activeCategory));
+  }
+  Renderer.render(articles);
+  injectYtSidebar();
+}
+
+const LAYOUT_ICONS = {
+  grid:     `<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>`,
+  list:     `<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="5" y1="4" x2="14" y2="4"/><line x1="5" y1="8" x2="14" y2="8"/><line x1="5" y1="12" x2="14" y2="12"/><circle cx="2" cy="4" r="1" fill="currentColor" stroke="none"/><circle cx="2" cy="8" r="1" fill="currentColor" stroke="none"/><circle cx="2" cy="12" r="1" fill="currentColor" stroke="none"/></svg>`,
+  magazine: `<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="9" height="9" rx="1.5"/><rect x="12" y="1" width="3" height="4" rx="1"/><rect x="12" y="7" width="3" height="3" rx="1"/><rect x="1" y="12" width="14" height="3" rx="1"/></svg>`,
+  reader:   `<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="4" x2="14" y2="4"/><line x1="2" y1="7" x2="14" y2="7"/><line x1="2" y1="10" x2="10" y2="10"/><line x1="2" y1="13" x2="7" y2="13"/></svg>`
+};
+const LAYOUT_ORDER = ['magazine','grid','list','reader'];
+
+function updateLayoutBtns() {
+  document.querySelectorAll('.v-layout-btn[data-layout]').forEach(b =>
+    b.classList.toggle('active', b.dataset.layout === S.layout)
+  );
+}
+
+function setLayout(layout) {
+  S.layout = layout;
+  saveSettings();
+  updateLayoutBtns();
+  renderArticles();
+}
+
+async function refreshAll(bust = false) {
+  if (bust) S.feeds.forEach(f => Fetcher.bust(f.url));
+  const prevSig = S.articles.slice(0, 40).map(a => a.id).join('|');
+  setLoading(true);
+  await Promise.all(S.feeds.map(async f => {
+    const arts = await Fetcher.get(f.url, bust).catch(() => null);
+    if (arts && arts.length) {
+      S.articles = S.articles.filter(a => a.feedUrl !== f.url);
+      S.articles.push(...arts);
+    }
+  }));
+  S.articles.sort((a, b) => b.date - a.date);
+  setLoading(false);
+  const newSig = S.articles.slice(0, 40).map(a => a.id).join('|');
+  if (bust || newSig !== prevSig) renderArticles();
+  saveArticles();
+}
+
+function setLoading(on) {
+  if (on) {
+    const content = $('content');
+    const hasContent = content.querySelector('.ix-article, .ix-card, .ix-text-fill, .ix-hero');
+    if (!hasContent) {
+      content.innerHTML = `<div class="state-box"><div class="spinner"></div></div>`;
+    }
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   SETTINGS UI BUILD
+════════════════════════════════════════════════════════════ */
+function buildSettingsUI() {
+  // Presets
+  $('presetGrid').innerHTML = Object.entries(PRESETS).map(([k, p]) => `
+    <div class="preset-wrap">
+      <div class="preset-card${S.preset===k?' active':''}" data-preset="${k}">
+        <div class="preset-preview">
+          <div class="pp-top" style="background:${p.light.bg}"></div>
+          <div class="pp-bot" style="background:${p.light.card}">
+            <div class="pp-dot" style="background:${p.light.ac}"></div>
+            <div class="pp-dot" style="background:${p.light.bg}"></div>
+          </div>
+        </div>
+      </div>
+      <div class="preset-name">${p.name}</div>
+    </div>`).join('');
+
+  // Swatches
+  $('swatchRow').innerHTML = SWATCHES.map(c => `
+    <div class="swatch${S.customAccent===c?' active':''}" style="background:${c}" data-color="${c}"></div>
+  `).join('') + `<input type="color" id="accentPicker" title="Egyéni szín" value="${S.customAccent || '#2563eb'}">`;
+  $('accentPicker').addEventListener('input', ev => setAccent(ev.target.value));
+
+  // Font slider
+  $('fontSlider').value = S.fontSize;
+
+  // Suggestions
+  $('suggestions').innerHTML = SUGGESTIONS.map(s =>
+    `<span class="chip" onclick="$('feedUrl').value='${s.url}';$('feedName').value='${s.label}'">${s.label}</span>`
+  ).join('');
+
+}
+
+function setPreset(p) {
+  S.preset = p; S.customAccent = null; saveSettings(); Theme.apply(); buildSettingsUI();
+}
+function setAccent(c) {
+  S.customAccent = c; saveSettings(); Theme.apply(); Theme._syncUI();
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   ADD FEED MODAL
+════════════════════════════════════════════════════════════ */
+function openAddModal() {
+  $('feedUrl').value = '';
+  $('feedName').value = '';
+  $('feedErr').classList.remove('show');
+  $('confirmAdd').disabled = false;
+  $('confirmAdd').textContent = 'Hozzáadás';
+  $('addModal').classList.add('open');
+  $('overlay').classList.add('open');
+  setTimeout(() => $('feedUrl').focus(), 80);
+}
+function closeAddModal() {
+  $('addModal').classList.remove('open');
+  $('overlay').classList.remove('open');
+}
+
+async function submitAddFeed() {
+  let url = $('feedUrl').value.trim();
+  if (!url) return;
+  if (!url.startsWith('http')) url = 'https://' + url;
+
+  if (S.feeds.find(f => f.url === url)) { toast('Ez a feed már létezik.'); closeAddModal(); return; }
+
+  const btn = $('confirmAdd');
+  btn.disabled = true;
+  btn.textContent = 'Betöltés...';
+  $('feedErr').classList.remove('show');
+
+  const articles = await Fetcher.get(url).catch(() => []);
+
+  if (!articles.length) {
+    $('feedErr').classList.add('show');
+    btn.disabled = false; btn.textContent = 'Hozzáadás';
+    return;
+  }
+
+  let name = $('feedName').value.trim();
+  if (!name) {
+    try { name = new URL(url).hostname.replace(/^www\./,'').split('.')[0]; name = name[0].toUpperCase() + name.slice(1); }
+    catch(e) { name = url; }
+  }
+
+  S.feeds.push({ url, name });
+  S.articles = S.articles.filter(a => a.feedUrl !== url);
+  S.articles.push(...articles);
+  S.articles.sort((a, b) => b.date - a.date);
+  saveFeeds();
+  renderSidebar();
+  renderSFeeds();
+  closeAddModal();
+  renderArticles();
+  toast(`"${name}" hozzáadva!`);
+}
+
+/* ════════════════════════════════════════════════════════════
+   EVENT BINDINGS
+══════════════════════════════════════════���═════════════════ */
+function bindEvents() {
+  // ── Hover preview: Presets ───────────────────────────────
+  let _pP = undefined, _pA = undefined; // undefined = not previewing
+  const pg = $('presetGrid');
+  pg.addEventListener('mouseover', ev => {
+    const card = ev.target.closest('.preset-card[data-preset]');
+    if (!card) return;
+    if (_pP === undefined) { _pP = S.preset; _pA = S.customAccent; }
+    S.preset = card.dataset.preset; S.customAccent = null;
+    Theme.apply();
+    pg.querySelectorAll('.preset-card').forEach(c => c.classList.toggle('active', c.dataset.preset === S.preset));
+  });
+  pg.addEventListener('mouseleave', () => {
+    if (_pP === undefined) return;
+    S.preset = _pP; S.customAccent = _pA; _pP = _pA = undefined;
+    Theme.apply();
+    pg.querySelectorAll('.preset-card').forEach(c => c.classList.toggle('active', c.dataset.preset === S.preset));
+  });
+  pg.addEventListener('click', ev => {
+    const card = ev.target.closest('.preset-card[data-preset]');
+    if (!card) return;
+    _pP = _pA = undefined;
+    setPreset(card.dataset.preset);
+  });
+
+  // ── Hover preview: Accent swatches ───────────────────────
+  let _pC = undefined;
+  const sr = $('swatchRow');
+  sr.addEventListener('mouseover', ev => {
+    const sw = ev.target.closest('.swatch[data-color]');
+    if (!sw) return;
+    if (_pC === undefined) _pC = S.customAccent;
+    S.customAccent = sw.dataset.color;
+    Theme.apply();
+    sr.querySelectorAll('.swatch').forEach(s => s.classList.toggle('active', s.dataset.color === S.customAccent));
+  });
+  sr.addEventListener('mouseleave', () => {
+    if (_pC === undefined) return;
+    S.customAccent = _pC; _pC = undefined;
+    Theme.apply();
+    sr.querySelectorAll('.swatch').forEach(s => s.classList.toggle('active', s.dataset.color === S.customAccent));
+  });
+  sr.addEventListener('click', ev => {
+    const sw = ev.target.closest('.swatch[data-color]');
+    if (!sw) return;
+    _pC = undefined;
+    setAccent(sw.dataset.color);
+  });
+
+  // View panel — hover + click toggle (hold ikon)
+  let _vTimer;
+  const _vBtn = $('viewBtn'), _vPanel = $('viewPanel');
+  const openView  = () => { clearTimeout(_vTimer); _vPanel.classList.add('open'); };
+  const closeView = () => { _vTimer = setTimeout(() => _vPanel.classList.remove('open'), 150); };
+  _vBtn.addEventListener('mouseenter', openView);
+  _vBtn.addEventListener('mouseleave', closeView);
+  _vPanel.addEventListener('mouseenter', () => clearTimeout(_vTimer));
+  _vPanel.addEventListener('mouseleave', closeView);
+  _vBtn.addEventListener('click', () => _vPanel.classList.toggle('open'));
+  _vPanel.addEventListener('click', ev => {
+    const btn = ev.target.closest('.v-layout-btn[data-layout]');
+    if (btn) { setLayout(btn.dataset.layout); _vPanel.classList.remove('open'); }
+  });
+
+  // Settings page — hamburger gomb
+  const _spPage = $('settingsPage');
+  const openSettingsPage = () => {
+    renderSFeeds(); renderSYtChannels();
+    const pv = $('ytPerVal'); if (pv) pv.textContent = S.ytPerChannel || 3;
+    const mv = $('ytMaxVal'); if (mv) mv.textContent = S.ytMaxChannels || 5;
+    _spPage.classList.add('open');
+  };
+  $('settingsBtn').addEventListener('click', openSettingsPage);
+  $('spClose').addEventListener('click', () => _spPage.classList.remove('open'));
+  $('spNav').addEventListener('click', ev => {
+    const item = ev.target.closest('.sp-nav-item[data-sp]');
+    if (!item) return;
+    document.querySelectorAll('.sp-nav-item').forEach(b => b.classList.remove('active'));
+    item.classList.add('active');
+    document.querySelectorAll('.sp-section').forEach(s => s.classList.remove('active'));
+    $('sp-' + item.dataset.sp).classList.add('active');
+  });
+
+  // Overlay click — close any open modal
+  $('overlay').onclick = () => { closeAddModal(); closeAddYtModal(); };
+
+  // Close view panel on outside click
+  document.addEventListener('click', ev => {
+    if (!_vBtn.contains(ev.target) && !_vPanel.contains(ev.target)) _vPanel.classList.remove('open');
+  });
+
+  // Add feed
+  $('addFeedBtn').onclick = openAddModal;
+  $('cancelAdd').onclick = closeAddModal;
+  $('confirmAdd').onclick = submitAddFeed;
+  $('feedUrl').addEventListener('keydown', ev => { if (ev.key === 'Enter') submitAddFeed(); });
+
+  // YouTube steppers
+  const updateYtPer = delta => {
+    S.ytPerChannel = Math.max(1, Math.min(10, (S.ytPerChannel || 3) + delta));
+    $('ytPerVal').textContent = S.ytPerChannel;
+    saveSettings(); injectYtSidebar();
+  };
+  $('ytPerMinus').onclick = () => updateYtPer(-1);
+  $('ytPerPlus').onclick  = () => updateYtPer(+1);
+
+  const updateYtMax = delta => {
+    S.ytMaxChannels = Math.max(1, Math.min(10, (S.ytMaxChannels || 5) + delta));
+    $('ytMaxVal').textContent = S.ytMaxChannels;
+    saveSettings(); injectYtSidebar();
+  };
+  $('ytMaxMinus').onclick = () => updateYtMax(-1);
+  $('ytMaxPlus').onclick  = () => updateYtMax(+1);
+
+  // YouTube channel modal
+  $('addYtBtn').onclick = openAddYtModal;
+  $('cancelYt').onclick = closeAddYtModal;
+  $('confirmYt').onclick = submitAddYt;
+  $('ytChannelInput').addEventListener('keydown', ev => { if (ev.key === 'Enter') submitAddYt(); });
+
+  // Mode toggle
+  $('modeBar').addEventListener('click', ev => {
+    const b = ev.target.closest('.mode-btn');
+    if (b) { S.theme = b.dataset.mode; saveSettings(); Theme.apply(); }
+  });
+
+  // Font slider
+  $('fontSlider').addEventListener('input', ev => {
+    S.fontSize = +ev.target.value;
+    document.documentElement.style.setProperty('--font-size-base', S.fontSize + 'px');
+  });
+  $('fontSlider').addEventListener('change', saveSettings);
+
+
+  // Auto dark/light
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if (S.theme === 'auto') Theme.apply();
+  });
+
+  // Config file
+  $('configSaveBtn').onclick = () => Config.save();
+  $('configLoadBtn').onclick = () => Config.load();
+
+}
+
+/* ════════════════════════════════════════════════════════════
+   WEATHER
+════════════════════════════════════════════════════════════ */
+const WX_CDN = 'https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/fill/all/';
+// [day-name, night-name]
+const WX_ICONS = {
+  0: ['clear-day','clear-night'],
+  1: ['partly-cloudy-day','partly-cloudy-night'],
+  2: ['partly-cloudy-day','partly-cloudy-night'],
+  3: ['overcast-day','overcast-night'],
+  45:['fog-day','fog-night'], 48:['fog-day','fog-night'],
+  51:['partly-cloudy-day-drizzle','partly-cloudy-night-drizzle'],
+  53:['drizzle','drizzle'], 55:['rain','rain'],
+  61:['partly-cloudy-day-rain','partly-cloudy-night-rain'],
+  63:['rain','rain'], 65:['rain','rain'],
+  71:['partly-cloudy-day-snow','partly-cloudy-night-snow'],
+  73:['snow','snow'], 75:['snow','snow'],
+  80:['partly-cloudy-day-rain','partly-cloudy-night-rain'],
+  81:['rain','rain'], 82:['thunderstorms-rain','thunderstorms-rain'],
+  95:['thunderstorms-day-rain','thunderstorms-night-rain'],
+  96:['thunderstorms-rain','thunderstorms-rain'],
+  99:['thunderstorms-rain','thunderstorms-rain']
+};
+const _wxSvgCache = {};
+let _wxUid = 0;
+async function _wxFetch(name) {
+  if (_wxSvgCache[name]) return _wxSvgCache[name];
+  try {
+    const r = await fetch(WX_CDN + name + '.svg');
+    _wxSvgCache[name] = await r.text();
+  } catch(e) { _wxSvgCache[name] = ''; }
+  return _wxSvgCache[name];
+}
+function wxInline(svgText, size) {
+  if (!svgText) return `<div style="width:${size}px;height:${size}px"></div>`;
+  // Make every inlined SVG's IDs unique to prevent gradient ID collisions
+  const p = 'wx' + (_wxUid++);
+  let svg = svgText
+    .replace(/\bid="([^"]+)"/g,    `id="${p}$1"`)
+    .replace(/url\(#([^)]+)\)/g,   `url(#${p}$1)`)
+    .replace(/href="#([^"]+)"/g,   `href="#${p}$1"`);
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  if (!dark) {
+    // Light bg: only near-white cloud colors need darkening
+    svg = svg
+      .replace(/#f3f7fe/gi, '#bfdbfe')  // cloud fill light  → blue-200
+      .replace(/#deeafb/gi, '#93c5fd')  // cloud fill darker → blue-300
+      .replace(/#e6effc/gi, '#93c5fd'); // cloud stroke      → blue-300
+  }
+  // Dark mode: original fill colors are perfect as-is
+  return svg.replace(/<svg\b/, `<svg width="${size}" height="${size}" style="display:block;flex-shrink:0;overflow:visible"`);
+}
+function wxIconName(code, isDay) {
+  const pair = WX_ICONS[code] || ['not-available','not-available'];
+  return pair[isDay ? 0 : 1];
+}
+const WX_LABELS = {
+  0:'Derült',1:'Enyhén felhős',2:'Változékony',3:'Borult',
+  45:'Köd',48:'Zúzmarás köd',
+  51:'Szitálás',53:'Szitálás',55:'Erős szitálás',
+  61:'Eső',63:'Eső',65:'Erős eső',
+  71:'Hószállingózás',73:'Havazás',75:'Erős havazás',
+  80:'Zápor',81:'Erős zápor',82:'Viharos zápor',
+  95:'Zivatar',96:'Zivatar jégesővel',99:'Zivatar jégesővel'
+};
+
+async function loadWeather() {
+  const el = document.getElementById('navWeather');
+  if (!el) return;
+  const WX_TTL = 30 * 60 * 1000; // 30 perc
+
+  async function renderWx(w) {
+    const label = WX_LABELS[w.code] || '';
+    const feels = w.feels    !== undefined ? w.feels    : '–';
+    const humid = w.humidity !== undefined ? w.humidity : '–';
+    const wind  = w.wind     !== undefined ? w.wind     : '–';
+
+    const h = new Date().getHours();
+    const isDay = h >= 6 && h < 21;
+
+    // Pre-fetch all needed icons in parallel
+    // Recompute isSunset dynamically from sunsetTime (handles stale cache)
+    const sunsetHourRx = w.sunsetTime ? parseInt(w.sunsetTime) : -1;
+    const hourSlots  = (w.hours || []).slice(1, 7).map(hr => ({
+      ...hr, isSunset: parseInt(hr.time) === sunsetHourRx
+    }));
+    const dayCodes   = (w.days  || []).map(d => wxIconName(d.code, true));
+    const uvName     = `uv-index-${Math.min(Math.max(w.uv, 1), 11)}`;
+    const hasSunset  = hourSlots.some(hr => hr.isSunset);
+    // Pre-fetch uses per-slot hrIsDay so night variants are also cached
+    const hourIconNames = hourSlots.map(hr => {
+      const hrIsDay = parseInt(hr.time) >= 6 && parseInt(hr.time) < 21;
+      return wxIconName(hr.code, hrIsDay);
+    });
+    const allNames   = [
+      wxIconName(w.code, isDay),
+      ...hourIconNames,
+      ...dayCodes,
+      uvName, 'wind', 'raindrop',
+      ...(hasSunset ? ['sunset'] : [])
+    ];
+    await Promise.all([...new Set(allNames)].map(n => _wxFetch(n)));
+
+    const ic = (name, size) => wxInline(_wxSvgCache[name] || '', size);
+
+    const mainSvg = ic(wxIconName(w.code, isDay), 52);
+    const navSvg  = ic(wxIconName(w.code, isDay), 22);
+
+    const hourlyHtml = hourSlots.map(hr => {
+      const hrIsDay = parseInt(hr.time) >= 6 && parseInt(hr.time) < 21;
+      if (hr.isSunset) {
+        return `<div class="wx-hour">
+          <span class="wx-hour-time" style="color:var(--ac);font-weight:600">${w.sunsetTime}</span>
+          <div class="wx-hour-icon">${ic('sunset', 24)}</div>
+          <span class="wx-hour-temp">${hr.temp}°</span>
+        </div>`;
+      }
+      return `<div class="wx-hour">
+        <span class="wx-hour-time">${hr.time || ''}</span>
+        <div class="wx-hour-icon">${ic(wxIconName(hr.code, hrIsDay), 24)}</div>
+        <span class="wx-hour-temp">${hr.temp}°</span>
+      </div>`;
+    }).join('');
+
+    el.innerHTML = `
+      <div class="nav-weather-icon">${navSvg}</div>
+      <span class="nav-weather-temp">${w.temp}°</span>
+      <div class="wx-popup" id="wxPopup">
+        <div class="wx-top">
+          <div class="wx-left">
+            <div class="wx-big-temp">${w.temp}°</div>
+          </div>
+          <div class="wx-main-right">
+            <div class="wx-big-icon">${mainSvg}</div>
+            <div class="wx-condition">${label}</div>
+          </div>
+        </div>
+        <div class="wx-bottom-row">
+          <div class="wx-meta">
+            ${w.precip0 > 0 ? `<span>${ic('raindrop', 14)}${w.precip0}%</span>` : ''}
+            <span>${ic(uvName, 14)}UV ${w.uv}</span>
+            <span>${ic('wind', 14)}${wind} km/h</span>
+          </div>
+          <div class="wx-minmax"><span style="color:#60a5fa">↓${w.tmin}°</span>&nbsp; <span style="color:#f97316">↑${w.tmax}°</span></div>
+        </div>
+        <div class="wx-hourly">${hourlyHtml}</div>
+        <div class="wx-forecast">${(w.days || []).map((day, i) => {
+          const HU = ['Vasárnap','Hétfő','Kedd','Szerda','Csütörtök','Péntek','Szombat'];
+          return `<div class="wx-frow">
+            <span class="wx-fday">${i === 0 ? 'Holnap' : HU[day.dow]}</span>
+            <span class="wx-ficon">${ic(wxIconName(day.code, true), 20)}</span>
+            <span class="wx-fcond">${WX_LABELS[day.code] || ''}</span>
+            <span class="wx-frain" style="display:flex;align-items:center;justify-content:flex-end;gap:2px">${day.precip > 0 ? `${day.precip}%${ic('raindrop', 11)}` : ''}</span>
+            <span class="wx-ftemp"><span class="wx-ftemp-min">${day.tmin}°</span><span class="wx-ftemp-max">${day.tmax}°</span></span>
+          </div>`;
+        }).join('')}</div>
+      </div>`;
+    el.title = '';
+
+    // JS hover with timer — mouse can move into popup without closing it
+    let _wxHTimer;
+    const wxOpen  = () => { clearTimeout(_wxHTimer); document.getElementById('wxPopup')?.classList.add('wx-open'); };
+    const wxClose = () => { _wxHTimer = setTimeout(() => document.getElementById('wxPopup')?.classList.remove('wx-open'), 150); };
+    el.addEventListener('mouseenter', wxOpen);
+    el.addEventListener('mouseleave', wxClose);
+    document.getElementById('wxPopup').addEventListener('mouseenter', wxOpen);
+    document.getElementById('wxPopup').addEventListener('mouseleave', wxClose);
+  }
+
+  // Cached adat elég friss? (és teljes — régi cache-t eldobjuk)
+  try {
+    const cached = JSON.parse(localStorage.getItem('flux_wx') || 'null');
+    const fresh = cached && Date.now() - cached.ts < WX_TTL && cached.uv !== undefined && cached.hours && cached.hours.length && cached.days && cached.days.length && cached.sunsetTime;
+    const newFormat = fresh && !String(cached.hours[0]?.time || '').includes(':');
+    if (fresh && newFormat) { renderWx(cached); return; }
+  } catch(e) {}
+
+  try {
+    // Koordináta: cache-ből vagy fresh geolocation
+    let lat, lon;
+    const cachedCoords = JSON.parse(localStorage.getItem('flux_wx_coords') || 'null');
+    if (cachedCoords) {
+      lat = cachedCoords.lat; lon = cachedCoords.lon;
+    } else {
+      const pos = await new Promise((res, rej) =>
+        navigator.geolocation.getCurrentPosition(res, rej, { timeout: 6000 })
+      );
+      lat = pos.coords.latitude; lon = pos.coords.longitude;
+      localStorage.setItem('flux_wx_coords', JSON.stringify({ lat, lon }));
+    }
+
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+      `&current=temperature_2m,weathercode,apparent_temperature,relative_humidity_2m,wind_speed_10m,uv_index` +
+      `&hourly=temperature_2m,weathercode` +
+      `&daily=temperature_2m_max,temperature_2m_min,weathercode,precipitation_probability_max,sunset` +
+      `&timezone=auto&forecast_days=7`;
+    const d = await fetchT(url, {}, 10000).then(r => r.json());
+
+    // Parse sunset time for today
+    const sunsetStr  = d.daily.sunset?.[0] || '';          // "2026-04-02T19:43"
+    const sunsetTime = sunsetStr.slice(11, 16);             // "19:43"
+    const sunsetHour = sunsetTime ? parseInt(sunsetTime)  : -1;
+
+    // Next 7 hours from current hour (slice(1) later gives 6 columns)
+    const nowH = new Date().getHours();
+    const hours = [];
+    for (let i = 0; i < 7; i++) {
+      const hi = nowH + i;
+      if (hi < (d.hourly.time || []).length) {
+        const hourOfDay = hi % 24;
+        hours.push({
+          time:     String(hourOfDay),
+          temp:     Math.round(d.hourly.temperature_2m[hi]),
+          code:     d.hourly.weathercode[hi],
+          isSunset: hourOfDay === sunsetHour
+        });
+      }
+    }
+
+    const w = {
+      temp:     Math.round(d.current.temperature_2m),
+      feels:    Math.round(d.current.apparent_temperature),
+      humidity: d.current.relative_humidity_2m,
+      wind:     Math.round(d.current.wind_speed_10m),
+      code:     d.current.weathercode,
+      uv:       Math.round(d.current.uv_index ?? 0),
+      precip0:  d.daily.precipitation_probability_max?.[0] ?? 0,
+      tmax:     Math.round(d.daily.temperature_2m_max[0]),
+      tmin:     Math.round(d.daily.temperature_2m_min[0]),
+      sunsetTime,
+      hours,
+      days: [1,2,3,4,5].map(i => ({
+        dow:    new Date((d.daily.time[i] || '') + 'T12:00:00').getDay(),
+        code:   d.daily.weathercode[i],
+        tmax:   Math.round(d.daily.temperature_2m_max[i]),
+        tmin:   Math.round(d.daily.temperature_2m_min[i]),
+        precip: d.daily.precipitation_probability_max?.[i] ?? 0
+      })).filter(x => !isNaN(x.tmax)),
+      ts:       Date.now()
+    };
+    localStorage.setItem('flux_wx', JSON.stringify(w));
+    renderWx(w);
+  } catch(e) {
+    // Geolocation vagy API hiba: próbáljuk a stale cache-t, különben csendben nem töltünk
+    try {
+      const stale = JSON.parse(localStorage.getItem('flux_wx') || 'null');
+      if (stale && stale.temp !== undefined) renderWx(stale);
+    } catch(e2) {}
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   YOUTUBE
+════════════════════════════════════════════════════════════ */
+function extractYtChannelId(input) {
+  input = input.trim();
+  if (!input) return null;
+  input = input.replace(/\/+$/, '');
+
+  if (/^UC[A-Za-z0-9_\-]{22}$/.test(input)) return { type: 'id', value: input };
+  if (/^\@([A-Za-z0-9._\-]+)$/.test(input)) return { type: 'handle', value: input.slice(1) };
+
+  let parsedUrl = null;
+  try {
+    const urlish = /^[a-z]+:\/\//i.test(input) ? input : `https://${input}`;
+    parsedUrl = new URL(urlish);
+  } catch(e) {}
+
+  if (parsedUrl) {
+    const host = parsedUrl.hostname.replace(/^www\./, '').replace(/^m\./, '');
+    const path = parsedUrl.pathname.replace(/\/+$/, '');
+    const videoId = parsedUrl.searchParams.get('v');
+    if ((host === 'youtube.com' || host === 'youtu.be') && (videoId || host === 'youtu.be')) {
+      return { type: 'video', value: videoId || path.replace(/^\//, '') };
+    }
+    if (host === 'youtube.com') {
+      const m1 = path.match(/^\/channel\/(UC[A-Za-z0-9_\-]{22})$/);
+      if (m1) return { type: 'id', value: m1[1] };
+      const m2 = path.match(/^\/@([A-Za-z0-9._\-]+)$/);
+      if (m2) return { type: 'handle', value: m2[1] };
+      const m3 = path.match(/^\/user\/([A-Za-z0-9._\-]+)$/);
+      if (m3) return { type: 'user', value: m3[1] };
+      return { type: 'url', value: `${parsedUrl.origin}${path}` };
+    }
+  }
+
+  const m1 = input.match(/youtube\.com\/channel\/(UC[A-Za-z0-9_\-]{22})/);
+  if (m1) return { type: 'id', value: m1[1] };
+  const m2 = input.match(/(?:youtube\.com\/)?\@([A-Za-z0-9._\-]+)/);
+  if (m2) return { type: 'handle', value: m2[1] };
+  const m3 = input.match(/youtube\.com\/user\/([A-Za-z0-9._\-]+)/);
+  if (m3) return { type: 'user', value: m3[1] };
+  return null;
+}
+
+async function fetchJsonThroughProxies(url) {
+  try {
+    const r = await fetchT(CORSPROXY + encodeURIComponent(url), { cache: 'no-store' });
+    if (r.ok) {
+      const text = await r.text();
+      try { return JSON.parse(text); } catch(e) {}
+    }
+  } catch(e) {}
+  try {
+    const r = await fetchT(ALLORIGINS + encodeURIComponent(url), { cache: 'no-store' });
+    if (r.ok) {
+      const d = await r.json();
+      return JSON.parse(d.contents);
+    }
+  } catch(e) {}
+  return null;
+}
+
+async function resolveYtVideoToChannel(videoId) {
+  if (!videoId) return null;
+  const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+  const sources = [
+    `https://www.youtube.com/oembed?url=${encodeURIComponent(videoUrl)}&format=json`,
+    `https://noembed.com/embed?url=${encodeURIComponent(videoUrl)}`
+  ];
+  for (const src of sources) {
+    const data = await fetchJsonThroughProxies(src).catch(() => null);
+    const authorUrl = data?.author_url || '';
+    const authorName = data?.author_name || '';
+    if (!authorUrl) continue;
+    const parsed = extractYtChannelId(authorUrl);
+    if (!parsed) continue;
+    const resolved = await resolveYtInputToChannel(parsed).catch(() => null);
+    if (resolved) return { ...resolved, name: authorName || resolved.id };
+  }
+  return null;
+}
+
+async function fetchYtPage(pageUrl) {
+  const proxies = [
+    () => fetchT(CORSPROXY + encodeURIComponent(pageUrl), { cache: 'no-store' }, 10000).then(r => r.ok ? r.text() : Promise.reject()),
+    () => fetchT(ALLORIGINS + encodeURIComponent(pageUrl), { cache: 'no-store' }, 10000).then(r => r.ok ? r.json().then(d => d.contents) : Promise.reject()),
+    () => fetchT('https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(pageUrl), { cache: 'no-store' }, 10000).then(r => r.ok ? r.text() : Promise.reject()),
+  ];
+  for (const attempt of proxies) {
+    try { const html = await attempt(); if (html) return html; } catch(e) {}
+  }
+  return null;
+}
+
+function extractChannelIdFromHtml(html) {
+  if (!html) return null;
+  const patterns = [
+    /window\['ytCommand'\]\s*=\s*\{[\s\S]*?"browseEndpoint":\{"browseId":"(UC[A-Za-z0-9_\-]{22})"/,
+    /"vanityChannelUrl":"[^"]+","externalId":"(UC[A-Za-z0-9_\-]{22})"/,
+    /"rssUrl":"https:\\\/\\\/www\.youtube\.com\\\/feeds\\\/videos\.xml\?channel_id=(UC[A-Za-z0-9_\-]{22})"/,
+    /"externalId":"(UC[A-Za-z0-9_\-]{22})"/,
+    /<link[^>]+rel="alternate"[^>]+type="application\/rss\+xml"[^>]+href="https:\/\/www\.youtube\.com\/feeds\/videos\.xml\?channel_id=(UC[A-Za-z0-9_\-]{22})"/i,
+    /<meta[^>]+itemprop="identifier"[^>]+content="(UC[A-Za-z0-9_\-]{22})"/i,
+    /"channelId":"(UC[A-Za-z0-9_\-]{22})"/,
+    /"browseId":"(UC[A-Za-z0-9_\-]{22})"/,
+    /\/channel\/(UC[A-Za-z0-9_\-]{22})"/,
+    /channel_id=(UC[A-Za-z0-9_\-]{22})/
+  ];
+  for (const pattern of patterns) {
+    const m = html.match(pattern);
+    if (m) return m[1];
+  }
+  return null;
+}
+
+async function resolveYtHandle(handle) {
+  const html = await fetchYtPage(`https://www.youtube.com/@${handle}`);
+  return extractChannelIdFromHtml(html);
+}
+
+async function resolveYtChannelUrl(url) {
+  const html = await fetchYtPage(url);
+  return extractChannelIdFromHtml(html);
+}
+
+async function resolveYtInputToChannel(parsed) {
+  if (!parsed) return null;
+  if (parsed.type === 'id') return { id: parsed.value, idType: 'id' };
+  if (parsed.type === 'handle') {
+    const id = await resolveYtHandle(parsed.value).catch(() => null);
+    return id ? { id, idType: 'id' } : null;
+  }
+  if (parsed.type === 'user') {
+    const id = await resolveYtChannelUrl(`https://www.youtube.com/user/${parsed.value}`).catch(() => null);
+    return id ? { id, idType: 'id' } : { id: parsed.value, idType: 'user' };
+  }
+  if (parsed.type === 'url') {
+    const id = await resolveYtChannelUrl(parsed.value).catch(() => null);
+    return id ? { id, idType: 'id' } : null;
+  }
+  if (parsed.type === 'video') {
+    return resolveYtVideoToChannel(parsed.value);
+  }
+  return null;
+}
+
+function parseYtVideosFromHtml(html, fallbackChannelId, fallbackChannelName) {
+  if (!html) return { videos: [], channelName: fallbackChannelName || fallbackChannelId };
+
+  const channelName =
+    html.match(/"ownerChannelName":"([^"]+)"/)?.[1] ||
+    html.match(/"channelMetadataRenderer":\{"title":"([^"]+)"/)?.[1] ||
+    fallbackChannelName ||
+    fallbackChannelId;
+
+  const seen = new Set();
+  const videos = [];
+  const patterns = [
+    /"videoId":"([A-Za-z0-9_-]{11})"[\s\S]{0,600}?"title":\{"runs":\[\{"text":"([^"]+)"/g,
+    /"gridVideoRenderer":\{[\s\S]{0,1200}?"videoId":"([A-Za-z0-9_-]{11})"[\s\S]{0,1200}?"title":\{"runs":\[\{"text":"([^"]+)"/g,
+    /"richItemRenderer":\{[\s\S]{0,1600}?"videoId":"([A-Za-z0-9_-]{11})"[\s\S]{0,1600}?"title":\{"runs":\[\{"text":"([^"]+)"/g
+  ];
+
+  for (const pattern of patterns) {
+    let m;
+    while ((m = pattern.exec(html)) && videos.length < 15) {
+      const videoId = m[1];
+      const title = m[2];
+      if (!videoId || seen.has(videoId)) continue;
+      seen.add(videoId);
+      videos.push({
+        videoId,
+        title,
+        date: new Date(),
+        thumb: `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`,
+        channelName,
+        channelId: fallbackChannelId
+      });
+    }
+    if (videos.length) break;
+  }
+
+  return { videos, channelName };
+}
+
+async function fetchYtVideosFromChannelPage(url, channelId, channelName) {
+  const html = await fetchYtPage(url);
+  return parseYtVideosFromHtml(html, channelId, channelName);
+}
+
+async function fetchYtChannelVideos(ch) {
+  if (ch.idType === 'handle') {
+    return fetchYtVideosFromChannelPage(`https://www.youtube.com/@${ch.id}/videos`, ch.id, ch.name);
+  }
+  if (ch.idType === 'url') {
+    return fetchYtVideosFromChannelPage(ch.id.replace(/\/+$/, '') + '/videos', ch.id, ch.name);
+  }
+
+  const param = ch.idType === 'id' ? `channel_id=${ch.id}` : `user=${ch.id}`;
+  const feedUrl = `https://www.youtube.com/feeds/videos.xml?${param}`;
+  try {
+    const r = await fetchT(RSS2JSON + encodeURIComponent(feedUrl), { cache: 'no-store' });
+    if (r.ok) {
+      const d = await r.json();
+      if (d.status === 'ok' && Array.isArray(d.items) && d.items.length) {
+        const channelName = d.feed?.title || ch.name || ch.id;
+        const videos = d.items.slice(0, 15).map(i => {
+          const link = i.link || '';
+          const videoId = link.match(/[?&]v=([^&]+)/)?.[1] || '';
+          return {
+            videoId,
+            title: i.title || '',
+            date: new Date(i.pubDate),
+            thumb: i.thumbnail || (videoId ? `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg` : ''),
+            channelName,
+            channelId: ch.id
+          };
+        }).filter(v => v.videoId);
+        if (videos.length) return { videos, channelName };
+      }
+    }
+  } catch(e) {}
+
+  let xml = null;
+  try {
+    const r = await fetchT(CORSPROXY + encodeURIComponent(feedUrl), { cache: 'no-store' });
+    if (r.ok) xml = await r.text();
+  } catch(e) {}
+  if (!xml) {
+    try {
+      const r = await fetchT(ALLORIGINS + encodeURIComponent(feedUrl), { cache: 'no-store' });
+      if (r.ok) { const d = await r.json(); xml = d.contents; }
+    } catch(e) {}
+  }
+  if (!xml) return { videos: [], channelName: ch.name };
+
+  const doc = new DOMParser().parseFromString(xml, 'application/xml');
+  const entries = [...doc.querySelectorAll('entry')];
+  if (!entries.length) return { videos: [], channelName: ch.name };
+
+  const channelName = doc.querySelector('author > name')?.textContent?.trim() || ch.name || ch.id;
+  const videos = entries.slice(0, 15).map(el => {
+    const link = el.querySelector('link')?.getAttribute('href') || '';
+    const videoId = link.match(/[?&]v=([^&]+)/)?.[1] || '';
+    const title = el.querySelector('title')?.textContent?.trim() || '';
+    const published = el.querySelector('published')?.textContent || '';
+    const thumb = videoId ? `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg` : '';
+    return { videoId, title, date: new Date(published), thumb, channelName, channelId: ch.id };
+  }).filter(v => v.videoId);
+
+  return { videos, channelName };
+}
+
+async function loadYouTube(bust = false) {
+  if (!S.ytChannels.length) {
+    ytLoading = false;
+    ytVideos = [];
+    removeYtSidebar();
+    return;
+  }
+  const YT_TTL = 30 * 60 * 1000;
+  ytLoading = true;
+  injectYtSidebar();
+  let cached = null;
+  if (!bust) {
+    try {
+      cached = JSON.parse(localStorage.getItem('flux_yt_cache') || 'null');
+      if (
+        cached &&
+        cached.sig === ytCacheSignature() &&
+        Date.now() - cached.ts < YT_TTL &&
+        cached.videos?.length
+      ) {
+        ytVideos = cached.videos.map(v => ({ ...v, date: new Date(v.date) }));
+        ytVideos.forEach(v => { ytVideoMap[v.videoId] = v; });
+        ytLoading = false;
+        injectYtSidebar();
+        return;
+      }
+    } catch(e) {}
+  }
+  const results = await Promise.all(
+    S.ytChannels.map(ch => fetchYtChannelVideos(ch).catch(() => ({ videos: [], channelName: ch.name })))
+  );
+  results.forEach((r, i) => {
+    if (r.channelName && r.channelName !== S.ytChannels[i].id) S.ytChannels[i].name = r.channelName;
+  });
+  saveYtChannels();
+  const freshVideos = results.flatMap(r => r.videos).sort((a, b) => b.date - a.date);
+  const expectedChannels = S.ytChannels.length;
+  const freshChannelCount = ytChannelCountFromVideos(freshVideos);
+  const cachedVideos = (cached && cached.sig === ytCacheSignature() && cached.videos?.length)
+    ? cached.videos.map(v => ({ ...v, date: new Date(v.date) }))
+    : [];
+  const cachedChannelCount = ytChannelCountFromVideos(cachedVideos);
+
+  // If the first network pass only brings back a subset of channels,
+  // prefer an older fuller cache over replacing it with a partial snapshot.
+  ytVideos = freshVideos;
+  if (freshChannelCount < expectedChannels && cachedChannelCount > freshChannelCount) {
+    ytVideos = cachedVideos;
+  }
+  ytVideos.forEach(v => { ytVideoMap[v.videoId] = v; });
+  if (freshChannelCount >= expectedChannels || !cachedChannelCount) {
+    try {
+      localStorage.setItem('flux_yt_cache', JSON.stringify({
+        ts: Date.now(),
+        sig: ytCacheSignature(),
+        videos: freshVideos
+      }));
+    } catch(e) {}
+  }
+  ytLoading = false;
+  injectYtSidebar();
+}
+
+function ytAge(d) {
+  if (!d || isNaN(d)) return '';
+  const s = (Date.now() - d) / 1000;
+  if (s < 3600) return `${Math.floor(s/60)}p`;
+  if (s < 86400) return `${Math.floor(s/3600)}ó`;
+  if (s < 604800) return `${Math.floor(s/86400)}n`;
+  return d.toLocaleDateString('hu-HU', { month:'short', day:'numeric' });
+}
+
+function getYtSidebarGroups() {
+  const n = S.ytPerChannel || 3;
+  // Group videos by channel, preserving S.ytChannels order
+  const byChannel = {};
+  ytVideos.forEach(v => {
+    if (!byChannel[v.channelId]) byChannel[v.channelId] = [];
+    byChannel[v.channelId].push(v);
+  });
+
+  const maxCh = S.ytMaxChannels || 5;
+  const groups = S.ytChannels.slice(0, maxCh).map(ch => ({
+    name: ch.name || ch.id,
+    videos: (byChannel[ch.id] || []).slice(0, n)
+  })).filter(g => g.videos.length);
+  return groups;
+}
+
+function buildYtSidebarHtml() {
+  const ytIcon = `<svg width="12" height="12" viewBox="0 0 24 24" fill="#ff0000"><path d="M23 7s-.3-2-1.2-2.8C20.7 3 19.4 3 18.8 2.9 15.7 2.7 12 2.7 12 2.7s-3.7 0-6.8.2C4.6 3 3.3 3 2.2 4.2 1.3 5 1 7 1 7S.7 9.3.7 11.6v2.1c0 2.3.3 4.6.3 4.6s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2C7.9 22.5 12 22.5 12 22.5s3.7 0 6.8-.3c.6-.1 1.9-.1 3-1.3.9-.8 1.2-2.8 1.2-2.8s.3-2.3.3-4.6v-2.1C23.3 9.3 23 7 23 7zM9.7 15.5V9.2l6.6 3.2-6.6 3.1z"/></svg>`;
+  const refreshIcon = `<button class="yt-refresh-btn${ytLoading ? ' spinning' : ''}" type="button" title="YouTube frissítése" onclick="refreshYtFeed(event)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg></button>`;
+  const groups = getYtSidebarGroups();
+
+  if (!groups.length) {
+    const message = ytLoading
+      ? 'YouTube videók betöltése...'
+      : 'Még nincs megjeleníthető videó. Ellenőrizd a csatornákat vagy frissíts újra.';
+    return `<div class="yt-sidebar-heading"><div class="yt-sidebar-heading-main">${ytIcon} YouTube</div>${refreshIcon}</div><div class="yt-empty">${e(message)}</div>`;
+  }
+
+  const html = groups.map((g, gi) => {
+    const cards = g.videos.map(v => `
+      <div class="yt-vcard" onclick="openYtVideo('${e(v.videoId)}')">
+        <img class="yt-vcard-thumb" src="${e(v.thumb)}" alt="" loading="lazy" onerror="this.style.display='none'">
+        <div class="yt-vcard-body">
+          <div class="yt-vcard-title">${e(v.title)}</div>
+          <div class="yt-vcard-meta">${ytAge(v.date)}</div>
+        </div>
+      </div>`).join('');
+    return `<div class="yt-ch-group${gi > 0 ? ' yt-ch-group--sep' : ''}">
+      <div class="yt-ch-heading">${e(g.name)}</div>
+      ${cards}
+    </div>`;
+  }).join('');
+
+  return `<div class="yt-sidebar-heading"><div class="yt-sidebar-heading-main">${ytIcon} YouTube</div>${refreshIcon}</div><div class="yt-scroll-row">${html}</div>`;
+}
+
+function refreshYtFeed(ev) {
+  if (ev) ev.stopPropagation();
+  try { localStorage.removeItem('flux_yt_cache'); } catch(e) {}
+  loadYouTube(true);
+}
+
+function mergeSplitLayouts(container) {
+  if (!container) return;
+  container.querySelectorAll('.yt-section-divider').forEach(el => el.remove());
+  ['grid-layout', 'list-layout', 'reader-layout'].forEach(cls => {
+    const nodes = [...container.children].filter(el => el.classList && el.classList.contains(cls));
+    if (nodes.length < 2) return;
+    const first = nodes[0];
+    nodes.slice(1).forEach(node => {
+      while (node.firstChild) first.appendChild(node.firstChild);
+      node.remove();
+    });
+  });
+}
+
+function getYtLeadCount(layout) {
+  if (layout === 'reader') return 8;
+  if (layout === 'list') return 6;
+  if (layout === 'grid') return 8;
+  if (layout === 'magazine') return 2;
+  return 0;
+}
+
+function syncYtSidebarHeight(sidebar, referenceEl) {
+  if (!sidebar || !referenceEl) return;
+  requestAnimationFrame(() => {
+    const h = referenceEl.offsetHeight;
+    const target = Math.max(0, h - 6);
+    sidebar.style.height = target > 0 ? `${target}px` : '';
+    sidebar.style.maxHeight = target > 0 ? `${target}px` : '';
+  });
+}
+
+function injectYtSplitLayout(content, sidebar, layoutClass) {
+  const layoutEl = content.querySelector(`.${layoutClass}`);
+  if (!layoutEl) return false;
+
+  const items = [...layoutEl.children];
+  const leadCount = Math.min(getYtLeadCount(S.layout), items.length);
+  if (!leadCount || leadCount >= items.length) return false;
+
+  const topLayout = layoutEl.cloneNode(false);
+  const bottomLayout = layoutEl.cloneNode(false);
+  items.forEach((item, idx) => {
+    (idx < leadCount ? topLayout : bottomLayout).appendChild(item);
+  });
+
+  const wrap = document.createElement('div');
+  wrap.className = 'yt-wrap';
+  const mainDiv = document.createElement('div');
+  mainDiv.style.cssText = 'min-width:0';
+  mainDiv.appendChild(topLayout);
+  wrap.appendChild(mainDiv);
+  wrap.appendChild(sidebar);
+  const divider = document.createElement('div');
+  divider.className = 'yt-section-divider';
+  divider.innerHTML = '<div class="yt-divider-main"></div><div class="yt-divider-side"></div>';
+
+  layoutEl.replaceWith(wrap);
+  if (bottomLayout.children.length) {
+    content.appendChild(divider);
+    content.appendChild(bottomLayout);
+  }
+  syncYtSidebarHeight(sidebar, topLayout);
+  return true;
+}
+
+function injectYtSplitMagazine(content, sidebar) {
+  const magLayout = content.querySelector('.magazine-layout');
+  if (!magLayout) return false;
+
+  const hero = magLayout.querySelector('.ix-hero');
+  const allChildren = [...magLayout.children];
+  const bodyChildren = allChildren.filter(el => el !== hero);
+  const leadCount = Math.min(getYtLeadCount('magazine'), bodyChildren.length);
+  if (!leadCount || leadCount >= bodyChildren.length) return false;
+
+  const topBody = document.createElement('div');
+  const bottomBody = document.createElement('div');
+  topBody.style.cssText = 'min-width:0';
+  bottomBody.style.cssText = 'min-width:0';
+
+  bodyChildren.forEach((child, idx) => {
+    (idx < leadCount ? topBody : bottomBody).appendChild(child);
+  });
+
+  const wrap = document.createElement('div');
+  wrap.className = 'yt-wrap';
+  wrap.appendChild(topBody);
+  wrap.appendChild(sidebar);
+  const divider = document.createElement('div');
+  divider.className = 'yt-section-divider';
+  divider.innerHTML = '<div class="yt-divider-main"></div><div class="yt-divider-side"></div>';
+
+  magLayout.innerHTML = '';
+  if (hero) magLayout.appendChild(hero);
+  magLayout.appendChild(wrap);
+  if (bottomBody.firstChild) {
+    magLayout.appendChild(divider);
+  }
+  while (bottomBody.firstChild) magLayout.appendChild(bottomBody.firstChild);
+  syncYtSidebarHeight(sidebar, topBody);
+  return true;
+}
+
+function removeYtSidebar() {
+  const content = $('content');
+  if (!content) return;
+
+  content.querySelectorAll('.yt-wrap').forEach(wrap => {
+    const parent = wrap.parentElement;
+    const mainDiv = wrap.firstElementChild;
+    if (mainDiv && (parent === content || parent?.classList.contains('magazine-layout'))) {
+      while (mainDiv.firstChild) parent.insertBefore(mainDiv.firstChild, wrap);
+    }
+    wrap.remove();
+  });
+
+  content.querySelectorAll('.yt-sidebar').forEach(sidebar => {
+    if (!sidebar.closest('.yt-wrap')) sidebar.remove();
+  });
+  mergeSplitLayouts(content);
+}
+
+function injectYtSidebar() {
+  const content = $('content');
+  if (!content) return;
+  if (!S.ytChannels.length) {
+    removeYtSidebar();
+    return;
+  }
+  if (content.querySelector('.spinner')) return;
+
+  const existing = content.querySelector('.yt-sidebar');
+  if (existing) { existing.innerHTML = buildYtSidebarHtml(); return; }
+
+  const sidebar = document.createElement('aside');
+  sidebar.className = 'yt-sidebar';
+  sidebar.innerHTML = buildYtSidebarHtml();
+
+  if (S.layout === 'magazine') {
+    if (injectYtSplitMagazine(content, sidebar)) return;
+  }
+
+  if (S.layout === 'reader' && injectYtSplitLayout(content, sidebar, 'reader-layout')) return;
+  if (S.layout === 'list' && injectYtSplitLayout(content, sidebar, 'list-layout')) return;
+  if (S.layout === 'grid' && injectYtSplitLayout(content, sidebar, 'grid-layout')) return;
+
+  // Grid / list / reader: wrap all content + sidebar in .yt-wrap grid
+  const wrap = document.createElement('div');
+  wrap.className = 'yt-wrap';
+  const mainDiv = document.createElement('div');
+  mainDiv.style.cssText = 'min-width:0';
+  while (content.firstChild) mainDiv.appendChild(content.firstChild);
+  wrap.appendChild(mainDiv);
+  wrap.appendChild(sidebar);
+  content.appendChild(wrap);
+}
+
+function openYtVideo(videoId) {
+  const url = `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}`;
+  window.open(url, '_blank', 'noopener');
+}
+
+function renderSYtChannels() {
+  const c = $('sYtList');
+  if (!c) return;
+  if (!S.ytChannels.length) {
+    c.innerHTML = '<div style="font-size:.78rem;color:var(--muted);padding:4px 0">Nincs csatorna.</div>';
+    return;
+  }
+  const ytIcon = `<svg width="13" height="13" viewBox="0 0 24 24" fill="#ff0000" style="flex-shrink:0"><path d="M23 7s-.3-2-1.2-2.8C20.7 3 19.4 3 18.8 2.9 15.7 2.7 12 2.7 12 2.7s-3.7 0-6.8.2C4.6 3 3.3 3 2.2 4.2 1.3 5 1 7 1 7S.7 9.3.7 11.6v2.1c0 2.3.3 4.6.3 4.6s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2C7.9 22.5 12 22.5 12 22.5s3.7 0 6.8-.3c.6-.1 1.9-.1 3-1.3.9-.8 1.2-2.8 1.2-2.8s.3-2.3.3-4.6v-2.1C23.3 9.3 23 7 23 7zM9.7 15.5V9.2l6.6 3.2-6.6 3.1z"/></svg>`;
+  c.innerHTML = S.ytChannels.map((ch, i) => `
+    <div class="s-feed-item" draggable="true" data-ytid="${e(ch.id)}" data-idx="${i}">
+      <span class="s-feed-drag" title="Húzd át">⠿</span>
+      <span style="flex-shrink:0;padding-top:3px">${ytIcon}</span>
+      <div style="flex:1;min-width:0">
+        <input class="s-feed-name" value="${e(ch.name || ch.id)}" onblur="renameYtChannelName('${e(ch.id)}',this.value)" onkeydown="if(event.key==='Enter')this.blur()">
+        <input class="s-feed-url" value="${e(ch.id)}" onblur="renameYtChannelUrl('${e(ch.id)}',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()" title="Csatorna handle / ID — kattints a szerkesztéshez" placeholder="@handle vagy channel ID">
+      </div>
+      <button class="s-feed-del" onclick="deleteYtChannel('${e(ch.id)}')" style="margin-top:1px">✕</button>
+    </div>`).join('');
+
+  let dragIdx = null;
+  c.querySelectorAll('.s-feed-item').forEach(row => {
+    row.addEventListener('dragstart', ev => {
+      dragIdx = +row.dataset.idx;
+      ev.dataTransfer.effectAllowed = 'move';
+      setTimeout(() => row.style.opacity = '.4', 0);
+    });
+    row.addEventListener('dragend', () => row.style.opacity = '');
+    row.addEventListener('dragover', ev => {
+      ev.preventDefault(); ev.dataTransfer.dropEffect = 'move';
+      const overIdx = +row.dataset.idx;
+      c.querySelectorAll('.s-feed-item').forEach(r => r.classList.remove('drag-over'));
+      if (overIdx !== dragIdx) row.classList.add('drag-over');
+    });
+    row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
+    row.addEventListener('drop', ev => {
+      ev.preventDefault();
+      row.classList.remove('drag-over');
+      const toIdx = +row.dataset.idx;
+      if (dragIdx === null || dragIdx === toIdx) return;
+      const moved = S.ytChannels.splice(dragIdx, 1)[0];
+      S.ytChannels.splice(toIdx, 0, moved);
+      saveYtChannels(); renderSYtChannels(); injectYtSidebar();
+    });
+  });
+}
+
+function deleteYtChannel(id) {
+  const ch = S.ytChannels.find(c => c.id === id);
+  confirmDialog(`"${ch?.name || id}" csatorna törlése visszavonhatatlan.`, () => {
+    S.ytChannels = S.ytChannels.filter(c => c.id !== id);
+    saveYtChannels();
+    ytVideos = ytVideos.filter(v => v.channelId !== id);
+    try { localStorage.removeItem('flux_yt_cache'); } catch(e) {}
+    renderSYtChannels();
+    injectYtSidebar();
+    toast('Csatorna törölve.');
+  }, null, { title: 'Csatorna törlése', okLabel: 'Törlés' });
+}
+
+function openAddYtModal() {
+  $('ytChannelInput').value = '';
+  $('ytErr').classList.remove('show');
+  $('confirmYt').disabled = false;
+  $('confirmYt').textContent = 'Hozzáadás';
+  $('addYtModal').classList.add('open');
+  $('overlay').classList.add('open');
+  setTimeout(() => $('ytChannelInput').focus(), 80);
+}
+
+function closeAddYtModal() {
+  $('addYtModal').classList.remove('open');
+  $('overlay').classList.remove('open');
+}
+
+async function submitAddYt() {
+  const input = $('ytChannelInput').value.trim();
+  if (!input) return;
+  const parsed = extractYtChannelId(input);
+  const debug = [];
+  if (!parsed) {
+    $('ytErr').textContent = 'Érvénytelen URL/ID. Adj meg channel URL-t, UC… ID-t, vagy YouTube videó linket.';
+    $('ytErr').classList.add('show');
+    return;
+  }
+  const btn = $('confirmYt');
+  btn.disabled = true; btn.textContent = 'Betöltés...';
+  $('ytErr').classList.remove('show');
+
+  const resolved = await resolveYtInputToChannel(parsed).catch(() => null);
+  debug.push(`parsed:${parsed.type}`);
+  debug.push(`resolved:${resolved ? resolved.idType : 'no'}`);
+  let idType = resolved?.idType || (
+    parsed.type === 'id' ? 'id' :
+    parsed.type === 'user' ? 'user' :
+    parsed.type === 'handle' ? 'handle' :
+    parsed.type === 'video' ? resolved?.idType || null :
+    parsed.type === 'url' ? 'url' :
+    null
+  );
+  let chId = resolved?.id || parsed.value;
+  let presetName = resolved?.name || '';
+
+  if (S.ytChannels.find(ch => ch.id === chId)) {
+    toast('Ez a csatorna már hozzáadva.'); closeAddYtModal(); return;
+  }
+
+  let videos = [];
+  let channelName = '';
+
+  if (idType) {
+    const tempCh = { id: chId, name: chId, idType };
+    const feedResult = await fetchYtChannelVideos(tempCh).catch(() => ({ videos: [], channelName: '' }));
+    videos = feedResult.videos;
+    channelName = feedResult.channelName || presetName;
+    debug.push(`feed:${videos.length}`);
+  }
+
+  if (!videos.length && parsed.type === 'handle') {
+    const pageResult = await fetchYtVideosFromChannelPage(`https://www.youtube.com/@${parsed.value}/videos`, chId, channelName || chId).catch(() => ({ videos: [], channelName: '' }));
+    videos = pageResult.videos;
+    channelName = pageResult.channelName || channelName;
+    debug.push(`handlePage:${videos.length}`);
+  }
+
+  if (!videos.length && parsed.type === 'url') {
+    const pageResult = await fetchYtVideosFromChannelPage(parsed.value.replace(/\/+$/, '') + '/videos', chId, channelName || chId).catch(() => ({ videos: [], channelName: '' }));
+    videos = pageResult.videos;
+    channelName = pageResult.channelName || channelName;
+    debug.push(`urlPage:${videos.length}`);
+  }
+
+  if (!videos.length) {
+    $('ytErr').textContent = `Nem sikerült betölteni. Debug: ${debug.join(', ')}`;
+    $('ytErr').classList.add('show');
+    btn.disabled = false; btn.textContent = 'Hozzáadás';
+    return;
+  }
+
+  const ch = { id: chId, name: channelName || presetName || chId, idType };
+  S.ytChannels.push(ch);
+  saveYtChannels();
+  videos.forEach(v => { ytVideoMap[v.videoId] = v; });
+  ytVideos = [...ytVideos, ...videos].sort((a, b) => b.date - a.date);
+  try {
+    localStorage.setItem('flux_yt_cache', JSON.stringify({
+      ts: Date.now(),
+      sig: ytCacheSignature(),
+      videos: ytVideos
+    }));
+  } catch(e) {}
+  renderSYtChannels();
+  closeAddYtModal();
+  injectYtSidebar();
+  toast(`"${ch.name}" csatorna hozzáadva!`);
+}
+
+/* ════════════════════════════════════════════════════════════
+   F1 WIDGET
+════════════════════════════════════════════════════════════ */
+const F1_TEAM_COLORS = {
+  'Mercedes':'#00D2BE','McLaren':'#FF8700','Ferrari':'#DC0000',
+  'Red Bull':'#3671C6','Williams':'#64C4FF','Aston Martin':'#358C75',
+  'Alpine':'#FF87BC','RB':'#6692FF','Haas F1 Team':'#B6BABD',
+  'Kick Sauber':'#52E252','Sauber':'#52E252'
+};
+const F1_HU = ['jan','feb','már','ápr','máj','jún','júl','aug','szep','okt','nov','dec'];
+const F1_BASE = 'https://api.jolpi.ca/ergast/f1';
+const F1_TTL  = 30 * 60 * 1000;
+
+function renderF1(f1) {
+  const el = document.getElementById('navF1');
+  if (!el) return;
+
+  const shortName = n => n.replace(' Grand Prix','').replace(' GP','') + ' GP';
+  const fmtDate  = d => { const dt = new Date(d+'T12:00:00'); return `${F1_HU[dt.getMonth()]} ${dt.getDate()}.`; };
+  const teamDot  = c => `<span class="f1-team-dot" style="background:${F1_TEAM_COLORS[c]||'#555'}"></span>`;
+  const teamBar  = c => `<span class="f1-team-bar" style="background:${F1_TEAM_COLORS[c]||'#555'}"></span>`;
+
+  const F1_AVATAR_BASE = 'https://elijahcreative.github.io/F1/Avatars';
+  const F1_AVATAR_MAP = {
+    'max_verstappen':'verstappen','verstappen':'verstappen',
+    'hamilton':'hamilton','leclerc':'leclerc',
+    'norris':'norris','piastri':'piastri',
+    'russell':'russell','hulkenberg':'hulkenberg',
+    'antonelli':'antonelli','andrea_kimi_antonelli':'antonelli'
+  };
+  const driverAvatar = (driverId, constructor) => {
+    const color = F1_TEAM_COLORS[constructor] || '#555';
+    const slug  = F1_AVATAR_MAP[driverId];
+    const inner = slug ? `<img src="${F1_AVATAR_BASE}/driver-${slug}.jpeg" alt="" onerror="this.remove()">` : '';
+    return `<span class="f1-driver-avatar" style="border-color:${color}">${inner}</span>`;
+  };
+
+  const F1_CARD_IMG_BASE = 'https://elijahcreative.github.io/F1/Card';
+  const F1_CIRCUIT_MAP = {
+    'Abu Dhabi':'AbuDhabi', 'Australian':'Melbourne', 'Bahrain':'Sakhir',
+    'Azerbaijan':'Baku', 'Saudi Arabian':'Jeddah', 'Miami':'Miami',
+    'Emilia Romagna':'Imola', 'Monaco':'Monaco', 'Spanish':'Barcelona',
+    'Canadian':'Montreal', 'Austrian':'Spielberg', 'British':'Silverstone',
+    'Hungarian':'Mogyorod', 'Belgian':'Stavelot', 'Dutch':'Zandvoort',
+    'Italian':'Monza', 'Singapore':'MarinaBay', 'Japanese':'Suzuka',
+    'Qatar':'Doha', 'United States':'Austin', 'Mexico City':'MexicoCity',
+    'São Paulo':'SaoPaulo', 'Las Vegas':'LasVegas', 'Chinese':'Shanghai'
+  };
+  const circuitImg = name => {
+    const folder = Object.entries(F1_CIRCUIT_MAP).find(([k]) => name.includes(k))?.[1];
+    return folder ? `${F1_CARD_IMG_BASE}/${folder}/Day/Day01.png` : null;
+  };
+  const F1_FLAG_MAP = {
+    'Australian':'au','Bahrain':'bh','Saudi Arabian':'sa','Miami':'us',
+    'Chinese':'cn','Japanese':'jp','Azerbaijan':'az','Emilia Romagna':'it',
+    'Monaco':'mc','Spanish':'es','Canadian':'ca','Austrian':'at',
+    'British':'gb','Hungarian':'hu','Belgian':'be','Dutch':'nl',
+    'Italian':'it','Singapore':'sg','Qatar':'qa','United States':'us',
+    'Mexico City':'mx','São Paulo':'br','Las Vegas':'us','Abu Dhabi':'ae'
+  };
+  const circuitFlag = name => {
+    const cc = Object.entries(F1_FLAG_MAP).find(([k]) => name.includes(k))?.[1];
+    return cc ? `<img class="f1-flag-img" src="https://flagcdn.com/w40/${cc}.png" alt="">` : '';
+  };
+
+  // Countdown
+  let countdown = '';
+  if (f1.nextRace) {
+    const diff = new Date(f1.nextRace.dateTime) - Date.now();
+    if (diff > 0) {
+      const d = Math.floor(diff/86400000), h = Math.floor((diff%86400000)/3600000);
+      countdown = d > 0 ? `${d} nap` : h > 0 ? `${h} ó` : 'Ma!';
+    } else { countdown = 'Ma!'; }
+  }
+
+  const nextImgUrl = f1.nextRace ? circuitImg(f1.nextRace.name) : null;
+  const nextSection = f1.nextRace ? `
+    <div class="f1-next-card">
+      ${nextImgUrl ? `<div class="f1-next-card-img" style="background-image:url('${nextImgUrl}')"></div>` : ''}
+      <div class="f1-next-card-body">
+        <div>
+          <div class="f1-section-title">Következő futam</div>
+          <div class="f1-next-name">${circuitFlag(f1.nextRace.name)}${shortName(f1.nextRace.name)}</div>
+          <div class="f1-next-circuit">${f1.nextRace.circuit}</div>
+        </div>
+        <div class="f1-next-bottom">
+          <div class="f1-countdown">${countdown}</div>
+          <div class="f1-next-date">${new Date(f1.nextRace.dateTime).toLocaleString('hu-HU',{month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+        </div>
+      </div>
+    </div>` : '';
+
+  const podiumSection = f1.lastRace?.podium?.length ? `
+    <div class="f1-section">
+      <div class="f1-section-title">Utolsó futam · ${shortName(f1.lastRace.name)}</div>
+      <div class="f1-podium-grid">
+        ${f1.lastRace.podium.map(p => {
+          const slug = F1_AVATAR_MAP[p.driverId];
+          const imgUrl = slug ? `${F1_AVATAR_BASE}/driver-${slug}.jpeg` : null;
+          const teamColor = F1_TEAM_COLORS[p.constructor] || '#555';
+          return `<div class="f1-podium-card" style="border-color:${teamColor}">
+            ${imgUrl ? `<div class="f1-podium-card-bg" style="background-image:url('${imgUrl}')"></div>` : ''}
+            <div class="f1-podium-card-overlay"></div>
+            <span class="f1-podium-pos">P${p.pos}</span>
+            <div class="f1-podium-info">
+              <div class="f1-podium-driver">${p.driver}</div>
+              <div class="f1-podium-team">${p.constructor}</div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>` : '';
+
+  const standingsSection = f1.standings?.length ? `
+    <div class="f1-section">
+      <div class="f1-section-title">Pilóta bajnokság</div>
+      ${f1.standings.map(s => `
+        <div class="f1-standing-row">
+          <span class="f1-standing-pos">${s.pos}</span>
+          ${teamBar(s.constructor)}
+          <span class="f1-standing-driver">${s.driver}</span>
+          <span class="f1-standing-pts">${s.points}</span>
+        </div>`).join('')}
+    </div>` : '';
+
+  const calSection = f1.upcoming?.length ? `
+    <div class="f1-section">
+      <div class="f1-section-title">Kövi futamok</div>
+      ${f1.upcoming.map((r,i) => `
+        <div class="f1-cal-row${i===0?' f1-cal-next':''}">
+          <span class="f1-cal-dot"></span>
+          <span class="f1-cal-name">${shortName(r.name)}</span>
+          <span class="f1-cal-date">${fmtDate(r.date)}</span>
+        </div>`).join('')}
+    </div>` : '';
+
+  const badgeLabel = f1.nextRace
+    ? `${shortName(f1.nextRace.name)}<span class="f1-badge-sep">|</span>${countdown}`
+    : `F1`;
+
+  el.innerHTML = `
+    <span class="f1-badge">${badgeLabel}</span>
+    <div class="f1-popup" id="f1Popup">
+      ${nextSection}${podiumSection}${standingsSection}${calSection}
+    </div>`;
+
+  let _f1T;
+  const f1Open  = () => { clearTimeout(_f1T); document.getElementById('f1Popup')?.classList.add('f1-open'); };
+  const f1Close = () => { _f1T = setTimeout(() => document.getElementById('f1Popup')?.classList.remove('f1-open'), 150); };
+  el.addEventListener('mouseenter', f1Open);
+  el.addEventListener('mouseleave', f1Close);
+  document.getElementById('f1Popup').addEventListener('mouseenter', f1Open);
+  document.getElementById('f1Popup').addEventListener('mouseleave', f1Close);
+}
+
+async function loadF1() {
+  try {
+    const cached = JSON.parse(localStorage.getItem('flux_f1') || 'null');
+    if (cached && Date.now() - cached.ts < F1_TTL) { renderF1(cached); return; }
+  } catch(e) {}
+  try {
+    const [schedJ, lastJ, standJ] = await Promise.all([
+      fetch(`${F1_BASE}/current.json`).then(r=>r.json()),
+      fetch(`${F1_BASE}/current/last/results.json`).then(r=>r.json()),
+      fetch(`${F1_BASE}/current/driverStandings.json`).then(r=>r.json())
+    ]);
+    const now   = Date.now();
+    const races = schedJ.MRData.RaceTable.Races;
+    const future = races.filter(r => new Date(r.date+'T'+(r.time||'12:00:00Z')) > now);
+    const next  = future[0];
+    const lastRaceData = lastJ.MRData.RaceTable.Races[0];
+    const f1 = {
+      nextRace: next ? {
+        name:     next.raceName,
+        circuit:  next.Circuit.circuitName,
+        dateTime: next.date+'T'+(next.time||'12:00:00Z')
+      } : null,
+      lastRace: {
+        name:   lastRaceData?.raceName || '',
+        podium: (lastRaceData?.Results||[]).slice(0,3).map(r=>({
+          pos: r.position, driver: r.Driver.familyName,
+          driverId: r.Driver.driverId, constructor: r.Constructor.name
+        }))
+      },
+      standings: (standJ.MRData.StandingsTable.StandingsLists[0]?.DriverStandings||[]).slice(0,6).map(s=>({
+        pos: s.position, driver: s.Driver.familyName,
+        driverId: s.Driver.driverId,
+        points: s.points, constructor: s.Constructors[0]?.name||''
+      })),
+      upcoming: future.slice(0,6).map(r=>({ name: r.raceName, date: r.date })),
+      ts: Date.now()
+    };
+    localStorage.setItem('flux_f1', JSON.stringify(f1));
+    renderF1(f1);
+  } catch(e) { console.warn('F1 load error', e); }
+}
+
+/* ════════════════════════════════════════════════════════════
+   BOOT
+════════════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════════
+   CONFIG FILE (File System Access API)
+════════════════════════════════════════════════════════════ */
+const Config = {
+  _toJSON() {
+    return JSON.stringify({
+      version: 1,
+      settings: {
+        theme: S.theme, preset: S.preset, customAccent: S.customAccent,
+        fontSize: S.fontSize, ytPerChannel: S.ytPerChannel, ytMaxChannels: S.ytMaxChannels
+      },
+      feeds: S.feeds,
+      ytChannels: S.ytChannels
+    }, null, 2);
+  },
+  _apply(data) {
+    if (!data || typeof data !== 'object') return;
+    if (data.settings) {
+      const d = data.settings;
+      if (d.theme)         S.theme         = d.theme;
+      if (d.preset)        S.preset        = d.preset;
+      if (d.customAccent !== undefined) S.customAccent = d.customAccent;
+      if (d.fontSize)      S.fontSize      = d.fontSize;
+      if (d.ytPerChannel)  S.ytPerChannel  = d.ytPerChannel;
+      if (d.ytMaxChannels) S.ytMaxChannels = d.ytMaxChannels;
+    }
+    if (Array.isArray(data.feeds) && data.feeds.length) S.feeds = data.feeds;
+    if (Array.isArray(data.ytChannels)) S.ytChannels = data.ytChannels;
+  },
+
+  save() {
+    const blob = new Blob([this._toJSON()], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'flux-config.json';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    toast('Config letöltve');
+  },
+
+  load() {
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = '.json';
+    input.onchange = async () => {
+      try {
+        const text = await input.files[0].text();
+        this._apply(JSON.parse(text));
+        saveSettings(); saveFeeds(); saveYtChannels();
+        Theme.apply(); renderSidebar(); renderSFeeds(); renderSYtChannels(); renderArticles();
+        refreshAll();
+        toast('Config betöltve');
+      } catch(e) { toast('Hibás config fájl'); }
+    };
+    input.click();
+  }
+};
+
+(async function init() {
+  loadStorage();
+  Theme.apply();
+  buildSettingsUI();
+  renderSidebar();
+  bindEvents();
+  updateLayoutBtns();
+  loadWeather();
+  loadF1();
+  loadYouTube();
+
+  const contentEl = document.getElementById('content');
+  const navbar = document.getElementById('navbar');
+  contentEl.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', contentEl.scrollTop > 10);
+  }, { passive: true });
+
+  if (S.feeds.length) {
+    renderArticles(); // azonnali megjelenítés cache-ből
+    refreshAll();     // háttérben frissítés, nem blokkol
+  }
+})();
+
+</script>
+</body>
+</html>
