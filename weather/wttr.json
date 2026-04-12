@@ -1,19 +1,19 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "9",
-      "FeelsLikeF": "48",
+      "FeelsLikeC": "12",
+      "FeelsLikeF": "53",
       "cloudcover": "0",
-      "humidity": "40",
-      "localObsDateTime": "2026-04-12 10:45 AM",
-      "observation_time": "08:45 AM",
+      "humidity": "38",
+      "localObsDateTime": "2026-04-12 12:22 PM",
+      "observation_time": "10:22 AM",
       "precipInches": "0.0",
       "precipMM": "0.0",
       "pressure": "1020",
       "pressureInches": "30",
-      "temp_C": "10",
-      "temp_F": "50",
-      "uvIndex": "3",
+      "temp_C": "12",
+      "temp_F": "54",
+      "uvIndex": "5",
       "visibility": "10",
       "visibilityMiles": "6",
       "weatherCode": "116",
@@ -27,17 +27,17 @@
           "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0002_sunny_intervals.png"
         }
       ],
-      "winddir16Point": "SE",
-      "winddirDegree": "127",
-      "windspeedKmph": "11",
-      "windspeedMiles": "7"
+      "winddir16Point": "SSE",
+      "winddirDegree": "153",
+      "windspeedKmph": "9",
+      "windspeedMiles": "5"
     }
   ],
   "nearest_area": [
     {
       "areaName": [
         {
-          "value": "Kis-Gellerthegy"
+          "value": "Gellert"
         }
       ],
       "country": [
@@ -46,7 +46,7 @@
         }
       ],
       "latitude": "47.483",
-      "longitude": "19.033",
+      "longitude": "19.050",
       "population": "0",
       "region": [
         {
@@ -55,7 +55,7 @@
       ],
       "weatherUrl": [
         {
-          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.483,19.033"
+          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.483,19.05"
         }
       ]
     }
@@ -307,16 +307,16 @@
           "chanceofsunshine": "88",
           "chanceofthunder": "0",
           "chanceofwindy": "0",
-          "cloudcover": "48",
+          "cloudcover": "0",
           "diffRad": "169.6",
-          "humidity": "40",
+          "humidity": "38",
           "precipInches": "0.0",
           "precipMM": "0.0",
           "pressure": "1020",
           "pressureInches": "30",
           "shortRad": "502.4",
-          "tempC": "13",
-          "tempF": "56",
+          "tempC": "12",
+          "tempF": "54",
           "time": "1200",
           "uvIndex": "5",
           "visibility": "10",
