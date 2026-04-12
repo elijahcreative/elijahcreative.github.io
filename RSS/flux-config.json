@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "settings": {
+    "theme": "auto",
+    "preset": "default",
+    "customAccent": null,
+    "fontSize": 15,
+    "ytPerChannel": 3,
+    "ytMaxChannels": 6
+  },
+  "feeds": [
+    {
+      "url": "https://index.hu/24ora/rss?&rovatkeres=osszes",
+      "name": "Index",
+      "color": "#3b82f6"
+    },
+    {
+      "url": "https://telex.hu/rss",
+      "name": "Telex",
+      "color": "#ef4444"
+    },
+    {
+      "url": "https://444.hu/feed",
+      "name": "444",
+      "color": "#3b82f6"
+    },
+    {
+      "url": "https://hvg.hu/rss",
+      "name": "HVG",
+      "color": "#22c55e"
+    },
+    {
+      "url": "https://www.portfolio.hu/rss/all.xml",
+      "name": "Portfolio",
+      "color": "#14b8a6"
+    }
+  ],
+  "ytChannels": [
+    {
+      "id": "UCBJycsmduvYEL83R_U4JriQ",
+      "name": "Marques Brownlee",
+      "idType": "id"
+    },
+    {
+      "id": "UCiQMYozSSTkJ2twtZM1bG9w",
+      "name": "zollotech",
+      "idType": "id"
+    },
+    {
+      "id": "UCLGOiIudM7bGHXM652Pat7w",
+      "name": "Trent The Traveler",
+      "idType": "id"
+    },
+    {
+      "id": "UCAA4EV4denSMDNMvUxDV82A",
+      "name": "Tech2.hu",
+      "idType": "id"
+    },
+    {
+      "id": "UChpleBmo18P08aKCIgti38g",
+      "name": "Matt Wolfe",
+      "idType": "id"
+    },
+    {
+      "id": "UCJquYOG5EL82sKTfH9aMA9Q",
+      "name": "Rick Beato",
+      "idType": "id"
+    }
+  ]
+}
