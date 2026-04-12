@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -:*)",
+      "Bash(python3 -c \":*)",
+      "WebSearch",
+      "WebFetch(domain:index.hu)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(node -e \":*)",
+      "Bash(grep -n \"''use strict''\" index.html)",
+      "WebFetch(domain:cdn.jsdelivr.net)",
+      "WebFetch(domain:api.jsdelivr.net)",
+      "WebFetch(domain:unpkg.com)",
+      "WebFetch(domain:app.unpkg.com)",
+      "WebFetch(domain:api.jolpi.ca)",
+      "WebFetch(domain:www.formula1.com)"
+    ]
+  }
+}
