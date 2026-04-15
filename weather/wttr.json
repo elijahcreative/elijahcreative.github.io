@@ -1,18 +1,18 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "11",
-      "FeelsLikeF": "52",
+      "FeelsLikeC": "14",
+      "FeelsLikeF": "57",
       "cloudcover": "0",
-      "humidity": "82",
-      "localObsDateTime": "2026-04-15 07:22 AM",
-      "observation_time": "05:22 AM",
+      "humidity": "72",
+      "localObsDateTime": "2026-04-15 08:58 AM",
+      "observation_time": "06:58 AM",
       "precipInches": "0.0",
       "precipMM": "0.0",
-      "pressure": "1020",
+      "pressure": "1021",
       "pressureInches": "30",
-      "temp_C": "11",
-      "temp_F": "52",
+      "temp_C": "13",
+      "temp_F": "56",
       "uvIndex": "0",
       "visibility": "10",
       "visibilityMiles": "6",
@@ -27,8 +27,8 @@
           "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0002_sunny_intervals.png"
         }
       ],
-      "winddir16Point": "ENE",
-      "winddirDegree": "69",
+      "winddir16Point": "E",
+      "winddirDegree": "90",
       "windspeedKmph": "4",
       "windspeedMiles": "2"
     }
@@ -37,7 +37,7 @@
     {
       "areaName": [
         {
-          "value": "Budapest"
+          "value": "Buda"
         }
       ],
       "country": [
@@ -46,8 +46,8 @@
         }
       ],
       "latitude": "47.500",
-      "longitude": "19.083",
-      "population": "1741041",
+      "longitude": "19.033",
+      "population": "0",
       "region": [
         {
           "value": "Budapest"
@@ -55,7 +55,7 @@
       ],
       "weatherUrl": [
         {
-          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.5,19.083"
+          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.5,19.033"
         }
       ]
     }
