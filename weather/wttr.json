@@ -1,43 +1,43 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "20",
-      "FeelsLikeF": "68",
+      "FeelsLikeC": "19",
+      "FeelsLikeF": "67",
       "cloudcover": "0",
       "humidity": "26",
-      "localObsDateTime": "2026-04-18 06:38 PM",
-      "observation_time": "04:38 PM",
+      "localObsDateTime": "2026-04-18 08:17 PM",
+      "observation_time": "06:17 PM",
       "precipInches": "0.0",
       "precipMM": "0.0",
       "pressure": "1017",
       "pressureInches": "30",
-      "temp_C": "20",
-      "temp_F": "68",
+      "temp_C": "19",
+      "temp_F": "67",
       "uvIndex": "0",
       "visibility": "10",
       "visibilityMiles": "6",
       "weatherCode": "113",
       "weatherDesc": [
         {
-          "value": "Sunny"
+          "value": "Clear"
         }
       ],
       "weatherIconUrl": [
         {
-          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0001_sunny.png"
+          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0008_clear_sky_night.png"
         }
       ],
-      "winddir16Point": "NW",
-      "winddirDegree": "321",
+      "winddir16Point": "NNW",
+      "winddirDegree": "345",
       "windspeedKmph": "4",
-      "windspeedMiles": "3"
+      "windspeedMiles": "2"
     }
   ],
   "nearest_area": [
     {
       "areaName": [
         {
-          "value": "Gellert"
+          "value": "Buda"
         }
       ],
       "country": [
@@ -45,8 +45,8 @@
           "value": "Hungary"
         }
       ],
-      "latitude": "47.483",
-      "longitude": "19.050",
+      "latitude": "47.500",
+      "longitude": "19.033",
       "population": "0",
       "region": [
         {
@@ -55,7 +55,7 @@
       ],
       "weatherUrl": [
         {
-          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.483,19.05"
+          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.5,19.033"
         }
       ]
     }
@@ -409,9 +409,9 @@
           "chanceofsunshine": "86",
           "chanceofthunder": "0",
           "chanceofwindy": "0",
-          "cloudcover": "0",
+          "cloudcover": "18",
           "diffRad": "89.8",
-          "humidity": "26",
+          "humidity": "31",
           "precipInches": "0.0",
           "precipMM": "0.0",
           "pressure": "1017",
