@@ -1,1 +1,1257 @@
 
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clio — Kórházi megfelelőség-felügyelet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,200;1,9..144,300&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Brand colours — consistent throughout */
+  --c-emerald:      #0C4E3C;
+  --c-emerald-mid:  #177A5E;
+  --c-emerald-lit:  #1FA375;
+  --c-emerald-pale: #E6F4EE;
+  --c-emerald-faint:#F1FAF6;
+  --c-gold:         #C8901E;
+  --c-gold-pale:    #FDF5E6;
+  --c-gold-lit:     #F5C97A;
+  /* Neutrals */
+  --c-ink:          #111211;
+  --c-ink-2:        #2C2E2D;
+  --c-ink-3:        #545755;
+  --c-ink-4:        #9EA09F;
+  --c-rule:         #E3E6E4;
+  --c-bg:           #F9FAF9;
+  --c-white:        #FFFFFF;
+  /* Fonts */
+  --f-display: 'Fraunces', Georgia, serif;   /* titles only */
+  --f-body:    'Figtree', system-ui, sans-serif; /* everything else */
+  /* Shadows — soft, emerald-tinted */
+  --s-sm: 0 2px 10px rgba(12,78,60,.07), 0 1px 3px rgba(0,0,0,.05);
+  --s-md: 0 8px 32px rgba(12,78,60,.10), 0 2px 8px rgba(0,0,0,.06);
+  --s-lg: 0 20px 60px rgba(12,78,60,.14), 0 4px 20px rgba(0,0,0,.07);
+  /* Radii */
+  --r:    14px;
+  --r-lg: 20px;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--f-body);
+  font-weight: 400;
+  font-size: 16px;
+  background: var(--c-bg);
+  color: var(--c-ink);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ─────────────────────────────────────────────
+   DISPLAY TYPE SYSTEM
+   .dt-title  → Fraunces 900, ultra-black
+   .dt-italic → Fraunces 200–300 italic, hair-thin
+   Everything else → Figtree
+───────────────────────────────────────────── */
+.dt-title {
+  font-family: var(--f-display);
+  font-weight: 900;
+  font-optical-sizing: auto;
+  line-height: 1.0;
+  letter-spacing: -0.03em;
+}
+.dt-title em {
+  font-weight: 200;
+  font-style: italic;
+  letter-spacing: -0.01em;
+  font-optical-sizing: auto;
+}
+
+/* ── Clio logo block ── */
+.hero-logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 2.5rem;
+}
+.hero-logo-name {
+  font-family: var(--f-display);
+  font-weight: 900;
+  font-optical-sizing: auto;
+  font-size: 1.8rem;
+  color: white;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin-bottom: 3px;
+}
+.hero-logo-sub {
+  font-family: var(--f-body);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.38);
+}
+
+/* ── Badge inside mockup bar ── */
+.m-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--c-gold);
+  color: white;
+  font-family: var(--f-body);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-left: 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Section label above every heading */
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--f-body);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-emerald-mid);
+  margin-bottom: 18px;
+}
+.label::before {
+  content: '';
+  display: block;
+  width: 22px; height: 2px;
+  background: var(--c-gold);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* Section heading + lead — used in multiple sections */
+.s-title {
+  font-size: clamp(2.2rem, 3.8vw, 3.1rem);
+  color: var(--c-ink);
+  margin-bottom: 1.1rem;
+}
+.s-lead {
+  font-family: var(--f-body);
+  font-size: 1.05rem;
+  font-weight: 300;
+  color: var(--c-ink-3);
+  line-height: 1.8;
+  max-width: 560px;
+  margin-bottom: 3rem;
+}
+
+/* ─────────────────────────────────────────────
+   ICONS — large, currentColor, no fill/no bg
+───────────────────────────────────────────── */
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--c-emerald-mid);
+  margin-bottom: 1.25rem;
+  flex-shrink: 0;
+}
+.icon svg { width: 40px; height: 40px; }
+
+.icon-sm {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--c-emerald-mid);
+  flex-shrink: 0;
+}
+.icon-sm svg { width: 36px; height: 36px; }
+
+/* ─────────────────────────────────────────────
+   HERO
+───────────────────────────────────────────── */
+.hero {
+  min-height: 100vh;
+  background: var(--c-emerald);
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* Layered atmosphere — deep gradient + gold orb + grid */
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 55% 70% at 82% 35%, rgba(200,144,30,.16) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 90% at 10% 110%, rgba(0,0,0,.4) 0%, transparent 55%),
+    linear-gradient(145deg, #061d15 0%, #0C4E3C 42%, #177A5E 70%, #092e22 100%);
+  z-index: 0;
+}
+.hero::after {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px);
+  background-size: 48px 48px;
+  z-index: 0;
+}
+/* Gold glow orb */
+.hero-orb {
+  position: absolute;
+  width: 580px; height: 580px;
+  top: -120px; right: 2%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(200,144,30,.15) 0%, transparent 68%);
+  filter: blur(60px);
+  pointer-events: none;
+  z-index: 0;
+}
+.hero-orb-2 {
+  position: absolute;
+  width: 340px; height: 340px;
+  bottom: 5%; left: 8%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(31,163,117,.22) 0%, transparent 68%);
+  filter: blur(70px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hero-inner {
+  position: relative; z-index: 2;
+  max-width: 1120px; margin: 0 auto;
+  padding: 5.5rem 2rem 4.5rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4.5rem;
+  align-items: center;
+  width: 100%;
+}
+
+/* Hero headline */
+.hero-headline {
+  font-size: clamp(3rem, 5.5vw, 5rem);
+  color: var(--c-white);
+  margin-bottom: 1.75rem;
+  line-height: 1.0;
+}
+.hero-headline .gold-thin {
+  font-weight: 200;
+  font-style: italic;
+  color: var(--c-gold-lit);
+}
+
+/* Hero desc */
+.hero-desc {
+  font-family: var(--f-body);
+  font-size: 1.1rem;
+  font-weight: 300;
+  color: rgba(255,255,255,.6);
+  line-height: 1.8;
+  margin-bottom: 2.75rem;
+  max-width: 460px;
+}
+
+/* Hero stat strip */
+.hero-stats {
+  display: flex;
+  gap: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255,255,255,.1);
+}
+.hs-val {
+  font-family: var(--f-display);
+  font-weight: 900;
+  font-size: 2.2rem;
+  color: var(--c-gold-lit);
+  line-height: 1;
+  margin-bottom: 4px;
+  letter-spacing: -0.03em;
+  font-optical-sizing: auto;
+}
+.hs-lbl {
+  font-family: var(--f-body);
+  font-size: 13px;
+  font-weight: 300;
+  color: rgba(255,255,255,.38);
+  line-height: 1.4;
+}
+
+/* ─── Hero mockup card ─── */
+.hero-mockup {
+  position: relative;
+  animation: rise .9s ease-out .15s both;
+}
+@keyframes rise { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:none} }
+
+.mockup {
+  background: rgba(255,255,255,.055);
+  border: 1px solid rgba(255,255,255,.11);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 32px 80px rgba(0,0,0,.36), inset 0 1px 0 rgba(255,255,255,.08);
+}
+.m-bar {
+  background: rgba(0,0,0,.22);
+  padding: 12px 18px;
+  display: flex; align-items: center; gap: 7px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+.m-dot { width: 9px; height: 9px; border-radius: 50%; }
+.m-label {
+  font-family: var(--f-body);
+  font-size: 12px; font-weight: 300;
+  color: rgba(255,255,255,.3);
+  margin-left: auto;
+}
+.m-body { padding: 1.25rem; }
+.m-hlabel {
+  font-family: var(--f-body);
+  font-size: 10px; font-weight: 600;
+  color: rgba(255,255,255,.3);
+  text-transform: uppercase; letter-spacing: .1em;
+  margin-bottom: 12px;
+}
+.m-row {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  display: flex; gap: 10px; align-items: flex-start;
+  transition: background .2s;
+}
+.m-row:hover { background: rgba(255,255,255,.09); }
+.m-sev { width: 3px; border-radius: 3px; align-self: stretch; min-height: 28px; flex-shrink: 0; }
+.sr{background:#f87171} .sa{background:#fbbf24} .sg{background:#34d399}
+.m-name { font-family: var(--f-body); font-size: 13px; font-weight: 500; color: rgba(255,255,255,.84); margin-bottom: 3px; line-height: 1.3; }
+.m-sub  { font-family: var(--f-body); font-size: 11px; font-weight: 300; color: rgba(255,255,255,.35); }
+.m-days { font-family: var(--f-body); font-size: 11px; font-weight: 600; margin-left: auto; white-space: nowrap; padding-top: 2px; }
+.dr{color:#f87171} .da{color:#fbbf24} .dg{color:#34d399}
+.m-foot {
+  border-top: 1px solid rgba(255,255,255,.07);
+  padding: 10px 0 0;
+  display: flex; justify-content: space-between;
+  font-family: var(--f-body);
+  font-size: 11px; font-weight: 300;
+  color: rgba(255,255,255,.24);
+}
+
+/* ─────────────────────────────────────────────
+   SHARED LAYOUT
+───────────────────────────────────────────── */
+.container { max-width: 1120px; margin: 0 auto; padding: 0 2rem; }
+.section { padding: 7rem 2rem; }
+
+/* ─────────────────────────────────────────────
+   PAIN SECTION
+───────────────────────────────────────────── */
+.pain-section {
+  padding: 7rem 2rem;
+  background: linear-gradient(180deg, #F9FAF9 0%, #EFF7F3 100%);
+}
+.pain-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 3.5rem;
+}
+.pain-card {
+  background: var(--c-white);
+  border: 1px solid var(--c-rule);
+  border-radius: var(--r);
+  padding: 2rem 1.75rem;
+  box-shadow: var(--s-sm);
+  position: relative;
+  overflow: hidden;
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.pain-card::after {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--c-emerald-lit), var(--c-gold));
+  opacity: 0;
+  transition: opacity .25s;
+}
+.pain-card:hover { transform: translateY(-5px); box-shadow: var(--s-md); }
+.pain-card:hover::after { opacity: 1; }
+.pain-card.alert {
+  background: linear-gradient(145deg, #FDF8EE, #FBF2DA);
+  border-color: rgba(200,144,30,.25);
+}
+.pain-card.alert::after { opacity: 1; background: linear-gradient(90deg, var(--c-gold), #e0a028); }
+.pain-title {
+  font-family: var(--f-body);
+  font-size: 16px; font-weight: 600;
+  color: var(--c-ink);
+  margin-bottom: 10px;
+}
+.pain-desc {
+  font-family: var(--f-body);
+  font-size: 15px; font-weight: 300;
+  color: var(--c-ink-3);
+  line-height: 1.7;
+}
+
+/* ─────────────────────────────────────────────
+   HOW IT WORKS
+───────────────────────────────────────────── */
+.how-section { background: var(--c-white); padding: 7rem 2rem; }
+.how-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: start;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+.steps { display: flex; flex-direction: column; }
+.step {
+  display: grid;
+  grid-template-columns: 54px 1fr;
+  gap: 1.5rem;
+  padding: 1.75rem 0;
+  border-bottom: 1px solid var(--c-rule);
+  opacity: 0;
+  transform: translateX(-18px);
+  transition: opacity .5s ease, transform .5s ease;
+}
+.step.visible { opacity: 1; transform: none; }
+.step:last-child { border-bottom: none; }
+.step-num {
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  border: 1.5px solid var(--c-emerald-pale);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--f-display);
+  font-weight: 900;
+  font-optical-sizing: auto;
+  font-size: 1.25rem;
+  color: var(--c-emerald-mid);
+  flex-shrink: 0;
+}
+.step-title {
+  font-family: var(--f-body);
+  font-size: 17px; font-weight: 600;
+  color: var(--c-ink);
+  margin-bottom: 6px;
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+}
+.step-desc {
+  font-family: var(--f-body);
+  font-size: 15px; font-weight: 300;
+  color: var(--c-ink-3);
+  line-height: 1.75;
+}
+.badge {
+  font-family: var(--f-body);
+  font-size: 11px; font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 10px;
+  letter-spacing: .03em;
+}
+.b-auto { background: var(--c-emerald-pale); color: var(--c-emerald); }
+.b-ai   { background: #EEF2FF; color: #4338CA; }
+.b-fast { background: var(--c-gold-pale); color: var(--c-gold); }
+
+/* How-section dashboard mockup */
+.how-mockup { position: sticky; top: 2rem; opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
+.how-mockup.visible { opacity: 1; transform: none; }
+
+.dash {
+  background: var(--c-white);
+  border: 1px solid var(--c-rule);
+  border-radius: var(--r-lg);
+  box-shadow: var(--s-lg);
+  overflow: hidden;
+}
+.dash-bar {
+  background: var(--c-emerald);
+  padding: 14px 20px;
+  display: flex; align-items: center; gap: 8px;
+}
+.db-dot { width: 9px; height: 9px; border-radius: 50%; }
+.db-lbl { font-family: var(--f-body); font-size: 12px; font-weight: 300; color: rgba(255,255,255,.38); margin-left: auto; }
+.dash-body { padding: 1.5rem; }
+.dash-slbl { font-family: var(--f-body); font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--c-ink-4); margin-bottom: 12px; }
+.dash-row {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 11px 13px;
+  border-radius: 10px;
+  margin-bottom: 7px;
+  border: 1px solid var(--c-rule);
+  background: var(--c-bg);
+  transition: background .15s, border-color .15s;
+}
+.dash-row:hover { background: var(--c-emerald-faint); border-color: rgba(12,78,60,.14); }
+.dr-sev { width: 3px; border-radius: 3px; align-self: stretch; min-height: 28px; flex-shrink: 0; }
+.rs-r{background:#EF4444} .rs-a{background:var(--c-gold)} .rs-g{background:var(--c-emerald-lit)}
+.dr-name { font-family: var(--f-body); font-size: 13px; font-weight: 500; color: var(--c-ink); margin-bottom: 2px; }
+.dr-sub  { font-family: var(--f-body); font-size: 12px; font-weight: 300; color: var(--c-ink-4); }
+.dr-days { font-family: var(--f-body); font-size: 12px; font-weight: 600; margin-left: auto; white-space: nowrap; padding-top: 2px; }
+.days-r{color:#EF4444} .days-a{color:var(--c-gold)} .days-g{color:var(--c-emerald)}
+.dash-div { height: 1px; background: var(--c-rule); margin: 1.25rem 0; }
+.dash-metrics { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.dash-metric { background: var(--c-emerald-faint); border-radius: 10px; padding: 12px 14px; text-align: center; }
+.dm-val { font-family: var(--f-display); font-weight: 900; font-optical-sizing: auto; font-size: 22px; color: var(--c-emerald); line-height: 1; margin-bottom: 3px; letter-spacing: -0.03em; }
+.dm-lbl { font-family: var(--f-body); font-size: 11px; font-weight: 300; color: var(--c-ink-4); }
+
+/* ─────────────────────────────────────────────
+   SOURCES SECTION — dark bg
+───────────────────────────────────────────── */
+.sources-section {
+  background: linear-gradient(160deg, var(--c-emerald) 0%, #071e13 100%);
+  padding: 7rem 2rem;
+  position: relative;
+  overflow: hidden;
+}
+.sources-section::before {
+  content: '';
+  position: absolute;
+  top: -30%; right: -15%;
+  width: 580px; height: 580px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(200,144,30,.1), transparent 68%);
+  pointer-events: none;
+}
+.sources-section .label   { color: var(--c-gold-lit); }
+.sources-section .label::before { background: var(--c-gold-lit); }
+.sources-section .s-title { color: white; }
+.sources-section .s-lead  { color: rgba(255,255,255,.52); }
+
+.sources-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+.source-card {
+  background: rgba(255,255,255,.055);
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: var(--r);
+  padding: 1.75rem;
+  transition: background .2s, border-color .2s;
+}
+.source-card:hover { background: rgba(255,255,255,.09); border-color: rgba(200,144,30,.32); }
+.source-card .icon-sm { color: rgba(240,201,122,.75); margin-bottom: 14px; }
+.src-name { font-family: var(--f-body); font-size: 17px; font-weight: 600; color: white; margin-bottom: 5px; }
+.src-desc { font-family: var(--f-body); font-size: 14px; font-weight: 300; color: rgba(255,255,255,.48); line-height: 1.65; margin-bottom: 12px; }
+.src-freq { display: inline-flex; align-items: center; gap: 6px; font-family: var(--f-body); font-size: 12px; font-weight: 500; padding: 4px 12px; border-radius: 20px; }
+.sf-hi  { background: rgba(239,68,68,.18); color: #fca5a5; }
+.sf-mid { background: rgba(251,191,36,.18); color: #fde68a; }
+.sf-lo  { background: rgba(52,211,153,.18); color: #6ee7b7; }
+
+/* ─────────────────────────────────────────────
+   SHOWCASE SECTIONS
+───────────────────────────────────────────── */
+.showcase { padding: 7rem 2rem; }
+.sc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.35fr;
+  gap: 5rem;
+  align-items: center;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+.sc-grid.rev { grid-template-columns: 1.35fr 1fr; }
+.sc-grid.rev .sc-txt  { order: 2; }
+.sc-grid.rev .sc-vis  { order: 1; }
+.sc-txt .s-title { font-size: clamp(1.85rem, 2.8vw, 2.6rem); }
+.sc-txt .s-lead  { margin-bottom: 1.75rem; }
+.feat-list { list-style: none; display: flex; flex-direction: column; gap: 11px; }
+.feat-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  font-family: var(--f-body);
+  font-size: 15px; font-weight: 300;
+  color: var(--c-ink-3);
+  line-height: 1.6;
+}
+.fi-check {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--c-emerald-pale);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* — Briefing card — */
+.briefing {
+  background: var(--c-white);
+  border: 1px solid var(--c-rule);
+  border-radius: var(--r-lg);
+  box-shadow: var(--s-lg);
+  overflow: hidden;
+}
+.bf-head {
+  background: linear-gradient(135deg, var(--c-emerald) 0%, #1a6b52 100%);
+  padding: 18px 22px;
+  display: flex; align-items: center; gap: 12px;
+}
+.bf-htxt { font-family: var(--f-body); font-size: 14px; font-weight: 600; color: white; }
+.bf-hsub { font-family: var(--f-body); font-size: 12px; font-weight: 300; color: rgba(255,255,255,.5); }
+.bf-body { padding: 1.75rem; }
+.bf-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--f-body); font-size: 12px; font-weight: 600;
+  padding: 4px 12px; border-radius: 20px; margin-bottom: 12px;
+}
+.bf-badge-r { background: #fef2f2; color: #dc2626; border: 1px solid rgba(220,38,38,.18); }
+.bf-title  { font-family: var(--f-body); font-size: 16px; font-weight: 600; color: var(--c-ink); margin-bottom: 5px; }
+.bf-source { font-family: var(--f-body); font-size: 12px; font-weight: 300; color: var(--c-ink-4); margin-bottom: 14px; }
+.bf-block  { padding: 12px 16px; border-radius: 10px; margin-bottom: 10px; border-left: 3px solid transparent; }
+.bfb-r { background: #fef9f9; border-left-color: #EF4444; }
+.bfb-g { background: var(--c-emerald-faint); border-left-color: var(--c-emerald-lit); }
+.bf-blbl { font-family: var(--f-body); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 5px; }
+.bfb-r .bf-blbl { color: #dc2626; }
+.bfb-g .bf-blbl { color: var(--c-emerald); }
+.bf-btxt { font-family: var(--f-body); font-size: 13px; font-weight: 300; color: var(--c-ink-3); line-height: 1.65; }
+.bf-tasks { list-style: none; margin-top: 14px; display: flex; flex-direction: column; gap: 7px; }
+.bf-task {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--f-body); font-size: 13px; font-weight: 400; color: var(--c-ink-2);
+  padding: 9px 13px;
+  background: var(--c-bg); border-radius: 8px; border: 1px solid var(--c-rule);
+}
+.bf-chk { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--c-emerald-lit); flex-shrink: 0; }
+.bf-dl  { margin-left: auto; font-size: 12px; font-weight: 600; color: var(--c-gold); white-space: nowrap; }
+
+/* — Audit card — */
+.audit {
+  background: var(--c-white);
+  border: 1px solid var(--c-rule);
+  border-radius: var(--r-lg);
+  box-shadow: var(--s-lg);
+  overflow: hidden;
+}
+.au-head {
+  background: var(--c-bg);
+  border-bottom: 1px solid var(--c-rule);
+  padding: 16px 22px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.au-htitle { font-family: var(--f-body); font-size: 14px; font-weight: 600; color: var(--c-ink); }
+.au-export {
+  font-family: var(--f-body); font-size: 12px; font-weight: 600;
+  padding: 6px 14px;
+  background: var(--c-emerald); color: white;
+  border-radius: 8px;
+  display: flex; align-items: center; gap: 6px;
+}
+.au-body { padding: 1.25rem; }
+.au-row {
+  display: grid;
+  grid-template-columns: 26px 1fr auto;
+  gap: 12px; align-items: start;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--c-rule);
+}
+.au-row:last-child { border-bottom: none; }
+.au-dot { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+.ad-new    { background: #fef2f2; }
+.ad-done   { background: var(--c-emerald-pale); }
+.ad-active { background: var(--c-gold-pale); }
+.au-ename { font-family: var(--f-body); font-size: 13px; font-weight: 500; color: var(--c-ink); margin-bottom: 3px; }
+.au-esub  { font-family: var(--f-body); font-size: 12px; font-weight: 300; color: var(--c-ink-4); }
+.au-time  { font-family: var(--f-body); font-size: 11px; font-weight: 300; color: var(--c-ink-4); white-space: nowrap; text-align: right; }
+.au-st    { font-family: var(--f-body); font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 8px; }
+.as-done   { background: var(--c-emerald-pale); color: var(--c-emerald); }
+.as-active { background: var(--c-gold-pale); color: var(--c-gold); }
+.as-new    { background: #fef2f2; color: #dc2626; }
+
+/* — Chat card — */
+.chat {
+  background: var(--c-white);
+  border: 1px solid var(--c-rule);
+  border-radius: var(--r-lg);
+  box-shadow: var(--s-lg);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.chat-head { background: linear-gradient(135deg, var(--c-emerald), #1a6b52); padding: 16px 22px; display: flex; align-items: center; gap: 12px; }
+.chat-av { width: 34px; height: 34px; border-radius: 50%; background: rgba(200,144,30,.25); display: flex; align-items: center; justify-content: center; }
+.chat-htitle { font-family: var(--f-body); font-size: 14px; font-weight: 600; color: white; }
+.chat-hsub   { font-family: var(--f-body); font-size: 12px; font-weight: 300; color: rgba(255,255,255,.5); }
+.chat-body { padding: 1.5rem; flex: 1; display: flex; flex-direction: column; gap: 14px; }
+.bubble {
+  max-width: 86%;
+  padding: 12px 16px;
+  border-radius: 16px;
+  font-family: var(--f-body);
+  font-size: 14px; font-weight: 300;
+  line-height: 1.65;
+}
+.b-user { align-self: flex-end; background: var(--c-emerald); color: rgba(255,255,255,.88); border-bottom-right-radius: 4px; }
+.b-ai   { align-self: flex-start; background: var(--c-bg); border: 1px solid var(--c-rule); color: var(--c-ink-2); border-bottom-left-radius: 4px; }
+.b-cite {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--f-body); font-size: 11px; font-weight: 500;
+  color: var(--c-emerald); background: var(--c-emerald-pale);
+  padding: 3px 9px; border-radius: 8px; margin-top: 7px;
+}
+.chat-input { padding: 12px 16px; border-top: 1px solid var(--c-rule); display: flex; align-items: center; gap: 10px; background: var(--c-bg); }
+.chat-field { flex: 1; font-family: var(--f-body); font-size: 14px; font-weight: 300; color: var(--c-ink-4); }
+
+/* ─────────────────────────────────────────────
+   EVIDENCE
+───────────────────────────────────────────── */
+.evidence-section {
+  padding: 7rem 2rem;
+  background: linear-gradient(160deg, #EBF5EF 0%, #E4F4EC 100%);
+  border-top: 1px solid rgba(12,78,60,.07);
+  border-bottom: 1px solid rgba(12,78,60,.07);
+}
+.ev-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; max-width: 1120px; margin: 3.5rem auto 0; }
+.ev-card {
+  background: var(--c-white);
+  border: 1px solid rgba(12,78,60,.1);
+  border-radius: var(--r);
+  padding: 2.25rem;
+  box-shadow: var(--s-sm);
+  position: relative;
+  overflow: hidden;
+}
+.ev-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--c-emerald-lit), var(--c-gold)); }
+.ev-val { font-family: var(--f-display); font-weight: 900; font-optical-sizing: auto; font-size: 3.2rem; color: var(--c-emerald); line-height: 1; margin-bottom: 8px; letter-spacing: -0.04em; }
+.ev-val span { font-size: 1.5rem; color: var(--c-gold); }
+.ev-title { font-family: var(--f-body); font-size: 16px; font-weight: 600; color: var(--c-ink); margin-bottom: 8px; }
+.ev-desc  { font-family: var(--f-body); font-size: 15px; font-weight: 300; color: var(--c-ink-3); line-height: 1.7; }
+
+/* ─────────────────────────────────────────────
+   BENEFITS
+───────────────────────────────────────────── */
+.benefits-section { background: var(--c-white); padding: 7rem 2rem; }
+.ben-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.75rem; max-width: 1120px; margin: 3.5rem auto 0; }
+.ben-card {
+  display: flex; gap: 1.5rem; align-items: flex-start;
+  padding: 2rem;
+  border: 1px solid var(--c-rule);
+  border-radius: var(--r);
+  background: var(--c-bg);
+  box-shadow: var(--s-sm);
+  transition: box-shadow .25s, transform .25s;
+}
+.ben-card:hover { box-shadow: var(--s-md); transform: translateY(-3px); }
+.ben-title { font-family: var(--f-body); font-size: 17px; font-weight: 600; color: var(--c-ink); margin-bottom: 6px; }
+.ben-desc  { font-family: var(--f-body); font-size: 15px; font-weight: 300; color: var(--c-ink-3); line-height: 1.7; }
+
+/* ─────────────────────────────────────────────
+   FOOTER
+───────────────────────────────────────────── */
+.footer {
+  background: linear-gradient(135deg, var(--c-emerald) 0%, #071e13 100%);
+  padding: 3.5rem 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.footer::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 100% at 50% 110%, rgba(200,144,30,.08), transparent);
+  pointer-events: none;
+}
+.footer-name {
+  font-family: var(--f-display);
+  font-weight: 900;
+  font-optical-sizing: auto;
+  font-size: 2.4rem;
+  color: white;
+  letter-spacing: -0.03em;
+  margin-bottom: 6px;
+  position: relative;
+}
+.footer-tagline { font-family: var(--f-body); font-size: 14px; font-weight: 300; color: rgba(255,255,255,.35); position: relative; }
+
+/* ─────────────────────────────────────────────
+   ANIMATIONS
+───────────────────────────────────────────── */
+.fade-up {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity .65s ease, transform .65s ease;
+}
+.fade-up.visible { opacity: 1; transform: none; }
+.d1{transition-delay:.1s} .d2{transition-delay:.2s} .d3{transition-delay:.3s}
+
+/* ─────────────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────────────── */
+@media(max-width:960px){
+  .hero-inner     { grid-template-columns: 1fr; gap: 2.5rem; }
+  .how-grid       { grid-template-columns: 1fr; }
+  .how-mockup     { position: static; }
+  .pain-grid      { grid-template-columns: 1fr 1fr; }
+  .sources-grid   { grid-template-columns: 1fr 1fr; }
+  .sc-grid,
+  .sc-grid.rev    { grid-template-columns: 1fr; }
+  .sc-grid.rev .sc-txt { order: 1; }
+  .sc-grid.rev .sc-vis { order: 2; }
+  .ev-grid        { grid-template-columns: 1fr; }
+  .ben-grid       { grid-template-columns: 1fr; }
+}
+@media(max-width:600px){
+  .pain-grid    { grid-template-columns: 1fr; }
+  .sources-grid { grid-template-columns: 1fr; }
+  .hero-stats   { flex-wrap: wrap; gap: 1.5rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     HERO
+═══════════════════════════════════════ -->
+<header class="hero">
+  <div class="hero-orb"></div>
+  <div class="hero-orb-2"></div>
+  <div class="hero-inner">
+
+    <!-- LEFT: text -->
+    <div>
+      <!-- Clio logo -->
+      <div class="hero-logo">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- C shape: open circle arc -->
+          <path d="M30 9.5A15 15 0 1 0 30 26.5" stroke="white" stroke-width="2.8" stroke-linecap="round" fill="none"/>
+          <!-- Small inner dot -->
+          <circle cx="18" cy="18" r="2.5" fill="var(--c-gold-lit)"/>
+        </svg>
+        <div>
+          <div class="hero-logo-name">Clio</div>
+          <div class="hero-logo-sub">Megfelelőségi asszisztens</div>
+        </div>
+      </div>
+
+      <h1 class="dt-title hero-headline">
+        Mindig tudja,<br>
+        mi változott.<br>
+        <em>Mielőtt bárki más.</em>
+      </h1>
+
+      <p class="hero-desc">
+        A Clio naponta átvizsgálja a NEAK, NAIH, Magyar Közlöny és más szabályozói forrásokat — és csak akkor értesíti Önt, ha a kórházát valóban érintő változás történt. Emberi nyelven, konkrét teendőkkel.
+      </p>
+
+      <div class="hero-stats">
+        <div><div class="hs-val">7+</div><div class="hs-lbl">szabályozói<br>forrás figyelve</div></div>
+        <div><div class="hs-val">Napi</div><div class="hs-lbl">automatikus<br>átvizsgálás</div></div>
+        <div><div class="hs-val">100%</div><div class="hs-lbl">automatizált<br>jogszabály-figyelés</div></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: mockup -->
+    <div class="hero-mockup">
+      <div class="mockup">
+        <div class="m-bar">
+          <div class="m-dot" style="background:#f87171"></div>
+          <div class="m-dot" style="background:#fbbf24"></div>
+          <div class="m-dot" style="background:#34d399"></div>
+          <div class="m-label">Clio · Napi összefoglaló</div>
+          <div class="m-badge">
+            <svg width="9" height="9" fill="none" viewBox="0 0 9 9"><circle cx="4.5" cy="4.5" r="3.5" stroke="white" stroke-width="1.1"/><path d="M3 4.5l1.2 1.2L6 3" stroke="white" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            3 új
+          </div>
+        </div>
+        <div class="m-body">
+          <div class="m-hlabel">Ma érkezett — 2025. január 9.</div>
+          <div class="m-row">
+            <div class="m-sev sr"></div>
+            <div style="flex:1"><div class="m-name">NAIH — Szülői beleegyezés elektronikus dokumentálása</div><div class="m-sub">3 teendő · naih.hu</div></div>
+            <div class="m-days dr">23 nap</div>
+          </div>
+          <div class="m-row">
+            <div class="m-sev sa"></div>
+            <div style="flex:1"><div class="m-name">NEAK — Gyógyászati segédeszköz törzs frissítve</div><div class="m-sub">2 teendő · neak.gov.hu</div></div>
+            <div class="m-days da">23 nap</div>
+          </div>
+          <div class="m-row">
+            <div class="m-sev sg"></div>
+            <div style="flex:1"><div class="m-name">Magyar Közlöny — Ügyeleti díj számítás módosítva</div><div class="m-sub">2 teendő · magyarkozlony.hu</div></div>
+            <div class="m-days dg">51 nap</div>
+          </div>
+          <div class="m-foot"><span>Forrás: AI összefoglaló</span><span>Összes 3 · Kritikus 1</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════
+     PAIN
+═══════════════════════════════════════ -->
+<section class="pain-section">
+  <div class="container">
+    <div class="fade-up">
+      <div class="label">A jelenlegi helyzet</div>
+      <h2 class="dt-title s-title">Ma így zajlik a<br><em>jogszabály-figyelés.</em></h2>
+      <p class="s-lead">Rengeteg idő megy el böngészésre, értelmezésre — és még így is csúszhat ki egy-egy határidő.</p>
+    </div>
+    <div class="pain-grid">
+      <div class="pain-card fade-up d1">
+        <div class="icon">
+          <svg fill="none" viewBox="0 0 40 40" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 32V12a2 2 0 012-2h20a2 2 0 012 2v20M4 32h32"/>
+            <path d="M16 22h8M16 27h5"/>
+            <rect x="16" y="8" width="8" height="4" rx="1"/>
+          </svg>
+        </div>
+        <div class="pain-title">Szétszórt forrásokban kell keresni</div>
+        <div class="pain-desc">NEAK, Magyar Közlöny, NAIH, NNK — mind más oldal, más struktúra, különböző frissítési ritmus. Nem elég egyet figyelni.</div>
+      </div>
+      <div class="pain-card fade-up d2">
+        <div class="icon">
+          <svg fill="none" viewBox="0 0 40 40" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="20" cy="20" r="14"/>
+            <path d="M20 11v9l5.5 3.5"/>
+            <path d="M8 8l3 3"/>
+          </svg>
+        </div>
+        <div class="pain-title">Utólag derül ki a változás</div>
+        <div class="pain-desc">A módosítások nem mindig egyértelmű bejelentéssel érkeznek. Hetek telhetnek el, mire valaki észreveszi.</div>
+      </div>
+      <div class="pain-card fade-up d3">
+        <div class="icon">
+          <svg fill="none" viewBox="0 0 40 40" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M34 10H6a2 2 0 00-2 2v4a2 2 0 002 2h28a2 2 0 002-2v-4a2 2 0 00-2-2z"/>
+            <path d="M4 18v10a2 2 0 002 2h28a2 2 0 002-2V18"/>
+            <path d="M16 24h8"/>
+          </svg>
+        </div>
+        <div class="pain-title">Jogi szövegek értelmezése</div>
+        <div class="pain-desc">Hosszú, technikai jogszabályszövegekből kell kiszűrni, hogy mi vonatkozik a kórházra — és mit kell tenni miatta.</div>
+      </div>
+      <div class="pain-card alert fade-up d1">
+        <div class="icon" style="color:var(--c-gold)">
+          <svg fill="none" viewBox="0 0 40 40" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 6L4.5 33h31L20 6z"/>
+            <path d="M20 18v7"/>
+            <circle cx="20" cy="29" r="1" fill="currentColor" stroke="none"/>
+          </svg>
+        </div>
+        <div class="pain-title">Egyetlen elmulasztott határidő</div>
+        <div class="pain-desc">Egy kihagyott GDPR-módosítás vagy NEAK-határidő bírságot, akkreditációs problémát és rengeteg utólagos munkát jelent.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     HOW IT WORKS
+═══════════════════════════════════════ -->
+<section class="how-section">
+  <div class="how-grid container">
+    <div>
+      <div class="label">Hogyan működik</div>
+      <h2 class="dt-title s-title">A Clio végzi<br>a figyelést.<br><em>Ön csak dönt.</em></h2>
+      <p class="s-lead">Hat automatikus lépés — a forrás-figyeléstől az ellenőrzési riportig.</p>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div><div class="step-title">Napi átvizsgálás <span class="badge b-auto">Automatikus</span></div><div class="step-desc">Minden reggel végigolvassa a NEAK, NAIH, Magyar Közlöny, NNK és EU forrásokat. Csak az előző naphoz képest valóban megváltozott tartalom kerül tovább.</div></div></div>
+        <div class="step"><div class="step-num">2</div><div><div class="step-title">Relevanciaszűrés <span class="badge b-ai">AI</span></div><div class="step-desc">Az AI eldönti: érinti-e a változás az Önök intézményét? Felesleges rendeletek, más szektorok szabályai kiszűrve — csak ami valóban számít.</div></div></div>
+        <div class="step"><div class="step-num">3</div><div><div class="step-title">Emberi nyelvű tájékoztató <span class="badge b-ai">AI</span></div><div class="step-desc">Mi változott? Miért érinti a kórházat? Konkrét teendők határidőkkel. Nem jogi zsargon — érthető, cselekvésre kész összefoglaló, forrásra hivatkozva.</div></div></div>
+        <div class="step"><div class="step-num">4</div><div><div class="step-title">Reggeli értesítő <span class="badge b-fast">E-mail + SMS</span></div><div class="step-desc">Napi összefoglaló e-mailben, sürgős esetben SMS is. Minden értesítés az áttekintőhöz kapcsolva — egy kattintás és kész az áttekintés.</div></div></div>
+        <div class="step"><div class="step-num">5</div><div><div class="step-title">Feladatkövetés</div><div class="step-desc">A teendőket az áttekintőn lehet státuszozni, felelőshöz rendelni, megjegyzéssel ellátni. Határidők automatikusan emlékeztetnek.</div></div></div>
+        <div class="step"><div class="step-num">6</div><div><div class="step-title">Ellenőrzési riport <span class="badge b-fast">Egy kattintás</span></div><div class="step-desc">Revizori vizit vagy akkreditáció esetén: PDF exportálás, amely időbélyeggel dokumentálja az értesítés, feladathozzárendelés és lezárás teljes folyamatát.</div></div></div>
+      </div>
+    </div>
+    <div class="how-mockup">
+      <div class="dash">
+        <div class="dash-bar">
+          <div class="db-dot" style="background:#f87171"></div>
+          <div class="db-dot" style="background:#fbbf24"></div>
+          <div class="db-dot" style="background:#34d399"></div>
+          <div class="db-lbl">Clio · Feladatáttekintő</div>
+        </div>
+        <div class="dash-body">
+          <div class="dash-slbl">Nyitott feladatok</div>
+          <div class="dash-row"><div class="dr-sev rs-r"></div><div style="flex:1"><div class="dr-name">NAIH — Szülői beleegyezés dokumentálása</div><div class="dr-sub">3 teendő · naih.hu</div></div><div><div class="dr-days days-r">23 nap</div><div class="dr-sub" style="text-align:right">Kritikus</div></div></div>
+          <div class="dash-row"><div class="dr-sev rs-a"></div><div style="flex:1"><div class="dr-name">NEAK — Gyógyászati segédeszköz lista</div><div class="dr-sub">2 teendő · neak.gov.hu</div></div><div><div class="dr-days days-a">23 nap</div><div class="dr-sub" style="text-align:right">Közepes</div></div></div>
+          <div class="dash-row"><div class="dr-sev rs-g"></div><div style="flex:1"><div class="dr-name">MK — Ügyeleti díj módosítás</div><div class="dr-sub">2 teendő · magyarkozlony.hu</div></div><div><div class="dr-days days-g">51 nap</div><div class="dr-sub" style="text-align:right">Alacsony</div></div></div>
+          <div class="dash-div"></div>
+          <div class="dash-slbl">Januári összesítő</div>
+          <div class="dash-metrics">
+            <div class="dash-metric"><div class="dm-val">12</div><div class="dm-lbl">Értesítés</div></div>
+            <div class="dash-metric"><div class="dm-val">9</div><div class="dm-lbl">Lezárva</div></div>
+            <div class="dash-metric"><div class="dm-val">3</div><div class="dm-lbl">Nyitott</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     SOURCES
+═══════════════════════════════════════ -->
+<section class="sources-section">
+  <div class="container">
+    <div class="fade-up">
+      <div class="label">Figyelt források</div>
+      <h2 class="dt-title s-title">Minden forrás,<br><em>egy helyen összegyűjtve.</em></h2>
+      <p class="s-lead">A Clio 7 kulcsforrást figyel folyamatosan — a legkritikusabbakat napi rendszerességgel.</p>
+    </div>
+    <div class="sources-grid">
+      <div class="source-card fade-up d1">
+        <div class="icon-sm" style="margin-bottom:14px">
+          <svg fill="none" viewBox="0 0 36 36" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M30 9H6a2 2 0 00-2 2v14a2 2 0 002 2h24a2 2 0 002-2V11a2 2 0 00-2-2z"/><path d="M4 15h28"/><path d="M12 22h4M20 22h4"/></svg>
+        </div>
+        <div class="src-name">NEAK / OEP</div>
+        <div class="src-desc">Finanszírozás, számlázás, kódrendszerek, gyógyászati segédeszköz lista, ártámogatások</div>
+        <span class="src-freq sf-hi">Havonta frissül</span>
+      </div>
+      <div class="source-card fade-up d2">
+        <div class="icon-sm" style="margin-bottom:14px">
+          <svg fill="none" viewBox="0 0 36 36" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 4a14 14 0 100 28A14 14 0 0018 4z"/><path d="M12 18h4a2 2 0 002-2v-4"/><path d="M22 22l-4-4"/></svg>
+        </div>
+        <div class="src-name">NAIH</div>
+        <div class="src-desc">GDPR iránymutatások, betegadatok kezelése, hozzájárulás dokumentálása, adatvédelem</div>
+        <span class="src-freq sf-mid">Negyedévente</span>
+      </div>
+      <div class="source-card fade-up d3">
+        <div class="icon-sm" style="margin-bottom:14px">
+          <svg fill="none" viewBox="0 0 36 36" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h18l6 6v22H6V4z"/><path d="M24 4v6h6"/><path d="M11 16h14M11 21h10M11 26h6"/></svg>
+        </div>
+        <div class="src-name">Magyar Közlöny</div>
+        <div class="src-desc">Egészségügyi és munkajogi jogszabályok, rendeletek, törvénymódosítások</div>
+        <span class="src-freq sf-hi">Folyamatosan</span>
+      </div>
+      <div class="source-card fade-up d1">
+        <div class="icon-sm" style="margin-bottom:14px">
+          <svg fill="none" viewBox="0 0 36 36" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6a12 12 0 100 24A12 12 0 0018 6z"/><path d="M18 12v6l4 2"/><path d="M6 6l3 3M27 6l3 3"/></svg>
+        </div>
+        <div class="src-name">NNK / ÁNTSZ</div>
+        <div class="src-desc">Fertőzéskontroll, járványügyi előírások, gyermek oltási rend, közegészségügyi szabályok</div>
+        <span class="src-freq sf-mid">Esemény alapján</span>
+      </div>
+      <div class="source-card fade-up d2">
+        <div class="icon-sm" style="margin-bottom:14px">
+          <svg fill="none" viewBox="0 0 36 36" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="28" height="20" rx="3"/><path d="M4 14h28"/><path d="M12 4v4M24 4v4"/><path d="M10 20h4M18 20h8"/></svg>
+        </div>
+        <div class="src-name">EUR-Lex</div>
+        <div class="src-desc">EU egészségügyi irányelvek, GDPR Article 9, európai szabványok és rendeletek</div>
+        <span class="src-freq sf-lo">Negyedévente</span>
+      </div>
+      <div class="source-card fade-up d3">
+        <div class="icon-sm" style="margin-bottom:14px">
+          <svg fill="none" viewBox="0 0 36 36" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 4L5 10v10c0 8 5.5 14 13 16 7.5-2 13-8 13-16V10L18 4z"/><path d="M13 18l4 4 6-6"/></svg>
+        </div>
+        <div class="src-name">njt.hu + Munkajog</div>
+        <div class="src-desc">Magyar törvények egységes szerkezete, ügyeleti szabályok, orvos-munkaidő előírások</div>
+        <span class="src-freq sf-hi">Folyamatosan</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     SHOWCASE 1 — Change Briefing
+═══════════════════════════════════════ -->
+<section class="showcase" style="background:var(--c-bg)">
+  <div class="sc-grid container">
+    <div class="sc-txt fade-up">
+      <div class="label">Változástájékoztató</div>
+      <h2 class="dt-title s-title">Nem jogszabályszöveg.<br><em>Cselekvési terv.</em></h2>
+      <p class="s-lead">Minden releváns változáshoz a Clio elkészíti az összefoglalót: mi változott, miért számít, mit kell tenni. Automatikusan, forrásra hivatkozva, határidőkkel.</p>
+      <ul class="feat-list">
+        <li class="feat-item"><span class="fi-check"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M2 5l2 2 4-4" stroke="var(--c-emerald)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>A változás emberi nyelven, a kórház szempontjából összefoglalva</li>
+        <li class="feat-item"><span class="fi-check"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M2 5l2 2 4-4" stroke="var(--c-emerald)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Konkrét teendők listája, egyenként határidőhöz rendelve</li>
+        <li class="feat-item"><span class="fi-check"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M2 5l2 2 4-4" stroke="var(--c-emerald)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Minden állítás az eredeti forrásra hivatkozik — ellenőrizhető</li>
+        <li class="feat-item"><span class="fi-check"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M2 5l2 2 4-4" stroke="var(--c-emerald)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Kockázati szint automatikusan meghatározva</li>
+      </ul>
+    </div>
+    <div class="sc-vis fade-up d2">
+      <div class="briefing">
+        <div class="bf-head">
+          <div><div class="bf-htxt">Változás tájékoztatója</div><div class="bf-hsub">2025. január 9. · naih.hu</div></div>
+          <span class="bf-badge bf-badge-r" style="margin-left:auto"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M5 2L1.5 8h7L5 2z" stroke="#dc2626" stroke-width="1.2" stroke-linejoin="round"/></svg>Kritikus</span>
+        </div>
+        <div class="bf-body">
+          <div class="bf-title">Szülői beleegyezés elektronikus dokumentálása — gyermekbetegek</div>
+          <div class="bf-source">Forrás: NAIH 2024/12-es iránymutatás · Hatályos: 2025. február 1.</div>
+          <div class="bf-block bfb-r"><div class="bf-blbl">Mi változott</div><div class="bf-btxt">2025. február 1-jétől a gyermekbetegek esetén a szülői beleegyezést elektronikusan, archivált és visszakereshető formában kell tárolni — papír alapú aláírás önmagában nem elegendő.</div></div>
+          <div class="bf-block bfb-g"><div class="bf-blbl">Miért érinti az intézményt</div><div class="bf-btxt">Gyermekkórházként az összes új felvételre vonatkozik. A jelenlegi papír alapú folyamat módosítást igényel. GDPR-bírság kockázat fennáll meg nem felelés esetén.</div></div>
+          <ul class="bf-tasks">
+            <li class="bf-task"><div class="bf-chk"></div>IT rendszer módosítás: digitális beleegyező nyilatkozat tárolása<span class="bf-dl">jan. 20.</span></li>
+            <li class="bf-task"><div class="bf-chk"></div>Személyzeti tájékoztató frissítése és kiküldése<span class="bf-dl">jan. 15.</span></li>
+            <li class="bf-task"><div class="bf-chk"></div>Belső audit: meglévő dokumentumok áttekintése<span class="bf-dl">jan. 31.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     SHOWCASE 2 — Audit Log
+═══════════════════════════════════════ -->
+<section class="showcase" style="background:var(--c-white)">
+  <div class="sc-grid rev container">
+    <div class="sc-vis fade-up d1">
+      <div class="audit">
+        <div class="au-head">
+          <div class="au-htitle">Audit napló — 2025. január</div>
+          <div class="au-export"><svg width="13" height="13" fill="none" viewBox="0 0 13 13"><path d="M6.5 2v7M4 6.5L6.5 9l2.5-2.5M2 11h9" stroke="white" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>PDF export</div>
+        </div>
+        <div class="au-body">
+          <div class="au-row"><div class="au-dot ad-new"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><circle cx="5" cy="5" r="3" stroke="#dc2626" stroke-width="1.2"/></svg></div><div><div class="au-ename">NAIH iránymutatás beérkezett</div><div class="au-esub">Automatikus értesítő kiküldve · 3 teendő generálva</div></div><div class="au-time">jan. 9. 07:12<br><span class="au-st as-new">Nyitott</span></div></div>
+          <div class="au-row"><div class="au-dot ad-active"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><circle cx="5" cy="5" r="3" stroke="var(--c-gold)" stroke-width="1.2"/></svg></div><div><div class="au-ename">NEAK segédeszköz lista — feldolgozva</div><div class="au-esub">Felelős: Kovács Ágnes · 1/2 teendő lezárva</div></div><div class="au-time">jan. 8. 09:45<br><span class="au-st as-active">Folyamatban</span></div></div>
+          <div class="au-row"><div class="au-dot ad-done"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M3 5l1.5 1.5L7 3.5" stroke="var(--c-emerald)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="au-ename">Munkaidő-nyilvántartás módosítás — lezárva</div><div class="au-esub">Bérszámfejtés értesítve · Dokumentálva</div></div><div class="au-time">jan. 5. 14:20<br><span class="au-st as-done">Lezárva</span></div></div>
+          <div class="au-row"><div class="au-dot ad-done"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M3 5l1.5 1.5L7 3.5" stroke="var(--c-emerald)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="au-ename">NNK járványügyi protokoll — lezárva</div><div class="au-esub">Osztályvezető főnővér értesítve · Tájékoztató kiküldve</div></div><div class="au-time">jan. 3. 11:05<br><span class="au-st as-done">Lezárva</span></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="sc-txt fade-up">
+      <div class="label">Ellenőrzési napló</div>
+      <h2 class="dt-title s-title">Minden lépés<br><em>dokumentálva.</em></h2>
+      <p class="s-lead">A revizori vizit nem meglepetés — a Clio minden értesítést, felelőshozzárendelést és lezárást időbélyeggel rögzít. Egy kattintás és a teljes napló PDF-ben készen áll.</p>
+      <ul class="feat-list">
+        <li class="feat-item"><span class="fi-check"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M2 5l2 2 4-4" stroke="var(--c-emerald)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Időbélyeges napló minden eseményről — ki, mikor, mit</li>
+        <li class="feat-item"><span class="fi-check"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M2 5l2 2 4-4" stroke="var(--c-emerald)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Felelős személyek hozzárendelhetők minden teendőhöz</li>
+        <li class="feat-item"><span class="fi-check"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M2 5l2 2 4-4" stroke="var(--c-emerald)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>PDF exportálás revizoroknak, JCI akkreditációhoz azonnal kész</li>
+        <li class="feat-item"><span class="fi-check"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M2 5l2 2 4-4" stroke="var(--c-emerald)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>10 éves megőrzési idő, GDPR-kompatibilis archiválás</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     SHOWCASE 3 — Q&A Chat
+═══════════════════════════════════════ -->
+<section class="showcase" style="background:var(--c-bg)">
+  <div class="sc-grid container">
+    <div class="sc-txt fade-up">
+      <div class="label">Szabályozási kérdések</div>
+      <h2 class="dt-title s-title">Bármikor kérdezhet.<br><em>Azonnali válasz.</em></h2>
+      <p class="s-lead">A Clio beépített AI-asszisztense az összes indexelt szabályozást ismeri. Tegyen fel kérdést magyarul — a válasz forrásra hivatkozva érkezik, azonnal.</p>
+      <ul class="feat-list">
+        <li class="feat-item"><span class="fi-check"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M2 5l2 2 4-4" stroke="var(--c-emerald)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Természetes kérdések — "Mit jelent ez számunkra konkrétan?"</li>
+        <li class="feat-item"><span class="fi-check"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M2 5l2 2 4-4" stroke="var(--c-emerald)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Minden válasz pontos forrással hivatkozva — ellenőrizhető</li>
+        <li class="feat-item"><span class="fi-check"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M2 5l2 2 4-4" stroke="var(--c-emerald)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Nem helyettesíti a jogi tanácsot — de azonnal tájékoztat</li>
+      </ul>
+    </div>
+    <div class="sc-vis fade-up d2">
+      <div class="chat">
+        <div class="chat-head">
+          <div class="chat-av"><svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M8 2a6 6 0 100 12A6 6 0 008 2z" stroke="#f0c66a" stroke-width="1.2"/><path d="M5.5 9.5s1 1.5 2.5 1.5 2.5-1.5 2.5-1.5M6 6.5h.01M10 6.5h.01" stroke="#f0c66a" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+          <div><div class="chat-htitle">Clio AI-asszisztens</div><div class="chat-hsub">Szabályozási kérdések · Magyar forrásokra hivatkozva</div></div>
+        </div>
+        <div class="chat-body">
+          <div class="bubble b-user">Mit kell tennünk az új NAIH iránymutatás alapján a beleegyező dokumentálásban?</div>
+          <div class="bubble b-ai">A 2024/12-es NAIH iránymutatás alapján 2025. február 1-től gyermekbetegek esetén a szülői beleegyezést elektronikusan kell tárolni, visszakereshető formában. A papír alapú aláírás önmagában már nem elegendő. Az intézménynek három teendője van: IT módosítás, személyzeti tájékoztató és belső audit.<div class="b-cite"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><rect x="2" y="2" width="6" height="6" rx="1" stroke="var(--c-emerald)" stroke-width="1"/><path d="M4 5h2M4 6.5h1" stroke="var(--c-emerald)" stroke-width="0.8" stroke-linecap="round"/></svg>naih.hu/iranymutatások/2024-12</div></div>
+          <div class="bubble b-user">Mi a pontos határidő az IT módosításra?</div>
+          <div class="bubble b-ai">Az IT rendszer módosítás javasolt határideje 2025. január 20. — ez 12 napot hagy a tesztelésre a február 1-i hatálybalépés előtt. A Clio által generált feladatlistában ez az első és legkritikusabb teendő.</div>
+        </div>
+        <div class="chat-input">
+          <div class="chat-field">Írjon kérdést a szabályozásokról...</div>
+          <svg width="20" height="20" fill="none" viewBox="0 0 20 20" stroke="var(--c-emerald)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h12M11 5l5 5-5 5"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     EVIDENCE
+═══════════════════════════════════════ -->
+<section class="evidence-section">
+  <div class="container">
+    <div class="fade-up" style="text-align:center">
+      <div class="label" style="justify-content:center">Miért fontos</div>
+      <h2 class="dt-title s-title" style="text-align:center">A számok, amelyek<br><em>mindent elmondanak.</em></h2>
+    </div>
+    <div class="ev-grid">
+      <div class="ev-card fade-up d1"><div class="ev-val">Havi<span> frissítés</span></div><div class="ev-title">NEAK változás üteme</div><div class="ev-desc">A gyógyászati segédeszköz törzs minden hónapban frissül — hozzáadott, módosított és törölt tételekkel. Kézzel követni óriási munkateher.</div></div>
+      <div class="ev-card fade-up d2"><div class="ev-val">20M<span> Ft+</span></div><div class="ev-title">Tipikus GDPR bírság</div><div class="ev-desc">Egyetlen elmulasztott adatvédelmi előírás ennyi pénzbe kerülhet. A Clio éves díja ennek töredéke — egyetlen megelőzött incidens megtéríti.</div></div>
+      <div class="ev-card fade-up d3"><div class="ev-val">7<span>+ forrás</span></div><div class="ev-title">Naponta átvizsgálva</div><div class="ev-desc">NEAK, NAIH, Magyar Közlöny, NNK, EUR-Lex, njt.hu és munkajogi portálok — mind figyelve, automatikusan, minden nap.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     BENEFITS
+═══════════════════════════════════════ -->
+<section class="benefits-section">
+  <div class="container">
+    <div class="fade-up" style="text-align:center">
+      <div class="label" style="justify-content:center">Mit kap</div>
+      <h2 class="dt-title s-title" style="text-align:center">Minden ami kell,<br><em>semmi ami nem.</em></h2>
+      <p class="s-lead" style="text-align:center;margin-left:auto;margin-right:auto">A Clio kizárólag a megfelelőségi felelős munkáját könnyíti meg — nem generál felesleges zajt, nem vesz el időt.</p>
+    </div>
+    <div class="ben-grid">
+      <div class="ben-card fade-up d1">
+        <div class="icon-sm"><svg fill="none" viewBox="0 0 36 36" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="18" r="13"/><path d="M18 10v8l5 3"/></svg></div>
+        <div><div class="ben-title">Napi automatikus figyelés</div><div class="ben-desc">Reggel megnyitja az áttekintőt — és már ott van, ami változott. Nem kell kézzel keresni semmit.</div></div>
+      </div>
+      <div class="ben-card fade-up d2">
+        <div class="icon-sm"><svg fill="none" viewBox="0 0 36 36" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 18l6 6 10-10"/><rect x="4" y="7" width="28" height="22" rx="3"/></svg></div>
+        <div><div class="ben-title">Konkrét teendők határidőkkel</div><div class="ben-desc">Minden értesítés pontosan megmondja, mit kell tenni — nem kell értelmezni a jogszabályszöveget.</div></div>
+      </div>
+      <div class="ben-card fade-up d3">
+        <div class="icon-sm"><svg fill="none" viewBox="0 0 36 36" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="5" y="5" width="26" height="26" rx="3"/>
+          <path d="M12 13l3 3 6-6"/>
+          <path d="M12 21l3 3 6-6"/>
+        </svg></div>
+        <div><div class="ben-title">Feladatkövetés és megbízás</div><div class="ben-desc">Hozzárendelhet felelőst minden teendőhöz, megjegyzést fűzhet, lezárhatja — minden dokumentálva marad.</div></div>
+      </div>
+      <div class="ben-card fade-up d1">
+        <div class="icon-sm"><svg fill="none" viewBox="0 0 36 36" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 5L6 11v10c0 7.5 5 13.5 12 15.5 7-2 12-8 12-15.5V11L18 5z"/></svg></div>
+        <div><div class="ben-title">Revizori ellenőrzési riport</div><div class="ben-desc">Egykattintásos PDF exportálás, ami bizonyítja a szabályos folyamatot — JCI és NAIH-ellenőrzéshez egyaránt alkalmas.</div></div>
+      </div>
+      <div class="ben-card fade-up d2">
+        <div class="icon-sm"><svg fill="none" viewBox="0 0 36 36" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 7h24a2 2 0 012 2v14a2 2 0 01-2 2H10l-6 4V9a2 2 0 012-2z"/>
+          <path d="M19 12l-3 5h5l-3 5"/>
+        </svg></div>
+        <div><div class="ben-title">AI-asszisztens kérdésekhez</div><div class="ben-desc">Kérdezzen bármikor a szabályozásokról — az asszisztens a saját indexelt adatbázisából, forrásra hivatkozva válaszol.</div></div>
+      </div>
+      <div class="ben-card fade-up d3">
+        <div class="icon-sm"><svg fill="none" viewBox="0 0 36 36" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 4a2 2 0 012 2v1.2A9 9 0 0127 16v6l3 3H6l3-3v-6a9 9 0 017-8.8V6a2 2 0 012-2z"/>
+          <path d="M15 28a3 3 0 006 0"/>
+        </svg></div>
+        <div><div class="ben-title">E-mail és SMS értesítők</div><div class="ben-desc">Reggeli összefoglaló e-mailben, sürgős változásoknál azonnali SMS — soha nem csúszik ki határidő figyelmetlenségből.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════ -->
+<footer class="footer">
+  <div class="hero-logo" style="justify-content:center;margin-bottom:1rem;">
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M30 9.5A15 15 0 1 0 30 26.5" stroke="white" stroke-width="2.8" stroke-linecap="round" fill="none"/>
+      <circle cx="18" cy="18" r="2.5" fill="var(--c-gold-lit)"/>
+    </svg>
+    <div style="text-align:left">
+      <div class="hero-logo-name" style="margin-left:0">Clio</div>
+      <div class="hero-logo-sub" style="margin-left:-0.08em">Megfelelőségi asszisztens</div>
+    </div>
+  </div>
+  <div class="footer-tagline">AI-alapú megfelelőség-felügyelet egészségügyi intézmények számára</div>
+</footer>
+
+<script>
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-up, .step, .how-mockup').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
