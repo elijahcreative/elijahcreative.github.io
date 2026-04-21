@@ -1,18 +1,18 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "5",
-      "FeelsLikeF": "41",
+      "FeelsLikeC": "1",
+      "FeelsLikeF": "34",
       "cloudcover": "0",
-      "humidity": "65",
-      "localObsDateTime": "2026-04-21 12:31 AM",
-      "observation_time": "10:31 PM",
+      "humidity": "75",
+      "localObsDateTime": "2026-04-21 03:48 AM",
+      "observation_time": "01:48 AM",
       "precipInches": "0.0",
       "precipMM": "0.0",
       "pressure": "1014",
       "pressureInches": "30",
-      "temp_C": "6",
-      "temp_F": "43",
+      "temp_C": "3",
+      "temp_F": "38",
       "uvIndex": "0",
       "visibility": "10",
       "visibilityMiles": "6",
@@ -28,8 +28,8 @@
         }
       ],
       "winddir16Point": "NW",
-      "winddirDegree": "307",
-      "windspeedKmph": "7",
+      "winddirDegree": "318",
+      "windspeedKmph": "6",
       "windspeedMiles": "4"
     }
   ],
@@ -37,7 +37,7 @@
     {
       "areaName": [
         {
-          "value": "Ferencvaros"
+          "value": "Buda"
         }
       ],
       "country": [
@@ -45,8 +45,8 @@
           "value": "Hungary"
         }
       ],
-      "latitude": "47.467",
-      "longitude": "19.083",
+      "latitude": "47.500",
+      "longitude": "19.033",
       "population": "0",
       "region": [
         {
@@ -55,7 +55,7 @@
       ],
       "weatherUrl": [
         {
-          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.467,19.083"
+          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.5,19.033"
         }
       ]
     }
@@ -154,16 +154,16 @@
           "chanceofsunshine": "88",
           "chanceofthunder": "0",
           "chanceofwindy": "0",
-          "cloudcover": "23",
+          "cloudcover": "0",
           "diffRad": "0.0",
-          "humidity": "64",
+          "humidity": "75",
           "precipInches": "0.0",
           "precipMM": "0.0",
           "pressure": "1014",
           "pressureInches": "30",
           "shortRad": "0.0",
-          "tempC": "9",
-          "tempF": "48",
+          "tempC": "3",
+          "tempF": "38",
           "time": "300",
           "uvIndex": "0",
           "visibility": "10",
