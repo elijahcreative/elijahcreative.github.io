@@ -1,43 +1,43 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "4",
-      "FeelsLikeF": "39",
+      "FeelsLikeC": "9",
+      "FeelsLikeF": "48",
       "cloudcover": "0",
-      "humidity": "65",
-      "localObsDateTime": "2026-04-22 05:56 AM",
-      "observation_time": "03:56 AM",
+      "humidity": "46",
+      "localObsDateTime": "2026-04-22 09:13 AM",
+      "observation_time": "07:13 AM",
       "precipInches": "0.0",
       "precipMM": "0.0",
       "pressure": "1019",
       "pressureInches": "30",
-      "temp_C": "6",
-      "temp_F": "43",
-      "uvIndex": "0",
+      "temp_C": "10",
+      "temp_F": "51",
+      "uvIndex": "2",
       "visibility": "10",
       "visibilityMiles": "6",
-      "weatherCode": "116",
+      "weatherCode": "113",
       "weatherDesc": [
         {
-          "value": "Partly cloudy"
+          "value": "Sunny"
         }
       ],
       "weatherIconUrl": [
         {
-          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0004_black_low_cloud.png"
+          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0001_sunny.png"
         }
       ],
       "winddir16Point": "NNW",
-      "winddirDegree": "341",
-      "windspeedKmph": "9",
-      "windspeedMiles": "5"
+      "winddirDegree": "330",
+      "windspeedKmph": "11",
+      "windspeedMiles": "7"
     }
   ],
   "nearest_area": [
     {
       "areaName": [
         {
-          "value": "Kis-Gellerthegy"
+          "value": "Buda"
         }
       ],
       "country": [
@@ -45,7 +45,7 @@
           "value": "Hungary"
         }
       ],
-      "latitude": "47.483",
+      "latitude": "47.500",
       "longitude": "19.033",
       "population": "0",
       "region": [
@@ -55,7 +55,7 @@
       ],
       "weatherUrl": [
         {
-          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.483,19.033"
+          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.5,19.033"
         }
       ]
     }
@@ -256,15 +256,15 @@
           "chanceofsunshine": "94",
           "chanceofthunder": "0",
           "chanceofwindy": "0",
-          "cloudcover": "17",
+          "cloudcover": "0",
           "diffRad": "113.8",
-          "humidity": "47",
+          "humidity": "46",
           "precipInches": "0.0",
           "precipMM": "0.0",
-          "pressure": "1020",
+          "pressure": "1019",
           "pressureInches": "30",
           "shortRad": "398.2",
-          "tempC": "11",
+          "tempC": "10",
           "tempF": "51",
           "time": "900",
           "uvIndex": "2",
