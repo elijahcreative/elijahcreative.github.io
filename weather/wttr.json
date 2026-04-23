@@ -1,18 +1,18 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "9",
-      "FeelsLikeF": "47",
+      "FeelsLikeC": "3",
+      "FeelsLikeF": "38",
       "cloudcover": "0",
-      "humidity": "46",
-      "localObsDateTime": "2026-04-23 01:32 AM",
-      "observation_time": "11:32 PM",
+      "humidity": "56",
+      "localObsDateTime": "2026-04-23 04:48 AM",
+      "observation_time": "02:48 AM",
       "precipInches": "0.0",
       "precipMM": "0.0",
       "pressure": "1019",
       "pressureInches": "30",
-      "temp_C": "9",
-      "temp_F": "49",
+      "temp_C": "5",
+      "temp_F": "42",
       "uvIndex": "0",
       "visibility": "10",
       "visibilityMiles": "6",
@@ -28,16 +28,16 @@
         }
       ],
       "winddir16Point": "NW",
-      "winddirDegree": "320",
-      "windspeedKmph": "6",
-      "windspeedMiles": "4"
+      "winddirDegree": "312",
+      "windspeedKmph": "9",
+      "windspeedMiles": "5"
     }
   ],
   "nearest_area": [
     {
       "areaName": [
         {
-          "value": "Gellert"
+          "value": "Buda"
         }
       ],
       "country": [
@@ -45,8 +45,8 @@
           "value": "Hungary"
         }
       ],
-      "latitude": "47.483",
-      "longitude": "19.050",
+      "latitude": "47.500",
+      "longitude": "19.033",
       "population": "0",
       "region": [
         {
@@ -55,7 +55,7 @@
       ],
       "weatherUrl": [
         {
-          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.483,19.05"
+          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.5,19.033"
         }
       ]
     }
