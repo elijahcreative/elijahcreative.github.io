@@ -1,19 +1,19 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "20",
-      "FeelsLikeF": "69",
+      "FeelsLikeC": "21",
+      "FeelsLikeF": "70",
       "cloudcover": "0",
-      "humidity": "30",
-      "localObsDateTime": "2026-04-24 03:05 PM",
-      "observation_time": "01:05 PM",
+      "humidity": "26",
+      "localObsDateTime": "2026-04-24 04:44 PM",
+      "observation_time": "02:44 PM",
       "precipInches": "0.0",
       "precipMM": "0.0",
       "pressure": "1013",
       "pressureInches": "30",
-      "temp_C": "20",
-      "temp_F": "69",
-      "uvIndex": "4",
+      "temp_C": "21",
+      "temp_F": "70",
+      "uvIndex": "3",
       "visibility": "10",
       "visibilityMiles": "6",
       "weatherCode": "113",
@@ -28,7 +28,7 @@
         }
       ],
       "winddir16Point": "NW",
-      "winddirDegree": "326",
+      "winddirDegree": "323",
       "windspeedKmph": "19",
       "windspeedMiles": "12"
     }
@@ -37,7 +37,7 @@
     {
       "areaName": [
         {
-          "value": "Gellert"
+          "value": "Buda"
         }
       ],
       "country": [
@@ -45,8 +45,8 @@
           "value": "Hungary"
         }
       ],
-      "latitude": "47.483",
-      "longitude": "19.050",
+      "latitude": "47.500",
+      "longitude": "19.033",
       "population": "0",
       "region": [
         {
@@ -55,7 +55,7 @@
       ],
       "weatherUrl": [
         {
-          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.483,19.05"
+          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.5,19.033"
         }
       ]
     }
@@ -358,16 +358,16 @@
           "chanceofsunshine": "93",
           "chanceofthunder": "0",
           "chanceofwindy": "0",
-          "cloudcover": "0",
+          "cloudcover": "17",
           "diffRad": "112.2",
-          "humidity": "30",
+          "humidity": "33",
           "precipInches": "0.0",
           "precipMM": "0.0",
-          "pressure": "1013",
+          "pressure": "1014",
           "pressureInches": "30",
           "shortRad": "758.6",
-          "tempC": "20",
-          "tempF": "69",
+          "tempC": "19",
+          "tempF": "67",
           "time": "1500",
           "uvIndex": "4",
           "visibility": "10",
