@@ -5,11 +5,11 @@
       "FeelsLikeF": "75",
       "cloudcover": "0",
       "humidity": "29",
-      "localObsDateTime": "2026-04-25 05:15 PM",
-      "observation_time": "03:15 PM",
+      "localObsDateTime": "2026-04-25 06:53 PM",
+      "observation_time": "04:53 PM",
       "precipInches": "0.0",
       "precipMM": "0.0",
-      "pressure": "1012",
+      "pressure": "1011",
       "pressureInches": "30",
       "temp_C": "22",
       "temp_F": "72",
@@ -29,15 +29,15 @@
       ],
       "winddir16Point": "WNW",
       "winddirDegree": "300",
-      "windspeedKmph": "20",
-      "windspeedMiles": "12"
+      "windspeedKmph": "17",
+      "windspeedMiles": "10"
     }
   ],
   "nearest_area": [
     {
       "areaName": [
         {
-          "value": "Var"
+          "value": "Buda"
         }
       ],
       "country": [
@@ -45,8 +45,8 @@
           "value": "Hungary"
         }
       ],
-      "latitude": "47.517",
-      "longitude": "19.050",
+      "latitude": "47.500",
+      "longitude": "19.033",
       "population": "0",
       "region": [
         {
@@ -55,7 +55,7 @@
       ],
       "weatherUrl": [
         {
-          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.517,19.05"
+          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.5,19.033"
         }
       ]
     }
@@ -409,16 +409,16 @@
           "chanceofsunshine": "85",
           "chanceofthunder": "0",
           "chanceofwindy": "0",
-          "cloudcover": "1",
+          "cloudcover": "0",
           "diffRad": "91.1",
-          "humidity": "41",
+          "humidity": "29",
           "precipInches": "0.0",
           "precipMM": "0.0",
-          "pressure": "1012",
+          "pressure": "1011",
           "pressureInches": "30",
           "shortRad": "552.3",
-          "tempC": "20",
-          "tempF": "68",
+          "tempC": "22",
+          "tempF": "72",
           "time": "1800",
           "uvIndex": "1",
           "visibility": "10",
