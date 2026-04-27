@@ -1,1 +1,81 @@
+name: Update next holiday
 
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Generate next holiday JSON
+        run: |
+          mkdir -p Holiday
+
+          node <<'NODE'
+          const fs = require("fs");
+
+          async function main() {
+            const res = await fetch("https://elijahcreative.github.io/Holiday/HU.json");
+            const data = await res.json();
+
+            const today = new Date();
+            today.setHours(0,0,0,0);
+
+            const next = data.info
+              .map(item => {
+                const d = new Date(item.date + "T00:00:00");
+                d.setHours(0,0,0,0);
+
+                const daysLeft = Math.ceil((d - today) / 86400000);
+
+                const dateText = d.toLocaleDateString("hu-HU", {
+                  month: "long",
+                  day: "numeric"
+                });
+
+                return {
+                  date: dateText.charAt(0).toUpperCase() + dateText.slice(1),
+                  name: item.name,
+                  workday: item.workday ? "Munkanap" : "Munkaszüneti nap",
+                  daysLeft: daysLeft
+                };
+              })
+              .filter(item => item.daysLeft >= 0)
+              .sort((a,b) => a.daysLeft - b.daysLeft)[0];
+
+            const output = {
+              updated: new Date().toISOString(),
+              nextHoliday: next || null
+            };
+
+            fs.writeFileSync(
+              "Holiday/next.json",
+              JSON.stringify(output, null, 4) + "\n"
+            );
+          }
+
+          main();
+          NODE
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git add Holiday/next.json
+
+          if git diff --cached --quiet; then
+            echo "No changes"
+          else
+            git commit -m "Update next holiday"
+            git push
+          fi
