@@ -1,43 +1,43 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "27",
-      "FeelsLikeF": "80",
+      "FeelsLikeC": "26",
+      "FeelsLikeF": "78",
       "cloudcover": "0",
-      "humidity": "32",
-      "localObsDateTime": "2026-05-06 05:49 PM",
-      "observation_time": "03:49 PM",
+      "humidity": "39",
+      "localObsDateTime": "2026-05-06 07:28 PM",
+      "observation_time": "05:28 PM",
       "precipInches": "0.0",
-      "precipMM": "0.0",
+      "precipMM": "0.2",
       "pressure": "1009",
       "pressureInches": "30",
-      "temp_C": "26",
-      "temp_F": "79",
-      "uvIndex": "1",
+      "temp_C": "24",
+      "temp_F": "76",
+      "uvIndex": "0",
       "visibility": "10",
       "visibilityMiles": "6",
-      "weatherCode": "116",
+      "weatherCode": "263",
       "weatherDesc": [
         {
-          "value": "Partly cloudy"
+          "value": "Patchy light drizzle"
         }
       ],
       "weatherIconUrl": [
         {
-          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0002_sunny_intervals.png"
+          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0009_light_rain_showers.png"
         }
       ],
       "winddir16Point": "SSW",
-      "winddirDegree": "197",
-      "windspeedKmph": "16",
-      "windspeedMiles": "10"
+      "winddirDegree": "194",
+      "windspeedKmph": "9",
+      "windspeedMiles": "6"
     }
   ],
   "nearest_area": [
     {
       "areaName": [
         {
-          "value": "Angyalfold"
+          "value": "Var"
         }
       ],
       "country": [
@@ -45,8 +45,8 @@
           "value": "Hungary"
         }
       ],
-      "latitude": "47.533",
-      "longitude": "19.067",
+      "latitude": "47.517",
+      "longitude": "19.050",
       "population": "0",
       "region": [
         {
@@ -55,7 +55,7 @@
       ],
       "weatherUrl": [
         {
-          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.533,19.067"
+          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.517,19.05"
         }
       ]
     }
