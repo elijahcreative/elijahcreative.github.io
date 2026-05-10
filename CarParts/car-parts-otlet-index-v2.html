@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Autóalkatrész árfigyelő – ötletösszefoglaló</title>
+  <style>
+    :root{--bg:#0f1115;--panel:#171a21;--text:#f4f1e8;--muted:#a9adba;--line:rgba(255,255,255,.12);--accent:#ffb347;--accent2:#7ee0c1;--danger:#ff6b6b;--shadow:0 30px 80px rgba(0,0,0,.35)}
+    *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 20% 0%,#2a2419 0,#0f1115 34%,#0f1115 100%);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.55}
+    a{color:var(--accent2);text-decoration:none} a:hover{text-decoration:underline} .wrap{max-width:1180px;margin:0 auto;padding:56px 22px 80px}
+    .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:32px;align-items:center;margin-bottom:52px} .badge{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);background:rgba(255,255,255,.05);border-radius:999px;padding:8px 12px;color:var(--muted);font-size:13px;margin-bottom:18px} .dot{width:8px;height:8px;background:var(--accent);border-radius:50%}
+    h1{font-size:clamp(42px,6vw,76px);letter-spacing:-.065em;line-height:.92;margin:0 0 20px} h2{font-size:34px;letter-spacing:-.04em;margin:0 0 18px} h3{font-size:22px;letter-spacing:-.025em;margin:0 0 10px} p{margin:0 0 14px;color:#d8d6cf} .lead{font-size:21px;color:#e9e4d7;max-width:720px} .muted{color:var(--muted)}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.035));border:1px solid var(--line);border-radius:28px;padding:26px;box-shadow:var(--shadow)} .grid{display:grid;gap:18px} .grid.two{grid-template-columns:repeat(2,minmax(0,1fr))} .grid.three{grid-template-columns:repeat(3,minmax(0,1fr))} .section{margin:54px 0} .pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:6px 10px;color:var(--muted);font-size:13px;margin-bottom:12px} .big-number{font-size:48px;line-height:1;font-weight:800;color:var(--accent);letter-spacing:-.05em} .list{padding-left:19px;color:#d8d6cf} .list li{margin:8px 0} .quote{font-size:26px;letter-spacing:-.03em;line-height:1.2;color:#fff;margin:0} .warning{border-color:rgba(255,107,107,.35);background:linear-gradient(180deg,rgba(255,107,107,.12),rgba(255,255,255,.035))} .ok{border-color:rgba(126,224,193,.35)}
+    .screens{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin-top:24px} .shot{border-radius:28px;overflow:hidden;border:1px solid var(--line);background:#08090c;box-shadow:var(--shadow)} .shot img{display:block;width:100%;height:auto} .caption{padding:16px 18px;color:var(--muted);font-size:14px} .source{font-size:13px;color:var(--muted)} code{background:rgba(255,255,255,.08);padding:2px 6px;border-radius:7px;color:#fff}
+    @media(max-width:900px){.hero,.grid.two,.grid.three,.screens{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero">
+      <div>
+        <div class="badge"><span class="dot"></span> Ötletvalidáció – autóalkatrész árfigyelő</div>
+        <h1>Van benne lehetőség, de nem sima árfigyelőként.</h1>
+        <p class="lead">A magyar piacon sok autóalkatrész-webshop és néhány árösszehasonlító megoldás létezik, de nem látszik erős, egyszerű, fogyasztói fókuszú termék arra, hogy egy autótulajdonos konkrét alkatrészeket figyeljen, ármozgást lásson, és értesítést kapjon jó vétel esetén.</p>
+      </div>
+      <div class="card"><p class="quote">A fő probléma nem az, hogy “hol a legolcsóbb az olajszűrő?”, hanem az, hogy “biztos jó ez az én autómba, és nem fizetek-e érte hülyén sokat?”</p></div>
+    </section>
+
+    <section class="section grid three">
+      <div class="card"><div class="big-number">1</div><h3>Helyzet</h3><p>Van Árukereső autóalkatrész kategória, vannak nagy alkatrészboltok, például Bárdi, Unix, AUTODOC, Kovács, ZS+U. Ezek keresésre és vásárlásra jók, de nem igazán arra, hogy az ember hosszabb távon figyeljen egy konkrét alkatrészt.</p></div>
+      <div class="card"><div class="big-number">2</div><h3>Probléma</h3><p>Az átlag autótulajdonos nem biztos benne, hogy melyik alkatrész való az autójába, melyik márka vállalható, és hogy a szerelő vagy webshop ára reális-e.</p></div>
+      <div class="card"><div class="big-number">3</div><h3>Megoldás</h3><p>Első lépésben egy konkrét alkatrész árfigyelése link vagy cikkszám alapján. Később ebből nőhet ki egy személyes garázs-asszisztens autóprofillal és kompatibilitási segítséggel.</p></div>
+    </section>
+
+    <section class="section grid two">
+      <div class="card">
+        <span class="pill">Mi van már?</span>
+        <h2>Jelenlegi piaci kép</h2>
+        <ul class="list">
+          <li><strong>Árukereső:</strong> létezik autóalkatrész kategória és árösszehasonlítás, de ez inkább kategória-szintű keresés.</li>
+          <li><strong>Bárdi / Unix:</strong> nagy katalógus, erős kereskedelmi háttér, de nem userbarát árfigyelő-termék.</li>
+          <li><strong>AUTODOC:</strong> nagy választék, app és garázs jellegű funkciók, de nem magyar fókuszú ármonitor.</li>
+          <li><strong>Kisebb webshopok:</strong> sokszor hasonló katalóguslogika, kevés valódi “spórolást segítő” UX-szel.</li>
+        </ul>
+      </div>
+      <div class="card ok">
+        <span class="pill">Mi hiányzik?</span>
+        <h2>A piaci rés</h2>
+        <ul class="list">
+          <li>Egyszerű figyelőlista konkrét alkatrészekre.</li>
+          <li>Ártörténet: most tényleg jó ár, vagy csak akciónak van nevezve?</li>
+          <li>Értesítés, amikor érdemes megvenni.</li>
+          <li>Cikkszám / szerelő által küldött link mentése.</li>
+          <li>Autóhoz kötött alkatrésznapló.</li>
+          <li>Később: VIN / alvázszám alapú pontosabb kompatibilitás.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section card">
+      <span class="pill">Célközönség</span>
+      <h2>Nem elsősorban autófanatikusoknak szólna.</h2>
+      <p>A legjobb célcsoport a normál autótulajdonos, aki nem ért mélyen az autókhoz, de nem akar feleslegesen sokat fizetni. Van autója, évente költ szervizre, a szerelő küld neki cikkszámot vagy ajánlatot, ő pedig szeretné tudni, hogy az ár reális-e.</p>
+      <p>A másodlagos célcsoport a DIY szerelő és az autórajongó, aki eleve szeret árakat, cikkszámokat és márkákat figyelni. Ők aktívabbak lehetnek, de kisebb piacot jelentenek.</p>
+    </section>
+
+    <section class="section grid two">
+      <div class="card">
+        <span class="pill">Első, praktikus verzió</span>
+        <h2>Link / cikkszám alapú árfigyelés</h2>
+        <p>Ez azt jelenti, hogy az első verzióban az app nem próbálja meg kitalálni, pontosan melyik alkatrész jó az autóhoz. A felhasználó már hoz valamit: egy webshop linket, egy cikkszámot, vagy a szerelő által küldött alkatrésznevet.</p>
+        <p>Példa: a szerelő elküldi, hogy <code>BOSCH 0986479xxx</code>, vagy a user bemásol egy Bárdi / Unix / AUTODOC linket. Az app ezt menti, és azt figyeli: hol mennyi az ára, változott-e, mikor volt olcsóbb, és érdemes-e most megvenni.</p>
+      </div>
+      <div class="card">
+        <span class="pill">Későbbi, nehezebb verzió</span>
+        <h2>Autóprofil + kompatibilitás</h2>
+        <p>Ez már az a szint, amikor a user megadja az autóját, például rendszám, alvázszám / VIN vagy pontos modell alapján, és az app segít megmondani, milyen alkatrészek jók hozzá.</p>
+        <p>Ez sokkal nehezebb, mert pontos kompatibilitási adat kell hozzá. Ugyanazon autómodellből több motorváltozat, fékrendszer vagy felszereltség létezhet. Ezért ezt nem érdemes első MVP-nek választani.</p>
+      </div>
+    </section>
+
+    <section class="section card warning">
+      <span class="pill">Fontos egyszerűsítés</span>
+      <h2>Mit jelent röviden az MVP?</h2>
+      <p><strong>Első MVP:</strong> “Van egy konkrét alkatrész, figyeld az árát.”</p>
+      <p><strong>Későbbi nagyobb verzió:</strong> “Mondd meg, milyen alkatrész kell az autómhoz, és figyeld az árát.”</p>
+      <p>Az első gyorsabban építhető, kevesebb adat kell hozzá, és hamarabb kiderül, hogy érdekli-e az embereket. A második hasznosabb, de jóval nagyobb adat- és fejlesztési probléma.</p>
+    </section>
+
+    <section class="section">
+      <span class="pill">App kinézet – konkrét irány</span>
+      <h2>Három fejlesztésre alkalmas képernyőterv</h2>
+      <p>Ezek nem végleges UI-k, hanem irányadó app-screenek: megmutatják, hogy a termék nem sima táblázatos árfigyelő lenne, hanem egy modern, személyes autóalkatrész-figyelő.</p>
+      <div class="screens">
+        <div class="shot">
+          <img src="carparts-screen-01.png" alt="Áttekintés app screen">
+          <div class="caption">Áttekintés: figyelt alkatrészek, megtakarítás, aktuális ármozgások.</div>
+        </div>
+        <div class="shot">
+          <img src="carparts-screen-02.png" alt="Figyelőlista app screen">
+          <div class="caption">Figyelőlista: mentett alkatrészek, ármozgás, webshopok.</div>
+        </div>
+        <div class="shot">
+          <img src="carparts-screen-03.png" alt="Részletek app screen">
+          <div class="caption">Részletező screen: ártörténet, boltok összehasonlítása és “jó vétel” jelzés.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section grid two">
+      <div class="card">
+        <span class="pill">MVP</span>
+        <h2>Első verzió, ami már tesztelhető</h2>
+        <ul class="list">
+          <li>Felhasználó linkkel vagy cikkszámmal felvesz egy alkatrészt.</li>
+          <li>Az app naponta figyeli az árat néhány kiválasztott webshopon.</li>
+          <li>Egyszerű ártörténet grafikon.</li>
+          <li>Email vagy push értesítés, ha az ár beesik.</li>
+          <li>“Jó vétel” jelzés, ha az ár a saját historikus átlag alatt van.</li>
+        </ul>
+      </div>
+      <div class="card warning">
+        <span class="pill">Kockázat</span>
+        <h2>Az adat a nehéz rész</h2>
+        <p>A pontos autó-kompatibilitási adat nem triviális. Sok szereplő TecDoc vagy hasonló adatbázisokra épül, ezekhez a hozzáférés és jogi használat nem feltétlenül egyszerű.</p>
+        <p>Ezért érdemes először konkrét linkek és cikkszámok árfigyelésével validálni az ötletet, és csak utána ráépíteni az autóprofilos-kompatibilitási réteget.</p>
+      </div>
+    </section>
+
+    <section class="section card">
+      <span class="pill">Javasolt konklúzió</span>
+      <h2>Az ötlet nem rossz, de át kell keretezni.</h2>
+      <p>“Autóalkatrész árfigyelő” önmagában kicsit vékony termék. A jobb irány egy olyan eszköz, ami segít az autótulajdonosnak nem rossz alkatrészt venni, nem túlfizetni, és rendben tartani a saját autójához kapcsolódó alkatrészlistát.</p>
+      <p>Az első MVP legyen kicsi: árfigyelés konkrét linkekre / cikkszámokra. Ha erre van érdeklődés, utána lehet bővíteni autóprofilra, VIN-re, szerelői ajánlat ellenőrzésre és karbantartási előrejelzésre.</p>
+    </section>
+
+    <section class="section card">
+      <span class="pill">Források, amik alapján a helyzetképet néztem</span>
+      <p class="source"><a href="https://autoalkatresz.arukereso.hu/">Árukereső – Autóalkatrész kategória</a> · <a href="https://www.bardiauto.hu/webshop/">Bárdi Autó webshop</a> · <a href="https://www.unixauto.hu/">Unix Autó</a> · <a href="https://www.autodoc.hu/">AUTODOC Magyarország</a> · <a href="https://alkatreszek.hu/">Kovács Autóalkatrész</a></p>
+    </section>
+  </main>
+</body>
+</html>
