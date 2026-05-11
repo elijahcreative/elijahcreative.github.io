@@ -1,36 +1,36 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "21",
-      "FeelsLikeF": "70",
+      "FeelsLikeC": "19",
+      "FeelsLikeF": "67",
       "cloudcover": "0",
-      "humidity": "49",
-      "localObsDateTime": "2026-05-11 08:20 PM",
-      "observation_time": "06:20 PM",
+      "humidity": "52",
+      "localObsDateTime": "2026-05-11 09:59 PM",
+      "observation_time": "07:59 PM",
       "precipInches": "0.0",
-      "precipMM": "0.5",
+      "precipMM": "1.1",
       "pressure": "1001",
       "pressureInches": "30",
-      "temp_C": "21",
-      "temp_F": "70",
+      "temp_C": "19",
+      "temp_F": "67",
       "uvIndex": "0",
       "visibility": "10",
       "visibilityMiles": "6",
-      "weatherCode": "176",
+      "weatherCode": "386",
       "weatherDesc": [
         {
-          "value": "Patchy rain nearby"
+          "value": "Patchy light rain in area with thunder"
         }
       ],
       "weatherIconUrl": [
         {
-          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0009_light_rain_showers.png"
+          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0032_thundery_showers_night.png"
         }
       ],
       "winddir16Point": "SW",
-      "winddirDegree": "232",
-      "windspeedKmph": "13",
-      "windspeedMiles": "8"
+      "winddirDegree": "224",
+      "windspeedKmph": "14",
+      "windspeedMiles": "9"
     }
   ],
   "nearest_area": [
@@ -460,16 +460,16 @@
           "chanceofsunshine": "0",
           "chanceofthunder": "61",
           "chanceofwindy": "0",
-          "cloudcover": "75",
+          "cloudcover": "0",
           "diffRad": "0.0",
-          "humidity": "81",
+          "humidity": "52",
           "precipInches": "0.0",
           "precipMM": "1.1",
-          "pressure": "1002",
+          "pressure": "1001",
           "pressureInches": "30",
           "shortRad": "0.1",
-          "tempC": "15",
-          "tempF": "59",
+          "tempC": "19",
+          "tempF": "67",
           "time": "2100",
           "uvIndex": "0",
           "visibility": "10",
