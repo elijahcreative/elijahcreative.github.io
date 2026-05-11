@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Csornai Széchenyi István Általános Iskola - térkép demo</title>
   <link rel="icon" href="cimer-cropped.png">
+  <script src="anime.min.js"></script>
   <script>
     document.documentElement.dataset.theme = localStorage.getItem("school-theme") || "day";
   </script>
@@ -142,14 +143,17 @@
 
     .school-render--night {
       visibility: hidden;
+      opacity: 0;
     }
 
     [data-theme="night"] .school-render--day {
       visibility: hidden;
+      opacity: 0;
     }
 
     [data-theme="night"] .school-render--night {
       visibility: visible;
+      opacity: 1;
     }
 
     .app:hover .school-render {
@@ -744,18 +748,148 @@
     const root = document.documentElement;
     const toggle = document.getElementById("themeToggle");
     const label = toggle.querySelector("span");
+    const scene = document.querySelector(".scene");
+    const topbar = document.querySelector(".topbar");
+    const panel = document.querySelector(".side-panel");
+    const controls = document.querySelector(".controls");
+    const hotspots = Array.from(document.querySelectorAll(".hotspot"));
+    const dayRender = document.querySelector(".school-render--day");
+    const nightRender = document.querySelector(".school-render--night");
+    let isAnimatingTheme = false;
 
     function syncThemeLabel() {
       label.textContent = root.dataset.theme === "night" ? "Sötét" : "Világos";
     }
 
+    function activeRenderFor(theme) {
+      return theme === "night" ? nightRender : dayRender;
+    }
+
+    function inactiveRenderFor(theme) {
+      return theme === "night" ? dayRender : nightRender;
+    }
+
+    function finishThemeSwitch(nextTheme) {
+      [dayRender, nightRender, scene, topbar, panel, controls, toggle, ...hotspots].forEach((el) => {
+        if (!el) return;
+        el.style.opacity = "";
+        el.style.transform = "";
+        el.style.filter = "";
+        el.style.visibility = "";
+      });
+      root.dataset.theme = nextTheme;
+      localStorage.setItem("school-theme", nextTheme);
+      syncThemeLabel();
+      isAnimatingTheme = false;
+    }
+
+    function switchThemeWithAnime(nextTheme) {
+      if (!window.anime) {
+        root.dataset.theme = nextTheme;
+        localStorage.setItem("school-theme", nextTheme);
+        syncThemeLabel();
+        return;
+      }
+
+      isAnimatingTheme = true;
+      toggle.disabled = true;
+
+      const currentTheme = root.dataset.theme === "night" ? "night" : "day";
+      const outgoing = activeRenderFor(currentTheme);
+      const incoming = activeRenderFor(nextTheme);
+      const supporting = [topbar, panel, controls].filter(Boolean);
+
+      anime.remove([dayRender, nightRender, scene, topbar, panel, controls, toggle, ...hotspots]);
+
+      incoming.style.visibility = "visible";
+      incoming.style.opacity = "0";
+      outgoing.style.visibility = "visible";
+      outgoing.style.opacity = "1";
+
+      const timeline = anime.timeline({
+        easing: "easeOutCubic",
+        complete: () => {
+          toggle.disabled = false;
+          finishThemeSwitch(nextTheme);
+        },
+      });
+
+      timeline
+        .add({
+          targets: supporting,
+          opacity: [1, 0.82],
+          translateY: [0, -8],
+          scale: [1, 0.985],
+          duration: 210,
+          easing: "easeOutQuad",
+        }, 0)
+        .add({
+          targets: hotspots,
+          opacity: [1, 0.68],
+          translateY: [0, -10],
+          scale: [1, 0.94],
+          delay: anime.stagger(14, { from: "center" }),
+          duration: 220,
+          easing: "easeOutQuad",
+        }, 20)
+        .add({
+          targets: scene,
+          filter: ["saturate(1) brightness(1)", "saturate(.86) brightness(.92)"],
+          duration: 260,
+          easing: "easeOutQuad",
+        }, 0)
+        .add({
+          targets: outgoing,
+          opacity: [1, 0],
+          scale: [1, 0.985],
+          translateY: [0, 10],
+          duration: 320,
+          easing: "easeInOutSine",
+        }, 120)
+        .add({
+          targets: incoming,
+          opacity: [0, 1],
+          scale: [1.012, 1],
+          translateY: [-8, 0],
+          duration: 360,
+          easing: "easeOutQuart",
+          begin: () => {
+            root.dataset.theme = nextTheme;
+            localStorage.setItem("school-theme", nextTheme);
+            syncThemeLabel();
+          },
+        }, 230)
+        .add({
+          targets: supporting,
+          opacity: [0.82, 1],
+          translateY: [-8, 0],
+          scale: [0.985, 1],
+          duration: 390,
+          easing: "easeOutExpo",
+        }, 420)
+        .add({
+          targets: hotspots,
+          opacity: [0.68, 1],
+          translateY: [-10, 0],
+          scale: [0.94, 1],
+          delay: anime.stagger(22, { from: "center" }),
+          duration: 420,
+          easing: "easeOutExpo",
+        }, 430)
+        .add({
+          targets: scene,
+          filter: ["saturate(.86) brightness(.92)", "saturate(1) brightness(1)"],
+          duration: 440,
+          easing: "easeOutExpo",
+        }, 430);
+    }
+
     syncThemeLabel();
 
     toggle.addEventListener("click", () => {
+      if (isAnimatingTheme) return;
       const next = root.dataset.theme === "night" ? "day" : "night";
-      root.dataset.theme = next;
-      localStorage.setItem("school-theme", next);
-      syncThemeLabel();
+      switchThemeWithAnime(next);
     });
   </script>
 </body>
