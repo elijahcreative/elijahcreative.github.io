@@ -4,15 +4,15 @@
       "FeelsLikeC": "16",
       "FeelsLikeF": "61",
       "cloudcover": "75",
-      "humidity": "82",
-      "observation_time": "03:02 PM",
+      "humidity": "77",
+      "observation_time": "04:30 PM",
       "precipInches": "0.0",
       "precipMM": "0.1",
-      "pressure": "1001",
+      "pressure": "1000",
       "pressureInches": "30",
       "temp_C": "16",
       "temp_F": "61",
-      "uvIndex": "1",
+      "uvIndex": "0",
       "visibility": "10",
       "visibilityMiles": "6",
       "weatherCode": "296",
@@ -27,9 +27,9 @@
         }
       ],
       "winddir16Point": "N",
-      "winddirDegree": "359",
-      "windspeedKmph": "12",
-      "windspeedMiles": "7"
+      "winddirDegree": "351",
+      "windspeedKmph": "10",
+      "windspeedMiles": "6"
     }
   ],
   "nearest_area": [
@@ -408,29 +408,29 @@
           "chanceofsunshine": "0",
           "chanceofthunder": "0",
           "chanceofwindy": "0",
-          "cloudcover": "100",
+          "cloudcover": "75",
           "diffRad": "46.9",
-          "humidity": "92",
+          "humidity": "77",
           "precipInches": "0.0",
           "precipMM": "0.1",
-          "pressure": "1001",
+          "pressure": "1000",
           "pressureInches": "30",
           "shortRad": "73.7",
-          "tempC": "13",
-          "tempF": "55",
+          "tempC": "16",
+          "tempF": "61",
           "time": "1800",
           "uvIndex": "0",
           "visibility": "10",
           "visibilityMiles": "6",
-          "weatherCode": "176",
+          "weatherCode": "296",
           "weatherDesc": [
             {
-              "value": "Patchy rain nearby"
+              "value": "Light rain"
             }
           ],
           "weatherIconUrl": [
             {
-              "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0009_light_rain_showers.png"
+              "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0017_cloudy_with_light_rain.png"
             }
           ],
           "winddir16Point": "N",
