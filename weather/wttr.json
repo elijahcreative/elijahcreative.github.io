@@ -2,17 +2,17 @@
   "current_condition": [
     {
       "FeelsLikeC": "16",
-      "FeelsLikeF": "60",
-      "cloudcover": "100",
-      "humidity": "77",
-      "observation_time": "09:02 AM",
+      "FeelsLikeF": "61",
+      "cloudcover": "75",
+      "humidity": "72",
+      "observation_time": "10:32 AM",
       "precipInches": "0.0",
-      "precipMM": "0.1",
+      "precipMM": "0.2",
       "pressure": "1001",
       "pressureInches": "30",
-      "temp_C": "15",
-      "temp_F": "59",
-      "uvIndex": "2",
+      "temp_C": "16",
+      "temp_F": "61",
+      "uvIndex": "1",
       "visibility": "10",
       "visibilityMiles": "6",
       "weatherCode": "296",
@@ -26,8 +26,8 @@
           "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0017_cloudy_with_light_rain.png"
         }
       ],
-      "winddir16Point": "W",
-      "winddirDegree": "266",
+      "winddir16Point": "N",
+      "winddirDegree": "351",
       "windspeedKmph": "4",
       "windspeedMiles": "2"
     }
@@ -36,7 +36,7 @@
     {
       "areaName": [
         {
-          "value": "Buda"
+          "value": "Gellert"
         }
       ],
       "country": [
@@ -44,8 +44,8 @@
           "value": "Hungary"
         }
       ],
-      "latitude": "47.500",
-      "longitude": "19.033",
+      "latitude": "47.483",
+      "longitude": "19.050",
       "population": "0",
       "region": [
         {
@@ -54,7 +54,7 @@
       ],
       "weatherUrl": [
         {
-          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.5,19.033"
+          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.483,19.05"
         }
       ]
     }
@@ -306,29 +306,29 @@
           "chanceofsunshine": "0",
           "chanceofthunder": "4",
           "chanceofwindy": "0",
-          "cloudcover": "100",
+          "cloudcover": "75",
           "diffRad": "56.2",
-          "humidity": "84",
+          "humidity": "72",
           "precipInches": "0.0",
           "precipMM": "0.2",
-          "pressure": "1003",
+          "pressure": "1001",
           "pressureInches": "30",
           "shortRad": "92.2",
-          "tempC": "14",
-          "tempF": "57",
+          "tempC": "16",
+          "tempF": "61",
           "time": "1200",
           "uvIndex": "1",
           "visibility": "10",
           "visibilityMiles": "6",
-          "weatherCode": "353",
+          "weatherCode": "296",
           "weatherDesc": [
             {
-              "value": "Light rain shower"
+              "value": "Light rain"
             }
           ],
           "weatherIconUrl": [
             {
-              "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0009_light_rain_showers.png"
+              "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0017_cloudy_with_light_rain.png"
             }
           ],
           "winddir16Point": "N",
