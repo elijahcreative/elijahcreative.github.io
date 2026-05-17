@@ -2,10 +2,10 @@
   "current_condition": [
     {
       "FeelsLikeC": "10",
-      "FeelsLikeF": "50",
+      "FeelsLikeF": "49",
       "cloudcover": "75",
       "humidity": "82",
-      "observation_time": "06:03 PM",
+      "observation_time": "07:32 PM",
       "precipInches": "0.0",
       "precipMM": "0.1",
       "pressure": "1011",
@@ -23,13 +23,13 @@
       ],
       "weatherIconUrl": [
         {
-          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0002_sunny_intervals.png"
+          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0004_black_low_cloud.png"
         }
       ],
       "winddir16Point": "NW",
-      "winddirDegree": "310",
-      "windspeedKmph": "13",
-      "windspeedMiles": "8"
+      "winddirDegree": "313",
+      "windspeedKmph": "12",
+      "windspeedMiles": "7"
     }
   ],
   "nearest_area": [
@@ -459,29 +459,29 @@
           "chanceofsunshine": "0",
           "chanceofthunder": "0",
           "chanceofwindy": "0",
-          "cloudcover": "69",
+          "cloudcover": "75",
           "diffRad": "0.1",
-          "humidity": "87",
+          "humidity": "82",
           "precipInches": "0.0",
           "precipMM": "0.1",
-          "pressure": "1013",
+          "pressure": "1011",
           "pressureInches": "30",
           "shortRad": "0.2",
-          "tempC": "10",
-          "tempF": "50",
+          "tempC": "11",
+          "tempF": "52",
           "time": "2100",
           "uvIndex": "0",
           "visibility": "10",
           "visibilityMiles": "6",
-          "weatherCode": "176",
+          "weatherCode": "116",
           "weatherDesc": [
             {
-              "value": "Patchy rain nearby"
+              "value": "Partly cloudy"
             }
           ],
           "weatherIconUrl": [
             {
-              "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0025_light_rain_showers_night.png"
+              "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0004_black_low_cloud.png"
             }
           ],
           "winddir16Point": "NW",
