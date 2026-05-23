@@ -1,34 +1,34 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "15",
-      "FeelsLikeF": "59",
+      "FeelsLikeC": "14",
+      "FeelsLikeF": "57",
       "cloudcover": "0",
       "humidity": "72",
-      "observation_time": "10:45 PM",
+      "observation_time": "03:15 AM",
       "precipInches": "0.0",
       "precipMM": "0.0",
-      "pressure": "1025",
+      "pressure": "1026",
       "pressureInches": "30",
-      "temp_C": "15",
-      "temp_F": "59",
+      "temp_C": "14",
+      "temp_F": "57",
       "uvIndex": "0",
       "visibility": "10",
       "visibilityMiles": "6",
-      "weatherCode": "113",
+      "weatherCode": "116",
       "weatherDesc": [
         {
-          "value": "Clear "
+          "value": "Partly Cloudy "
         }
       ],
       "weatherIconUrl": [
         {
-          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0008_clear_sky_night.png"
+          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0002_sunny_intervals.png"
         }
       ],
-      "winddir16Point": "NE",
-      "winddirDegree": "36",
-      "windspeedKmph": "9",
+      "winddir16Point": "N",
+      "winddirDegree": "352",
+      "windspeedKmph": "8",
       "windspeedMiles": "5"
     }
   ],
@@ -36,7 +36,7 @@
     {
       "areaName": [
         {
-          "value": "Kis-Gellerthegy"
+          "value": "Buda"
         }
       ],
       "country": [
@@ -44,7 +44,7 @@
           "value": "Hungary"
         }
       ],
-      "latitude": "47.483",
+      "latitude": "47.500",
       "longitude": "19.033",
       "population": "0",
       "region": [
@@ -54,7 +54,7 @@
       ],
       "weatherUrl": [
         {
-          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.483,19.033"
+          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.5,19.033"
         }
       ]
     }
@@ -491,10 +491,10 @@
         }
       ],
       "maxtempC": "26",
-      "maxtempF": "79",
+      "maxtempF": "78",
       "mintempC": "15",
       "mintempF": "60",
-      "sunHour": "15.7",
+      "sunHour": "15.5",
       "totalSnow_cm": "0.0",
       "uvIndex": "7"
     },
@@ -923,10 +923,10 @@
         }
       ],
       "maxtempC": "27",
-      "maxtempF": "80",
+      "maxtempF": "81",
       "mintempC": "16",
       "mintempF": "60",
-      "sunHour": "15.7",
+      "sunHour": "15.5",
       "totalSnow_cm": "0.0",
       "uvIndex": "8"
     },
@@ -942,7 +942,7 @@
         }
       ],
       "avgtempC": "24",
-      "avgtempF": "74",
+      "avgtempF": "75",
       "date": "2026-05-25",
       "hourly": [
         {
@@ -1355,7 +1355,7 @@
         }
       ],
       "maxtempC": "29",
-      "maxtempF": "84",
+      "maxtempF": "85",
       "mintempC": "18",
       "mintempF": "64",
       "sunHour": "15.7",
