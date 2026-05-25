@@ -1,28 +1,28 @@
 {
   "Podiums": [
     {
-      "Country": "🇺🇸 USA",
-      "City": "Miami",
-      "Message": "2026 4th race"
+      "Country": "🇨🇦 Canada",
+      "City": "Montréal",
+      "Message": "Race ?"
     },
     {
       "Place": "1",
       "Name": "Antonelli",
       "Team": "Mercedes",
       "Points": "+25",
-      "Total": "100"
+      "Total": "131"
     },
     {
       "Place": "2",
-      "Name": "Norris",
-      "Team": "McLaren",
+      "Name": "Hamilton",
+      "Team": "Ferrari",
       "Points": "+18",
-      "Total": "51"
+      "Total": "72"
     },
     {
       "Place": "3",
-      "Name": "Piastri",
-      "Team": "McLaren",
+      "Name": "Verstappen",
+      "Team": "Red Bull",
       "Points": "+15",
       "Total": "43"
     }
