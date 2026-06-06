@@ -4,15 +4,15 @@
       "FeelsLikeC": "25",
       "FeelsLikeF": "78",
       "cloudcover": "0",
-      "humidity": "39",
-      "observation_time": "02:03 PM",
+      "humidity": "36",
+      "observation_time": "03:33 PM",
       "precipInches": "0.0",
       "precipMM": "0.0",
       "pressure": "1016",
       "pressureInches": "30",
       "temp_C": "25",
       "temp_F": "77",
-      "uvIndex": "5",
+      "uvIndex": "2",
       "visibility": "10",
       "visibilityMiles": "6",
       "weatherCode": "116",
@@ -26,8 +26,8 @@
           "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0002_sunny_intervals.png"
         }
       ],
-      "winddir16Point": "NNW",
-      "winddirDegree": "334",
+      "winddir16Point": "NNE",
+      "winddirDegree": "16",
       "windspeedKmph": "4",
       "windspeedMiles": "2"
     }
@@ -36,7 +36,7 @@
     {
       "areaName": [
         {
-          "value": "Buda"
+          "value": "Gellert"
         }
       ],
       "country": [
@@ -44,8 +44,8 @@
           "value": "Hungary"
         }
       ],
-      "latitude": "47.500",
-      "longitude": "19.033",
+      "latitude": "47.483",
+      "longitude": "19.050",
       "population": "0",
       "region": [
         {
@@ -54,7 +54,7 @@
       ],
       "weatherUrl": [
         {
-          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.5,19.033"
+          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.483,19.05"
         }
       ]
     }
@@ -345,8 +345,8 @@
           "HeatIndexF": "79",
           "WindChillC": "26",
           "WindChillF": "78",
-          "WindGustKmph": "11",
-          "WindGustMiles": "7",
+          "WindGustKmph": "2",
+          "WindGustMiles": "2",
           "chanceoffog": "0",
           "chanceoffrost": "0",
           "chanceofhightemp": "20",
@@ -357,16 +357,16 @@
           "chanceofsunshine": "22",
           "chanceofthunder": "0",
           "chanceofwindy": "0",
-          "cloudcover": "0",
+          "cloudcover": "45",
           "diffRad": "206.4",
           "humidity": "39",
           "precipInches": "0.0",
           "precipMM": "0.0",
-          "pressure": "1016",
+          "pressure": "1017",
           "pressureInches": "30",
           "shortRad": "790.3",
-          "tempC": "25",
-          "tempF": "77",
+          "tempC": "26",
+          "tempF": "78",
           "time": "1500",
           "uvIndex": "5",
           "visibility": "10",
@@ -384,8 +384,8 @@
           ],
           "winddir16Point": "NNW",
           "winddirDegree": "334",
-          "windspeedKmph": "4",
-          "windspeedMiles": "2"
+          "windspeedKmph": "2",
+          "windspeedMiles": "1"
         },
         {
           "DewPointC": "10",
