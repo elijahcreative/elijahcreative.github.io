@@ -1,8 +1,8 @@
 {
   "Podiums": [
     {
-      "Country": "🇨🇦 Canada",
-      "City": "Montréal",
+      "Country": "🇲🇨 Monaco",
+      "City": "Monte Carlo",
       "Message": "Race ?"
     },
     {
@@ -10,21 +10,21 @@
       "Name": "Antonelli",
       "Team": "Mercedes",
       "Points": "+25",
-      "Total": "131"
+      "Total": "156"
     },
     {
       "Place": "2",
       "Name": "Hamilton",
       "Team": "Ferrari",
       "Points": "+18",
-      "Total": "72"
+      "Total": "90"
     },
     {
       "Place": "3",
-      "Name": "Verstappen",
+      "Name": "Hadjar",
       "Team": "Red Bull",
       "Points": "+15",
-      "Total": "43"
+      "Total": "29"
     }
   ]
 }

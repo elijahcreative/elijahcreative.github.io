@@ -1,43 +1,43 @@
 {
   "Standings": [
     {
-      "After": "After Canada"
+      "After": "After Monaco"
     },
     {
       "Place": "1",
       "Name": "Antonelli",
       "Team": "Mercedes",
-      "Points": "131"
+      "Points": "156"
     },
     {
       "Place": "2",
+      "Name": "Hamilton",
+      "Team": "Ferrari",
+      "Points": "90"
+    },
+    {
+      "Place": "3",
       "Name": "Russell",
       "Team": "Mercedes",
       "Points": "88"
     },
     {
-      "Place": "3",
+      "Place": "4",
       "Name": "Leclerc",
       "Team": "Ferrari",
       "Points": "75"
     },
     {
-      "Place": "4",
-      "Name": "Hamilton",
-      "Team": "Ferrari",
-      "Points": "72"
-    },
-    {
       "Place": "5",
-      "Name": "Norris",
+      "Name": "Piastri",
       "Team": "McLaren",
-      "Points": "58"
+      "Points": "60"
     },
     {
       "Place": "6",
-      "Name": "Piastri",
+      "Name": "Norris",
       "Team": "McLaren",
-      "Points": "48"
+      "Points": "58"
     }
   ]
 }
