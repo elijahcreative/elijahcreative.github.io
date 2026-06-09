@@ -1,0 +1,45 @@
+name: Update races-new practice sessions
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "15 3 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  update-races-new-practices:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Update races-new practice sessions
+        run: node scripts/update-races-new-practices.js
+
+      - name: Check for races-new changes
+        id: git-check
+        run: |
+          if git diff --quiet -- F1/2023/Data/races-new.json; then
+            echo "changes=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changes=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and push if changed
+        if: steps.git-check.outputs.changes == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add F1/2023/Data/races-new.json
+          git commit -m "Update races-new practice sessions"
+          git push origin main

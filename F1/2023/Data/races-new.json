@@ -3,6 +3,9 @@
         {
             "Country": "🇦🇺 Australia",
             "City": "Melbourne",
+            "FP1": "Mar 6 2026 1:30 UTC",
+            "FP2": "Mar 6 2026 5:00 UTC",
+            "FP3": "Mar 7 2026 1:30 UTC",
             "Qual": "Mar 7 2026 05:00 UTC",
             "Sprint": "",
             "Sprintqual": "",
@@ -20,6 +23,9 @@
         {
             "Country": "🇨🇳 China",
             "City": "Shanghai",
+            "FP1": "Mar 13 2026 3:30 UTC",
+            "FP2": "",
+            "FP3": "",
             "Qual": "Mar 14 2026 07:00 UTC",
             "Sprint": "Mar 14 2026 03:00 UTC",
             "Sprintqual": "Mar 13 2026 7:30 UTC",
@@ -37,6 +43,9 @@
         {
             "Country": "🇯🇵 Japan",
             "City": "Suzuka",
+            "FP1": "Mar 27 2026 2:30 UTC",
+            "FP2": "Mar 27 2026 6:00 UTC",
+            "FP3": "Mar 28 2026 2:30 UTC",
             "Qual": "Mar 28 2026 06:00 UTC",
             "Sprint": "",
             "Sprintqual": "",
@@ -54,6 +63,9 @@
         {
             "Country": "🇧🇭 Bahrain",
             "City": "Sakhir",
+            "FP1": "Apr 10 2026 11:30 UTC",
+            "FP2": "Apr 10 2026 15:00 UTC",
+            "FP3": "Apr 11 2026 12:30 UTC",
             "Qual": "Apr 11 2026 16:00 UTC",
             "Sprint": "",
             "Sprintqual": "",
@@ -71,6 +83,9 @@
         {
             "Country": "🇺🇸 USA",
             "City": "Miami",
+            "FP1": "May 1 2026 16:00 UTC",
+            "FP2": "",
+            "FP3": "",
             "Qual": "May 2 2026 20:00 UTC",
             "Sprint": "May 2 2026 16:00 UTC",
             "Sprintqual": "May 1 2026 20:30 UTC",
@@ -88,6 +103,9 @@
         {
             "Country": "🇨🇦 Canada",
             "City": "Montréal",
+            "FP1": "May 22 2026 16:30 UTC",
+            "FP2": "",
+            "FP3": "",
             "Qual": "May 23 2026 20:00 UTC",
             "Sprint": "May 23 2026 16:00 UTC",
             "Sprintqual": "May 22 2026 20:30 UTC",
@@ -105,6 +123,9 @@
         {
             "Country": "🇲🇨 Monaco",
             "City": "Monte Carlo",
+            "FP1": "Jun 5 2026 11:30 UTC",
+            "FP2": "Jun 5 2026 15:00 UTC",
+            "FP3": "Jun 6 2026 10:30 UTC",
             "Qual": "Jun 6 2026 14:00 UTC",
             "Sprint": "",
             "Sprintqual": "",
@@ -122,6 +143,9 @@
         {
             "Country": "🇪🇸 Spain",
             "City": "Barcelona",
+            "FP1": "Jun 12 2026 11:30 UTC",
+            "FP2": "Jun 12 2026 15:00 UTC",
+            "FP3": "Jun 13 2026 10:30 UTC",
             "Qual": "Jun 13 2026 14:00 UTC",
             "Sprint": "",
             "Sprintqual": "",
@@ -139,6 +163,9 @@
         {
             "Country": "🇦🇹 Austria",
             "City": "Spielberg",
+            "FP1": "Jun 26 2026 11:30 UTC",
+            "FP2": "Jun 26 2026 15:00 UTC",
+            "FP3": "Jun 27 2026 10:30 UTC",
             "Qual": "Jun 27 2026 14:00 UTC",
             "Sprint": "",
             "Sprintqual": "",
@@ -156,6 +183,9 @@
         {
             "Country": "🇬🇧 UK",
             "City": "Silverstone",
+            "FP1": "Jul 3 2026 11:30 UTC",
+            "FP2": "",
+            "FP3": "",
             "Qual": "Jul 4 2026 15:00 UTC",
             "Sprint": "Jul 4 2026 11:00 UTC",
             "Sprintqual": "Jul 3 2026 15:30 UTC",
@@ -173,6 +203,9 @@
         {
             "Country": "🇧🇪 Belgium",
             "City": "Stavelot",
+            "FP1": "Jul 17 2026 11:30 UTC",
+            "FP2": "Jul 17 2026 15:00 UTC",
+            "FP3": "Jul 18 2026 10:30 UTC",
             "Qual": "Jul 18 2026 14:00 UTC",
             "Sprint": "",
             "Sprintqual": "",
@@ -190,6 +223,9 @@
         {
             "Country": "🇭🇺 Hungary",
             "City": "Mogyoród",
+            "FP1": "Jul 24 2026 11:30 UTC",
+            "FP2": "Jul 24 2026 15:00 UTC",
+            "FP3": "Jul 25 2026 10:30 UTC",
             "Qual": "Jul 25 2026 14:00 UTC",
             "Sprint": "",
             "Sprintqual": "",
@@ -207,6 +243,9 @@
         {
             "Country": "🇳🇱 Netherlands",
             "City": "Zandvoort",
+            "FP1": "Aug 21 2026 10:30 UTC",
+            "FP2": "",
+            "FP3": "",
             "Qual": "Aug 22 2026 14:00 UTC",
             "Sprint": "Aug 22 2026 10:00 UTC",
             "Sprintqual": "Aug 21 2026 14:30 UTC",
@@ -224,6 +263,9 @@
         {
             "Country": "🇮🇹 Italy",
             "City": "Monza",
+            "FP1": "Sep 4 2026 10:30 UTC",
+            "FP2": "Sep 4 2026 14:00 UTC",
+            "FP3": "Sep 5 2026 10:30 UTC",
             "Qual": "Sep 5 2026 14:00 UTC",
             "Sprint": "",
             "Sprintqual": "",
@@ -241,6 +283,9 @@
         {
             "Country": "🇪🇸 Spain",
             "City": "Madrid",
+            "FP1": "Sep 11 2026 11:30 UTC",
+            "FP2": "Sep 11 2026 15:00 UTC",
+            "FP3": "Sep 12 2026 10:30 UTC",
             "Qual": "Sep 12 2026 14:00 UTC",
             "Sprint": "",
             "Sprintqual": "",
@@ -258,6 +303,9 @@
         {
             "Country": "🇦🇿 Azerbaijan",
             "City": "Baku",
+            "FP1": "Sep 24 2026 8:30 UTC",
+            "FP2": "Sep 24 2026 12:00 UTC",
+            "FP3": "Sep 25 2026 8:30 UTC",
             "Qual": "Sep 25 2026 12:00 UTC",
             "Sprint": "",
             "Sprintqual": "",
@@ -275,6 +323,9 @@
         {
             "Country": "🇸🇬 Singapore",
             "City": "Marina Bay",
+            "FP1": "Oct 9 2026 8:30 UTC",
+            "FP2": "",
+            "FP3": "",
             "Qual": "Oct 10 2026 13:00 UTC",
             "Sprint": "Oct 10 2026 09:00 UTC",
             "Sprintqual": "Oct 9 2026 13:30 UTC",
@@ -292,6 +343,9 @@
         {
             "Country": "🇺🇸 USA",
             "City": "Austin",
+            "FP1": "Oct 23 2026 17:30 UTC",
+            "FP2": "Oct 23 2026 21:00 UTC",
+            "FP3": "Oct 24 2026 17:30 UTC",
             "Qual": "Oct 24 2026 21:00 UTC",
             "Sprint": "",
             "Sprintqual": "",
@@ -309,6 +363,9 @@
         {
             "Country": "🇲🇽 Mexico",
             "City": "Mexico City",
+            "FP1": "Oct 30 2026 18:30 UTC",
+            "FP2": "Oct 30 2026 22:00 UTC",
+            "FP3": "Oct 31 2026 17:30 UTC",
             "Qual": "Oct 31 2026 21:00 UTC",
             "Sprint": "",
             "Sprintqual": "",
@@ -326,6 +383,9 @@
         {
             "Country": "🇧🇷 Brazil",
             "City": "São Paulo",
+            "FP1": "Nov 6 2026 15:30 UTC",
+            "FP2": "Nov 6 2026 19:00 UTC",
+            "FP3": "Nov 7 2026 14:30 UTC",
             "Qual": "Nov 7 2026 18:00 UTC",
             "Sprint": "",
             "Sprintqual": "",
@@ -343,6 +403,9 @@
         {
             "Country": "🇺🇸 USA",
             "City": "Las Vegas",
+            "FP1": "Nov 20 2026 0:30 UTC",
+            "FP2": "Nov 20 2026 4:00 UTC",
+            "FP3": "Nov 21 2026 0:30 UTC",
             "Qual": "Nov 21 2026 04:00 UTC",
             "Sprint": "",
             "Sprintqual": "",
@@ -360,6 +423,9 @@
         {
             "Country": "🇶🇦 Qatar",
             "City": "Doha",
+            "FP1": "Nov 27 2026 13:30 UTC",
+            "FP2": "Nov 27 2026 17:00 UTC",
+            "FP3": "Nov 28 2026 14:30 UTC",
             "Qual": "Nov 28 2026 18:00 UTC",
             "Sprint": "",
             "Sprintqual": "",
@@ -377,6 +443,9 @@
         {
             "Country": "🇦🇪 U.A. Emirates",
             "City": "Abu Dhabi",
+            "FP1": "Dec 4 2026 9:30 UTC",
+            "FP2": "Dec 4 2026 13:00 UTC",
+            "FP3": "Dec 5 2026 10:30 UTC",
             "Qual": "Dec 5 2026 14:00 UTC",
             "Sprint": "",
             "Sprintqual": "",
