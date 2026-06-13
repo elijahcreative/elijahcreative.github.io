@@ -1273,6 +1273,23 @@
     .s-feed-del:hover { background: #fee2e2; color: #dc2626; }
     .s-feed-drag { color: var(--muted); cursor: grab; padding: 3px 4px; font-size: 1rem; line-height: 1.6; user-select: none; }
     .s-feed-drag:active { cursor: grabbing; }
+    .s-feed-grip { display: inline-block; }
+    .s-feed-move {
+      display: none;
+      width: 28px;
+      height: 28px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg);
+      color: var(--text2);
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: .8rem;
+      line-height: 1;
+    }
+    .s-feed-move:disabled { opacity: .35; cursor: default; }
+    .s-feed-move:not(:disabled):hover { border-color: var(--ac); color: var(--ac); background: var(--bg-hover); }
     .s-feed-item.drag-over { outline: 2px solid var(--ac); border-radius: var(--radius-sm); }
 
     /* ── Add Feed Modal ─────────────────────────────────────── */
@@ -1423,6 +1440,17 @@
       .v-layout-btn {
         min-height: 44px;
       }
+      .s-feed-drag {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding: 0;
+        cursor: default;
+        touch-action: manipulation;
+      }
+      .s-feed-grip { display: none; }
+      .s-feed-move { display: inline-flex; }
+      .s-feed-item { align-items: center; }
 
       .article-modal-layer {
         align-items: flex-end;
@@ -3151,9 +3179,14 @@ function renderSidebar() {
 function renderSFeeds() {
   const c = $('sFeedList');
   if (!S.feeds.length) { c.innerHTML = '<div style="font-size:.78rem;color:var(--muted)">Nincs feed.</div>'; return; }
+  const js = v => e(JSON.stringify(v));
   c.innerHTML = S.feeds.map((f, i) => `
     <div class="s-feed-item" draggable="true" data-url="${f.url}" data-idx="${i}">
-      <span class="s-feed-drag" title="Húzd át">⠿</span>
+      <span class="s-feed-drag" title="Átrendezés">
+        <span class="s-feed-grip">⠿</span>
+        <button class="s-feed-move" type="button" onclick="moveFeed(${js(f.url)},-1)" ${i === 0 ? 'disabled' : ''} title="Fel">↑</button>
+        <button class="s-feed-move" type="button" onclick="moveFeed(${js(f.url)},1)" ${i === S.feeds.length - 1 ? 'disabled' : ''} title="Le">↓</button>
+      </span>
       <div style="flex:1;min-width:0">
         <input class="s-feed-name" value="${e(f.name)}" onblur="renameFeed('${f.url}',this.value)" onkeydown="if(event.key==='Enter')this.blur()">
         <input class="s-feed-url" value="${e(f.url)}" onblur="renameFeedUrl('${e(f.url)}',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()" title="Feed URL — kattints a szerkesztéshez">
@@ -4387,10 +4420,15 @@ function renderSYtChannels() {
     c.innerHTML = '<div style="font-size:.78rem;color:var(--muted);padding:4px 0">Nincs csatorna.</div>';
     return;
   }
+  const js = v => e(JSON.stringify(v));
   const ytIcon = `<svg width="13" height="13" viewBox="0 0 24 24" fill="#ff0000" style="flex-shrink:0"><path d="M23 7s-.3-2-1.2-2.8C20.7 3 19.4 3 18.8 2.9 15.7 2.7 12 2.7 12 2.7s-3.7 0-6.8.2C4.6 3 3.3 3 2.2 4.2 1.3 5 1 7 1 7S.7 9.3.7 11.6v2.1c0 2.3.3 4.6.3 4.6s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2C7.9 22.5 12 22.5 12 22.5s3.7 0 6.8-.3c.6-.1 1.9-.1 3-1.3.9-.8 1.2-2.8 1.2-2.8s.3-2.3.3-4.6v-2.1C23.3 9.3 23 7 23 7zM9.7 15.5V9.2l6.6 3.2-6.6 3.1z"/></svg>`;
   c.innerHTML = S.ytChannels.map((ch, i) => `
     <div class="s-feed-item" draggable="true" data-ytid="${e(ch.id)}" data-idx="${i}">
-      <span class="s-feed-drag" title="Húzd át">⠿</span>
+      <span class="s-feed-drag" title="Átrendezés">
+        <span class="s-feed-grip">⠿</span>
+        <button class="s-feed-move" type="button" onclick="moveYtChannel(${js(ch.id)},-1)" ${i === 0 ? 'disabled' : ''} title="Fel">↑</button>
+        <button class="s-feed-move" type="button" onclick="moveYtChannel(${js(ch.id)},1)" ${i === S.ytChannels.length - 1 ? 'disabled' : ''} title="Le">↓</button>
+      </span>
       <span style="flex-shrink:0;padding-top:3px">${ytIcon}</span>
       <div style="flex:1;min-width:0">
         <input class="s-feed-name" value="${e(ch.name || ch.id)}" onblur="renameYtChannelName('${e(ch.id)}',this.value)" onkeydown="if(event.key==='Enter')this.blur()">
@@ -4424,6 +4462,17 @@ function renderSYtChannels() {
       saveYtChannels(); renderSYtChannels(); injectYtSidebar();
     });
   });
+}
+
+function moveYtChannel(id, dir) {
+  const i = S.ytChannels.findIndex(ch => ch.id === id);
+  if (i < 0) return;
+  const j = i + dir;
+  if (j < 0 || j >= S.ytChannels.length) return;
+  [S.ytChannels[i], S.ytChannels[j]] = [S.ytChannels[j], S.ytChannels[i]];
+  saveYtChannels();
+  renderSYtChannels();
+  injectYtSidebar();
 }
 
 function deleteYtChannel(id) {

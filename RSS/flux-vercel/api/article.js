@@ -84,7 +84,12 @@ function extractTelexArticle(html, sourceUrl) {
 
 function extractIndexArticle(html, sourceUrl) {
   const lead = cleanupArticleContent(extractElementByClass(html, 'lead') || '', sourceUrl);
-  const body = cleanupArticleContent(extractElementByClass(html, 'cikk-torzs') || '', sourceUrl);
+  const body = cleanupArticleContent(
+    extractElementByClass(html, 'cikk-torzs') ||
+    extractIndexLiveblogEntry(html, sourceUrl) ||
+    '',
+    sourceUrl
+  );
   const content = [lead ? `<p>${lead}</p>` : '', body].join('\n').trim();
 
   return {
@@ -96,6 +101,22 @@ function extractIndexArticle(html, sourceUrl) {
     date: meta(html, 'property', 'article:published_time'),
     content
   };
+}
+
+function extractIndexLiveblogEntry(html, sourceUrl) {
+  const normalizedUrl = sourceUrl.replace(/\/+$/, '');
+  const candidates = [
+    sourceUrl,
+    normalizedUrl,
+    normalizedUrl + '/'
+  ];
+  let start = -1;
+  for (const url of candidates) {
+    start = html.indexOf(`href="${url}"`);
+    if (start >= 0) break;
+  }
+  if (start < 0) return '';
+  return extractElementByClassFrom(html, 'pp-cikk-torzs', start) || '';
 }
 
 function extractHvgArticle(html, sourceUrl) {
@@ -133,6 +154,11 @@ function extractPortfolioArticle(html, sourceUrl) {
 function extractElementByClass(html, className) {
   const span = elementSpanByClass(html, className);
   return span ? html.slice(span.innerStart, span.innerEnd) : '';
+}
+
+function extractElementByClassFrom(html, className, start) {
+  const span = elementSpanByClass(html.slice(start), className);
+  return span ? html.slice(start + span.innerStart, start + span.innerEnd) : '';
 }
 
 function extractElementById(html, id) {
