@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "api/article.js": {
+      "maxDuration": 10
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/index.html"
+    }
+  ]
+}
