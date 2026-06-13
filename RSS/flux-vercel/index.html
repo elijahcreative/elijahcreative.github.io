@@ -1487,7 +1487,60 @@
       .ix-trio { grid-template-columns: 1fr; }
       .ix-strip { grid-template-columns: 1fr; }
       .ix-mini-grid { grid-template-columns: 1fr 1fr; }
-      .ix-hero-side { grid-template-columns: 1fr; }
+      .ix-hero-side {
+        grid-template-columns: 1fr;
+        gap: 0;
+        margin-top: 4px;
+      }
+      .ix-hero-side .ix-card {
+        display: grid;
+        grid-template-columns: 112px minmax(0, 1fr);
+        column-gap: 12px;
+        row-gap: 4px;
+        align-items: start;
+        padding: 12px 0;
+        margin-bottom: 0;
+        border-top: 1px solid var(--border);
+      }
+      .ix-hero-side .ix-card .ix-img-wrap {
+        grid-row: 1 / span 3;
+        width: 100%;
+      }
+      .ix-hero-side .ix-card-img,
+      .ix-hero-side .ix-card-nobg {
+        width: 100%;
+        aspect-ratio: 4/3;
+        border-radius: var(--radius);
+      }
+      .ix-hero-side .ix-card-title {
+        grid-column: 2;
+        font-size: 1rem;
+        line-height: 1.22;
+        -webkit-line-clamp: 3;
+      }
+      .ix-hero-side .ix-card-desc {
+        grid-column: 2;
+        font-size: .84rem;
+        line-height: 1.38;
+        -webkit-line-clamp: 2;
+      }
+      .ix-hero-side .ix-card-time {
+        grid-column: 2;
+        margin-top: 1px;
+      }
+      .ix-hero-side .ix-text-fill {
+        padding: 12px 0;
+        margin-top: 0;
+        border-top: 1px solid var(--border);
+      }
+      .ix-hero-side .ix-tf-title {
+        font-size: 1rem;
+        line-height: 1.26;
+      }
+      .ix-hero-side .ix-tf-desc {
+        font-size: .84rem;
+        line-height: 1.42;
+      }
       .ix-col-side { flex-direction: column; gap: 0; }
       .ix-col-side .ix-card { flex: 0 0 auto; }
 
@@ -1824,6 +1877,58 @@
       color: var(--muted);
       line-height: 1.5;
       padding-top: 10px;
+    }
+    @media (max-width: 600px) {
+      .magazine-layout > .yt-sidebar {
+        width: 100%;
+        margin-top: 26px;
+        margin-bottom: 34px;
+      }
+      .yt-sidebar::before,
+      .yt-sidebar::after {
+        bottom: 48px;
+        width: 34px;
+      }
+      .yt-scroll-row {
+        gap: 14px;
+        padding: 0 2px 10px;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+      }
+      .yt-scroll-row::-webkit-scrollbar { display: none; }
+      .yt-vcard {
+        flex: 0 0 calc((100% - 14px) / 2);
+        min-width: calc((100% - 14px) / 2);
+        gap: 7px;
+        scroll-snap-align: start;
+        overflow: visible;
+      }
+      .yt-vcard-thumb {
+        border-radius: var(--radius);
+      }
+      .yt-vcard-title {
+        font-size: .94rem;
+        line-height: 1.24;
+        -webkit-line-clamp: 3;
+      }
+      .yt-vcard-meta {
+        font-size: .74rem;
+        line-height: 1.3;
+        margin-top: 5px;
+      }
+      .yt-vcard-channel {
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .yt-pager {
+        margin-top: 10px;
+      }
+      .yt-page-btn {
+        width: 36px;
+        height: 36px;
+      }
     }
 
     /* ── View Panel Layout Buttons ──────────────────────────── */
