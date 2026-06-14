@@ -13,13 +13,13 @@
       "Place": "2",
       "Name": "Hamilton",
       "Team": "Ferrari",
-      "Points": "90"
+      "Points": "115"
     },
     {
       "Place": "3",
       "Name": "Russell",
       "Team": "Mercedes",
-      "Points": "88"
+      "Points": "106"
     },
     {
       "Place": "4",
@@ -29,15 +29,15 @@
     },
     {
       "Place": "5",
-      "Name": "Piastri",
+      "Name": "Norris",
       "Team": "McLaren",
-      "Points": "58"
+      "Points": "73"
     },
     {
       "Place": "6",
-      "Name": "Norris",
+      "Name": "Piastri",
       "Team": "McLaren",
-      "Points": "58"
+      "Points": "68"
     }
   ]
 }

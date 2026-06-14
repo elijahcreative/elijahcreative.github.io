@@ -7,24 +7,24 @@
     },
     {
       "Place": "1",
-      "Name": "Antonelli",
-      "Team": "Mercedes",
+      "Name": "Hamilton",
+      "Team": "Ferrari",
       "Points": "+25",
-      "Total": "156"
+      "Total": "115"
     },
     {
       "Place": "2",
-      "Name": "Hamilton",
-      "Team": "Ferrari",
+      "Name": "Russell",
+      "Team": "Mercedes",
       "Points": "+18",
-      "Total": "90"
+      "Total": "106"
     },
     {
       "Place": "3",
-      "Name": "Gasly",
-      "Team": "Alpine F1 Team",
+      "Name": "Norris",
+      "Team": "McLaren",
       "Points": "+15",
-      "Total": "35"
+      "Total": "73"
     }
   ]
 }
