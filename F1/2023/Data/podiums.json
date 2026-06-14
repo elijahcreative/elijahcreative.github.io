@@ -1,8 +1,8 @@
 {
   "Podiums": [
     {
-      "Country": "🇲🇨 Monaco",
-      "City": "Monte Carlo",
+      "Country": "🇪🇸 Spain",
+      "City": "Barcelona",
       "Message": "Race ?"
     },
     {
@@ -21,10 +21,10 @@
     },
     {
       "Place": "3",
-      "Name": "Hadjar",
-      "Team": "Red Bull",
+      "Name": "Gasly",
+      "Team": "Alpine F1 Team",
       "Points": "+15",
-      "Total": "29"
+      "Total": "35"
     }
   ]
 }
