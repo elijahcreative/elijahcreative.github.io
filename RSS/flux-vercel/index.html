@@ -320,19 +320,33 @@
     }
     .wx-frow {
       display: grid;
-      grid-template-columns: 1fr 22px auto 1fr 1fr;
+      grid-template-columns: minmax(54px, .9fr) 24px minmax(72px, 1.3fr) 44px 34px 34px;
       align-items: center;
-      gap: 6px;
+      column-gap: 6px;
       padding: 4px 0;
       font-size: .8rem;
     }
     .wx-fday  { color: var(--text); font-weight: 500; text-align: left; }
-    .wx-ficon { display: flex; justify-content: center; }
+    .wx-ficon { display: flex; justify-content: flex-start; min-width: 0; }
     .wx-fcond { color: var(--text2); text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .wx-frain { color: var(--text2); text-align: right; font-size: .75rem; }
-    .wx-ftemp { text-align: right; white-space: nowrap; }
-    .wx-ftemp-min { color: #60a5fa; margin-right: 4px; }
-    .wx-ftemp-max { color: #f97316; }
+    .wx-frain {
+      color: var(--text2);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 2px;
+      min-width: 0;
+      font-size: .75rem;
+      text-align: right;
+      white-space: nowrap;
+    }
+    .wx-ftemp-min,
+    .wx-ftemp-max {
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+    .wx-ftemp-min { color: #60a5fa; text-align: right; }
+    .wx-ftemp-max { color: #f97316; text-align: left; }
 
     /* ── Content ───────────────────────────────────────────── */
 
@@ -3864,8 +3878,9 @@ async function loadWeather() {
             <span class="wx-fday">${i === 0 ? 'Holnap' : HU[day.dow]}</span>
             <span class="wx-ficon">${ic(wxIconName(day.code, true), 20)}</span>
             <span class="wx-fcond">${WX_LABELS[day.code] || ''}</span>
-            <span class="wx-frain" style="display:flex;align-items:center;justify-content:flex-end;gap:2px">${day.precip > 0 ? `${day.precip}%${ic('raindrop', 11)}` : ''}</span>
-            <span class="wx-ftemp"><span class="wx-ftemp-min">${day.tmin}°</span><span class="wx-ftemp-max">${day.tmax}°</span></span>
+            <span class="wx-frain">${day.precip > 0 ? `${day.precip}%${ic('raindrop', 11)}` : ''}</span>
+            <span class="wx-ftemp-min">${day.tmin}°</span>
+            <span class="wx-ftemp-max">${day.tmax}°</span>
           </div>`;
         }).join('')}</div>
       </div>`;
