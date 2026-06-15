@@ -1902,44 +1902,49 @@
     }
     @media (max-width: 720px) {
       .f1-popup {
-        position: fixed;
-        top: 64px;
-        left: 12px;
-        right: 12px;
-        width: auto;
+        position: fixed !important;
+        top: 66px !important;
+        left: 16px !important;
+        right: 16px !important;
+        width: auto !important;
+        max-width: none !important;
+        transform: translateY(-8px) !important;
+      }
+      .f1-popup.f1-open {
+        transform: translateY(0) !important;
       }
       .f1-nav-country { display: none; }
       .f1-card {
         border-radius: var(--radius);
-        padding: 13px 13px 14px;
+        padding: 12px 11px 12px;
       }
       .f1-ticker {
-        justify-content: flex-start;
-        font-size: .5rem;
+        justify-content: center;
+        font-size: .58rem;
       }
       .f1-title {
-        font-size: clamp(1.18rem, 6.6vw, 1.72rem);
-        letter-spacing: .085em;
-        margin: 10px 0 13px;
+        font-size: clamp(1rem, 5.2vw, 1.42rem);
+        letter-spacing: .075em;
+        margin: 9px 0 11px;
       }
       .f1-track { padding-top: 10px; }
-      .f1-trackline { top: 38px; left: 9%; right: 9%; height: 3px; }
+      .f1-trackline { top: 37px; left: 9%; right: 9%; height: 3px; }
       .f1-event {
-        grid-template-rows: 15px 28px 34px 22px 20px;
+        grid-template-rows: 15px 26px 28px 19px 18px;
       }
       .f1-event-dot {
-        width: 22px;
-        height: 22px;
+        width: 20px;
+        height: 20px;
         border-width: 3px;
       }
-      .f1-event-status { font-size: .58rem; margin-left: 0; justify-self: center; }
-      .f1-event-label { font-size: clamp(.78rem, 4vw, 1.08rem); }
+      .f1-event-status { font-size: .5rem; margin-left: 0; justify-self: center; }
+      .f1-event-label { font-size: clamp(.66rem, 3.4vw, .92rem); }
       .f1-event-date,
-      .f1-event-time { font-size: clamp(.72rem, 3.7vw, 1rem); }
+      .f1-event-time { font-size: clamp(.6rem, 3.1vw, .82rem); }
       .f1-upcoming {
-        justify-content: flex-start;
-        font-size: .5rem;
-        margin-top: 11px;
+        justify-content: center;
+        font-size: .58rem;
+        margin-top: 10px;
       }
     }
 
