@@ -268,7 +268,7 @@
       position: absolute;
       top: calc(100% + 10px);
       right: 0;
-      width: 300px;
+      width: clamp(320px, 30em, min(480px, calc(100vw - 24px)));
       background: var(--bg);
       border: 1px solid var(--border);
       border-radius: var(--radius);
@@ -317,14 +317,17 @@
     .wx-forecast {
       border-top: 1px solid var(--border);
       padding: 8px 0 4px;
+      width: 100%;
+      overflow: hidden;
     }
     .wx-frow {
       display: grid;
-      grid-template-columns: minmax(54px, .9fr) 24px minmax(72px, 1.3fr) 44px 34px 34px;
+      grid-template-columns: minmax(4.8em, .85fr) 1.5em minmax(0, 1.4fr) minmax(3.4em, .55fr) 2.8em 2.8em;
       align-items: center;
-      column-gap: 6px;
+      column-gap: .45em;
       padding: 4px 0;
       font-size: .8rem;
+      min-width: 0;
     }
     .wx-fday  { color: var(--text); font-weight: 500; text-align: left; }
     .wx-ficon { display: flex; justify-content: flex-start; min-width: 0; }
