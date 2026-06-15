@@ -268,7 +268,7 @@
       position: absolute;
       top: calc(100% + 10px);
       right: 0;
-      width: clamp(320px, 30em, min(480px, calc(100vw - 24px)));
+      width: clamp(320px, 24.5em, min(410px, calc(100vw - 24px)));
       background: var(--bg);
       border: 1px solid var(--border);
       border-radius: var(--radius);
@@ -322,9 +322,9 @@
     }
     .wx-frow {
       display: grid;
-      grid-template-columns: minmax(4.8em, .85fr) 1.5em minmax(0, 1.4fr) minmax(3.4em, .55fr) 2.8em 2.8em;
+      grid-template-columns: 5.1em 1.45em minmax(5.7em, 1fr) 3.25em 2.55em 2.55em;
       align-items: center;
-      column-gap: .45em;
+      column-gap: .35em;
       padding: 4px 0;
       font-size: .8rem;
       min-width: 0;
@@ -2647,8 +2647,8 @@ const Fetcher = {
     if (d.status !== 'ok') throw new Error(d.message);
     return d.items.map(i => ({
       id:         i.guid || i.link || i.title,
-      title:      i.title || '',
-      desc:       this._strip(i.description || '').slice(0, 500),
+      title:      normalizeText(i.title || ''),
+      desc:       normalizeText(this._strip(i.description || '')).slice(0, 500),
       content:    i.content || i.description || '',
       url:        i.link || '',
       image:      i.thumbnail || i.enclosure?.link || this._img(i.content || i.description || ''),
@@ -2685,8 +2685,8 @@ const Fetcher = {
       const media = el.querySelector('media\\:content, media\\:thumbnail')?.getAttribute('url');
       return {
         id:         qs('guid') || qs('id') || link,
-        title:      qs('title'),
-        desc:       this._strip(desc).slice(0, 500),
+        title:      normalizeText(qs('title')),
+        desc:       normalizeText(this._strip(desc)).slice(0, 500),
         content:    content,
         url:        link,
         image:      enc || media || this._img(content || desc),
@@ -3198,6 +3198,17 @@ function aid(a) {
 function e(s) {
   if (!s) return '';
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function decodeEntities(text) {
+  if (!text) return '';
+  const d = document.createElement('textarea');
+  d.innerHTML = text;
+  return d.value;
+}
+
+function normalizeText(text) {
+  return decodeEntities(String(text || '')).replace(/\s+/g, ' ').trim();
 }
 
 function toast(msg) {
@@ -4135,11 +4146,12 @@ async function resolveYtInputToChannel(parsed) {
 function parseYtVideosFromHtml(html, fallbackChannelId, fallbackChannelName) {
   if (!html) return { videos: [], channelName: fallbackChannelName || fallbackChannelId };
 
-  const channelName =
+  const channelName = normalizeText(
     html.match(/"ownerChannelName":"([^"]+)"/)?.[1] ||
     html.match(/"channelMetadataRenderer":\{"title":"([^"]+)"/)?.[1] ||
     fallbackChannelName ||
-    fallbackChannelId;
+    fallbackChannelId
+  );
 
   const seen = new Set();
   const videos = [];
@@ -4158,7 +4170,7 @@ function parseYtVideosFromHtml(html, fallbackChannelId, fallbackChannelName) {
       seen.add(videoId);
       videos.push({
         videoId,
-        title,
+        title: normalizeText(title),
         date: new Date(),
         thumb: `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`,
         channelName,
@@ -4191,13 +4203,13 @@ async function fetchYtChannelVideos(ch) {
     if (r.ok) {
       const d = await r.json();
       if (d.status === 'ok' && Array.isArray(d.items) && d.items.length) {
-        const channelName = d.feed?.title || ch.name || ch.id;
+        const channelName = normalizeText(d.feed?.title || ch.name || ch.id);
         const videos = d.items.slice(0, 15).map(i => {
           const link = i.link || '';
           const videoId = link.match(/[?&]v=([^&]+)/)?.[1] || '';
           return {
             videoId,
-            title: i.title || '',
+            title: normalizeText(i.title || ''),
             date: new Date(i.pubDate),
             thumb: i.thumbnail || (videoId ? `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg` : ''),
             channelName,
@@ -4226,11 +4238,11 @@ async function fetchYtChannelVideos(ch) {
   const entries = [...doc.querySelectorAll('entry')];
   if (!entries.length) return { videos: [], channelName: ch.name };
 
-  const channelName = doc.querySelector('author > name')?.textContent?.trim() || ch.name || ch.id;
+  const channelName = normalizeText(doc.querySelector('author > name')?.textContent?.trim() || ch.name || ch.id);
   const videos = entries.slice(0, 15).map(el => {
     const link = el.querySelector('link')?.getAttribute('href') || '';
     const videoId = link.match(/[?&]v=([^&]+)/)?.[1] || '';
-    const title = el.querySelector('title')?.textContent?.trim() || '';
+    const title = normalizeText(el.querySelector('title')?.textContent?.trim() || '');
     const published = el.querySelector('published')?.textContent || '';
     const thumb = videoId ? `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg` : '';
     return { videoId, title, date: new Date(published), thumb, channelName, channelId: ch.id };
