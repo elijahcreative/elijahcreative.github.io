@@ -1693,126 +1693,255 @@
       display: flex; align-items: center; gap: 6px; white-space: nowrap;
     }
     .f1-badge-sep { opacity: .35; font-weight: 300; }
-    /* F1 popup — theme-adaptive, matches weather widget */
     .f1-popup {
       position: absolute; top: calc(100% + 10px); right: 0;
-      width: 300px; max-height: calc(100vh - 80px); overflow-y: auto;
-      background: var(--bg); border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-lg); z-index: 200;
+      width: clamp(384px, 27.6em, min(504px, calc(100vw - 24px)));
+      color: var(--text);
+      z-index: 200;
       opacity: 0; pointer-events: none; transform: translateY(-8px);
       transition: opacity .2s ease, transform .2s ease;
     }
     .f1-popup.f1-open { opacity: 1; pointer-events: all; transform: translateY(0); }
-    .f1-popup::-webkit-scrollbar { width: 3px; }
-    .f1-popup::-webkit-scrollbar-thumb { background: var(--border); }
-    /* Next race card */
-    .f1-next-card {
-      position: relative; overflow: hidden;
-      border-radius: var(--radius) var(--radius) 0 0;
-      border-bottom: 1px solid var(--border);
+    .f1-card {
+      --f1-teal: #20d6d2;
+      --f1-red: #f02a2a;
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius);
+      padding: 14px 16px 13px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-lg);
     }
-    .f1-next-card-img {
-      position: absolute; inset: 0;
-      background-size: cover; background-position: center;
-      filter: brightness(.45);
+    [data-theme="dark"] .f1-card {
+      background: var(--bg);
+      border-color: var(--border);
+      box-shadow: var(--shadow-lg);
     }
-    .f1-next-card-body {
-      position: relative; z-index: 1;
-      padding: 14px 14px 12px;
-      min-height: 140px;
-      display: flex; flex-direction: column; justify-content: space-between;
+    .f1-card::before,
+    .f1-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
     }
-    .f1-next-bottom { display: flex; flex-direction: column; align-items: flex-end; }
-    .f1-next-card .f1-section-title { color: rgba(255,255,255,.65); }
-    .f1-next-card .f1-next-name {
-      color: #fff; text-shadow: 0 1px 8px rgba(0,0,0,.6);
-      display: flex; align-items: center; gap: 6px;
+    .f1-card::before {
+      background:
+        radial-gradient(ellipse at 18% 118%, color-mix(in srgb, var(--f1-teal) 14%, transparent), transparent 54%),
+        radial-gradient(ellipse at 88% 112%, color-mix(in srgb, var(--f1-red) 13%, transparent), transparent 52%);
+      opacity: .85;
     }
-    .f1-flag-img { width: 1.2em; height: 1.2em; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
-    .f1-next-card .f1-next-circuit { color: rgba(255,255,255,.6); }
-    .f1-next-card .f1-countdown { color: #fff; text-shadow: 0 1px 8px rgba(0,0,0,.6); }
-    .f1-next-card .f1-next-date {
-      display: inline-block; background: #e10600; color: #fff !important;
-      padding: 2px 7px; border-radius: 4px; margin-top: 3px;
+    .f1-card::after {
+      inset: 1px;
+      border-radius: calc(var(--radius) - 1px);
+      box-shadow:
+        inset 0 -18px 42px color-mix(in srgb, var(--f1-teal) 5%, transparent),
+        inset 18px -12px 46px color-mix(in srgb, var(--f1-red) 4%, transparent);
     }
-    .f1-section { padding: 10px 14px; border-bottom: 1px solid var(--border); }
-    .f1-section:last-child { border-bottom: none; }
-    .f1-section-title {
-      font-size: .6rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: .14em; color: #e10600; margin-bottom: 8px;
+    .f1-card > * { position: relative; z-index: 1; }
+    .f1-ticker {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      min-width: 0;
+      color: color-mix(in srgb, var(--text) 50%, transparent);
+      font-size: clamp(.52rem, 1.18vw, .62rem);
+      font-style: italic;
+      font-weight: 100;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: visible;
+      text-overflow: clip;
     }
-    /* Next race */
-    .f1-next-name {
-      font-size: 1rem; font-weight: 800; color: var(--text);
-      text-transform: uppercase; letter-spacing: -.2px; margin-bottom: 1px; line-height: 1.2;
+    .f1-ticker span,
+    .f1-upcoming span {
+      min-width: max-content;
+      overflow: visible;
+      text-overflow: clip;
+      white-space: nowrap;
     }
-    .f1-next-circuit { font-size: .7rem; color: var(--muted); margin-bottom: 8px; letter-spacing: .02em; }
-    .f1-countdown {
-      font-size: 1.6rem; font-weight: 900; color: var(--text);
-      letter-spacing: -1px; line-height: 1; margin-bottom: 3px;
+    .f1-title {
+      margin: 11px 0 16px;
+      text-align: center;
+      font-style: italic;
+      text-transform: uppercase;
+      letter-spacing: .095em;
+      font-size: clamp(1.16rem, 2.9vw, 1.48rem);
+      line-height: .95;
+      white-space: nowrap;
+      overflow: visible;
+      text-overflow: clip;
     }
-    .f1-next-date { font-size: .68rem; color: #e10600; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
-    /* Podium */
-    /* Podium cards */
-    .f1-podium-grid {
-      display: grid; grid-template-columns: repeat(3,1fr); gap: 5px;
-      padding: 8px 0 4px;
+    .f1-title strong {
+      font-weight: 850;
+      letter-spacing: .02em;
     }
-    .f1-podium-card {
-      position: relative; border-radius: var(--radius-sm);
-      overflow: hidden; aspect-ratio: 2/3;
-      background: color-mix(in srgb, var(--border) 60%, var(--bg));
-      border: 1px solid #555;
+    .f1-title span {
+      font-weight: 100;
+      color: color-mix(in srgb, var(--text) 72%, transparent);
+      font-variation-settings: "wght" 100;
     }
-    .f1-podium-card-bg {
-      position: absolute; inset: 0;
-      background-size: cover; background-position: center top;
+    .f1-track {
+      position: relative;
+      padding-top: 10px;
     }
-    .f1-podium-card-overlay {
-      position: absolute; inset: 0;
-      background: linear-gradient(to top, rgba(0,0,0,.5) 30%, transparent 52%);
+    .f1-trackline {
+      position: absolute;
+      left: 7.5%;
+      right: 7.5%;
+      top: 36px;
+      height: 3px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--text) 22%, transparent);
+      overflow: hidden;
     }
-    .f1-podium-pos {
-      position: absolute; top: 6px; right: 6px;
-      font-size: .6rem; font-weight: 900; color: #fff;
-      background: rgba(0,0,0,.45); border-radius: 4px;
-      padding: 2px 5px; letter-spacing: .04em;
+    .f1-trackline-fill {
+      display: block;
+      height: 100%;
+      width: var(--f1-progress-width, 0%);
+      max-width: 100%;
+      background: color-mix(in srgb, var(--f1-teal) 80%, var(--text));
+      transition: width .25s ease;
     }
-    .f1-podium-info {
-      position: absolute; bottom: 0; left: 0; right: 0;
-      padding: 6px 7px;
+    .f1-events {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      align-items: start;
+      gap: 0;
     }
-    .f1-podium-driver {
-      font-size: .7rem; font-weight: 800; color: #fff;
-      text-transform: uppercase; letter-spacing: .03em; line-height: 1.3;
+    .f1-event {
+      display: grid;
+      grid-template-rows: 14px 26px 30px 20px 17px;
+      justify-items: center;
+      min-width: 0;
+      text-align: center;
     }
-    .f1-podium-team {
-      font-size: .56rem; color: rgba(255,255,255,.65);
-      text-transform: uppercase; letter-spacing: .04em;
+    .f1-event-status {
+      height: 16px;
+      font-size: .52rem;
+      font-style: italic;
+      font-weight: 750;
+      line-height: 1;
+      text-transform: uppercase;
+      color: var(--text);
+      justify-self: center;
+      margin-left: 0;
     }
-    /* Standings */
-    .f1-standing-row {
-      display: flex; align-items: center; gap: 0;
-      padding: 3px 0; border-bottom: 1px solid color-mix(in srgb, var(--border) 35%, transparent);
+    .f1-event-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 3px solid color-mix(in srgb, var(--text) 24%, transparent);
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--bg) 70%, transparent);
+      position: relative;
+      z-index: 2;
+      align-self: center;
     }
-    .f1-standing-row:last-child { border-bottom: none; }
-    .f1-team-bar { width: 3px; height: 16px; border-radius: 1px; flex-shrink: 0; margin-right: 9px; }
-    .f1-standing-pos { font-size: .7rem; font-weight: 900; color: var(--muted); width: 18px; flex-shrink: 0; }
-    .f1-standing-driver { font-size: .86rem; font-weight: 700; color: var(--text); flex: 1; text-transform: uppercase; letter-spacing: .02em; }
-    .f1-standing-pts { font-size: .62rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
-    /* Calendar */
-    .f1-cal-row {
-      display: flex; align-items: center; gap: 10px;
-      padding: 4px 0; border-bottom: 1px solid color-mix(in srgb, var(--border) 35%, transparent);
+    .f1-event.done .f1-event-dot,
+    .f1-event.live .f1-event-dot,
+    .f1-event.next .f1-event-dot {
+      border-color: var(--f1-teal);
     }
-    .f1-cal-row:last-child { border-bottom: none; }
-    .f1-cal-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
-    .f1-cal-name { font-size: .78rem; color: var(--text2); flex: 1; text-transform: uppercase; letter-spacing: .02em; font-weight: 600; }
-    .f1-cal-date { font-size: .62rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
-    .f1-cal-row.f1-cal-next .f1-cal-dot { background: #e10600; width: 6px; height: 6px; }
-    .f1-cal-row.f1-cal-next .f1-cal-name { color: var(--text); }
-    .f1-cal-row.f1-cal-next .f1-cal-date { color: #e10600; }
+    .f1-event.live .f1-event-dot {
+      background: var(--f1-teal);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--f1-teal) 24%, transparent);
+    }
+    .f1-event.next .f1-event-dot::after {
+      content: "";
+      position: absolute;
+      inset: 4px;
+      border-radius: 50%;
+      background: var(--f1-teal);
+    }
+    .f1-event-label {
+      min-width: 0;
+      color: var(--f1-teal);
+      font-size: clamp(.7rem, 1.55vw, .84rem);
+      font-weight: 900;
+      font-style: italic;
+      line-height: 1;
+      text-transform: uppercase;
+      white-space: nowrap;
+      align-self: center;
+    }
+    .f1-event.qual .f1-event-label,
+    .f1-event.race .f1-event-label {
+      color: var(--f1-red);
+    }
+    .f1-event-date,
+    .f1-event-time {
+      font-size: clamp(.7rem, 1.4vw, .8rem);
+      font-style: italic;
+      font-weight: 300;
+      line-height: 1.05;
+      white-space: nowrap;
+      color: color-mix(in srgb, var(--text) 92%, transparent);
+    }
+    .f1-upcoming {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 13px;
+      color: color-mix(in srgb, var(--text) 50%, transparent);
+      font-size: clamp(.52rem, 1.18vw, .62rem);
+      font-style: italic;
+      font-weight: 100;
+      letter-spacing: .02em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: visible;
+      text-overflow: clip;
+    }
+    .f1-upcoming span + span::before,
+    .f1-ticker span + span::before {
+      content: "•";
+      margin-right: 6px;
+      color: color-mix(in srgb, var(--text) 44%, transparent);
+    }
+    @media (max-width: 720px) {
+      .f1-popup {
+        position: fixed;
+        top: 64px;
+        left: 12px;
+        right: 12px;
+        width: auto;
+      }
+      .f1-nav-country { display: none; }
+      .f1-card {
+        border-radius: var(--radius);
+        padding: 13px 13px 14px;
+      }
+      .f1-ticker {
+        justify-content: flex-start;
+        font-size: .5rem;
+      }
+      .f1-title {
+        font-size: clamp(1.18rem, 6.6vw, 1.72rem);
+        letter-spacing: .085em;
+        margin: 10px 0 13px;
+      }
+      .f1-track { padding-top: 10px; }
+      .f1-trackline { top: 38px; left: 9%; right: 9%; height: 3px; }
+      .f1-event {
+        grid-template-rows: 15px 28px 34px 22px 20px;
+      }
+      .f1-event-dot {
+        width: 22px;
+        height: 22px;
+        border-width: 3px;
+      }
+      .f1-event-status { font-size: .58rem; margin-left: 0; justify-self: center; }
+      .f1-event-label { font-size: clamp(.78rem, 4vw, 1.08rem); }
+      .f1-event-date,
+      .f1-event-time { font-size: clamp(.72rem, 3.7vw, 1rem); }
+      .f1-upcoming {
+        justify-content: flex-start;
+        font-size: .5rem;
+        margin-top: 11px;
+      }
+    }
 
     /* ── YouTube Sidebar ────────────────────────────────────────── */
     .yt-wrap {
@@ -3211,6 +3340,55 @@ function normalizeText(text) {
   return decodeEntities(String(text || '')).replace(/\s+/g, ' ').trim();
 }
 
+function setupHoverTapPopup(trigger, popup, openClass) {
+  if (!trigger || !popup) return;
+  if (trigger._fluxPopupCleanup) trigger._fluxPopupCleanup();
+
+  let closeTimer = null;
+  const isOpen = () => popup.classList.contains(openClass);
+  const isTouchMode = () => window.matchMedia && window.matchMedia('(hover: none), (pointer: coarse)').matches;
+  const open = () => {
+    clearTimeout(closeTimer);
+    popup.classList.add(openClass);
+  };
+  const close = () => {
+    clearTimeout(closeTimer);
+    popup.classList.remove(openClass);
+  };
+  const closeSoon = () => {
+    closeTimer = setTimeout(close, 150);
+  };
+  const onDocPointer = ev => {
+    if (!isOpen()) return;
+    if (trigger.contains(ev.target) || popup.contains(ev.target)) return;
+    close();
+  };
+  const onClick = ev => {
+    if (!isTouchMode()) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+    isOpen() ? close() : open();
+  };
+  const onEnter = () => { if (!isTouchMode()) open(); };
+  const onLeave = () => { if (!isTouchMode()) closeSoon(); };
+
+  trigger.addEventListener('click', onClick);
+  trigger.addEventListener('mouseenter', onEnter);
+  trigger.addEventListener('mouseleave', onLeave);
+  popup.addEventListener('mouseenter', onEnter);
+  popup.addEventListener('mouseleave', onLeave);
+  document.addEventListener('pointerdown', onDocPointer);
+  trigger._fluxPopupCleanup = () => {
+    trigger.removeEventListener('click', onClick);
+    trigger.removeEventListener('mouseenter', onEnter);
+    trigger.removeEventListener('mouseleave', onLeave);
+    popup.removeEventListener('mouseenter', onEnter);
+    popup.removeEventListener('mouseleave', onLeave);
+    document.removeEventListener('pointerdown', onDocPointer);
+    clearTimeout(closeTimer);
+  };
+}
+
 function toast(msg) {
   const t = $('toast');
   t.textContent = msg;
@@ -3900,14 +4078,7 @@ async function loadWeather() {
       </div>`;
     el.title = '';
 
-    // JS hover with timer — mouse can move into popup without closing it
-    let _wxHTimer;
-    const wxOpen  = () => { clearTimeout(_wxHTimer); document.getElementById('wxPopup')?.classList.add('wx-open'); };
-    const wxClose = () => { _wxHTimer = setTimeout(() => document.getElementById('wxPopup')?.classList.remove('wx-open'), 150); };
-    el.addEventListener('mouseenter', wxOpen);
-    el.addEventListener('mouseleave', wxClose);
-    document.getElementById('wxPopup').addEventListener('mouseenter', wxOpen);
-    document.getElementById('wxPopup').addEventListener('mouseleave', wxClose);
+    setupHoverTapPopup(el, document.getElementById('wxPopup'), 'wx-open');
   }
 
   // Cached adat elég friss? (és teljes — régi cache-t eldobjuk)
@@ -4646,195 +4817,213 @@ async function submitAddYt() {
 /* ════════════════════════════════════════════════════════════
    F1 WIDGET
 ════════════════════════════════════════════════════════════ */
-const F1_TEAM_COLORS = {
-  'Mercedes':'#00D2BE','McLaren':'#FF8700','Ferrari':'#DC0000',
-  'Red Bull':'#3671C6','Williams':'#64C4FF','Aston Martin':'#358C75',
-  'Alpine':'#FF87BC','RB':'#6692FF','Haas F1 Team':'#B6BABD',
-  'Kick Sauber':'#52E252','Sauber':'#52E252'
-};
 const F1_HU = ['jan','feb','már','ápr','máj','jún','júl','aug','szep','okt','nov','dec'];
-const F1_BASE = 'https://api.jolpi.ca/ergast/f1';
+const F1_DATA_BASE = 'https://elijahcreative.github.io/F1/2023/Data';
 const F1_TTL  = 30 * 60 * 1000;
+const F1_COUNTRY_HU = {
+  Australia: 'Ausztrália',
+  China: 'Kína',
+  Japan: 'Japán',
+  Bahrain: 'Bahrein',
+  USA: 'USA',
+  Italy: 'Olaszország',
+  Monaco: 'Monaco',
+  Spain: 'Spanyolország',
+  Canada: 'Kanada',
+  Austria: 'Ausztria',
+  UK: 'Nagy-Britannia',
+  Hungary: 'Magyarország',
+  Belgium: 'Belgium',
+  Netherlands: 'Hollandia',
+  Azerbaijan: 'Azerbajdzsán',
+  Singapore: 'Szingapúr',
+  Mexico: 'Mexikó',
+  Brazil: 'Brazília',
+  Qatar: 'Katar',
+  UAE: 'Abu-Dzabi'
+};
+const F1_WEEKDAYS = ['V','H','K','SZE','CS','P','SZO'];
+
+function parseF1Date(value) {
+  return value ? new Date(value) : null;
+}
+
+function stripF1Country(country) {
+  return String(country || '').replace(/^[^A-Za-zÀ-ž]+/, '').trim();
+}
+
+function f1CountryHu(countryEn) {
+  return F1_COUNTRY_HU[countryEn] || countryEn;
+}
+
+function f1DateLabel(date) {
+  if (!date || Number.isNaN(date.getTime())) return '';
+  return `${F1_HU[date.getMonth()].toUpperCase()}. ${date.getDate()}`;
+}
+
+function f1TimeLabel(date) {
+  if (!date || Number.isNaN(date.getTime())) return '';
+  return `${F1_WEEKDAYS[date.getDay()]} ${date.toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit' })}`;
+}
+
+function f1ShortDate(date) {
+  if (!date || Number.isNaN(date.getTime())) return '';
+  return `${date.getMonth() + 1}.${date.getDate()}`;
+}
+
+function f1CountdownTo(date, nowMs) {
+  const diff = date ? date.getTime() - nowMs : 0;
+  if (diff <= 0) return 'Ma';
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  return d > 0 ? `${d} nap` : h > 0 ? `${h} ó` : 'Ma';
+}
+
+function f1EventSpecs(race) {
+  const sprint = Boolean(race.Sprint || race.Sprintqual);
+  const raw = sprint
+    ? [
+        ['FP1', 'FP1', 'practice'],
+        ['Sprintqual', 'SQ', 'practice'],
+        ['Sprint', 'SPRINT', 'practice'],
+        ['Qual', 'QUAL', 'qual'],
+        ['Race', 'RACE', 'race']
+      ]
+    : [
+        ['FP1', 'FP1', 'practice'],
+        ['FP2', 'FP2', 'practice'],
+        ['FP3', 'FP3', 'practice'],
+        ['Qual', 'QUAL', 'qual'],
+        ['Race', 'RACE', 'race']
+      ];
+  return raw.map(([key, label, kind]) => ({
+    key,
+    label,
+    kind,
+    start: parseF1Date(race[key])
+  }));
+}
+
+function f1RaceSelectionEnd(race) {
+  const raceStart = parseF1Date(race.Race);
+  if (raceStart && !Number.isNaN(raceStart.getTime())) return raceStart.getTime() + 3 * 3600000;
+  const starts = f1EventSpecs(race).map(ev => ev.start?.getTime()).filter(Boolean);
+  return starts.length ? Math.max(...starts) + 3600000 : 0;
+}
+
+function buildF1Model(races, standingsRaw) {
+  const nowMs = Date.now();
+  const futureIndex = races.findIndex(race => f1RaceSelectionEnd(race) > nowMs);
+  const selectedIndex = futureIndex >= 0 ? futureIndex : Math.max(0, races.length - 1);
+  const race = races[selectedIndex] || races[0] || {};
+  const countryEn = stripF1Country(race.Country);
+  const countryHu = f1CountryHu(countryEn);
+  const city = race.City || countryEn || 'F1';
+  const specs = f1EventSpecs(race);
+
+  let liveIndex = -1;
+  let nextIndex = -1;
+  let progress = -1;
+  const events = specs.map((ev, i) => {
+    const startMs = ev.start?.getTime();
+    const liveEndMs = startMs ? startMs + (ev.kind === 'race' ? 2 : 1) * 3600000 : 0;
+    let state = '';
+    if (startMs && nowMs >= startMs && nowMs < liveEndMs) {
+      state = 'live';
+      liveIndex = i;
+      progress = Math.max(progress, i);
+    } else if (startMs && nowMs >= liveEndMs) {
+      state = 'done';
+      progress = Math.max(progress, i);
+    } else if (startMs && nextIndex < 0) {
+      state = 'next';
+      nextIndex = i;
+    }
+    return {
+      ...ev,
+      state,
+      statusLabel: '',
+      dateLabel: f1DateLabel(ev.start),
+      timeLabel: f1TimeLabel(ev.start)
+    };
+  });
+
+  if (liveIndex >= 0) events[liveIndex].statusLabel = 'Élő';
+  else if (nextIndex >= 0) events[nextIndex].statusLabel = 'Következő';
+
+  const standingsTop5 = standingsRaw
+    .filter(s => s.Name && s.Points)
+    .slice(0, 5)
+    .map(s => ({ name: s.Name, points: s.Points }));
+  const upcoming = races
+    .slice(selectedIndex + 1, selectedIndex + 5)
+    .map(r => ({ city: r.City || stripF1Country(r.Country), dateLabel: f1ShortDate(parseF1Date(r.Race)) }));
+
+  return {
+    version: 2,
+    city,
+    countryEn,
+    countryHu,
+    events,
+    progress: Math.max(progress, 0),
+    liveEvent: liveIndex >= 0 ? events[liveIndex] : null,
+    nextEvent: nextIndex >= 0 ? events[nextIndex] : null,
+    countdown: nextIndex >= 0 ? f1CountdownTo(events[nextIndex].start, nowMs) : '',
+    standingsTop5,
+    upcoming,
+    ts: Date.now()
+  };
+}
 
 function renderF1(f1) {
   const el = document.getElementById('navF1');
   if (!el) return;
 
-  const shortName = n => n.replace(' Grand Prix','').replace(' GP','') + ' GP';
-  const fmtDate  = d => { const dt = new Date(d+'T12:00:00'); return `${F1_HU[dt.getMonth()]} ${dt.getDate()}.`; };
-  const teamDot  = c => `<span class="f1-team-dot" style="background:${F1_TEAM_COLORS[c]||'#555'}"></span>`;
-  const teamBar  = c => `<span class="f1-team-bar" style="background:${F1_TEAM_COLORS[c]||'#555'}"></span>`;
-
-  const F1_AVATAR_BASE = 'https://elijahcreative.github.io/F1/Avatars';
-  const F1_AVATAR_MAP = {
-    'max_verstappen':'verstappen','verstappen':'verstappen',
-    'hamilton':'hamilton','leclerc':'leclerc',
-    'norris':'norris','piastri':'piastri',
-    'russell':'russell','hulkenberg':'hulkenberg',
-    'antonelli':'antonelli','andrea_kimi_antonelli':'antonelli'
-  };
-  const driverAvatar = (driverId, constructor) => {
-    const color = F1_TEAM_COLORS[constructor] || '#555';
-    const slug  = F1_AVATAR_MAP[driverId];
-    const inner = slug ? `<img src="${F1_AVATAR_BASE}/driver-${slug}.jpeg" alt="" onerror="this.remove()">` : '';
-    return `<span class="f1-driver-avatar" style="border-color:${color}">${inner}</span>`;
-  };
-
-  const F1_CARD_IMG_BASE = 'https://elijahcreative.github.io/F1/Card';
-  const F1_CIRCUIT_MAP = {
-    'Abu Dhabi':'AbuDhabi', 'Australian':'Melbourne', 'Bahrain':'Sakhir',
-    'Azerbaijan':'Baku', 'Saudi Arabian':'Jeddah', 'Miami':'Miami',
-    'Emilia Romagna':'Imola', 'Monaco':'Monaco', 'Spanish':'Barcelona',
-    'Canadian':'Montreal', 'Austrian':'Spielberg', 'British':'Silverstone',
-    'Hungarian':'Mogyorod', 'Belgian':'Stavelot', 'Dutch':'Zandvoort',
-    'Italian':'Monza', 'Singapore':'MarinaBay', 'Japanese':'Suzuka',
-    'Qatar':'Doha', 'United States':'Austin', 'Mexico City':'MexicoCity',
-    'São Paulo':'SaoPaulo', 'Las Vegas':'LasVegas', 'Chinese':'Shanghai'
-  };
-  const circuitImg = name => {
-    const folder = Object.entries(F1_CIRCUIT_MAP).find(([k]) => name.includes(k))?.[1];
-    return folder ? `${F1_CARD_IMG_BASE}/${folder}/Day/Day01.png` : null;
-  };
-  const F1_FLAG_MAP = {
-    'Australian':'au','Bahrain':'bh','Saudi Arabian':'sa','Miami':'us',
-    'Chinese':'cn','Japanese':'jp','Azerbaijan':'az','Emilia Romagna':'it',
-    'Monaco':'mc','Spanish':'es','Canadian':'ca','Austrian':'at',
-    'British':'gb','Hungarian':'hu','Belgian':'be','Dutch':'nl',
-    'Italian':'it','Singapore':'sg','Qatar':'qa','United States':'us',
-    'Mexico City':'mx','São Paulo':'br','Las Vegas':'us','Abu Dhabi':'ae'
-  };
-  const circuitFlag = name => {
-    const cc = Object.entries(F1_FLAG_MAP).find(([k]) => name.includes(k))?.[1];
-    return cc ? `<img class="f1-flag-img" src="https://flagcdn.com/w40/${cc}.png" alt="">` : '';
-  };
-
-  // Countdown
-  let countdown = '';
-  if (f1.nextRace) {
-    const diff = new Date(f1.nextRace.dateTime) - Date.now();
-    if (diff > 0) {
-      const d = Math.floor(diff/86400000), h = Math.floor((diff%86400000)/3600000);
-      countdown = d > 0 ? `${d} nap` : h > 0 ? `${h} ó` : 'Ma!';
-    } else { countdown = 'Ma!'; }
-  }
-
-  const nextImgUrl = f1.nextRace ? circuitImg(f1.nextRace.name) : null;
-  const nextSection = f1.nextRace ? `
-    <div class="f1-next-card">
-      ${nextImgUrl ? `<div class="f1-next-card-img" style="background-image:url('${nextImgUrl}')"></div>` : ''}
-      <div class="f1-next-card-body">
-        <div>
-          <div class="f1-section-title">Következő futam</div>
-          <div class="f1-next-name">${circuitFlag(f1.nextRace.name)}${shortName(f1.nextRace.name)}</div>
-          <div class="f1-next-circuit">${f1.nextRace.circuit}</div>
-        </div>
-        <div class="f1-next-bottom">
-          <div class="f1-countdown">${countdown}</div>
-          <div class="f1-next-date">${new Date(f1.nextRace.dateTime).toLocaleString('hu-HU',{month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
-        </div>
-      </div>
-    </div>` : '';
-
-  const podiumSection = f1.lastRace?.podium?.length ? `
-    <div class="f1-section">
-      <div class="f1-section-title">Utolsó futam · ${shortName(f1.lastRace.name)}</div>
-      <div class="f1-podium-grid">
-        ${f1.lastRace.podium.map(p => {
-          const slug = F1_AVATAR_MAP[p.driverId];
-          const imgUrl = slug ? `${F1_AVATAR_BASE}/driver-${slug}.jpeg` : null;
-          const teamColor = F1_TEAM_COLORS[p.constructor] || '#555';
-          return `<div class="f1-podium-card" style="border-color:${teamColor}">
-            ${imgUrl ? `<div class="f1-podium-card-bg" style="background-image:url('${imgUrl}')"></div>` : ''}
-            <div class="f1-podium-card-overlay"></div>
-            <span class="f1-podium-pos">P${p.pos}</span>
-            <div class="f1-podium-info">
-              <div class="f1-podium-driver">${p.driver}</div>
-              <div class="f1-podium-team">${p.constructor}</div>
-            </div>
-          </div>`;
-        }).join('')}
-      </div>
-    </div>` : '';
-
-  const standingsSection = f1.standings?.length ? `
-    <div class="f1-section">
-      <div class="f1-section-title">Pilóta bajnokság</div>
-      ${f1.standings.map(s => `
-        <div class="f1-standing-row">
-          <span class="f1-standing-pos">${s.pos}</span>
-          ${teamBar(s.constructor)}
-          <span class="f1-standing-driver">${s.driver}</span>
-          <span class="f1-standing-pts">${s.points}</span>
-        </div>`).join('')}
-    </div>` : '';
-
-  const calSection = f1.upcoming?.length ? `
-    <div class="f1-section">
-      <div class="f1-section-title">Kövi futamok</div>
-      ${f1.upcoming.map((r,i) => `
-        <div class="f1-cal-row${i===0?' f1-cal-next':''}">
-          <span class="f1-cal-dot"></span>
-          <span class="f1-cal-name">${shortName(r.name)}</span>
-          <span class="f1-cal-date">${fmtDate(r.date)}</span>
-        </div>`).join('')}
-    </div>` : '';
-
-  const badgeLabel = f1.nextRace
-    ? `${shortName(f1.nextRace.name)}<span class="f1-badge-sep">|</span>${countdown}`
-    : `F1`;
+  const ticker = f1.standingsTop5.map(s => `<span>${e(s.name)} ${e(s.points)}</span>`).join('');
+  const eventHtml = f1.events.map(ev => `
+    <div class="f1-event ${ev.state} ${ev.kind}">
+      <div class="f1-event-status">${ev.statusLabel}</div>
+      <div class="f1-event-dot"></div>
+      <div class="f1-event-label">${e(ev.label)}</div>
+      <div class="f1-event-date">${e(ev.dateLabel)}</div>
+      <div class="f1-event-time">${e(ev.timeLabel)}</div>
+    </div>`).join('');
+  const upcoming = f1.upcoming.map(r => `<span>${e(r.city.toUpperCase())} ${e(r.dateLabel)}</span>`).join('');
+  const navStatus = f1.liveEvent ? 'Élő' : f1.nextEvent ? f1.countdown : 'Vége';
+  const progressWidth = `${Math.min(Math.max(Number(f1.progress) || 0, 0), 4) * 25}%`;
 
   el.innerHTML = `
-    <span class="f1-badge">${badgeLabel}</span>
+    <span class="f1-badge">
+      <span>${e(f1.city)}<span class="f1-nav-country">, ${e(f1.countryHu)}</span></span>
+      <span class="f1-badge-sep">|</span>
+      <span>${e(navStatus)}</span>
+    </span>
     <div class="f1-popup" id="f1Popup">
-      ${nextSection}${podiumSection}${standingsSection}${calSection}
+      <div class="f1-card" style="--f1-progress-width:${progressWidth}">
+        <div class="f1-ticker">${ticker}</div>
+        <div class="f1-title"><span>${e(f1.city)}</span> <strong>${e(f1.countryEn)}</strong></div>
+        <div class="f1-track">
+          <div class="f1-trackline"><span class="f1-trackline-fill"></span></div>
+          <div class="f1-events">${eventHtml}</div>
+        </div>
+        <div class="f1-upcoming">${upcoming}</div>
+      </div>
     </div>`;
 
-  let _f1T;
-  const f1Open  = () => { clearTimeout(_f1T); document.getElementById('f1Popup')?.classList.add('f1-open'); };
-  const f1Close = () => { _f1T = setTimeout(() => document.getElementById('f1Popup')?.classList.remove('f1-open'), 150); };
-  el.addEventListener('mouseenter', f1Open);
-  el.addEventListener('mouseleave', f1Close);
-  document.getElementById('f1Popup').addEventListener('mouseenter', f1Open);
-  document.getElementById('f1Popup').addEventListener('mouseleave', f1Close);
+  setupHoverTapPopup(el, document.getElementById('f1Popup'), 'f1-open');
 }
 
 async function loadF1() {
   try {
     const cached = JSON.parse(localStorage.getItem('flux_f1') || 'null');
-    if (cached && Date.now() - cached.ts < F1_TTL) { renderF1(cached); return; }
+    if (cached?.version === 2 && Date.now() - cached.ts < F1_TTL) { renderF1(cached); return; }
   } catch(e) {}
   try {
-    const [schedJ, lastJ, standJ] = await Promise.all([
-      fetch(`${F1_BASE}/current.json`).then(r=>r.json()),
-      fetch(`${F1_BASE}/current/last/results.json`).then(r=>r.json()),
-      fetch(`${F1_BASE}/current/driverStandings.json`).then(r=>r.json())
+    const [racesJ, standingsJ] = await Promise.all([
+      fetch(`${F1_DATA_BASE}/races-new.json`, { cache: 'no-store' }).then(r=>r.json()),
+      fetch(`${F1_DATA_BASE}/standings.json`, { cache: 'no-store' }).then(r=>r.json())
     ]);
-    const now   = Date.now();
-    const races = schedJ.MRData.RaceTable.Races;
-    const future = races.filter(r => new Date(r.date+'T'+(r.time||'12:00:00Z')) > now);
-    const next  = future[0];
-    const lastRaceData = lastJ.MRData.RaceTable.Races[0];
-    const f1 = {
-      nextRace: next ? {
-        name:     next.raceName,
-        circuit:  next.Circuit.circuitName,
-        dateTime: next.date+'T'+(next.time||'12:00:00Z')
-      } : null,
-      lastRace: {
-        name:   lastRaceData?.raceName || '',
-        podium: (lastRaceData?.Results||[]).slice(0,3).map(r=>({
-          pos: r.position, driver: r.Driver.familyName,
-          driverId: r.Driver.driverId, constructor: r.Constructor.name
-        }))
-      },
-      standings: (standJ.MRData.StandingsTable.StandingsLists[0]?.DriverStandings||[]).slice(0,6).map(s=>({
-        pos: s.position, driver: s.Driver.familyName,
-        driverId: s.Driver.driverId,
-        points: s.points, constructor: s.Constructors[0]?.name||''
-      })),
-      upcoming: future.slice(0,6).map(r=>({ name: r.raceName, date: r.date })),
-      ts: Date.now()
-    };
+    const f1 = buildF1Model(racesJ.Races || [], standingsJ.Standings || []);
     localStorage.setItem('flux_f1', JSON.stringify(f1));
     renderF1(f1);
   } catch(e) { console.warn('F1 load error', e); }
