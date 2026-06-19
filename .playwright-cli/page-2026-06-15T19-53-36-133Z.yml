@@ -1,0 +1,489 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4] [cursor=pointer]: Flux
+      - generic [ref=e12]:
+        - generic [ref=e13]:
+          - generic [ref=e24]:
+            - generic [ref=e25]: Spielberg
+            - generic [ref=e26]: "|"
+            - generic [ref=e27]: 10 nap
+          - generic [ref=e240]:
+            - generic [ref=e241]:
+              - generic [ref=e242]: Antonelli 156
+              - generic [ref=e243]: •Hamilton 115
+              - generic [ref=e244]: •Russell 106
+              - generic [ref=e245]: •Leclerc 75
+              - generic [ref=e246]: •Norris 73
+            - generic [ref=e247]:
+              - text: Spielberg
+              - strong [ref=e248]: Austria
+            - generic [ref=e251]:
+              - generic [ref=e252]:
+                - generic [ref=e253]: Következő
+                - generic [ref=e255]: FP1
+                - generic [ref=e256]: JÚN. 26
+                - generic [ref=e257]: P 13:30
+              - generic [ref=e258]:
+                - generic [ref=e260]: FP2
+                - generic [ref=e261]: JÚN. 26
+                - generic [ref=e262]: P 17:00
+              - generic [ref=e263]:
+                - generic [ref=e265]: FP3
+                - generic [ref=e266]: JÚN. 27
+                - generic [ref=e267]: SZO 12:30
+              - generic [ref=e268]:
+                - generic [ref=e270]: QUAL
+                - generic [ref=e271]: JÚN. 27
+                - generic [ref=e272]: SZO 16:00
+              - generic [ref=e273]:
+                - generic [ref=e275]: RACE
+                - generic [ref=e276]: JÚN. 28
+                - generic [ref=e277]: V 15:00
+            - generic [ref=e278]:
+              - generic [ref=e279]: SILVERSTONE 7.5
+              - generic [ref=e280]: •STAVELOT 7.19
+              - generic [ref=e281]: •MOGYORÓD 7.26
+              - generic [ref=e282]: •ZANDVOORT 8.23
+        - generic [ref=e15]:
+          - img [ref=e29]
+          - generic [ref=e31]: 20°
+          - generic:
+            - generic:
+              - generic:
+                - generic: 20°
+              - generic:
+                - generic:
+                  - img
+                - generic: Derült
+            - generic:
+              - generic:
+                - generic:
+                  - img
+                  - text: 22%
+                - generic:
+                  - img
+                  - text: UV 0
+                - generic:
+                  - img
+                  - text: 11 km/h
+              - generic: ↓17° ↑24°
+            - generic:
+              - generic:
+                - generic: "22"
+                - generic:
+                  - img
+                - generic: 20°
+              - generic:
+                - generic: "23"
+                - generic:
+                  - img
+                - generic: 19°
+              - generic:
+                - generic: "0"
+                - generic:
+                  - img
+                - generic: 18°
+              - generic:
+                - generic: "1"
+                - generic:
+                  - img
+                - generic: 18°
+              - generic:
+                - generic: "2"
+                - generic:
+                  - img
+                - generic: 17°
+              - generic:
+                - generic: "3"
+                - generic:
+                  - img
+                - generic: 17°
+            - generic:
+              - generic:
+                - generic: Holnap
+                - generic:
+                  - img
+                - generic: Borult
+                - generic:
+                  - text: 17%
+                  - img
+                - generic: 17°
+                - generic: 28°
+              - generic:
+                - generic: Szerda
+                - generic:
+                  - img
+                - generic: Borult
+                - generic:
+                  - text: 16%
+                  - img
+                - generic: 20°
+                - generic: 28°
+              - generic:
+                - generic: Csütörtök
+                - generic:
+                  - img
+                - generic: Borult
+                - generic:
+                  - text: 10%
+                  - img
+                - generic: 18°
+                - generic: 31°
+              - generic:
+                - generic: Péntek
+                - generic:
+                  - img
+                - generic: Változékony
+                - generic:
+                  - text: 8%
+                  - img
+                - generic: 19°
+                - generic: 34°
+              - generic:
+                - generic: Szombat
+                - generic:
+                  - img
+                - generic: Változékony
+                - generic:
+                  - text: 10%
+                  - img
+                - generic: 22°
+                - generic: 35°
+        - button "Nézet" [ref=e16] [cursor=pointer]:
+          - img [ref=e17]
+        - complementary:
+          - generic:
+            - generic:
+              - generic: Mód
+              - generic:
+                - button "Világos":
+                  - img
+                  - text: Világos
+                - button "Auto":
+                  - img
+                  - text: Auto
+                - button "Sötét":
+                  - img
+                  - text: Sötét
+            - generic:
+              - generic: Téma
+              - generic:
+                - generic:
+                  - generic: Default
+                - generic:
+                  - generic: Nord
+                - generic:
+                  - generic: Solar
+                - generic:
+                  - generic: Rose
+                - generic:
+                  - generic: Mono
+            - generic:
+              - generic: Kiemelő szín
+              - generic:
+                - textbox "Egyéni szín": "#2563eb"
+            - generic:
+              - generic: Betűméret
+              - generic:
+                - generic: A
+                - slider: "16"
+                - generic: A
+            - generic:
+              - generic: Nézet
+              - generic:
+                - button "Magazin":
+                  - img
+                  - text: Magazin
+                - button "Grid":
+                  - img
+                  - text: Grid
+                - button "Lista":
+                  - img
+                  - text: Lista
+                - button "Olvasó":
+                  - img
+                  - text: Olvasó
+            - generic:
+              - generic: Cikkolvasás
+              - generic:
+                - button "Teljes képernyős"
+                - button "Felugró lap"
+        - button "Beállítások" [ref=e19] [cursor=pointer]:
+          - img [ref=e20]
+  - generic:
+    - generic:
+      - generic: Beállítások
+      - button:
+        - img
+    - generic:
+      - navigation:
+        - button "Feedek kezelése":
+          - img
+          - text: Feedek kezelése
+        - button "YouTube csatornák":
+          - img
+          - text: YouTube csatornák
+        - button "Config fájl":
+          - img
+          - text: Config fájl
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - img
+            - generic:
+              - generic: Feedek kezelése
+              - generic: Adj hozzá RSS vagy Atom feedeket, rendezd át őket drag & drop-pal, vagy töröld a feleslegeseket.
+          - generic: Aktív feedek
+          - button "Feed hozzáadása":
+            - img
+            - text: Feed hozzáadása
+  - generic [ref=e32]:
+    - generic [ref=e33]:
+      - generic [ref=e35] [cursor=pointer]:
+        - generic [ref=e36]:
+          - generic: Telex
+        - generic [ref=e37]:
+          - generic [ref=e38]: Alig használt eljárásig fajult az uniós légiutasjogi vita, 13 év után egyeztek meg
+          - generic [ref=e39]: Továbbra is három órás késéstől jár kártérítés, hiába akartak korábban tagállami kormányok négyet, extra tájékoztatás is kell mellé, és a szülőktől nem kérhetnek pénzt, ha a gyerekeik mellé ülnének.
+          - generic [ref=e40]: 2ó
+      - generic [ref=e41]:
+        - generic [ref=e42] [cursor=pointer]:
+          - generic [ref=e43]:
+            - generic: Telex
+          - generic [ref=e44]: Király Nóra szerint a Fidesz kongresszusa után ugyanaz a mentalitás folytatódik, ami megbuktatta őket
+          - generic [ref=e45]: A Fidesz bukott csepeli jelöltje szomorúságot érzett a kongresszus nézése közben, és úgy érzi, hogy új irány kell nekik.
+          - generic [ref=e46]: 2ó
+        - generic [ref=e47] [cursor=pointer]:
+          - generic [ref=e48]: Pósfai Gábor megszüntette a TEK leváltott igazgatójának szolgálati jogviszonyát
+          - generic [ref=e49]: Hétfői hatállyal.
+        - generic [ref=e50] [cursor=pointer]:
+          - generic [ref=e51]: Bóka János szerint nem volt sikertelen az unió kitaktikázása a Vitnyédre tervezett menekülttáborral
+          - generic [ref=e52]: "A korábbi uniós ügyekért felelős miniszter a Telexnek azt mondta: a sikerességi mutatójuk attól függ, hogyan tudták képviselni a nemzeti érdeket. Azt elismerte, hogy ennek politikai és anyagi ára is volt."
+    - generic [ref=e53] [cursor=pointer]:
+      - generic [ref=e57]:
+        - generic [ref=e58]: Telex
+        - generic [ref=e59]: "Magyar Nemzet: Letartóztatásban marad az óbudai korrupciós ügy két volt momentumos gyanúsítottja"
+        - generic [ref=e60]: A Hungast-csoport tulajdonosának, Gy. Tamás letartóztatásának meghosszabbításáról is döntött a bíróság a lap értesülései szerint.
+        - generic [ref=e61]: 3ó
+      - generic [ref=e65]:
+        - generic [ref=e66]: Telex
+        - generic [ref=e67]: Az internetkorszak egyik legkülönösebb popsztárja volt Oliver Tree, a helikopter-baleset áldozata
+        - generic [ref=e68]: Oliver Tree túlméretezett ruhákban, abszurd karakterek mögé bújva, öniróniából és trollkodásból csinált karriert. Az előadó világkörüli turnéjának részeként júliusban először koncertezett volna Budapesten.
+        - generic [ref=e69]: 3ó
+    - generic [ref=e70]:
+      - generic [ref=e71] [cursor=pointer]:
+        - generic [ref=e72]:
+          - generic: Telex
+        - generic [ref=e73]: Bocsánatot kért a szentesi tiszás képviselő, amiért négyzetméter helyett köbméterben adta meg az ingatlanjait a vagyonnyilatkozatában
+        - generic [ref=e74]: Bárkányi Bence szerint ez nem azért történt így, mert nem ismerné a legalapvetőbb mértékegységeket.
+        - generic [ref=e75]: 3ó
+      - generic [ref=e76]:
+        - generic [ref=e77] [cursor=pointer]:
+          - generic [ref=e78]:
+            - generic: Telex
+          - generic [ref=e79]: Az elsüllyedt vitorlás kabinjában találták meg a horvátországi hajóbaleset negyedik áldozatát
+          - generic [ref=e80]: A vitorlás több mint 50 méter mélyen feküdt.
+          - generic [ref=e81]: 3ó
+        - generic [ref=e82] [cursor=pointer]:
+          - generic [ref=e83]: Unalmas spanyol tili-toli, a favorit pontvesztéssel kezdte a vb-t a Zöld-foki Köztársaság ellen
+          - generic [ref=e84]: "Megvan az eddigi legnagyobb meglepetés: a spanyoloknak ugyan volt egy kapufájuk, de ötletük és tervük nem igazán, hogy nyerjék meg az első meccsüket. Megszületett a vb első 0-0-ja."
+        - generic [ref=e85] [cursor=pointer]:
+          - generic [ref=e86]: Donald Trump szerint már alá is írták Iránnal a konfliktust lezáró megállapodást, a részleteket hamarosan közzéteszik
+          - generic [ref=e87]: Csak a pénteki hivatalos aláírási ceremónia után dolgozzák ki a végleges békemegállapodást.
+    - generic [ref=e88]:
+      - generic [ref=e89]:
+        - generic [ref=e90] [cursor=pointer]:
+          - generic [ref=e91]:
+            - generic: Index
+          - generic [ref=e92]: Sulyok Tamás azonnali hatállyal megszüntette Hajdu János volt TEK-vezér rendőr altábornagyi jogviszonyát
+          - generic [ref=e93]: Friss határozat a Közlönyben.
+          - generic [ref=e94]: 2ó
+        - generic [ref=e95] [cursor=pointer]:
+          - generic [ref=e96]: Trump nem hisz a múzeumokban, elnöki könyvtára így egy saját luxusszállodájában lehet
+          - generic [ref=e97]: Sokak szerint az elnöki könyvtár csak arra jó, hogy Donald Trump családja megkapjon ingyen egy akár 360 millió dollár értékű telket.
+        - generic [ref=e99] [cursor=pointer]: Kóbor Léna bevállalós fotókkal robbantotta fel az internetet
+      - generic [ref=e100] [cursor=pointer]:
+        - generic [ref=e101]:
+          - generic: Index
+        - generic [ref=e102]: Francia Kupa-győztes edzővel erősít a Crystal Palace
+        - generic [ref=e103]: Három évre írt alá a francia mester.
+        - generic [ref=e104]: 2ó
+    - generic [ref=e105]:
+      - generic [ref=e106] [cursor=pointer]:
+        - generic [ref=e107]:
+          - generic: Index
+        - generic [ref=e108]: "Horváth Éva az Indexnek: A trauma miatt már soha nem fogok emlékezni a balesetemre"
+        - generic [ref=e109]: Otthonában látogattuk meg a szépségkirálynő-modellt, aki nemrég megjelent könyve apropójából a kórházban eltöltött időszakáról számolt be lapunknak.
+        - generic [ref=e110]: 3ó
+      - generic [ref=e111] [cursor=pointer]:
+        - generic [ref=e112]:
+          - generic: Index
+        - generic [ref=e113]: "Itt a vébé eddigi legnagyobb meglepetése: a spanyolok nem bírtak a Zöld-foki Köztársasággal"
+        - generic [ref=e114]: Hősies küzdelmet mutatott az afrikai csapat.
+        - generic [ref=e115]: 3ó
+      - generic [ref=e116] [cursor=pointer]:
+        - generic [ref=e117]:
+          - generic: Index
+        - generic [ref=e118]: Donald Trump hatalmas meglepetést hozott a nyaralni induló magyaroknak
+        - generic [ref=e119]: Történelmi szintre erősödött a forint az iráni háború lezárásának hírére.
+        - generic [ref=e120]: 4ó
+    - generic [ref=e121]:
+      - generic [ref=e122] [cursor=pointer]:
+        - generic [ref=e123]:
+          - generic: Index
+        - generic [ref=e124]: "J.D. Vance: Irán akár egy 300 milliárd dolláros újjáépítési alaphoz is hozzáférhet a megállapodás után"
+        - generic [ref=e125]: 4ó
+      - generic [ref=e126] [cursor=pointer]:
+        - generic [ref=e127]:
+          - generic: Index
+        - generic [ref=e128]: Élete első önálló koncertjét adta Kim Kardashian 12 éves lánya, North, de a netezők aggódnak érte
+        - generic [ref=e129]: 4ó
+      - generic [ref=e130] [cursor=pointer]:
+        - generic [ref=e131]:
+          - generic: "444"
+        - generic [ref=e132]: Nem rendőr többé Hajdu János, a TEK korábbi igazgatója
+        - generic [ref=e133]: 2ó
+      - generic [ref=e134] [cursor=pointer]:
+        - generic [ref=e135]:
+          - generic: "444"
+        - generic [ref=e136]: Felfüggesztett börtönt kapott a portugál rendőr, aki lelőtt egy zöld-foki szigeteki fegyvertelen férfit
+        - generic [ref=e137]: 3ó
+      - generic [ref=e138] [cursor=pointer]:
+        - generic [ref=e139]:
+          - generic: "444"
+        - generic [ref=e140]: "A focitörténet egyik legromantikusabb null-nulla: a Zöld-foki-szigetek bravúrosan kivédekezte az ötlettelen spanyolokat"
+        - generic [ref=e141]: 3ó
+      - generic [ref=e142] [cursor=pointer]:
+        - generic [ref=e143]:
+          - generic: "444"
+        - generic [ref=e144]: A komádi általános iskola két tanára is molesztált egy-egy diákot
+        - generic [ref=e145]: 3ó
+      - generic [ref=e146] [cursor=pointer]:
+        - generic [ref=e147]:
+          - generic: "444"
+        - generic [ref=e148]: Amerika semmit, Irán viszont sokat nyert a tervezett békemegállapodás szerint
+        - generic [ref=e149]: 3ó
+    - generic [ref=e150]:
+      - generic [ref=e151] [cursor=pointer]:
+        - generic [ref=e152]:
+          - generic: "444"
+        - generic [ref=e153]: Mindenki nevetett rajtuk, most mégis meghódították Amerikát
+        - generic [ref=e154]: 3ó
+      - generic [ref=e155] [cursor=pointer]:
+        - generic [ref=e156]:
+          - generic: "444"
+        - generic [ref=e157]: Kirúgták a tunéziai szövetségi kapitányt a svédek elleni zakó után
+        - generic [ref=e158]: 4ó
+      - generic [ref=e159] [cursor=pointer]:
+        - generic [ref=e160]:
+          - generic: "444"
+        - generic [ref=e161]: Orbán szerint „alkalmatlan tárgyon elkövetett reménytelen kísérlet&quot; az alkotmánymódosítás, amivel el akarják tiltani a néptől
+        - generic [ref=e162]: 4ó
+      - generic [ref=e163] [cursor=pointer]:
+        - generic [ref=e164]:
+          - generic: "444"
+        - generic [ref=e165]: Megszűnik a Ripost, nem adják ki nyomtatásban a Borsot és három megyei napilapot
+        - generic [ref=e166]: 5ó
+      - generic [ref=e167] [cursor=pointer]:
+        - generic [ref=e168]:
+          - generic: "444"
+        - generic [ref=e169]: "Borízű hang # 274: Hallgatóbüdösségi és bongépítő verseny, valamint a „Hülye vagy kretén?” szellemi vetélkedő országos döntője a Fidesz-frakcióban [rövid verzió]"
+        - generic [ref=e170]: 5ó
+      - generic [ref=e171] [cursor=pointer]:
+        - generic [ref=e172]:
+          - generic: HVG
+        - generic [ref=e173]: Belgium–Egyiptom – ÉLŐ
+        - generic [ref=e174]: 2ó
+    - generic [ref=e175]:
+      - generic [ref=e176]:
+        - generic [ref=e178] [cursor=pointer]:
+          - generic [ref=e179]: Az olajpiac fellélegzett, pedig Irán sokkal veszélyesebbé vált, mint a háború előtt volt
+          - generic [ref=e180]:
+            - generic [ref=e181]: HVG
+            - generic [ref=e182]: 3ó
+        - generic [ref=e184] [cursor=pointer]:
+          - generic [ref=e185]: Kiemelték az adriai hajóbaleset negyedik áldozatát, az elsüllyedt vitorlásban találták meg a holttestét
+          - generic [ref=e186]:
+            - generic [ref=e187]: HVG
+            - generic [ref=e188]: 3ó
+        - generic [ref=e190] [cursor=pointer]:
+          - generic [ref=e191]: A világ egyik legritkább Porsche-ja került elő húsz év után egy raktár mélyéről
+          - generic [ref=e192]:
+            - generic [ref=e193]: HVG
+            - generic [ref=e194]: 3ó
+        - generic [ref=e196] [cursor=pointer]:
+          - generic [ref=e197]: "A vb eddigi legnagyobb meglepetése: döntetlent játszott Spanyolországgal a Zöld-foki Köztársaság"
+          - generic [ref=e198]:
+            - generic [ref=e199]: HVG
+            - generic [ref=e200]: 3ó
+      - generic [ref=e201]:
+        - generic [ref=e203] [cursor=pointer]:
+          - generic [ref=e204]: "Kiderült a nagy titok: így tájékozódnak a postagalambok"
+          - generic [ref=e205]:
+            - generic [ref=e206]: HVG
+            - generic [ref=e207]: 3ó
+        - generic [ref=e209] [cursor=pointer]:
+          - generic [ref=e210]: "Visszatér a kata, de már nem ugyanaz lesz: 4 forgatókönyv a megújításra"
+          - generic [ref=e211]:
+            - generic [ref=e212]: HVG
+            - generic [ref=e213]: 3ó
+        - generic [ref=e215] [cursor=pointer]:
+          - generic [ref=e216]: Zelenszkij a G7-csúcson akart találkozni Putyinnal
+          - generic [ref=e217]:
+            - generic [ref=e218]: HVG
+            - generic [ref=e219]: 3ó
+      - generic [ref=e220]:
+        - generic [ref=e222] [cursor=pointer]:
+          - generic [ref=e223]: Törvényesen minősítette terrorszervezetnek a Palestine Actiont a brit kormány
+          - generic [ref=e224]:
+            - generic [ref=e225]: HVG
+            - generic [ref=e226]: 3ó
+        - generic [ref=e228] [cursor=pointer]:
+          - generic [ref=e229]: Azonosították II. „Vak” Béla király maradványait
+          - generic [ref=e230]:
+            - generic [ref=e231]: HVG
+            - generic [ref=e232]: 4ó
+        - generic [ref=e234] [cursor=pointer]:
+          - generic [ref=e235]: Belgium–Egyiptom 0-0
+          - generic [ref=e236]:
+            - generic [ref=e237]: Telex
+            - generic [ref=e238]: 2ó
+  - generic:
+    - generic: Feed hozzáadása
+    - generic:
+      - generic: RSS feed URL
+      - textbox "RSS feed URL":
+        - /placeholder: https://telex.hu/rss
+      - generic: "Gyors hozzáadás:"
+      - generic:
+        - generic: Telex
+        - generic: Index
+        - generic: "444"
+        - generic: HVG
+        - generic: Portfolio
+        - generic: G7
+        - generic: Euronews
+    - generic:
+      - generic: Név (opcionális)
+      - textbox "Név (opcionális)":
+        - /placeholder: Automatikusan töltődik ki
+    - generic:
+      - button "Mégse"
+      - button "Hozzáadás"
+  - generic:
+    - generic: YouTube csatorna hozzáadása
+    - generic:
+      - generic: Channel URL vagy ID
+      - textbox "Channel URL vagy ID":
+        - /placeholder: youtube.com/channel/UCxxxxxx vagy youtube.com/watch?v=...
+      - generic: Pl. youtube.com/channel/UCxxxxxx, nyers UC… ID, vagy egy YouTube videó linkje
+    - generic:
+      - button "Mégse"
+      - button "Hozzáadás"
+  - generic:
+    - generic: Megerősítés
+    - generic:
+      - button "Mégse"
+      - button "OK"

@@ -1,0 +1,138 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4] [cursor=pointer]: Flux
+      - generic [ref=e6]:
+        - button "Összes" [ref=e7] [cursor=pointer]
+        - button "Telex" [ref=e8] [cursor=pointer]
+        - button "Index" [ref=e9] [cursor=pointer]
+        - button "444" [ref=e10] [cursor=pointer]
+        - button "HVG" [ref=e11] [cursor=pointer]
+      - generic [ref=e12]:
+        - generic [ref=e14]: F1
+        - button "Nézet" [ref=e16] [cursor=pointer]:
+          - img [ref=e17]
+        - complementary:
+          - generic:
+            - generic:
+              - generic: Mód
+              - generic:
+                - button "Világos":
+                  - img
+                  - text: Világos
+                - button "Auto":
+                  - img
+                  - text: Auto
+                - button "Sötét":
+                  - img
+                  - text: Sötét
+            - generic:
+              - generic: Téma
+              - generic:
+                - generic:
+                  - generic: Default
+                - generic:
+                  - generic: Nord
+                - generic:
+                  - generic: Solar
+                - generic:
+                  - generic: Rose
+                - generic:
+                  - generic: Mono
+            - generic:
+              - generic: Kiemelő szín
+              - generic:
+                - textbox "Egyéni szín": "#2563eb"
+            - generic:
+              - generic: Betűméret
+              - generic:
+                - generic: A
+                - slider: "16"
+                - generic: A
+            - generic:
+              - generic: Nézet
+              - generic:
+                - button "Magazin":
+                  - img
+                  - text: Magazin
+                - button "Grid":
+                  - img
+                  - text: Grid
+                - button "Lista":
+                  - img
+                  - text: Lista
+                - button "Olvasó":
+                  - img
+                  - text: Olvasó
+            - generic:
+              - generic: Cikkolvasás
+              - generic:
+                - button "Teljes képernyős"
+                - button "Felugró lap"
+        - button "Beállítások" [ref=e19] [cursor=pointer]:
+          - img [ref=e20]
+  - generic:
+    - generic:
+      - generic: Beállítások
+      - button:
+        - img
+    - generic:
+      - navigation:
+        - button "Feedek kezelése":
+          - img
+          - text: Feedek kezelése
+        - button "YouTube csatornák":
+          - img
+          - text: YouTube csatornák
+        - button "Config fájl":
+          - img
+          - text: Config fájl
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - img
+            - generic:
+              - generic: Feedek kezelése
+              - generic: Adj hozzá RSS vagy Atom feedeket, rendezd át őket drag & drop-pal, vagy töröld a feleslegeseket.
+          - generic: Aktív feedek
+          - button "Feed hozzáadása":
+            - img
+            - text: Feed hozzáadása
+  - generic:
+    - generic: Feed hozzáadása
+    - generic:
+      - generic: RSS feed URL
+      - textbox "RSS feed URL":
+        - /placeholder: https://telex.hu/rss
+      - generic: "Gyors hozzáadás:"
+      - generic:
+        - generic: Telex
+        - generic: Index
+        - generic: "444"
+        - generic: HVG
+        - generic: Portfolio
+        - generic: G7
+        - generic: Euronews
+    - generic:
+      - generic: Név (opcionális)
+      - textbox "Név (opcionális)":
+        - /placeholder: Automatikusan töltődik ki
+    - generic:
+      - button "Mégse"
+      - button "Hozzáadás"
+  - generic:
+    - generic: YouTube csatorna hozzáadása
+    - generic:
+      - generic: Channel URL vagy ID
+      - textbox "Channel URL vagy ID":
+        - /placeholder: youtube.com/channel/UCxxxxxx vagy youtube.com/watch?v=...
+      - generic: Pl. youtube.com/channel/UCxxxxxx, nyers UC… ID, vagy egy YouTube videó linkje
+    - generic:
+      - button "Mégse"
+      - button "Hozzáadás"
+  - generic:
+    - generic: Megerősítés
+    - generic:
+      - button "Mégse"
+      - button "OK"
