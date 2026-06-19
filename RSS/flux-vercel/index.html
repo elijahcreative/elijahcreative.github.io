@@ -252,11 +252,12 @@
 <div class="modal" id="addModal">
   <div class="modal-title">Feed hozzáadása</div>
   <div class="form-group">
-    <label class="form-label" for="feedUrl">RSS feed URL</label>
-    <input type="url" class="form-input" id="feedUrl" placeholder="https://telex.hu/rss">
-    <div class="form-hint">Gyors hozzáadás:</div>
+    <label class="form-label" for="feedUrl">Feed keresése vagy RSS URL</label>
+    <input type="text" class="form-input" id="feedUrl" placeholder="telex, portfolio.hu vagy https://.../rss">
+    <div class="form-hint">Név alapján választható találatokat ad, RSS/Atom URL alapján közvetlenül hozzáad.</div>
     <div class="suggestions" id="suggestions"></div>
   </div>
+  <div class="feed-choice-list" id="feedChoiceList"></div>
   <div class="form-group">
     <label class="form-label" for="feedName">Név (opcionális)</label>
     <input type="text" class="form-input" id="feedName" placeholder="Automatikusan töltődik ki">
@@ -298,6 +299,6 @@
 <div class="toast" id="toast"></div>
 
 <script src="drag-order.min.js?v=1"></script>
-<script src="app.js?v=ytsearch4"></script>
+<script src="app.js?v=feedsearch1"></script>
 </body>
 </html>

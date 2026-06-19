@@ -3,6 +3,7 @@ const ALLORIGINS  = 'https://api.allorigins.win/get?url=';
 const CORSPROXY   = 'https://corsproxy.io/?';
 const ARTICLE_API = '/api/article?url=';
 const YOUTUBE_API = '/api/youtube?input=';
+const FEED_API    = '/api/feed?input=';
 const CACHE_TTL   = 5 * 60 * 1000; // 5 minutes
 const ARTICLE_HOSTS = new Set(['telex.hu','www.telex.hu','index.hu','www.index.hu','hvg.hu','www.hvg.hu','portfolio.hu','www.portfolio.hu']);
 function fetchT(url, opts = {}, ms = 8000) {
@@ -866,6 +867,7 @@ function openAddModal() {
   $('feedUrl').value = '';
   $('feedName').value = '';
   $('feedErr').classList.remove('show');
+  clearFeedChoices();
   $('confirmAdd').disabled = false;
   $('confirmAdd').textContent = 'Hozzáadás';
   $('addModal').classList.add('open');
@@ -875,18 +877,74 @@ function openAddModal() {
 function closeAddModal() {
   $('addModal').classList.remove('open');
   $('overlay').classList.remove('open');
+  clearFeedChoices();
 }
-async function submitAddFeed() {
-  let url = $('feedUrl').value.trim();
-  if (!url) return;
-  if (!url.startsWith('http')) url = 'https://' + url;
+function clearFeedChoices() {
+  const list = $('feedChoiceList');
+  if (!list) return;
+  list.innerHTML = '';
+  list.classList.remove('show');
+}
+function renderFeedChoices(results) {
+  const list = $('feedChoiceList');
+  if (!list) return;
+  list.innerHTML = results.map(r => `<button class="feed-choice" type="button" data-url="${e(r.url)}" data-name="${e(r.name)}">
+    <span class="feed-choice-mark">RSS</span>
+    <span class="feed-choice-main">
+      <span class="feed-choice-name">${e(r.name)}</span>
+      <span class="feed-choice-meta">${e(r.site || r.url)}</span>
+    </span>
+  </button>`).join('');
+  list.classList.toggle('show', results.length > 0);
+}
+async function fetchFeedLookup(input) {
+  const response = await fetchT(FEED_API + encodeURIComponent(input), { cache: 'no-store' }, 12000);
+  if (!response.ok) return null;
+  const data = await response.json();
+  if (Array.isArray(data?.results)) return { results: data.results.filter(r => r.url && r.name) };
+  if (data?.feed?.url) return { feed: data.feed };
+  return null;
+}
+function isLikelyFeedUrl(input) {
+  return /^https?:\/\//i.test(input) || /\.[a-z]{2,}(?:\/|$)/i.test(input);
+}
+async function submitAddFeed(forcedInput) {
+  let input = (typeof forcedInput === 'string' ? forcedInput : $('feedUrl').value).trim();
+  if (!input) return;
+  let url = input;
   if (S.feeds.find(f => f.url === url)) { toast('Ez a feed már létezik.'); closeAddModal(); return; }
   const btn = $('confirmAdd');
   btn.disabled = true;
   btn.textContent = 'Betöltés...';
   $('feedErr').classList.remove('show');
+  clearFeedChoices();
+  const lookup = await fetchFeedLookup(input).catch(() => null);
+  if (lookup?.results) {
+    if (!lookup.results.length) {
+      $('feedErr').textContent = 'Nem találtam feedet. Próbálj pontosabb nevet vagy weboldal/RSS URL-t.';
+      $('feedErr').classList.add('show');
+      btn.disabled = false; btn.textContent = 'Hozzáadás';
+      return;
+    }
+    renderFeedChoices(lookup.results);
+    btn.disabled = false; btn.textContent = 'Hozzáadás';
+    return;
+  }
+  if (lookup?.feed?.url) {
+    url = lookup.feed.url;
+    if (!$('feedName').value.trim()) $('feedName').value = lookup.feed.name || '';
+  } else if (!isLikelyFeedUrl(input)) {
+    $('feedErr').textContent = 'Nem találtam feedet. Próbálj pontosabb nevet vagy weboldal/RSS URL-t.';
+    $('feedErr').classList.add('show');
+    btn.disabled = false; btn.textContent = 'Hozzáadás';
+    return;
+  } else if (!url.startsWith('http')) {
+    url = 'https://' + url;
+  }
+  if (S.feeds.find(f => f.url === url)) { toast('Ez a feed már létezik.'); closeAddModal(); return; }
   const articles = await Fetcher.get(url).catch(() => []);
   if (!articles.length) {
+    $('feedErr').textContent = 'Nem sikerült betölteni a feedet. Ellenőrizd az URL-t.';
     $('feedErr').classList.add('show');
     btn.disabled = false; btn.textContent = 'Hozzáadás';
     return;
@@ -1027,8 +1085,16 @@ function bindEvents() {
   $('suggestions').addEventListener('click', ev => {
     const chip = ev.target.closest('.chip[data-url]');
     if (!chip) return;
+    clearFeedChoices();
     $('feedUrl').value = chip.dataset.url;
     $('feedName').value = chip.dataset.label;
+  });
+  $('feedChoiceList').addEventListener('click', ev => {
+    const choice = ev.target.closest('.feed-choice[data-url]');
+    if (!choice) return;
+    $('feedUrl').value = choice.dataset.url;
+    $('feedName').value = choice.dataset.name || '';
+    submitAddFeed(choice.dataset.url);
   });
   $('addFeedBtn').onclick = openAddModal;
   $('cancelAdd').onclick = closeAddModal;

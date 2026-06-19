@@ -5,6 +5,9 @@
     },
     "api/youtube.js": {
       "maxDuration": 10
+    },
+    "api/feed.js": {
+      "maxDuration": 10
     }
   },
   "rewrites": [

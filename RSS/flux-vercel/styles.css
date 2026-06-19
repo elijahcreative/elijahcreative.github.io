@@ -363,18 +363,28 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 15p
 .form-input:focus { border-color: var(--ac); }
 .form-hint { font-size: .7rem; color: var(--muted); margin-top: 4px; }
 .yt-choice-list { display: none; flex-direction: column; gap: 6px; margin-top: 10px; }
+.feed-choice-list { display: none; flex-direction: column; gap: 6px; margin-top: 10px; }
 .yt-choice-list.show { display: flex; }
-.yt-choice {
+.feed-choice-list.show { display: flex; }
+.yt-choice,
+.feed-choice {
   display: flex; align-items: center; gap: 10px; width: 100%;
   padding: 9px 10px; background: var(--bg2); border: 1px solid transparent;
   border-radius: var(--radius-sm); color: var(--text); cursor: pointer;
   text-align: left; font-family: inherit; transition: background var(--t), border-color var(--t);
 }
-.yt-choice:hover { background: var(--bg-hover); border-color: var(--border); }
-.yt-choice-mark { width: 22px; height: 22px; border-radius: 5px; background: #ff0000; color: #fff; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: .68rem; font-weight: 800; }
-.yt-choice-main { min-width: 0; flex: 1; }
-.yt-choice-name { font-size: .86rem; font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.yt-choice-meta { font-size: .72rem; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.yt-choice:hover,
+.feed-choice:hover { background: var(--bg-hover); border-color: var(--border); }
+.yt-choice-mark,
+.feed-choice-mark { width: 22px; height: 22px; border-radius: 5px; color: #fff; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: .68rem; font-weight: 800; }
+.yt-choice-mark { background: #ff0000; }
+.feed-choice-mark { background: var(--ac); }
+.yt-choice-main,
+.feed-choice-main { min-width: 0; flex: 1; }
+.yt-choice-name,
+.feed-choice-name { font-size: .86rem; font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.yt-choice-meta,
+.feed-choice-meta { font-size: .72rem; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .suggestions { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
 .chip { padding: 3px 9px; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; font-size: .72rem; cursor: pointer; color: var(--text2); transition: all var(--t); }
 .chip:hover { border-color: var(--ac); color: var(--ac); background: var(--acl); }
