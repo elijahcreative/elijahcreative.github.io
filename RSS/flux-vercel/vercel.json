@@ -2,6 +2,9 @@
   "functions": {
     "api/article.js": {
       "maxDuration": 10
+    },
+    "api/youtube.js": {
+      "maxDuration": 10
     }
   },
   "rewrites": [

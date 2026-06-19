@@ -2,6 +2,7 @@ const RSS2JSON    = 'https://api.rss2json.com/v1/api.json?rss_url=';
 const ALLORIGINS  = 'https://api.allorigins.win/get?url=';
 const CORSPROXY   = 'https://corsproxy.io/?';
 const ARTICLE_API = '/api/article?url=';
+const YOUTUBE_API = '/api/youtube?input=';
 const CACHE_TTL   = 5 * 60 * 1000; // 5 minutes
 const ARTICLE_HOSTS = new Set(['telex.hu','www.telex.hu','index.hu','www.index.hu','hvg.hu','www.hvg.hu','portfolio.hu','www.portfolio.hu']);
 function fetchT(url, opts = {}, ms = 8000) {
@@ -635,43 +636,36 @@ function renderSidebar() {
   $('feedList').innerHTML = html;
 }
 function bindSortableList(container, items, afterMove) {
-  let dragIdx = null;
-  container.querySelectorAll('.s-feed-item').forEach(row => {
-    row.addEventListener('dragstart', ev => {
-      dragIdx = +row.dataset.idx;
-      ev.dataTransfer.effectAllowed = 'move';
-      setTimeout(() => row.style.opacity = '.4', 0);
-    });
-    row.addEventListener('dragend', () => row.style.opacity = '');
-    row.addEventListener('dragover', ev => {
-      ev.preventDefault();
-      ev.dataTransfer.dropEffect = 'move';
-      container.querySelectorAll('.s-feed-item').forEach(r => r.classList.remove('drag-over'));
-      if (+row.dataset.idx !== dragIdx) row.classList.add('drag-over');
-    });
-    row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
-    row.addEventListener('drop', ev => {
-      ev.preventDefault();
-      row.classList.remove('drag-over');
-      const toIdx = +row.dataset.idx;
-      if (dragIdx === null || dragIdx === toIdx) return;
-      items.splice(toIdx, 0, items.splice(dragIdx, 1)[0]);
+  if (!window.Sortable) {
+    console.warn('SortableJS is not available');
+    return;
+  }
+  Sortable.create(container, {
+    animation: 150,
+    handle: '.s-feed-drag',
+    draggable: '.s-feed-item',
+    ghostClass: 'sortable-ghost',
+    chosenClass: 'sortable-chosen',
+    dragClass: 'sortable-drag',
+    forceFallback: true,
+    fallbackClass: 'sortable-fallback',
+    fallbackOnBody: true,
+    onStart: () => container.classList.add('sorting'),
+    onEnd: () => {
+      container.classList.remove('sorting');
+      const byId = new Map(items.map(item => [item.url || item.id, item]));
+      const ordered = [...container.querySelectorAll('.s-feed-item')]
+        .map(row => byId.get(row.dataset.id))
+        .filter(Boolean);
+      if (ordered.length !== items.length) return;
+      items.splice(0, items.length, ...ordered);
       afterMove();
-    });
+    }
   });
 }
-function moveItem(items, predicate, dir, afterMove) {
-  const i = items.findIndex(predicate), j = i + dir;
-  if (i < 0 || j < 0 || j >= items.length) return;
-  [items[i], items[j]] = [items[j], items[i]];
-  afterMove();
-}
 function settingsRow(o) {
-  return `<div class="s-feed-item" draggable="true" data-kind="${o.kind}" data-id="${e(o.id)}" data-idx="${o.i}">
-    <span class="s-feed-drag" title="Átrendezés"><span class="s-feed-grip">⠿</span>
-      <button class="s-feed-move" type="button" data-act="move" data-dir="-1" ${o.i === 0 ? 'disabled' : ''} title="Fel">↑</button>
-      <button class="s-feed-move" type="button" data-act="move" data-dir="1" ${o.i === o.total - 1 ? 'disabled' : ''} title="Le">↓</button>
-    </span>
+  return `<div class="s-feed-item" data-kind="${o.kind}" data-id="${e(o.id)}" data-idx="${o.i}">
+    <span class="s-feed-drag" title="Átrendezés"><span class="s-feed-grip">⠿</span></span>
     ${o.icon ? `<span style="flex-shrink:0;padding-top:3px">${o.icon}</span>` : ''}
     <div style="flex:1;min-width:0">
       <input class="s-feed-name" data-field="name" value="${e(o.name)}">
@@ -688,11 +682,6 @@ function renderSFeeds() {
     title: 'Feed URL — kattints a szerkesztéshez'
   })).join('');
   bindSortableList(c, S.feeds, () => { saveFeeds(); renderSFeeds(); renderSidebar(); renderArticles(); });
-}
-function moveFeed(url, dir) {
-  moveItem(S.feeds, f => f.url === url, dir, () => {
-    saveFeeds(); renderSFeeds(); renderSidebar(); renderArticles();
-  });
 }
 function selectFeed(url) {
   S.activeUrl = url;
@@ -939,9 +928,9 @@ function bindEvents() {
   document.addEventListener('click', ev => {
     const btn = ev.target.closest('.s-feed-item [data-act]');
     if (!btn) return;
-    const row = btn.closest('.s-feed-item'), id = row.dataset.id, dir = Number(btn.dataset.dir || 0);
-    if (row.dataset.kind === 'feed') btn.dataset.act === 'delete' ? deleteFeed(id) : moveFeed(id, dir);
-    else btn.dataset.act === 'delete' ? deleteYtChannel(id) : moveYtChannel(id, dir);
+    const row = btn.closest('.s-feed-item'), id = row.dataset.id;
+    if (btn.dataset.act !== 'delete') return;
+    row.dataset.kind === 'feed' ? deleteFeed(id) : deleteYtChannel(id);
   });
   $('feedList').addEventListener('click', ev => {
     const btn = ev.target.closest('.nav-feed[data-feed-url]');
@@ -1430,6 +1419,25 @@ async function resolveYtInputToChannel(parsed) {
   }
   return null;
 }
+async function fetchYtLookup(input) {
+  const response = await fetchT(YOUTUBE_API + encodeURIComponent(input), { cache: 'no-store' }, 15000);
+  if (!response.ok) return null;
+  const data = await response.json();
+  if (!data?.id) return null;
+  return {
+    id: data.id,
+    idType: 'id',
+    name: normalizeText(data.name || data.channelName || data.id),
+    videos: Array.isArray(data.videos) ? data.videos.map(v => ({
+      videoId: v.videoId,
+      title: normalizeText(v.title || ''),
+      date: new Date(v.date || Date.now()),
+      thumb: v.thumb || (v.videoId ? `https://i.ytimg.com/vi/${v.videoId}/mqdefault.jpg` : ''),
+      channelName: normalizeText(v.channelName || data.name || data.channelName || data.id),
+      channelId: data.id
+    })).filter(v => v.videoId && v.title) : []
+  };
+}
 function parseYtVideosFromHtml(html, fallbackChannelId, fallbackChannelName) {
   if (!html) return { videos: [], channelName: fallbackChannelName || fallbackChannelId };
   const channelName = normalizeText(firstMatch(html, [/"ownerChannelName":"([^"]+)"/, /"channelMetadataRenderer":\{"title":"([^"]+)"/]) || fallbackChannelName || fallbackChannelId);
@@ -1722,11 +1730,6 @@ function renderSYtChannels() {
   })).join('');
   bindSortableList(c, S.ytChannels, () => { saveYtChannels(); renderSYtChannels(); injectYtSidebar(); });
 }
-function moveYtChannel(id, dir) {
-  moveItem(S.ytChannels, ch => ch.id === id, dir, () => {
-    saveYtChannels(); renderSYtChannels(); injectYtSidebar();
-  });
-}
 function deleteYtChannel(id) {
   const ch = S.ytChannels.find(c => c.id === id);
   confirmDialog(`"${ch?.name || id}" csatorna törlése visszavonhatatlan.`, () => {
@@ -1757,16 +1760,19 @@ async function submitAddYt() {
   if (!input) return;
   const parsed = extractYtChannelId(input);
   const debug = [];
-  if (!parsed) {
-    $('ytErr').textContent = 'Érvénytelen URL/ID. Adj meg channel URL-t, UC… ID-t, vagy YouTube videó linket.';
-    $('ytErr').classList.add('show');
-    return;
-  }
   const btn = $('confirmYt');
   btn.disabled = true; btn.textContent = 'Betöltés...';
   $('ytErr').classList.remove('show');
-  const resolved = await resolveYtInputToChannel(parsed).catch(() => null);
-  debug.push(`parsed:${parsed.type}`);
+  const lookup = await fetchYtLookup(input).catch(() => null);
+  debug.push(`api:${lookup ? 'ok' : 'no'}`);
+  if (!parsed && !lookup) {
+    $('ytErr').textContent = 'Nem sikerült azonosítani. Adj meg YouTube csatorna URL-t, @handle-t, UC… ID-t, vagy videó linket.';
+    $('ytErr').classList.add('show');
+    btn.disabled = false; btn.textContent = 'Hozzáadás';
+    return;
+  }
+  const resolved = lookup || await resolveYtInputToChannel(parsed).catch(() => null);
+  if (parsed) debug.push(`parsed:${parsed.type}`);
   debug.push(`resolved:${resolved ? resolved.idType : 'no'}`);
   let idType = resolved?.idType || (
     parsed.type === 'id' ? 'id' :
@@ -1783,20 +1789,24 @@ async function submitAddYt() {
   }
   let videos = [];
   let channelName = '';
-  if (idType) {
+  if (lookup?.videos?.length) {
+    videos = lookup.videos;
+    channelName = lookup.name || presetName;
+    debug.push(`apiFeed:${videos.length}`);
+  } else if (idType) {
     const tempCh = { id: chId, name: chId, idType };
     const feedResult = await fetchYtChannelVideos(tempCh).catch(() => ({ videos: [], channelName: '' }));
     videos = feedResult.videos;
     channelName = feedResult.channelName || presetName;
     debug.push(`feed:${videos.length}`);
   }
-  if (!videos.length && parsed.type === 'handle') {
+  if (!videos.length && parsed?.type === 'handle') {
     const pageResult = await fetchYtVideosFromChannelPage(`https://www.youtube.com/@${parsed.value}/videos`, chId, channelName || chId).catch(() => ({ videos: [], channelName: '' }));
     videos = pageResult.videos;
     channelName = pageResult.channelName || channelName;
     debug.push(`handlePage:${videos.length}`);
   }
-  if (!videos.length && parsed.type === 'url') {
+  if (!videos.length && parsed?.type === 'url') {
     const pageResult = await fetchYtVideosFromChannelPage(parsed.value.replace(/\/+$/, '') + '/videos', chId, channelName || chId).catch(() => ({ videos: [], channelName: '' }));
     videos = pageResult.videos;
     channelName = pageResult.channelName || channelName;
