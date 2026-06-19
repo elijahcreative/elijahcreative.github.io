@@ -515,25 +515,17 @@ function $(id) { return document.getElementById(id); }
 function saveReturnScroll() {
   try {
     const content = $('content');
-    sessionStorage.setItem('flux_return_scroll', JSON.stringify({
-      top: content ? content.scrollTop : 0,
-      ts: Date.now()
-    }));
+    window._fluxReturnScrollTop = content ? content.scrollTop : 0;
   } catch(e) {}
 }
 function restoreReturnScroll() {
   try {
-    const raw = sessionStorage.getItem('flux_return_scroll');
-    if (!raw) return;
-    const s = JSON.parse(raw);
-    if (!s || Date.now() - s.ts > 10 * 60 * 1000) {
-      sessionStorage.removeItem('flux_return_scroll');
-      return;
-    }
+    const top = window._fluxReturnScrollTop;
+    if (typeof top !== 'number') return;
+    window._fluxReturnScrollTop = null;
     const content = $('content');
     if (!content) return;
-    requestAnimationFrame(() => { content.scrollTo({ top: s.top || 0, behavior: 'smooth' }); });
-    setTimeout(() => sessionStorage.removeItem('flux_return_scroll'), 8000);
+    requestAnimationFrame(() => { content.scrollTop = top || 0; });
   } catch(e) {}
 }
 function stripHtml(html) {
@@ -771,7 +763,6 @@ function renderArticles() {
   if (!S.feeds.length) {
     $('content').innerHTML = `<div class="state-box"><div class="icon">📰</div><div class="title">Nincs feed hozzáadva</div><div class="desc">Kattints a "Feed hozzáadása" gombra.</div></div>`;
     injectYtSidebar();
-    restoreReturnScroll();
     return;
   }
   let articles = S.activeUrl
@@ -782,7 +773,6 @@ function renderArticles() {
   }
   Renderer.render(articles);
   injectYtSidebar();
-  restoreReturnScroll();
 }
 const LAYOUT_ICONS = {
   grid:     `<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>`,
