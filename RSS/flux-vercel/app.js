@@ -6,6 +6,9 @@ const YOUTUBE_API = '/api/youtube?input=';
 const FEED_API    = '/api/feed?input=';
 const CACHE_TTL   = 5 * 60 * 1000; // 5 minutes
 const ARTICLE_HOSTS = new Set(['telex.hu','www.telex.hu','index.hu','www.index.hu','hvg.hu','www.hvg.hu','portfolio.hu','www.portfolio.hu']);
+try { history.scrollRestoration = 'manual'; } catch(e) {}
+let activeArticleMode = null;
+let articleListSnapshot = null;
 function fetchT(url, opts = {}, ms = 8000) {
   const ctrl = new AbortController();
   const tid = setTimeout(() => ctrl.abort(), ms);
@@ -463,16 +466,18 @@ function articleViewHtml(a, opts = {}) {
 }
 function renderArticleShell(html) {
   if (S.readerMode === 'modal') {
+    activeArticleMode = 'modal';
     const layer = ensureArticleModal();
     layer.querySelector('.article-sheet').innerHTML = html;
     document.body.classList.add('article-modal-open');
     requestAnimationFrame(() => layer.classList.add('open'));
     return;
   }
+  activeArticleMode = 'page';
   closeArticleModal();
   const content = $('content');
   content.innerHTML = html;
-  content.scrollTop = 0;
+  setScrollTopInstant(content, 0);
 }
 function ensureArticleModal() {
   let layer = $('articleModalLayer');
@@ -504,8 +509,13 @@ function closeArticleView(fromHistory = false) {
     return;
   }
   closeArticleModal();
-  renderArticles();
-  restoreReturnScroll();
+  if (activeArticleMode === 'modal') {
+    activeArticleMode = null;
+    clearReturnScroll();
+    return;
+  }
+  activeArticleMode = null;
+  restoreArticleList();
 }
 function pushArticleState() {
   if (history.state?.flux === 'article') return;
@@ -516,17 +526,44 @@ function saveReturnScroll() {
   try {
     const content = $('content');
     window._fluxReturnScrollTop = content ? content.scrollTop : 0;
+    articleListSnapshot = (content && S.readerMode !== 'modal') ? content.innerHTML : null;
   } catch(e) {}
 }
-function restoreReturnScroll() {
+function restoreArticleList() {
+  const content = $('content');
+  if (!content) return;
+  if (articleListSnapshot !== null) {
+    content.innerHTML = articleListSnapshot;
+    articleListSnapshot = null;
+    restoreReturnScroll(true);
+    return;
+  }
+  renderArticles();
+  restoreReturnScroll();
+}
+function restoreReturnScroll(immediate = false) {
   try {
     const top = window._fluxReturnScrollTop;
     if (typeof top !== 'number') return;
     window._fluxReturnScrollTop = null;
     const content = $('content');
     if (!content) return;
-    requestAnimationFrame(() => { content.scrollTop = top || 0; });
+    if (immediate) {
+      setScrollTopInstant(content, top || 0);
+      return;
+    }
+    requestAnimationFrame(() => setScrollTopInstant(content, top || 0));
   } catch(e) {}
+}
+function clearReturnScroll() {
+  window._fluxReturnScrollTop = null;
+  articleListSnapshot = null;
+}
+function setScrollTopInstant(el, top) {
+  const prev = el.style.scrollBehavior;
+  el.style.scrollBehavior = 'auto';
+  el.scrollTop = top;
+  requestAnimationFrame(() => { el.style.scrollBehavior = prev; });
 }
 function stripHtml(html) {
   const d = document.createElement('div');
