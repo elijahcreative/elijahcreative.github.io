@@ -272,10 +272,11 @@
 <div class="modal" id="addYtModal">
   <div class="modal-title">YouTube csatorna hozzáadása</div>
   <div class="form-group">
-    <label class="form-label" for="ytChannelInput">Channel URL vagy ID</label>
-    <input type="text" class="form-input" id="ytChannelInput" placeholder="youtube.com/channel/UCxxxxxx vagy youtube.com/watch?v=...">
-    <div class="form-hint">Pl. youtube.com/channel/UCxxxxxx, nyers UC… ID, vagy egy YouTube videó linkje</div>
+    <label class="form-label" for="ytChannelInput">Csatorna keresése vagy URL</label>
+    <input type="text" class="form-input" id="ytChannelInput" placeholder="@handle, csatornanév, URL vagy videó link">
+    <div class="form-hint">Név alapján választható találatokat ad, URL/handle/UC ID alapján közvetlenül hozzáad.</div>
   </div>
+  <div class="yt-choice-list" id="ytChoiceList"></div>
   <div class="err" id="ytErr">Nem sikerült betölteni. Adj meg érvényes channel URL-t vagy ID-t.</div>
   <div class="modal-foot">
     <button class="btn btn-ghost" id="cancelYt">Mégse</button>
@@ -297,6 +298,6 @@
 <div class="toast" id="toast"></div>
 
 <script src="drag-order.min.js?v=1"></script>
-<script src="app.js?v=ytresolver1"></script>
+<script src="app.js?v=ytsearch4"></script>
 </body>
 </html>

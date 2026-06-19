@@ -16,7 +16,12 @@ module.exports = async function handler(req, res) {
   try {
     const parsed = parseInput(input);
     if (!parsed) {
-      sendJson(res, 400, { error: 'unsupported_input' });
+      const results = await searchChannels(input);
+      if (!results.length) {
+        const handleGuess = await resolveHandleGuess(input).catch(() => null);
+        if (handleGuess) results.push(handleGuess);
+      }
+      sendJson(res, 200, { results });
       return;
     }
 
@@ -75,6 +80,60 @@ function parseInput(rawInput) {
   }
 
   return null;
+}
+
+async function searchChannels(query) {
+  const normalizedQuery = query.replace(/^@+/, '').trim();
+  if (normalizedQuery.length < 2) return [];
+
+  const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(normalizedQuery)}&sp=EgIQAg%253D%253D`;
+  const html = await fetchText(url);
+  const results = [];
+  const seen = new Set();
+  const re = /"channelRenderer":\{"channelId":"(UC[A-Za-z0-9_-]{22})"[\s\S]{0,1000}?"title":\{"simpleText":"([^"]+)"[\s\S]{0,2400}?"canonicalBaseUrl":"([^"]+)"/g;
+  let match;
+  while ((match = re.exec(html)) && results.length < 8) {
+    const id = match[1];
+    if (seen.has(id)) continue;
+    const name = decodeHtml(match[2]);
+    const handle = decodeHtml(match[3]).replace(/^\//, '');
+    if (!isRelevantChannelResult(normalizedQuery, name, handle)) continue;
+    seen.add(id);
+    results.push({
+      id,
+      idType: 'id',
+      name,
+      handle
+    });
+  }
+  return results;
+}
+
+async function resolveHandleGuess(query) {
+  const handle = query.trim().replace(/^@+/, '');
+  if (!/^[A-Za-z0-9._-]{2,}$/.test(handle)) return null;
+  const resolved = await resolveChannelPage(`https://www.youtube.com/@${handle}`);
+  return resolved?.id ? {
+    id: resolved.id,
+    idType: 'id',
+    name: resolved.name || handle,
+    handle: `@${handle}`
+  } : null;
+}
+
+function isRelevantChannelResult(query, name, handle) {
+  const needle = normalizeForSearch(query);
+  if (!needle) return false;
+  return normalizeForSearch(name).includes(needle) ||
+    normalizeForSearch(handle.replace(/^@/, '')).includes(needle);
+}
+
+function normalizeForSearch(text) {
+  return String(text || '')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/gi, '')
+    .toLowerCase();
 }
 
 async function resolveChannel(parsed) {

@@ -1052,6 +1052,12 @@ function bindEvents() {
   $('cancelYt').onclick = closeAddYtModal;
   $('confirmYt').onclick = submitAddYt;
   $('ytChannelInput').addEventListener('keydown', ev => { if (ev.key === 'Enter') submitAddYt(); });
+  $('ytChoiceList').addEventListener('click', ev => {
+    const choice = ev.target.closest('.yt-choice[data-id]');
+    if (!choice) return;
+    $('ytChannelInput').value = choice.dataset.id;
+    submitAddYt(choice.dataset.id);
+  });
   $('modeBar').addEventListener('click', ev => {
     const b = ev.target.closest('.mode-btn');
     if (b) { S.theme = b.dataset.mode; saveSettings(); Theme.apply(); }
@@ -1423,6 +1429,16 @@ async function fetchYtLookup(input) {
   const response = await fetchT(YOUTUBE_API + encodeURIComponent(input), { cache: 'no-store' }, 15000);
   if (!response.ok) return null;
   const data = await response.json();
+  if (Array.isArray(data?.results)) {
+    return {
+      results: data.results.map(r => ({
+        id: r.id,
+        idType: 'id',
+        name: normalizeText(r.name || r.id),
+        handle: normalizeText(r.handle || '')
+      })).filter(r => r.id && r.name)
+    };
+  }
   if (!data?.id) return null;
   return {
     id: data.id,
@@ -1745,6 +1761,7 @@ function deleteYtChannel(id) {
 function openAddYtModal() {
   $('ytChannelInput').value = '';
   $('ytErr').classList.remove('show');
+  clearYtChoices();
   $('confirmYt').disabled = false;
   $('confirmYt').textContent = 'Hozzáadás';
   $('addYtModal').classList.add('open');
@@ -1754,19 +1771,66 @@ function openAddYtModal() {
 function closeAddYtModal() {
   $('addYtModal').classList.remove('open');
   $('overlay').classList.remove('open');
+  clearYtChoices();
 }
-async function submitAddYt() {
-  const input = $('ytChannelInput').value.trim();
+function clearYtChoices() {
+  const list = $('ytChoiceList');
+  if (!list) return;
+  list.innerHTML = '';
+  list.classList.remove('show');
+}
+function renderYtChoices(results) {
+  const list = $('ytChoiceList');
+  if (!list) return;
+  list.innerHTML = results.map(r => `<button class="yt-choice" type="button" data-id="${e(r.id)}">
+    <span class="yt-choice-mark">YT</span>
+    <span class="yt-choice-main">
+      <span class="yt-choice-name">${e(r.name)}</span>
+      <span class="yt-choice-meta">${e(r.handle || r.id)}</span>
+    </span>
+  </button>`).join('');
+  list.classList.toggle('show', results.length > 0);
+}
+async function submitAddYt(forcedInput) {
+  const input = (typeof forcedInput === 'string' ? forcedInput : $('ytChannelInput').value).trim();
   if (!input) return;
   const parsed = extractYtChannelId(input);
   const debug = [];
   const btn = $('confirmYt');
   btn.disabled = true; btn.textContent = 'Betöltés...';
   $('ytErr').classList.remove('show');
+  clearYtChoices();
   const lookup = await fetchYtLookup(input).catch(() => null);
   debug.push(`api:${lookup ? 'ok' : 'no'}`);
+  if (lookup?.results) {
+    if (!lookup.results.length && /^[A-Za-z0-9._-]{2,}$/.test(input)) {
+      const handleLookup = await fetchYtLookup('@' + input).catch(() => null);
+      if (handleLookup?.id) {
+        renderYtChoices([{
+          id: handleLookup.id,
+          idType: 'id',
+          name: handleLookup.name || input,
+          handle: '@' + input
+        }]);
+        btn.disabled = false;
+        btn.textContent = 'Hozzáadás';
+        return;
+      }
+    }
+    if (!lookup.results.length) {
+      $('ytErr').textContent = 'Nem találtam csatornát. Próbálj pontosabb nevet, @handle-t, URL-t vagy videó linket.';
+      $('ytErr').classList.add('show');
+      btn.disabled = false;
+      btn.textContent = 'Hozzáadás';
+      return;
+    }
+    renderYtChoices(lookup.results);
+    btn.disabled = false;
+    btn.textContent = 'Hozzáadás';
+    return;
+  }
   if (!parsed && !lookup) {
-    $('ytErr').textContent = 'Nem sikerült azonosítani. Adj meg YouTube csatorna URL-t, @handle-t, UC… ID-t, vagy videó linket.';
+    $('ytErr').textContent = 'Nem találtam csatornát. Próbálj pontosabb nevet, @handle-t, URL-t vagy videó linket.';
     $('ytErr').classList.add('show');
     btn.disabled = false; btn.textContent = 'Hozzáadás';
     return;
@@ -1775,14 +1839,14 @@ async function submitAddYt() {
   if (parsed) debug.push(`parsed:${parsed.type}`);
   debug.push(`resolved:${resolved ? resolved.idType : 'no'}`);
   let idType = resolved?.idType || (
-    parsed.type === 'id' ? 'id' :
-    parsed.type === 'user' ? 'user' :
-    parsed.type === 'handle' ? 'handle' :
-    parsed.type === 'video' ? resolved?.idType || null :
-    parsed.type === 'url' ? 'url' :
+    parsed?.type === 'id' ? 'id' :
+    parsed?.type === 'user' ? 'user' :
+    parsed?.type === 'handle' ? 'handle' :
+    parsed?.type === 'video' ? resolved?.idType || null :
+    parsed?.type === 'url' ? 'url' :
     null
   );
-  let chId = resolved?.id || parsed.value;
+  let chId = resolved?.id || parsed?.value;
   let presetName = resolved?.name || '';
   if (S.ytChannels.find(ch => ch.id === chId)) {
     toast('Ez a csatorna már hozzáadva.'); closeAddYtModal(); return;
