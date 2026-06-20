@@ -2,12 +2,8 @@
 <html lang="hu" data-theme="light" data-preset="default">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" id="themeColorMeta" content="#ffffff">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Flux">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <script>
   (function(){
     var BG = {
@@ -30,12 +26,10 @@
   </script>
   <title>Flux</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='2' y='2' width='28' height='28' rx='7' fill='%232563eb'/><line x1='8' y1='11' x2='24' y2='11' stroke='%23ffffff' stroke-width='2.2' stroke-linecap='round'/><line x1='8' y1='16' x2='24' y2='16' stroke='%23ffffff' stroke-width='2.2' stroke-linecap='round'/><line x1='8' y1='21' x2='17' y2='21' stroke='%23ffffff' stroke-width='2.2' stroke-linecap='round'/></svg>">
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=pwa1">
+  <link rel="stylesheet" href="styles.css?v=ytgrid1">
 </head>
 <body>
 
@@ -134,21 +128,21 @@
   </div>
   <div class="sp-body">
     <nav class="sp-nav" id="spNav">
-      <button class="sp-nav-item active" data-sp="general">
+      <button class="sp-nav-item active" data-sp="general" data-mobile-label="Általános">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg>
-        Általános
+        <span class="sp-nav-label">Általános</span>
       </button>
-      <button class="sp-nav-item" data-sp="feeds">
+      <button class="sp-nav-item" data-sp="feeds" data-mobile-label="Feedek">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1" fill="currentColor" stroke="none"/></svg>
-        Feedek kezelése
+        <span class="sp-nav-label">Feedek kezelése</span>
       </button>
-      <button class="sp-nav-item" data-sp="youtube">
+      <button class="sp-nav-item" data-sp="youtube" data-mobile-label="YouTube">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor" stroke="none"/></svg>
-        YouTube csatornák
+        <span class="sp-nav-label">YouTube csatornák</span>
       </button>
-      <button class="sp-nav-item" data-sp="config">
+      <button class="sp-nav-item" data-sp="config" data-mobile-label="Mentés">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        Mentés
+        <span class="sp-nav-label">Mentés</span>
       </button>
     </nav>
     <div class="sp-content">
@@ -229,6 +223,22 @@
             <button class="icon-btn" id="ytPerMinus" style="padding:0 8px;font-size:1rem;line-height:1">−</button>
             <span id="ytPerVal" style="font-size:.95rem;font-weight:700;min-width:20px;text-align:center"></span>
             <button class="icon-btn" id="ytPerPlus" style="padding:0 8px;font-size:1rem;line-height:1">+</button>
+          </div>
+        </div>
+        <div class="sp-stepper-row">
+          <span class="sp-stepper-label">Oszlopok / lap</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <button class="icon-btn" id="ytColsMinus" style="padding:0 8px;font-size:1rem;line-height:1">−</button>
+            <span id="ytColsVal" style="font-size:.95rem;font-weight:700;min-width:20px;text-align:center"></span>
+            <button class="icon-btn" id="ytColsPlus" style="padding:0 8px;font-size:1rem;line-height:1">+</button>
+          </div>
+        </div>
+        <div class="sp-stepper-row">
+          <span class="sp-stepper-label">Sorok / lap</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <button class="icon-btn" id="ytRowsMinus" style="padding:0 8px;font-size:1rem;line-height:1">−</button>
+            <span id="ytRowsVal" style="font-size:.95rem;font-weight:700;min-width:20px;text-align:center"></span>
+            <button class="icon-btn" id="ytRowsPlus" style="padding:0 8px;font-size:1rem;line-height:1">+</button>
           </div>
         </div>
         <div class="sp-mini-label">Csatornák</div>
@@ -335,6 +345,6 @@
 <div class="toast" id="toast"></div>
 
 <script src="drag-order.min.js?v=1"></script>
-<script src="app.js?v=general1"></script>
+<script src="app.js?v=ytgrid1"></script>
 </body>
 </html>

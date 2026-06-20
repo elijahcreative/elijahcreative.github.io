@@ -85,6 +85,8 @@ const S = {
   ytChannels:    [],
   ytPerChannel:  3,
   ytMaxChannels: 5,
+  ytColumns:     3,
+  ytRows:        1,
   readerMode:    'fullscreen',
   showWeather:   true,
   showF1:        true
@@ -107,7 +109,11 @@ const Store = {
   get(key, fallback) { try { return JSON.parse(localStorage.getItem(key) || 'null') ?? fallback; } catch(e) { return fallback; } },
   set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch(e) {} }
 };
-const SETTINGS_KEYS = ['layout','theme','preset','customAccent','fontSize','activeUrl','ytPerChannel','ytMaxChannels','readerMode','showWeather','showF1'];
+function clampInt(value, min, max, fallback) {
+  const n = Number.parseInt(value, 10);
+  return Number.isFinite(n) ? Math.max(min, Math.min(max, n)) : fallback;
+}
+const SETTINGS_KEYS = ['layout','theme','preset','customAccent','fontSize','activeUrl','ytPerChannel','ytMaxChannels','ytColumns','ytRows','readerMode','showWeather','showF1'];
 function saveSettings() {
   Store.set('flux_s', Object.fromEntries(SETTINGS_KEYS.map(k => [k, S[k]])));
 }
@@ -125,6 +131,8 @@ function loadStorage() {
     activeUrl: s.activeUrl || null,
     ytPerChannel: s.ytPerChannel || 3,
     ytMaxChannels: s.ytMaxChannels || 5,
+    ytColumns: clampInt(s.ytColumns, 1, 4, 3),
+    ytRows: clampInt(s.ytRows, 1, 4, 1),
     readerMode: s.readerMode || (window.matchMedia?.('(max-width: 720px)').matches ? 'modal' : 'fullscreen'),
     showWeather: s.showWeather !== false,
     showF1: s.showF1 !== false
@@ -1099,6 +1107,8 @@ function bindEvents() {
     renderSFeeds(); renderSYtChannels();
     const pv = $('ytPerVal'); if (pv) pv.textContent = S.ytPerChannel || 3;
     const mv = $('ytMaxVal'); if (mv) mv.textContent = S.ytMaxChannels || 5;
+    const cv = $('ytColsVal'); if (cv) cv.textContent = S.ytColumns || 3;
+    const rv = $('ytRowsVal'); if (rv) rv.textContent = S.ytRows || 1;
     _spPage.classList.add('open');
   };
   $('settingsBtn').addEventListener('click', openSettingsPage);
@@ -1161,6 +1171,15 @@ function bindEvents() {
   };
   $('ytMaxMinus').onclick = () => updateYtMax(-1);
   $('ytMaxPlus').onclick  = () => updateYtMax(+1);
+  const updateYtGrid = (key, valId, delta) => {
+    S[key] = clampInt((S[key] || 1) + delta, 1, 4, key === 'ytColumns' ? 3 : 1);
+    $(valId).textContent = S[key];
+    saveSettings(); injectYtSidebar();
+  };
+  $('ytColsMinus').onclick = () => updateYtGrid('ytColumns', 'ytColsVal', -1);
+  $('ytColsPlus').onclick  = () => updateYtGrid('ytColumns', 'ytColsVal', +1);
+  $('ytRowsMinus').onclick = () => updateYtGrid('ytRows', 'ytRowsVal', -1);
+  $('ytRowsPlus').onclick  = () => updateYtGrid('ytRows', 'ytRowsVal', +1);
   $('addYtBtn').onclick = openAddYtModal;
   $('cancelYt').onclick = closeAddYtModal;
   $('confirmYt').onclick = submitAddYt;
@@ -1732,12 +1751,13 @@ function ytAge(d) {
 }
 function getYtSidebarGroups() {
   const n = S.ytPerChannel || 3;
+  const maxChannels = clampInt(S.ytMaxChannels, 1, 10, 5);
   const byChannel = {};
   ytVideos.forEach(v => {
     if (!byChannel[v.channelId]) byChannel[v.channelId] = [];
     byChannel[v.channelId].push(v);
   });
-  const groups = S.ytChannels.map(ch => ({
+  const groups = S.ytChannels.slice(0, maxChannels).map(ch => ({
     name: ch.name || ch.id,
     videos: (byChannel[ch.id] || []).slice(0, n)
   })).filter(g => g.videos.length);
@@ -1755,23 +1775,29 @@ function buildYtSidebarHtml() {
       : 'Még nincs megjeleníthető videó. Ellenőrizd a csatornákat vagy frissíts újra.';
     return `<div class="yt-empty">${e(message)}</div>`;
   }
-  const html = videos.map(v => `
+  const cols = clampInt(S.ytColumns, 1, 4, 3);
+  const rows = clampInt(S.ytRows, 1, 4, 1);
+  const pageSize = cols * rows;
+  const pages = [];
+  for (let i = 0; i < videos.length; i += pageSize) pages.push(videos.slice(i, i + pageSize));
+  const cardHtml = v => `
       <div class="yt-vcard" data-video-id="${e(v.videoId)}">
         <img class="yt-vcard-thumb" src="${e(v.thumb)}" alt="" loading="lazy" onerror="this.style.display='none'">
         <div class="yt-vcard-body">
           <div class="yt-vcard-title">${e(v.title)}</div>
           <div class="yt-vcard-meta"><span class="yt-vcard-channel">${e(v.displayChannelName || v.channelName || '')}</span> · ${ytAge(v.date)}</div>
         </div>
-      </div>`).join('');
-  return `<div class="yt-scroll-row">${html}</div>
-    <div class="yt-pager">
+      </div>`;
+  const html = pages.map(page => `<div class="yt-page" style="--yt-cols:${cols}">${page.map(cardHtml).join('')}</div>`).join('');
+  const pager = pages.length > 1 ? `<div class="yt-pager">
       <button class="yt-page-btn" type="button" data-dir="-1" title="Előző videók">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
       </button>
       <button class="yt-page-btn" type="button" data-dir="1" title="Következő videók">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
       </button>
-    </div>`;
+    </div>` : '';
+  return `<div class="yt-scroll-row">${html}</div>${pager}`;
 }
 function refreshYtFeed(ev) {
   if (ev) ev.stopPropagation();
@@ -1819,17 +1845,26 @@ function placeYtSidebar(content, sidebar) {
 function initYtPager(sidebar) {
   const row = sidebar.querySelector('.yt-scroll-row');
   if (!row) return;
+  const pages = [...row.querySelectorAll('.yt-page')];
+  const pageLeft = index => pages[index] ? pages[index].offsetLeft - row.offsetLeft : 0;
+  const currentPage = () => {
+    if (!pages.length) return 0;
+    return pages.reduce((best, page, i) => (
+      Math.abs(pageLeft(i) - row.scrollLeft) < Math.abs(pageLeft(best) - row.scrollLeft) ? i : best
+    ), 0);
+  };
   const syncEdges = () => {
-    const max = row.scrollWidth - row.clientWidth;
-    sidebar.classList.toggle('has-left', row.scrollLeft > 2);
-    sidebar.classList.toggle('has-right', row.scrollLeft < max - 2);
+    const index = currentPage();
+    sidebar.classList.toggle('has-left', index > 0);
+    sidebar.classList.toggle('has-right', index < pages.length - 1);
   };
   row.onscroll = syncEdges;
   requestAnimationFrame(syncEdges);
   sidebar.querySelectorAll('.yt-page-btn').forEach(btn => {
     btn.onclick = () => {
       const dir = Number(btn.dataset.dir) || 0;
-      row.scrollBy({ left: dir * row.clientWidth, behavior: 'smooth' });
+      const next = Math.max(0, Math.min(pages.length - 1, currentPage() + dir));
+      row.scrollTo({ left: pageLeft(next), behavior: 'smooth' });
       requestAnimationFrame(syncEdges);
     };
   });
