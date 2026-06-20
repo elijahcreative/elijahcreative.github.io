@@ -611,6 +611,14 @@ to   { opacity: 1; transform: translateY(0); }
 .sp-sect-desc { font-size: .8rem; color: var(--muted); line-height: 1.5; }
 .sp-mini-label { font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin: 20px 0 10px; }
 .sp-mini-label:first-child { margin-top: 0; }
+.sp-setting-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 14px; background: var(--bg2); border-radius: var(--radius-sm); margin-bottom: 6px; cursor: pointer; }
+.sp-setting-title { display: block; font-size: .86rem; font-weight: 600; color: var(--text); }
+.sp-setting-desc { display: block; margin-top: 2px; font-size: .74rem; color: var(--muted); line-height: 1.35; }
+.switch-input { position: absolute; opacity: 0; pointer-events: none; }
+.switch-ui { width: 36px; height: 20px; border-radius: 999px; background: var(--border); position: relative; flex-shrink: 0; transition: background var(--t); }
+.switch-ui::after { content: ""; position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg-card); box-shadow: var(--shadow); transition: transform var(--t); }
+.switch-input:checked + .switch-ui { background: var(--ac); }
+.switch-input:checked + .switch-ui::after { transform: translateX(16px); }
 .sp-stepper-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--bg2); border-radius: var(--radius-sm); margin-bottom: 6px; }
 .sp-stepper-label { font-size: .85rem; color: var(--text2); }
 .sp-config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 4px; }

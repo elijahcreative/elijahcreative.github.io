@@ -85,7 +85,9 @@ const S = {
   ytChannels:    [],
   ytPerChannel:  3,
   ytMaxChannels: 5,
-  readerMode:    'fullscreen'
+  readerMode:    'fullscreen',
+  showWeather:   true,
+  showF1:        true
 };
 const articleMap = {};
 const extractedArticleCache = new Map();
@@ -105,7 +107,7 @@ const Store = {
   get(key, fallback) { try { return JSON.parse(localStorage.getItem(key) || 'null') ?? fallback; } catch(e) { return fallback; } },
   set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch(e) {} }
 };
-const SETTINGS_KEYS = ['layout','theme','preset','customAccent','fontSize','activeUrl','ytPerChannel','ytMaxChannels','readerMode'];
+const SETTINGS_KEYS = ['layout','theme','preset','customAccent','fontSize','activeUrl','ytPerChannel','ytMaxChannels','readerMode','showWeather','showF1'];
 function saveSettings() {
   Store.set('flux_s', Object.fromEntries(SETTINGS_KEYS.map(k => [k, S[k]])));
 }
@@ -123,7 +125,9 @@ function loadStorage() {
     activeUrl: s.activeUrl || null,
     ytPerChannel: s.ytPerChannel || 3,
     ytMaxChannels: s.ytMaxChannels || 5,
-    readerMode: s.readerMode || (window.matchMedia?.('(max-width: 720px)').matches ? 'modal' : 'fullscreen')
+    readerMode: s.readerMode || (window.matchMedia?.('(max-width: 720px)').matches ? 'modal' : 'fullscreen'),
+    showWeather: s.showWeather !== false,
+    showF1: s.showF1 !== false
   });
   const f = Store.get('flux_f', null);
   S.feeds = (f && f.length) ? f : [...DEFAULT_FEEDS];
@@ -169,7 +173,6 @@ const Theme = {
     newTc.setAttribute('content', c.bg);
     document.head.appendChild(newTc);
     this._syncUI();
-    if (typeof loadWeather === 'function') loadWeather();
   },
   _shade(hex, amt) {
     const n = parseInt(hex.slice(1), 16);
@@ -182,6 +185,9 @@ const Theme = {
   _syncUI() {
     document.querySelectorAll('.mode-btn[data-mode]').forEach(b => b.classList.toggle('active', b.dataset.mode === S.theme));
     document.querySelectorAll('.reader-mode-btn[data-reader-mode]').forEach(b => b.classList.toggle('active', b.dataset.readerMode === S.readerMode));
+    document.querySelectorAll('[data-setting]').forEach(input => {
+      if (input.type === 'checkbox' && input.dataset.setting in S) input.checked = !!S[input.dataset.setting];
+    });
     document.querySelectorAll('.preset-card').forEach(b => b.classList.toggle('active', b.dataset.preset === S.preset));
     document.querySelectorAll('.swatch').forEach(b => b.classList.toggle('active', b.dataset.color === S.customAccent));
     const sl = $('fontSlider'); if (sl) sl.value = S.fontSize;
@@ -620,31 +626,33 @@ function setupHoverTapPopup(trigger, popup, openClass) {
   const closeSoon = () => {
     closeTimer = setTimeout(close, 150);
   };
+  let lastPointerType = '';
   const onDocPointer = ev => {
+    lastPointerType = ev.pointerType || '';
     if (!isOpen()) return;
     if (trigger.contains(ev.target) || popup.contains(ev.target)) return;
     close();
   };
   const onClick = ev => {
-    if (!isTouchMode()) return;
+    if (lastPointerType === 'mouse' || !isTouchMode()) return;
     ev.preventDefault();
     ev.stopPropagation();
     isOpen() ? close() : open();
   };
-  const onEnter = () => { if (!isTouchMode()) open(); };
-  const onLeave = () => { if (!isTouchMode()) closeSoon(); };
+  const onEnter = ev => { if (ev.pointerType === 'mouse') open(); };
+  const onLeave = ev => { if (ev.pointerType === 'mouse') closeSoon(); };
   trigger.addEventListener('click', onClick);
-  trigger.addEventListener('mouseenter', onEnter);
-  trigger.addEventListener('mouseleave', onLeave);
-  popup.addEventListener('mouseenter', onEnter);
-  popup.addEventListener('mouseleave', onLeave);
+  trigger.addEventListener('pointerenter', onEnter);
+  trigger.addEventListener('pointerleave', onLeave);
+  popup.addEventListener('pointerenter', onEnter);
+  popup.addEventListener('pointerleave', onLeave);
   document.addEventListener('pointerdown', onDocPointer);
   trigger._fluxPopupCleanup = () => {
     trigger.removeEventListener('click', onClick);
-    trigger.removeEventListener('mouseenter', onEnter);
-    trigger.removeEventListener('mouseleave', onLeave);
-    popup.removeEventListener('mouseenter', onEnter);
-    popup.removeEventListener('mouseleave', onLeave);
+    trigger.removeEventListener('pointerenter', onEnter);
+    trigger.removeEventListener('pointerleave', onLeave);
+    popup.removeEventListener('pointerenter', onEnter);
+    popup.removeEventListener('pointerleave', onLeave);
     document.removeEventListener('pointerdown', onDocPointer);
     clearTimeout(closeTimer);
   };
@@ -880,6 +888,9 @@ function buildSettingsUI() {
   document.querySelectorAll('.reader-mode-btn[data-reader-mode]').forEach(btn =>
     btn.classList.toggle('active', btn.dataset.readerMode === S.readerMode)
   );
+  document.querySelectorAll('[data-setting]').forEach(input => {
+    if (input.type === 'checkbox' && input.dataset.setting in S) input.checked = !!S[input.dataset.setting];
+  });
   $('suggestions').innerHTML = SUGGESTIONS.map(s =>
     `<span class="chip" data-url="${e(s.url)}" data-label="${e(s.label)}">${s.label}</span>`
   ).join('');
@@ -1069,20 +1080,14 @@ function bindEvents() {
   const _vBtn = $('viewBtn'), _vPanel = $('viewPanel');
   const openView  = () => { clearTimeout(_vTimer); _vPanel.classList.add('open'); };
   const closeView = () => { _vTimer = setTimeout(() => _vPanel.classList.remove('open'), 150); };
-  _vBtn.addEventListener('mouseenter', openView);
-  _vBtn.addEventListener('mouseleave', closeView);
-  _vPanel.addEventListener('mouseenter', () => clearTimeout(_vTimer));
-  _vPanel.addEventListener('mouseleave', closeView);
+  _vBtn.addEventListener('pointerenter', ev => { if (ev.pointerType === 'mouse') openView(); });
+  _vBtn.addEventListener('pointerleave', ev => { if (ev.pointerType === 'mouse') closeView(); });
+  _vPanel.addEventListener('pointerenter', ev => { if (ev.pointerType === 'mouse') clearTimeout(_vTimer); });
+  _vPanel.addEventListener('pointerleave', ev => { if (ev.pointerType === 'mouse') closeView(); });
   _vBtn.addEventListener('click', () => _vPanel.classList.toggle('open'));
   _vPanel.addEventListener('click', ev => {
     const btn = ev.target.closest('.v-layout-btn[data-layout]');
     if (btn) { setLayout(btn.dataset.layout); _vPanel.classList.remove('open'); }
-    const readerBtn = ev.target.closest('.reader-mode-btn[data-reader-mode]');
-    if (readerBtn) {
-      S.readerMode = readerBtn.dataset.readerMode;
-      saveSettings();
-      buildSettingsUI();
-    }
   });
   window.addEventListener('popstate', () => {
     if (history.state?.flux === 'article') return;
@@ -1090,6 +1095,7 @@ function bindEvents() {
   });
   const _spPage = $('settingsPage');
   const openSettingsPage = () => {
+    Theme._syncUI();
     renderSFeeds(); renderSYtChannels();
     const pv = $('ytPerVal'); if (pv) pv.textContent = S.ytPerChannel || 3;
     const mv = $('ytMaxVal'); if (mv) mv.textContent = S.ytMaxChannels || 5;
@@ -1104,6 +1110,20 @@ function bindEvents() {
     item.classList.add('active');
     document.querySelectorAll('.sp-section').forEach(s => s.classList.remove('active'));
     $('sp-' + item.dataset.sp).classList.add('active');
+  });
+  _spPage.addEventListener('click', ev => {
+    const readerBtn = ev.target.closest('.reader-mode-btn[data-reader-mode]');
+    if (!readerBtn) return;
+    S.readerMode = readerBtn.dataset.readerMode;
+    saveSettings();
+    Theme._syncUI();
+  });
+  _spPage.addEventListener('change', ev => {
+    const input = ev.target.closest('[data-setting]');
+    if (!input || !(input.dataset.setting in S)) return;
+    S[input.dataset.setting] = input.type === 'checkbox' ? input.checked : input.value;
+    saveSettings();
+    syncWidgets();
   });
   $('overlay').onclick = () => { closeAddModal(); closeAddYtModal(); };
   document.addEventListener('click', ev => {
@@ -1165,6 +1185,18 @@ function bindEvents() {
   });
   $('configSaveBtn').onclick = () => Config.save();
   $('configLoadBtn').onclick = () => Config.load();
+}
+function syncWidgets() {
+  Theme._syncUI();
+  S.showWeather ? loadWeather() : clearWidget('navWeather');
+  S.showF1 ? loadF1() : clearWidget('navF1');
+}
+function clearWidget(id) {
+  const el = $(id);
+  if (!el) return;
+  if (el._fluxPopupCleanup) el._fluxPopupCleanup();
+  el.innerHTML = id === 'navF1' ? '<span class="f1-badge">F1</span>' : '';
+  el.style.display = 'none';
 }
 const WX_CDN = 'https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/fill/all/';
 const WX_ICONS = {
@@ -1247,8 +1279,11 @@ const WX_LABELS = {
 async function loadWeather() {
   const el = document.getElementById('navWeather');
   if (!el) return;
+  if (!S.showWeather) { clearWidget('navWeather'); return; }
+  el.style.display = '';
   const WX_TTL = 30 * 60 * 1000; // 30 perc
   async function renderWx(w) {
+    if (!S.showWeather) return;
     const label = WX_LABELS[w.code] || '';
     const feels = w.feels    !== undefined ? w.feels    : '–';
     const humid = w.humidity !== undefined ? w.humidity : '–';
@@ -2138,6 +2173,8 @@ function buildF1Model(races, standingsRaw) {
 function renderF1(f1) {
   const el = document.getElementById('navF1');
   if (!el) return;
+  if (!S.showF1) { clearWidget('navF1'); return; }
+  el.style.display = '';
   const ticker = f1.standingsTop5.map(s => `<span>${e(s.name)} ${e(s.points)}</span>`).join('');
   const eventHtml = f1.events.map(ev => `
     <div class="f1-event ${ev.state} ${ev.kind}">
@@ -2170,6 +2207,7 @@ function renderF1(f1) {
   setupHoverTapPopup(el, document.getElementById('f1Popup'), 'f1-open');
 }
 async function loadF1() {
+  if (!S.showF1) { clearWidget('navF1'); return; }
   try {
     const cached = JSON.parse(localStorage.getItem('flux_f1') || 'null');
     if (cached?.version === 2 && Date.now() - cached.ts < F1_TTL) { renderF1(cached); return; }
@@ -2185,7 +2223,7 @@ async function loadF1() {
   } catch(e) { console.warn('F1 load error', e); }
 }
 const Config = {
-  keys: ['theme','preset','customAccent','fontSize','ytPerChannel','ytMaxChannels','readerMode'],
+  keys: SETTINGS_KEYS.filter(k => k !== 'activeUrl'),
   _toJSON() {
     return JSON.stringify({
       version: 1,
@@ -2234,8 +2272,7 @@ const Config = {
   bindEvents();
   setupArticlePrefetch();
   updateLayoutBtns();
-  loadWeather();
-  loadF1();
+  syncWidgets();
   loadYouTube();
   const contentEl = document.getElementById('content');
   const navbar = document.getElementById('navbar');

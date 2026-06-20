@@ -29,7 +29,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=scrollfix3">
+  <link rel="stylesheet" href="styles.css?v=general1">
 </head>
 <body>
 
@@ -109,14 +109,6 @@
           </div>
         </div>
 
-        <div class="s-section">
-          <div class="s-label">Cikkolvasás</div>
-          <div class="mode-bar reader-mode-bar">
-            <button class="mode-btn reader-mode-btn" data-reader-mode="fullscreen">Teljes képernyős</button>
-            <button class="mode-btn reader-mode-btn" data-reader-mode="modal">Felugró lap</button>
-          </div>
-        </div>
-
       </div>
     </aside>
     <button class="icon-btn" id="settingsBtn" title="Beállítások">
@@ -136,7 +128,11 @@
   </div>
   <div class="sp-body">
     <nav class="sp-nav" id="spNav">
-      <button class="sp-nav-item active" data-sp="feeds">
+      <button class="sp-nav-item active" data-sp="general">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg>
+        Általános
+      </button>
+      <button class="sp-nav-item" data-sp="feeds">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1" fill="currentColor" stroke="none"/></svg>
         Feedek kezelése
       </button>
@@ -146,11 +142,45 @@
       </button>
       <button class="sp-nav-item" data-sp="config">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        Config fájl
+        Mentés
       </button>
     </nav>
     <div class="sp-content">
-      <div class="sp-section active" id="sp-feeds">
+      <div class="sp-section active" id="sp-general">
+        <div class="sp-sect-header">
+          <div class="sp-sect-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg>
+          </div>
+          <div>
+            <div class="sp-sect-title">Általános</div>
+            <div class="sp-sect-desc">Alap működési beállítások, amelyek nem feedhez vagy csatornához tartoznak.</div>
+          </div>
+        </div>
+        <div class="sp-mini-label">Olvasás</div>
+        <div class="mode-bar reader-mode-bar">
+          <button class="mode-btn reader-mode-btn" data-reader-mode="fullscreen">Teljes képernyős</button>
+          <button class="mode-btn reader-mode-btn" data-reader-mode="modal">Felugró lap</button>
+        </div>
+        <div class="sp-mini-label">Widgetek</div>
+        <label class="sp-setting-row">
+          <span>
+            <span class="sp-setting-title">Időjárás</span>
+            <span class="sp-setting-desc">Felső sáv időjárás widget.</span>
+          </span>
+          <input class="switch-input" type="checkbox" data-setting="showWeather">
+          <span class="switch-ui"></span>
+        </label>
+        <label class="sp-setting-row">
+          <span>
+            <span class="sp-setting-title">F1</span>
+            <span class="sp-setting-desc">Felső sáv Forma-1 widget.</span>
+          </span>
+          <input class="switch-input" type="checkbox" data-setting="showF1">
+          <span class="switch-ui"></span>
+        </label>
+      </div>
+
+      <div class="sp-section" id="sp-feeds">
         <div class="sp-sect-header">
           <div class="sp-sect-icon">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1" fill="currentColor" stroke="none"/></svg>
@@ -209,8 +239,8 @@
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
           </div>
           <div>
-            <div class="sp-sect-title">Config fájl</div>
-            <div class="sp-sect-desc">Exportáld az összes beállítást, feedet és csatornát JSON-ba, vagy töltsd be egy korábbi mentésből.</div>
+            <div class="sp-sect-title">Beállítások mentése</div>
+            <div class="sp-sect-desc">Exportáld az összes beállítást, feedet és csatornát, vagy töltsd be egy korábbi mentésből.</div>
           </div>
         </div>
         <div class="sp-config-grid">
@@ -219,7 +249,7 @@
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             </div>
             <div class="sp-config-card-title">Exportálás</div>
-            <div class="sp-config-card-desc">Elmenti a teljes konfigurációt .json fájlként.</div>
+            <div class="sp-config-card-desc">Elmenti a teljes konfigurációt fájlként.</div>
             <button class="btn btn-ghost" id="configSaveBtn" style="justify-content:center;margin-top:4px">Mentés</button>
           </div>
           <div class="sp-config-card">
@@ -227,7 +257,7 @@
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             </div>
             <div class="sp-config-card-title">Importálás</div>
-            <div class="sp-config-card-desc">Betölt egy korábban mentett config fájlt.</div>
+            <div class="sp-config-card-desc">Betölt egy korábban mentett Beállítások fájlt.</div>
             <button class="btn btn-ghost" id="configLoadBtn" style="justify-content:center;margin-top:4px">Betöltés</button>
           </div>
         </div>
@@ -299,6 +329,6 @@
 <div class="toast" id="toast"></div>
 
 <script src="drag-order.min.js?v=1"></script>
-<script src="app.js?v=scrollfix3"></script>
+<script src="app.js?v=general1"></script>
 </body>
 </html>
