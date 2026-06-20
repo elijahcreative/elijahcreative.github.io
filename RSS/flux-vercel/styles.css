@@ -402,11 +402,12 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 15p
 .toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%) translateY(12px); background: var(--text); color: var(--bg); padding: 9px 16px; border-radius: 10px; font-size: .83rem; font-weight: 500; z-index: 200; opacity: 0; transition: all .3s; pointer-events: none; white-space: nowrap; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 @media (max-width: 720px) {
+.navbar { min-height: calc(56px + env(safe-area-inset-top)); padding-top: env(safe-area-inset-top); background: var(--bg-nav, var(--bg)); backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%); border-bottom-color: var(--border); }
 .navbar-inner { padding: 0 12px; }
 .nav-feeds { display: none; }
 .layout-btn, .icon-btn { padding: 0 8px; }
 .nav-weather { padding: 4px 6px; gap: 5px; }
-.content { padding: 72px 12px calc(16px + env(safe-area-inset-bottom)); }
+.content { padding: calc(72px + env(safe-area-inset-top)) 12px calc(16px + env(safe-area-inset-bottom)); }
 .grid-layout { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
 .toast { bottom: calc(14px + env(safe-area-inset-bottom)); max-width: calc(100vw - 32px); white-space: normal; text-align: center; }
 .ix-spotlight { padding: 16px; gap: 16px; }
