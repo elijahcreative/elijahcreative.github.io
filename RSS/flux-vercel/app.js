@@ -93,6 +93,7 @@ const S = {
   showArticleMore: true,
   articleMoreColumns: 3,
   articleMoreRows: 1,
+  lastUpdated:   null,
   showWeather:   true,
   showF1:        true
 };
@@ -118,7 +119,7 @@ function clampInt(value, min, max, fallback) {
   const n = Number.parseInt(value, 10);
   return Number.isFinite(n) ? Math.max(min, Math.min(max, n)) : fallback;
 }
-const SETTINGS_KEYS = ['layout','theme','preset','customAccent','fontSize','activeUrl','ytPerChannel','ytMaxChannels','ytColumns','ytRows','showYoutube','readerMode','showArticleMore','articleMoreColumns','articleMoreRows','showWeather','showF1'];
+const SETTINGS_KEYS = ['layout','theme','preset','customAccent','fontSize','activeUrl','ytPerChannel','ytMaxChannels','ytColumns','ytRows','showYoutube','readerMode','showArticleMore','articleMoreColumns','articleMoreRows','lastUpdated','showWeather','showF1'];
 function saveSettings() {
   Store.set('flux_s', Object.fromEntries(SETTINGS_KEYS.map(k => [k, S[k]])));
 }
@@ -143,6 +144,7 @@ function loadStorage() {
     showArticleMore: s.showArticleMore !== false,
     articleMoreColumns: clampInt(s.articleMoreColumns, 1, 4, 3),
     articleMoreRows: clampInt(s.articleMoreRows, 1, 4, 1),
+    lastUpdated: s.lastUpdated || null,
     showWeather: s.showWeather !== false,
     showF1: s.showF1 !== false
   });
@@ -370,6 +372,7 @@ const Renderer = {
       list: () => `<div class="list-item" data-id="${id}">${this._rawImg(a, 'list-thumb', 'list-no-thumb')}<div class="list-body"><div class="list-title">${e(a.title)}</div>${this._desc(a, 'list-desc')}<div class="list-meta">${this._meta(a, 'list-source')}</div></div></div>`,
       ix: () => `<div class="ix-card" data-id="${id}">${this._ixImg(a, 'ix-card-img', 'ix-card-nobg')}<div class="ix-card-title">${e(a.title)}</div>${this._desc(a, 'ix-card-desc')}<div class="ix-card-time">${this._meta(a, 'ix-card-source')}</div></div>`,
       fill: () => `<div class="ix-text-fill" data-id="${id}"><div class="ix-tf-title">${e(a.title)}</div>${this._desc(a, 'ix-tf-desc')}</div>`,
+      heroMini: () => `<div class="ix-hero-mini" data-id="${id}">${this._rawImg(a, 'ix-hero-mini-img', 'ix-hero-mini-nobg')}<div class="ix-hero-mini-body"><div class="ix-hero-mini-title">${e(a.title)}</div>${this._desc(a, 'ix-hero-mini-desc')}<div class="ix-hero-mini-meta">${this._meta(a, 'ix-hero-mini-source')}</div></div></div>`,
       mini: () => `<div class="ix-mini" data-id="${id}">${this._ixImg(a, 'ix-mini-img', 'ix-mini-nobg')}<div class="ix-mini-title">${e(a.title)}</div><div class="ix-mini-time">${this._meta(a, 'ix-mini-source')}</div></div>`,
       strip: withImg => `<div class="ix-strip-item" data-id="${id}">${withImg && a.image ? this._rawImg(a, 'ix-strip-img', '') : ''}<div class="ix-strip-body"><div class="ix-strip-title">${e(a.title)}</div><div class="ix-strip-meta">${this._meta(a, 'ix-strip-source')}</div></div></div>`,
       spot: () => `<div class="ix-spot-card" data-id="${id}"><div class="ix-spot-img-side"><div class="ix-spot-img-clip">${this._rawImg(a, 'ix-spot-img', 'ix-spot-nobg', 'this.parentNode')}</div></div><div class="ix-spot-body"><div class="ix-spot-title">${e(a.title)}</div>${this._desc(a, 'ix-spot-desc')}<div class="ix-spot-time">${this._meta(a, 'ix-spot-source')}</div></div></div>`,
@@ -380,6 +383,12 @@ const Renderer = {
   _grid(articles) { return this._section('grid-layout', articles, a => this._card(a, 'grid')); },
   _list(articles) { return this._section('list-layout', articles, a => this._card(a, 'list')); },
   _reader(articles) { return this._section('reader-layout', articles, a => this._card(a, 'reader')); },
+  _footer(articles) {
+    const updated = S.lastUpdated ? new Date(S.lastUpdated) : null;
+    const parts = [`${S.feeds.length} feed`, `${articles.length} cikk`];
+    if (updated && !isNaN(updated)) parts.push(`frissítve ${updated.toLocaleTimeString('hu-HU', { hour:'2-digit', minute:'2-digit' })}`);
+    return `<footer class="ix-footer"><button class="ix-footer-brand" type="button"><span class="ix-footer-mark"></span>Flux</button>${parts.map(p => `<span class="ix-footer-sep">·</span><span>${e(p)}</span>`).join('')}</footer>`;
+  },
   _magazine(articles) {
     const pool = [...articles.filter(a => a.image), ...articles.filter(a => !a.image)];
     let idx = 0;
@@ -387,14 +396,15 @@ const Renderer = {
     const [hero] = take(1);
     if (!hero) return '';
     const heroHtml = `<div class="ix-hero" data-id="${aid(hero)}">${this._ixImg(hero, 'ix-hero-img', 'ix-hero-nobg', 'hero-wrap')}<div class="ix-hero-body"><div class="ix-hero-title">${e(hero.title)}</div>${this._desc(hero, 'ix-hero-desc')}<div class="ix-hero-time">${this._meta(hero, 'ix-hero-source')}</div></div></div>`;
-    const side = take(3);
-    const sideHtml = side.length ? `<div class="ix-hero-cluster"><div class="ix-hero-main">${heroHtml}</div><div class="ix-hero-side">${this._card(side[0], 'ix')}${side.slice(1).map(a => this._card(a, 'fill')).join('')}</div></div>` : `<div class="ix-hero-main">${heroHtml}</div>`;
-    const spotHtml = this._section('ix-spotlight', take(2), a => this._card(a, 'spot'));
-    const rows = [0, 1].map(row => {
+    const side = take(4);
+    const heroSep = '<div class="ix-hero-separator"><span></span><span></span><span></span></div>';
+    const rowSep = '<div class="ix-section-separator"><span></span><span></span><span></span></div>';
+    const sideHtml = side.length ? `<div class="ix-hero-cluster"><div class="ix-hero-main">${heroHtml}</div><div class="ix-hero-side"><div class="ix-hero-side-head"><span>FONTOS</span></div>${this._card(side[0], 'ix')}${side.slice(1).map(a => this._card(a, 'heroMini')).join('')}</div></div>${heroSep}` : `<div class="ix-hero-main">${heroHtml}</div>${heroSep}`;
+    const rows = [1, 0].map(row => {
       const [big] = take(1), [small] = take(1), fills = take(2);
       if (!big || !small) return '';
       const sideCol = `<div class="ix-col-side">${this._card(small, 'ix')}${fills.map(a => this._card(a, 'fill')).join('')}</div>`;
-      return `<div class="ix-row ${row ? 'row-b' : 'row-a'}">${row ? sideCol + this._card(big, 'ix') : this._card(big, 'ix') + sideCol}</div>`;
+      return `<div class="ix-row ${row ? 'row-b' : 'row-a'}">${row ? sideCol + this._card(big, 'ix') : this._card(big, 'ix') + sideCol}</div>${rowSep}`;
     }).join('');
     const trioHtml = this._section('ix-trio', take(3), a => this._card(a, 'ix'));
     const miniHtml = items => this._section('ix-mini-grid', items, a => this._card(a, 'mini'));
@@ -404,7 +414,8 @@ const Renderer = {
     const mini2Html = miniHtml(rest.slice(0, -10));
     const stripCols = [stripItems.slice(0, 4), stripItems.slice(4, 7), stripItems.slice(7, 10)];
     const stripHtml = stripItems.length ? `<div class="ix-strip">${stripCols.map((col, i) => `<div class="ix-strip-col">${col.map(a => this._card(a, i ? 'strip' : 'strip', !i)).join('')}</div>`).join('')}</div>` : '';
-    return `<div class="magazine-layout">${sideHtml}${spotHtml}${rows}${trioHtml}${mini1Html}${mini2Html}${stripHtml}</div>`;
+    const stripSep = stripItems.length ? rowSep.replace('ix-section-separator', 'ix-section-separator ix-strip-separator') : '';
+    return `<div class="magazine-layout">${sideHtml}${rows}${trioHtml}${mini1Html}${mini2Html}${stripSep}${stripHtml}${this._footer(articles)}</div>`;
   }
 };
 async function openArticle(id) {
@@ -920,8 +931,10 @@ async function refreshAll(bust = false) {
   setLoading(false);
   const newSig = S.articles.slice(0, 40).map(a => a.id).join('|');
   const changed = bust || newSig !== prevSig;
+  S.lastUpdated = new Date().toISOString();
   if (changed) renderArticles();
   saveArticles();
+  saveSettings();
   if (hadArticles) toast(changed ? 'Frissítve.' : 'Nincs új cikk.');
 }
 function setLoading(on) {
@@ -1071,7 +1084,8 @@ async function submitAddFeed(forcedInput) {
   toast(`"${name}" hozzáadva!`);
 }
 function bindEvents() {
-  $('homeLogo').addEventListener('click', () => document.querySelector('.content').scrollTo({ top: 0, behavior: 'smooth' }));
+  const scrollHome = () => document.querySelector('.content').scrollTo({ top: 0, behavior: 'smooth' });
+  $('homeLogo').addEventListener('click', scrollHome);
   document.addEventListener('pointerup', ev => {
     if (!window.matchMedia?.('(max-width: 720px)').matches) return;
     if (ev.clientY > 14) return;
@@ -1080,6 +1094,7 @@ function bindEvents() {
     if (content) content.scrollTo({ top: 0, behavior: 'smooth' });
   }, { passive: true });
   document.addEventListener('click', ev => {
+    if (ev.target.closest('.ix-footer-brand')) return scrollHome();
     if (ev.target.closest('.article-back')) closeArticleView();
   });
   document.addEventListener('keydown', ev => {
@@ -1860,7 +1875,7 @@ function buildYtSidebarHtml() {
   for (let i = 0; i < videos.length; i += pageSize) pages.push(videos.slice(i, i + pageSize));
   const cardHtml = v => `
       <div class="yt-vcard" data-video-id="${e(v.videoId)}">
-        <img class="yt-vcard-thumb" src="${e(v.thumb)}" alt="" loading="lazy" onerror="this.style.display='none'">
+        <div class="yt-vcard-thumb-wrap"><img class="yt-vcard-thumb" src="${e(v.thumb)}" alt="" loading="lazy" onerror="this.parentNode.style.display='none'"></div>
         <div class="yt-vcard-body">
           <div class="yt-vcard-title">${e(v.title)}</div>
           <div class="yt-vcard-meta"><span class="yt-vcard-channel">${e(v.displayChannelName || v.channelName || '')}</span> · ${ytAge(v.date)}</div>
@@ -1875,7 +1890,7 @@ function buildYtSidebarHtml() {
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
       </button>
     </div>` : '';
-  return `<div class="yt-scroll-row">${html}</div>${pager}`;
+  return `<div class="yt-box-head"><span>LEGFRISSEBB VIDEÓK</span></div><div class="yt-scroll-row">${html}</div>${pager}`;
 }
 function refreshYtFeed(ev) {
   if (ev) ev.stopPropagation();
@@ -1915,7 +1930,8 @@ function placeYtSidebar(content, sidebar) {
   const magLayout = content.querySelector('.magazine-layout');
   const heroCluster = magLayout?.querySelector('.ix-hero-cluster');
   if (magLayout && heroCluster) {
-    magLayout.insertBefore(sidebar, heroCluster.nextSibling);
+    const afterHero = heroCluster.nextElementSibling;
+    magLayout.insertBefore(sidebar, afterHero?.classList.contains('ix-hero-separator') ? afterHero.nextSibling : heroCluster.nextSibling);
     return;
   }
   content.appendChild(sidebar);
