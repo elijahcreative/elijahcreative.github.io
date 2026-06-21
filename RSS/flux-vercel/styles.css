@@ -176,6 +176,21 @@ body { position: relative; display: block; height: 100vh; height: 100dvh; overfl
 .yt-wrap .ix-text-fill { margin-top: 10px; padding: 10px 0; gap: 4px; }
 .yt-wrap .ix-tf-title { font-size: .96rem; line-height: 1.28; }
 .yt-wrap .ix-tf-desc { font-size: .84rem; line-height: 1.42; -webkit-line-clamp: 2; }
+@media (min-width: 901px) {
+.ix-hero-cluster,
+.ix-row { align-items: stretch; }
+.ix-hero-main,
+.ix-hero,
+.ix-row > .ix-card { min-height: 0; height: 100%; }
+.ix-hero { display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: 0; }
+.ix-row > .ix-card { display: grid; grid-template-rows: minmax(0, 1fr) auto auto auto; }
+.ix-hero .hero-wrap,
+.ix-row > .ix-card > .ix-img-wrap { min-height: 0; height: 100%; }
+.ix-hero-img,
+.ix-hero-nobg,
+.ix-row > .ix-card .ix-card-img,
+.ix-row > .ix-card .ix-card-nobg { height: 100%; aspect-ratio: auto; object-fit: cover; }
+}
 .ix-mini-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px 24px; margin-bottom: 32px; }
 .ix-mini-grid .ix-mini:first-child { grid-column: span 2; }
 .ix-mini-grid .ix-mini:first-child .ix-mini-img,
