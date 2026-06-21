@@ -1013,6 +1013,13 @@ async function submitAddFeed(forcedInput) {
 }
 function bindEvents() {
   $('homeLogo').addEventListener('click', () => document.querySelector('.content').scrollTo({ top: 0, behavior: 'smooth' }));
+  document.addEventListener('pointerup', ev => {
+    if (!window.matchMedia?.('(max-width: 720px)').matches) return;
+    if (ev.clientY > 14) return;
+    if (ev.target.closest('button,a,input,textarea,select,[role="button"],.view-panel,.sp-page,.modal')) return;
+    const content = $('content');
+    if (content) content.scrollTo({ top: 0, behavior: 'smooth' });
+  }, { passive: true });
   document.addEventListener('click', ev => {
     if (ev.target.closest('.article-back')) closeArticleView();
   });

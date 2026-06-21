@@ -282,11 +282,13 @@ body { position: relative; display: block; height: 100vh; height: 100dvh; overfl
 .reader-content img { max-width: 100%; border-radius: var(--radius-sm); margin: 8px 0; }
 .reader-content a { color: var(--ac); font-weight: 700; text-decoration: none; }
 .reader-content a:hover { text-decoration: underline; }
-.reader-ext { display: inline-flex; align-items: center; gap: 5px; margin-top: 18px; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-card); color: var(--text2); font-size: .82rem; text-decoration: none; font-weight: 650; transition: background var(--t), border-color var(--t), color var(--t); }
-.reader-ext:hover { background: var(--bg-hover); border-color: var(--muted); color: var(--text); text-decoration: none; }
+.reader-ext,
+.article-back { display: inline-flex; align-items: center; gap: 5px; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-card); color: var(--text2); font-family: var(--font-sans); font-size: .82rem; font-weight: 650; line-height: 1.2; text-decoration: none; cursor: pointer; transition: background var(--t), border-color var(--t), color var(--t); }
+.reader-ext { margin-top: 18px; }
+.reader-ext:hover,
+.article-back:hover { background: var(--bg-hover); border-color: var(--muted); color: var(--text); text-decoration: none; }
 .article-view { width: min(760px, 100%); margin: 0 auto; padding: 18px 0 40px; }
-.article-back { appearance: auto; -webkit-appearance: button; cursor: pointer; font: -apple-system-body; font-family: var(--font-sans); font-size: .86rem; margin-bottom: 18px; padding: 5px 10px; color: ButtonText; background: ButtonFace; border: 1px solid ButtonBorder; border-radius: 7px; }
-.article-back:hover { filter: brightness(.98); }
+.article-back { appearance: none; -webkit-appearance: none; margin-bottom: 18px; }
 .article-title { font-size: 2rem; font-weight: 900; line-height: 1.15; color: var(--text); margin-bottom: 10px; }
 .article-meta { color: var(--muted); font-size: .8rem; margin-bottom: 20px; display: flex; gap: 7px; }
 .article-hero-img { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: var(--radius); margin-bottom: 22px; }
@@ -428,7 +430,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 15p
 .article-modal-layer.open .article-sheet { transform: translateY(0); }
 .article-sheet .article-view,
 .content .article-view { width: 100%; padding: 0 0 20px; }
-.article-back { position: sticky; top: 0; z-index: 2; min-height: 34px; margin: -4px 0 12px; padding: 5px 10px; }
+.article-back { position: sticky; top: 0; z-index: 2; min-height: 40px; margin: -4px 0 12px; background: var(--bg-nav, var(--bg-card)); backdrop-filter: blur(18px) saturate(180%); -webkit-backdrop-filter: blur(18px) saturate(180%); box-shadow: var(--shadow); }
 .article-title { font-size: 1.72rem; line-height: 1.16; }
 .article-content p:first-child { font-size: 1.08em; line-height: 1.68; }
 .reader-ext { min-height: 44px; align-items: center; }
@@ -556,7 +558,7 @@ to   { opacity: 1; transform: translateY(0); }
 .yt-sidebar.has-left::before,
 .yt-sidebar.has-right::after { opacity: 1; }
 .magazine-layout > .yt-sidebar { align-self: center; width: min(calc(100vw - 48px), 2200px); margin-top: 18px; margin-bottom: 42px; }
-.yt-scroll-row { display: flex; gap: 20px; overflow-x: auto; overflow-y: hidden; padding: 0 0 10px; scrollbar-width: thin; scroll-behavior: smooth; overscroll-behavior-x: contain; touch-action: pan-x; scroll-snap-type: x mandatory; }
+.yt-scroll-row { display: flex; gap: 20px; overflow-x: auto; overflow-y: hidden; padding: 0 0 10px; scrollbar-width: thin; scroll-behavior: smooth; overscroll-behavior-x: contain; touch-action: pan-x pan-y; scroll-snap-type: x mandatory; }
 .yt-scroll-row::-webkit-scrollbar { height: 5px; }
 .yt-scroll-row::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
 .yt-page { flex: 0 0 100%; display: grid; grid-template-columns: repeat(var(--yt-cols, 3), minmax(0, 1fr)); gap: 20px; min-width: 0; scroll-snap-align: start; }
