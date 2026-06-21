@@ -29,7 +29,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=accent2">
+  <link rel="stylesheet" href="styles.css?v=meta-settings1">
 </head>
 <body>
 
@@ -157,9 +157,13 @@
           </div>
         </div>
         <div class="sp-mini-label">Olvasás</div>
-        <div class="mode-bar reader-mode-bar">
-          <button class="mode-btn reader-mode-btn" data-reader-mode="fullscreen">Teljes képernyős</button>
-          <button class="mode-btn reader-mode-btn" data-reader-mode="modal">Felugró lap</button>
+        <div class="sp-setting-card">
+          <div class="sp-setting-card-title">Cikkolvasó</div>
+          <div class="sp-setting-card-desc">Válaszd ki, hogy a cikkek teljes képernyős nézetben vagy felugró lapon nyíljanak meg.</div>
+          <div class="mode-bar reader-mode-bar">
+            <button class="mode-btn reader-mode-btn" data-reader-mode="fullscreen">Teljes képernyős</button>
+            <button class="mode-btn reader-mode-btn" data-reader-mode="modal">Felugró lap</button>
+          </div>
         </div>
         <label class="sp-setting-row">
           <span>
@@ -170,7 +174,7 @@
           <span class="switch-ui"></span>
         </label>
         <div class="sp-stepper-row">
-          <span class="sp-stepper-label">Továbbiak oszlop</span>
+          <span class="sp-stepper-label">Oszlopok száma</span>
           <div style="display:flex;align-items:center;gap:8px">
             <button class="icon-btn" id="articleMoreColsMinus" style="padding:0 8px;font-size:1rem;line-height:1">−</button>
             <span id="articleMoreColsVal" style="font-size:.95rem;font-weight:700;min-width:20px;text-align:center"></span>
@@ -178,7 +182,7 @@
           </div>
         </div>
         <div class="sp-stepper-row">
-          <span class="sp-stepper-label">Továbbiak sor</span>
+          <span class="sp-stepper-label">Sorok száma</span>
           <div style="display:flex;align-items:center;gap:8px">
             <button class="icon-btn" id="articleMoreRowsMinus" style="padding:0 8px;font-size:1rem;line-height:1">−</button>
             <span id="articleMoreRowsVal" style="font-size:.95rem;font-weight:700;min-width:20px;text-align:center"></span>
@@ -232,37 +236,53 @@
             <div class="sp-sect-desc">Kövesd kedvenc csatornáidat közvetlenül az appban. A legújabb videók az oldalsávban jelennek meg.</div>
           </div>
         </div>
-        <div class="sp-mini-label">Megjelenítési korlátok</div>
-        <div class="sp-stepper-row">
-          <span class="sp-stepper-label">Max. csatorna megjelenítve</span>
-          <div style="display:flex;align-items:center;gap:8px">
-            <button class="icon-btn" id="ytMaxMinus" style="padding:0 8px;font-size:1rem;line-height:1">−</button>
-            <span id="ytMaxVal" style="font-size:.95rem;font-weight:700;min-width:20px;text-align:center"></span>
-            <button class="icon-btn" id="ytMaxPlus" style="padding:0 8px;font-size:1rem;line-height:1">+</button>
+        <div class="sp-mini-label">Megjelenítés</div>
+        <label class="sp-setting-row">
+          <span>
+            <span class="sp-setting-title">YouTube sáv</span>
+            <span class="sp-setting-desc">A követett csatornák videói megjelennek a feedben.</span>
+          </span>
+          <input class="switch-input" type="checkbox" data-setting="showYoutube">
+          <span class="switch-ui"></span>
+        </label>
+        <div class="sp-setting-card">
+          <div class="sp-setting-card-title">Tartalmi korlátok</div>
+          <div class="sp-setting-card-desc">Add meg, hány csatornából és csatornánként hány videóból épüljön fel a YouTube sáv.</div>
+          <div class="sp-stepper-row">
+            <span class="sp-stepper-label">Megjelenített csatornák</span>
+            <div style="display:flex;align-items:center;gap:8px">
+              <button class="icon-btn" id="ytMaxMinus" style="padding:0 8px;font-size:1rem;line-height:1">−</button>
+              <span id="ytMaxVal" style="font-size:.95rem;font-weight:700;min-width:20px;text-align:center"></span>
+              <button class="icon-btn" id="ytMaxPlus" style="padding:0 8px;font-size:1rem;line-height:1">+</button>
+            </div>
+          </div>
+          <div class="sp-stepper-row">
+            <span class="sp-stepper-label">Videók csatornánként</span>
+            <div style="display:flex;align-items:center;gap:8px">
+              <button class="icon-btn" id="ytPerMinus" style="padding:0 8px;font-size:1rem;line-height:1">−</button>
+              <span id="ytPerVal" style="font-size:.95rem;font-weight:700;min-width:20px;text-align:center"></span>
+              <button class="icon-btn" id="ytPerPlus" style="padding:0 8px;font-size:1rem;line-height:1">+</button>
+            </div>
           </div>
         </div>
-        <div class="sp-stepper-row">
-          <span class="sp-stepper-label">Videó / csatorna</span>
-          <div style="display:flex;align-items:center;gap:8px">
-            <button class="icon-btn" id="ytPerMinus" style="padding:0 8px;font-size:1rem;line-height:1">−</button>
-            <span id="ytPerVal" style="font-size:.95rem;font-weight:700;min-width:20px;text-align:center"></span>
-            <button class="icon-btn" id="ytPerPlus" style="padding:0 8px;font-size:1rem;line-height:1">+</button>
+        <div class="sp-setting-card">
+          <div class="sp-setting-card-title">Elrendezés</div>
+          <div class="sp-setting-card-desc">Állítsd be, hány videó férjen egy lapon oszlopokba és sorokba rendezve.</div>
+          <div class="sp-stepper-row">
+            <span class="sp-stepper-label">Oszlopok száma</span>
+            <div style="display:flex;align-items:center;gap:8px">
+              <button class="icon-btn" id="ytColsMinus" style="padding:0 8px;font-size:1rem;line-height:1">−</button>
+              <span id="ytColsVal" style="font-size:.95rem;font-weight:700;min-width:20px;text-align:center"></span>
+              <button class="icon-btn" id="ytColsPlus" style="padding:0 8px;font-size:1rem;line-height:1">+</button>
+            </div>
           </div>
-        </div>
-        <div class="sp-stepper-row">
-          <span class="sp-stepper-label">Oszlopok / lap</span>
-          <div style="display:flex;align-items:center;gap:8px">
-            <button class="icon-btn" id="ytColsMinus" style="padding:0 8px;font-size:1rem;line-height:1">−</button>
-            <span id="ytColsVal" style="font-size:.95rem;font-weight:700;min-width:20px;text-align:center"></span>
-            <button class="icon-btn" id="ytColsPlus" style="padding:0 8px;font-size:1rem;line-height:1">+</button>
-          </div>
-        </div>
-        <div class="sp-stepper-row">
-          <span class="sp-stepper-label">Sorok / lap</span>
-          <div style="display:flex;align-items:center;gap:8px">
-            <button class="icon-btn" id="ytRowsMinus" style="padding:0 8px;font-size:1rem;line-height:1">−</button>
-            <span id="ytRowsVal" style="font-size:.95rem;font-weight:700;min-width:20px;text-align:center"></span>
-            <button class="icon-btn" id="ytRowsPlus" style="padding:0 8px;font-size:1rem;line-height:1">+</button>
+          <div class="sp-stepper-row">
+            <span class="sp-stepper-label">Sorok száma</span>
+            <div style="display:flex;align-items:center;gap:8px">
+              <button class="icon-btn" id="ytRowsMinus" style="padding:0 8px;font-size:1rem;line-height:1">−</button>
+              <span id="ytRowsVal" style="font-size:.95rem;font-weight:700;min-width:20px;text-align:center"></span>
+              <button class="icon-btn" id="ytRowsPlus" style="padding:0 8px;font-size:1rem;line-height:1">+</button>
+            </div>
           </div>
         </div>
         <div class="sp-mini-label">Csatornák</div>
@@ -369,6 +389,6 @@
 <div class="toast" id="toast"></div>
 
 <script src="drag-order.min.js?v=1"></script>
-<script src="app.js?v=accent2"></script>
+<script src="app.js?v=meta-settings1"></script>
 </body>
 </html>

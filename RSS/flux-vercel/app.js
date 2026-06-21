@@ -88,6 +88,7 @@ const S = {
   ytMaxChannels: 5,
   ytColumns:     3,
   ytRows:        1,
+  showYoutube:   true,
   readerMode:    'fullscreen',
   showArticleMore: true,
   articleMoreColumns: 3,
@@ -117,7 +118,7 @@ function clampInt(value, min, max, fallback) {
   const n = Number.parseInt(value, 10);
   return Number.isFinite(n) ? Math.max(min, Math.min(max, n)) : fallback;
 }
-const SETTINGS_KEYS = ['layout','theme','preset','customAccent','fontSize','activeUrl','ytPerChannel','ytMaxChannels','ytColumns','ytRows','readerMode','showArticleMore','articleMoreColumns','articleMoreRows','showWeather','showF1'];
+const SETTINGS_KEYS = ['layout','theme','preset','customAccent','fontSize','activeUrl','ytPerChannel','ytMaxChannels','ytColumns','ytRows','showYoutube','readerMode','showArticleMore','articleMoreColumns','articleMoreRows','showWeather','showF1'];
 function saveSettings() {
   Store.set('flux_s', Object.fromEntries(SETTINGS_KEYS.map(k => [k, S[k]])));
 }
@@ -137,6 +138,7 @@ function loadStorage() {
     ytMaxChannels: s.ytMaxChannels || 5,
     ytColumns: clampInt(s.ytColumns, 1, 4, 3),
     ytRows: clampInt(s.ytRows, 1, 4, 1),
+    showYoutube: s.showYoutube !== false,
     readerMode: s.readerMode || (window.matchMedia?.('(max-width: 720px)').matches ? 'modal' : 'fullscreen'),
     showArticleMore: s.showArticleMore !== false,
     articleMoreColumns: clampInt(s.articleMoreColumns, 1, 4, 3),
@@ -328,15 +330,17 @@ const Renderer = {
   },
   _section(cls, items, render) { return items.length ? `<div class="${cls}">${items.map(render).join('')}</div>` : ''; },
   _desc(a, cls) { return a.desc ? `<div class="${cls}">${e(a.desc)}</div>` : ''; },
-  _metaHtml(a, sourceCls, time) {
+  _metaHtml(a, sourceCls, opts = {}) {
     const feed = this._feedName(a.feedUrl);
-    return this._metaParts(a, feed, time).map((part, i) =>
+    return this._metaParts(a, feed, opts).map((part, i) =>
       `${i ? '<span>|</span>' : ''}<span${part === feed && sourceCls ? ` class="${sourceCls}"` : ''}>${e(part)}</span>`
     ).join('');
   },
-  _metaParts(a, feed, time) {
+  _metaParts(a, feed, opts = {}) {
     const seen = new Set();
-    return [time || this._age(a.date), feed, a.author, this._category(a)].map(v => normalizeText(v || '')).filter(v => {
+    const full = opts.full === true;
+    const parts = full ? [this._age(a.date), feed, a.author, this._category(a)] : [this._age(a.date), feed];
+    return parts.map(v => normalizeText(v || '')).filter(v => {
       const key = v.toLowerCase();
       if (!v || seen.has(key)) return false;
       seen.add(key);
@@ -350,6 +354,7 @@ const Renderer = {
     ) || '';
   },
   _meta(a, sourceCls) { return this._metaHtml(a, sourceCls); },
+  _readerMeta(a, sourceCls) { return this._metaHtml(a, sourceCls, { full: true }); },
   _rawImg(a, imgCls, noCls, hideTarget = 'this') {
     return a.image
       ? `<img class="${imgCls}" src="${e(a.image)}" alt="" loading="lazy" onerror="${hideTarget}.style.display='none'">`
@@ -368,7 +373,7 @@ const Renderer = {
       mini: () => `<div class="ix-mini" data-id="${id}">${this._ixImg(a, 'ix-mini-img', 'ix-mini-nobg')}<div class="ix-mini-title">${e(a.title)}</div><div class="ix-mini-time">${this._meta(a, 'ix-mini-source')}</div></div>`,
       strip: withImg => `<div class="ix-strip-item" data-id="${id}">${withImg && a.image ? this._rawImg(a, 'ix-strip-img', '') : ''}<div class="ix-strip-body"><div class="ix-strip-title">${e(a.title)}</div><div class="ix-strip-meta">${this._meta(a, 'ix-strip-source')}</div></div></div>`,
       spot: () => `<div class="ix-spot-card" data-id="${id}"><div class="ix-spot-img-side"><div class="ix-spot-img-clip">${this._rawImg(a, 'ix-spot-img', 'ix-spot-nobg', 'this.parentNode')}</div></div><div class="ix-spot-body"><div class="ix-spot-title">${e(a.title)}</div>${this._desc(a, 'ix-spot-desc')}<div class="ix-spot-time">${this._meta(a, 'ix-spot-source')}</div></div></div>`,
-      reader: () => `<div class="reader-item" data-id="${id}"><div class="reader-item-head"><div class="reader-item-info"><div class="reader-title">${e(a.title)}</div><div class="reader-meta">${this._meta(a, 'reader-source')}</div></div>${ChevronIcon}</div></div>`
+      reader: () => `<div class="reader-item" data-id="${id}"><div class="reader-item-head"><div class="reader-item-info"><div class="reader-title">${e(a.title)}</div><div class="reader-meta">${this._readerMeta(a, 'reader-source')}</div></div>${ChevronIcon}</div></div>`
     };
     return defs[type](opt);
   },
@@ -491,11 +496,10 @@ function setupArticlePrefetch() {
   }, { passive: true });
 }
 function renderArticleLoading(a) {
-  renderArticleShell(articleViewHtml(a, { meta: 'Cikk betöltése...' }));
+  renderArticleShell(articleViewHtml(a, { body: '<div class="article-content"><p>Cikk betöltése...</p></div>' }));
 }
 function renderArticleView(a) {
   renderArticleShell(articleViewHtml(a, {
-    meta: a.date ? a.date.toLocaleDateString('hu-HU') : '',
     body: `${a.image ? `<img class="article-hero-img" src="${e(a.image)}" alt="">` : ''}
       <div class="article-content">${sanitizeArticleHtml(a.content || a.desc || '')}</div>
       <a class="reader-ext" href="${e(a.url)}" target="_self" rel="noopener">Eredeti cikk megnyitása</a>
@@ -506,7 +510,7 @@ function articleViewHtml(a, opts = {}) {
   return `<article class="article-view">
     <button class="article-back" type="button">← Vissza</button>
     <h1 class="article-title">${e(a.title)}</h1>
-    <div class="article-meta">${Renderer._metaHtml(a, 'article-source', opts.meta)}</div>
+    <div class="article-meta">${Renderer._metaHtml(a, 'article-source', { full: true })}</div>
     ${opts.body || ''}
   </article>`;
 }
@@ -1197,6 +1201,7 @@ function bindEvents() {
     if (!input || !(input.dataset.setting in S)) return;
     S[input.dataset.setting] = input.type === 'checkbox' ? input.checked : input.value;
     saveSettings();
+    if (input.dataset.setting === 'showYoutube') injectYtSidebar();
     syncWidgets();
   });
   $('overlay').onclick = () => { closeAddModal(); closeAddYtModal(); };
@@ -1945,6 +1950,10 @@ function initYtPager(sidebar) {
 function injectYtSidebar() {
   const content = $('content');
   if (!content) return;
+  if (!S.showYoutube) {
+    removeYtSidebar();
+    return;
+  }
   if (!S.ytChannels.length) {
     removeYtSidebar();
     return;
