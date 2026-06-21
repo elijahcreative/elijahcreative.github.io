@@ -29,7 +29,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=topscroll1">
+  <link rel="stylesheet" href="styles.css?v=accent2">
 </head>
 <body>
 
@@ -160,6 +160,30 @@
         <div class="mode-bar reader-mode-bar">
           <button class="mode-btn reader-mode-btn" data-reader-mode="fullscreen">Teljes képernyős</button>
           <button class="mode-btn reader-mode-btn" data-reader-mode="modal">Felugró lap</button>
+        </div>
+        <label class="sp-setting-row">
+          <span>
+            <span class="sp-setting-title">Továbbiak</span>
+            <span class="sp-setting-desc">Kapcsolódó következő cikkek a cikkolvasó alján.</span>
+          </span>
+          <input class="switch-input" type="checkbox" data-setting="showArticleMore">
+          <span class="switch-ui"></span>
+        </label>
+        <div class="sp-stepper-row">
+          <span class="sp-stepper-label">Továbbiak oszlop</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <button class="icon-btn" id="articleMoreColsMinus" style="padding:0 8px;font-size:1rem;line-height:1">−</button>
+            <span id="articleMoreColsVal" style="font-size:.95rem;font-weight:700;min-width:20px;text-align:center"></span>
+            <button class="icon-btn" id="articleMoreColsPlus" style="padding:0 8px;font-size:1rem;line-height:1">+</button>
+          </div>
+        </div>
+        <div class="sp-stepper-row">
+          <span class="sp-stepper-label">Továbbiak sor</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <button class="icon-btn" id="articleMoreRowsMinus" style="padding:0 8px;font-size:1rem;line-height:1">−</button>
+            <span id="articleMoreRowsVal" style="font-size:.95rem;font-weight:700;min-width:20px;text-align:center"></span>
+            <button class="icon-btn" id="articleMoreRowsPlus" style="padding:0 8px;font-size:1rem;line-height:1">+</button>
+          </div>
         </div>
         <div class="sp-mini-label">Widgetek</div>
         <label class="sp-setting-row">
@@ -345,6 +369,6 @@
 <div class="toast" id="toast"></div>
 
 <script src="drag-order.min.js?v=1"></script>
-<script src="app.js?v=topscroll1"></script>
+<script src="app.js?v=accent2"></script>
 </body>
 </html>

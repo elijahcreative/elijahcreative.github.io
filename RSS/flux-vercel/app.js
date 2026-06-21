@@ -9,6 +9,7 @@ const ARTICLE_HOSTS = new Set(['telex.hu','www.telex.hu','index.hu','www.index.h
 try { history.scrollRestoration = 'manual'; } catch(e) {}
 let activeArticleMode = null;
 let articleListSnapshot = null;
+let currentArticleIds = [];
 function fetchT(url, opts = {}, ms = 8000) {
   const ctrl = new AbortController();
   const tid = setTimeout(() => ctrl.abort(), ms);
@@ -35,8 +36,8 @@ function cacheBustUrl(url, bust = false) {
 }
 const PRESETS = {
   default: { name: 'Default',
-    light: { bg:'#ffffff', bg2:'#f5f5f5', card:'#ffffff', hover:'#f0f0f0', text:'#111111', text2:'#555555', muted:'#999999', border:'#e8e8e8', ac:'#2563eb', ac2:'#1d4ed8', acl:'#dbeafe' },
-    dark:  { bg:'#111111', bg2:'#1c1c1c', card:'#1c1c1c', hover:'#252525', text:'#eeeeee', text2:'#aaaaaa', muted:'#666666', border:'#2c2c2c', ac:'#3b82f6', ac2:'#2563eb', acl:'#1e3a6e' }
+    light: { bg:'#ffffff', bg2:'#f5f5f5', card:'#ffffff', hover:'#f0f0f0', text:'#111111', text2:'#555555', muted:'#999999', border:'#e8e8e8', ac:'#0891b2', ac2:'#0e7490', acl:'#cffafe' },
+    dark:  { bg:'#111111', bg2:'#1c1c1c', card:'#1c1c1c', hover:'#252525', text:'#eeeeee', text2:'#aaaaaa', muted:'#666666', border:'#2c2c2c', ac:'#22d3ee', ac2:'#0891b2', acl:'#164e63' }
   },
   nord: { name: 'Nord',
     light: { bg:'#eceff4', bg2:'#e5e9f0', card:'#ffffff', hover:'#dce5f0', text:'#2e3440', text2:'#4c566a', muted:'#9aa3b0', border:'#d8dee9', ac:'#5e81ac', ac2:'#4c6f94', acl:'#dce5f0' },
@@ -88,6 +89,9 @@ const S = {
   ytColumns:     3,
   ytRows:        1,
   readerMode:    'fullscreen',
+  showArticleMore: true,
+  articleMoreColumns: 3,
+  articleMoreRows: 1,
   showWeather:   true,
   showF1:        true
 };
@@ -113,7 +117,7 @@ function clampInt(value, min, max, fallback) {
   const n = Number.parseInt(value, 10);
   return Number.isFinite(n) ? Math.max(min, Math.min(max, n)) : fallback;
 }
-const SETTINGS_KEYS = ['layout','theme','preset','customAccent','fontSize','activeUrl','ytPerChannel','ytMaxChannels','ytColumns','ytRows','readerMode','showWeather','showF1'];
+const SETTINGS_KEYS = ['layout','theme','preset','customAccent','fontSize','activeUrl','ytPerChannel','ytMaxChannels','ytColumns','ytRows','readerMode','showArticleMore','articleMoreColumns','articleMoreRows','showWeather','showF1'];
 function saveSettings() {
   Store.set('flux_s', Object.fromEntries(SETTINGS_KEYS.map(k => [k, S[k]])));
 }
@@ -134,6 +138,9 @@ function loadStorage() {
     ytColumns: clampInt(s.ytColumns, 1, 4, 3),
     ytRows: clampInt(s.ytRows, 1, 4, 1),
     readerMode: s.readerMode || (window.matchMedia?.('(max-width: 720px)').matches ? 'modal' : 'fullscreen'),
+    showArticleMore: s.showArticleMore !== false,
+    articleMoreColumns: clampInt(s.articleMoreColumns, 1, 4, 3),
+    articleMoreRows: clampInt(s.articleMoreRows, 1, 4, 1),
     showWeather: s.showWeather !== false,
     showF1: s.showF1 !== false
   });
@@ -243,6 +250,7 @@ const Fetcher = {
       url:        i.link || '',
       image:      i.thumbnail || i.enclosure?.link || this._img(i.content || i.description || ''),
       date:       new Date(i.pubDate),
+      author:     normalizeText(i.author || i.creator || ''),
       categories: i.categories || [],
       feedUrl:    url
     }));
@@ -270,6 +278,7 @@ const Fetcher = {
       const content = qs('content\\:encoded') || qs('content') || desc;
       const enc = el.querySelector('enclosure')?.getAttribute('url');
       const media = el.querySelector('media\\:content, media\\:thumbnail')?.getAttribute('url');
+      const author = qs('dc\\:creator') || el.querySelector('author > name')?.textContent?.trim() || qs('author');
       return {
         id:         qs('guid') || qs('id') || link,
         title:      normalizeText(qs('title')),
@@ -278,6 +287,7 @@ const Fetcher = {
         url:        link,
         image:      enc || media || this._img(content || desc),
         date:       new Date(qs('pubDate') || qs('published') || qs('updated')),
+        author:     normalizeText(author),
         categories: [...el.querySelectorAll('category')].map(c => c.textContent.trim()).filter(Boolean),
         feedUrl
       };
@@ -298,6 +308,7 @@ const ChevronIcon = '<svg class="chevron" width="15" height="15" viewBox="0 0 24
 const Renderer = {
   render(articles) {
     const el = $('content');
+    currentArticleIds = articles.map(aid);
     if (!articles.length) {
       el.innerHTML = `<div class="state-box"><div class="icon">📭</div><div class="title">Nincsenek cikkek</div><div class="desc">A feed üres vagy nem töltődött be.</div></div>`;
       return;
@@ -317,25 +328,46 @@ const Renderer = {
   },
   _section(cls, items, render) { return items.length ? `<div class="${cls}">${items.map(render).join('')}</div>` : ''; },
   _desc(a, cls) { return a.desc ? `<div class="${cls}">${e(a.desc)}</div>` : ''; },
-  _meta(a, sourceCls) { return `<span class="${sourceCls}">${e(this._feedName(a.feedUrl))}</span><span>${this._age(a.date)}</span>`; },
+  _metaHtml(a, sourceCls, time) {
+    const feed = this._feedName(a.feedUrl);
+    return this._metaParts(a, feed, time).map((part, i) =>
+      `${i ? '<span>|</span>' : ''}<span${part === feed && sourceCls ? ` class="${sourceCls}"` : ''}>${e(part)}</span>`
+    ).join('');
+  },
+  _metaParts(a, feed, time) {
+    const seen = new Set();
+    return [time || this._age(a.date), feed, a.author, this._category(a)].map(v => normalizeText(v || '')).filter(v => {
+      const key = v.toLowerCase();
+      if (!v || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  },
+  _category(a) {
+    const categories = Array.isArray(a.categories) ? a.categories : String(a.categories || '').split(',');
+    return categories.map(normalizeText).find(c =>
+      c && c.length <= 40 && /[A-Za-zÀ-ž]/.test(c) && !/^https?:/i.test(c) && !/^(uncategorized|egyéb)$/i.test(c)
+    ) || '';
+  },
+  _meta(a, sourceCls) { return this._metaHtml(a, sourceCls); },
   _rawImg(a, imgCls, noCls, hideTarget = 'this') {
     return a.image
       ? `<img class="${imgCls}" src="${e(a.image)}" alt="" loading="lazy" onerror="${hideTarget}.style.display='none'">`
       : `<div class="${noCls}">📰</div>`;
   },
   _ixImg(a, imgCls, noCls, wrapCls = '') {
-    return `<div class="ix-img-wrap${wrapCls ? ' ' + wrapCls : ''}">${this._rawImg(a, imgCls, noCls, 'this.parentNode')}<span class="ix-badge">${e(this._feedName(a.feedUrl))}</span></div>`;
+    return `<div class="ix-img-wrap${wrapCls ? ' ' + wrapCls : ''}">${this._rawImg(a, imgCls, noCls, 'this.parentNode')}</div>`;
   },
   _card(a, type = 'ix', opt) {
     const id = aid(a);
     const defs = {
-      grid: () => `<div class="card" data-id="${id}">${this._rawImg(a, 'card-img', 'card-no-img')}<div class="card-body"><div class="card-meta"><span class="card-source">${e(this._feedName(a.feedUrl))}</span><span>·</span><span>${this._age(a.date)}</span></div><div class="card-title">${e(a.title)}</div>${this._desc(a, 'card-desc')}</div></div>`,
+      grid: () => `<div class="card" data-id="${id}">${this._rawImg(a, 'card-img', 'card-no-img')}<div class="card-body"><div class="card-meta">${this._meta(a, 'card-source')}</div><div class="card-title">${e(a.title)}</div>${this._desc(a, 'card-desc')}</div></div>`,
       list: () => `<div class="list-item" data-id="${id}">${this._rawImg(a, 'list-thumb', 'list-no-thumb')}<div class="list-body"><div class="list-title">${e(a.title)}</div>${this._desc(a, 'list-desc')}<div class="list-meta">${this._meta(a, 'list-source')}</div></div></div>`,
-      ix: () => `<div class="ix-card" data-id="${id}">${this._ixImg(a, 'ix-card-img', 'ix-card-nobg')}<div class="ix-card-title">${e(a.title)}</div>${this._desc(a, 'ix-card-desc')}<div class="ix-card-time">${this._age(a.date)}</div></div>`,
+      ix: () => `<div class="ix-card" data-id="${id}">${this._ixImg(a, 'ix-card-img', 'ix-card-nobg')}<div class="ix-card-title">${e(a.title)}</div>${this._desc(a, 'ix-card-desc')}<div class="ix-card-time">${this._meta(a, 'ix-card-source')}</div></div>`,
       fill: () => `<div class="ix-text-fill" data-id="${id}"><div class="ix-tf-title">${e(a.title)}</div>${this._desc(a, 'ix-tf-desc')}</div>`,
-      mini: () => `<div class="ix-mini" data-id="${id}">${this._ixImg(a, 'ix-mini-img', 'ix-mini-nobg')}<div class="ix-mini-title">${e(a.title)}</div><div class="ix-mini-time">${this._age(a.date)}</div></div>`,
+      mini: () => `<div class="ix-mini" data-id="${id}">${this._ixImg(a, 'ix-mini-img', 'ix-mini-nobg')}<div class="ix-mini-title">${e(a.title)}</div><div class="ix-mini-time">${this._meta(a, 'ix-mini-source')}</div></div>`,
       strip: withImg => `<div class="ix-strip-item" data-id="${id}">${withImg && a.image ? this._rawImg(a, 'ix-strip-img', '') : ''}<div class="ix-strip-body"><div class="ix-strip-title">${e(a.title)}</div><div class="ix-strip-meta">${this._meta(a, 'ix-strip-source')}</div></div></div>`,
-      spot: () => `<div class="ix-spot-card" data-id="${id}"><div class="ix-spot-img-side"><div class="ix-spot-img-clip">${this._rawImg(a, 'ix-spot-img', 'ix-spot-nobg', 'this.parentNode')}</div></div><div class="ix-spot-body"><div class="ix-spot-source">${e(this._feedName(a.feedUrl))}</div><div class="ix-spot-title">${e(a.title)}</div>${this._desc(a, 'ix-spot-desc')}<div class="ix-spot-time">${this._age(a.date)}</div></div></div>`,
+      spot: () => `<div class="ix-spot-card" data-id="${id}"><div class="ix-spot-img-side"><div class="ix-spot-img-clip">${this._rawImg(a, 'ix-spot-img', 'ix-spot-nobg', 'this.parentNode')}</div></div><div class="ix-spot-body"><div class="ix-spot-title">${e(a.title)}</div>${this._desc(a, 'ix-spot-desc')}<div class="ix-spot-time">${this._meta(a, 'ix-spot-source')}</div></div></div>`,
       reader: () => `<div class="reader-item" data-id="${id}"><div class="reader-item-head"><div class="reader-item-info"><div class="reader-title">${e(a.title)}</div><div class="reader-meta">${this._meta(a, 'reader-source')}</div></div>${ChevronIcon}</div></div>`
     };
     return defs[type](opt);
@@ -349,7 +381,7 @@ const Renderer = {
     const take = n => pool.slice(idx, idx += n);
     const [hero] = take(1);
     if (!hero) return '';
-    const heroHtml = `<div class="ix-hero" data-id="${aid(hero)}">${this._ixImg(hero, 'ix-hero-img', 'ix-hero-nobg', 'hero-wrap')}<div class="ix-hero-body"><div class="ix-hero-title">${e(hero.title)}</div>${this._desc(hero, 'ix-hero-desc')}<div class="ix-hero-time">${this._age(hero.date)}</div></div></div>`;
+    const heroHtml = `<div class="ix-hero" data-id="${aid(hero)}">${this._ixImg(hero, 'ix-hero-img', 'ix-hero-nobg', 'hero-wrap')}<div class="ix-hero-body"><div class="ix-hero-title">${e(hero.title)}</div>${this._desc(hero, 'ix-hero-desc')}<div class="ix-hero-time">${this._meta(hero, 'ix-hero-source')}</div></div></div>`;
     const side = take(3);
     const sideHtml = side.length ? `<div class="ix-hero-cluster"><div class="ix-hero-main">${heroHtml}</div><div class="ix-hero-side">${this._card(side[0], 'ix')}${side.slice(1).map(a => this._card(a, 'fill')).join('')}</div></div>` : `<div class="ix-hero-main">${heroHtml}</div>`;
     const spotHtml = this._section('ix-spotlight', take(2), a => this._card(a, 'spot'));
@@ -379,14 +411,14 @@ async function openArticle(id) {
   if (canExtractArticle(a)) {
     const cached = extractedArticleCache.get(a.url);
     if (cached) {
-      renderArticleView({ ...a, ...cached, date: cached.date ? new Date(cached.date) : a.date });
+      renderArticleView({ ...a, ...cached, author: cached.author || a.author, date: cached.date ? new Date(cached.date) : a.date });
       return;
     }
     if (S.readerMode !== 'modal') renderArticleLoading(a);
     const extracted = await fetchExtractedArticle(a).catch(() => null);
     if (extracted && hasReadableRssContent(extracted)) {
       extractedArticleCache.set(a.url, extracted);
-      renderArticleView({ ...a, ...extracted, date: extracted.date ? new Date(extracted.date) : a.date });
+      renderArticleView({ ...a, ...extracted, author: extracted.author || a.author, date: extracted.date ? new Date(extracted.date) : a.date });
       return;
     }
   }
@@ -466,17 +498,38 @@ function renderArticleView(a) {
     meta: a.date ? a.date.toLocaleDateString('hu-HU') : '',
     body: `${a.image ? `<img class="article-hero-img" src="${e(a.image)}" alt="">` : ''}
       <div class="article-content">${sanitizeArticleHtml(a.content || a.desc || '')}</div>
-      <a class="reader-ext" href="${e(a.url)}" target="_self" rel="noopener">Eredeti cikk megnyitása</a>`
+      <a class="reader-ext" href="${e(a.url)}" target="_self" rel="noopener">Eredeti cikk megnyitása</a>
+      ${articleMoreHtml(a)}`
   }));
 }
 function articleViewHtml(a, opts = {}) {
-  const feedName = S.feeds.find(f => f.url === a.feedUrl)?.name || '';
   return `<article class="article-view">
     <button class="article-back" type="button">← Vissza</button>
     <h1 class="article-title">${e(a.title)}</h1>
-    <div class="article-meta"><span>${e(feedName)}</span><span>·</span><span>${e(opts.meta || '')}</span></div>
+    <div class="article-meta">${Renderer._metaHtml(a, 'article-source', opts.meta)}</div>
     ${opts.body || ''}
   </article>`;
+}
+function articleMoreHtml(a) {
+  if (!S.showArticleMore) return '';
+  const items = nextArticles(a, clampInt(S.articleMoreColumns, 1, 4, 3) * clampInt(S.articleMoreRows, 1, 4, 1));
+  if (!items.length) return '';
+  const cols = clampInt(S.articleMoreColumns, 1, 4, 3);
+  return `<section class="article-more" style="--article-more-cols:${cols};--article-more-mobile-cols:${Math.min(cols, 2)}">
+    <h2 class="article-more-title">Továbbiak</h2>
+    <div class="article-more-grid">${items.map(item => `
+      <div class="article-more-card" data-id="${aid(item)}">
+        ${Renderer._rawImg(item, 'article-more-img', 'article-more-noimg')}
+        <div class="article-more-card-title">${e(item.title)}</div>
+      </div>`).join('')}</div>
+  </section>`;
+}
+function nextArticles(a, limit) {
+  const ids = currentArticleIds.length ? currentArticleIds : S.articles.map(aid);
+  const current = aid(a);
+  const start = ids.indexOf(current);
+  const ordered = start >= 0 ? ids.slice(start + 1).concat(ids.slice(0, start)) : ids.filter(id => id !== current);
+  return ordered.map(id => articleMap[id]).filter(Boolean).slice(0, limit);
 }
 function renderArticleShell(html) {
   if (S.readerMode === 'modal') {
@@ -502,6 +555,8 @@ function ensureArticleModal() {
     layer.innerHTML = '<div class="article-sheet"></div>';
     layer.addEventListener('click', ev => {
       if (ev.target === layer) closeArticleView();
+      const item = ev.target.closest('[data-id]');
+      if (item && layer.querySelector('.article-sheet').contains(item)) openArticle(item.dataset.id);
     });
     document.body.appendChild(layer);
   }
@@ -890,7 +945,7 @@ function buildSettingsUI() {
     </div>`).join('');
   $('swatchRow').innerHTML = SWATCHES.map(c => `
     <div class="swatch${S.customAccent===c?' active':''}" style="background:${c}" data-color="${c}"></div>
-  `).join('') + `<input type="color" id="accentPicker" title="Egyéni szín" value="${S.customAccent || '#2563eb'}">`;
+  `).join('') + `<input type="color" id="accentPicker" title="Egyéni szín" value="${S.customAccent || PRESETS.default.light.ac}">`;
   $('accentPicker').addEventListener('input', ev => setAccent(ev.target.value));
   $('fontSlider').value = S.fontSize;
   document.querySelectorAll('.reader-mode-btn[data-reader-mode]').forEach(btn =>
@@ -1116,6 +1171,8 @@ function bindEvents() {
     const mv = $('ytMaxVal'); if (mv) mv.textContent = S.ytMaxChannels || 5;
     const cv = $('ytColsVal'); if (cv) cv.textContent = S.ytColumns || 3;
     const rv = $('ytRowsVal'); if (rv) rv.textContent = S.ytRows || 1;
+    const amc = $('articleMoreColsVal'); if (amc) amc.textContent = S.articleMoreColumns || 3;
+    const amr = $('articleMoreRowsVal'); if (amr) amr.textContent = S.articleMoreRows || 1;
     _spPage.classList.add('open');
   };
   $('settingsBtn').addEventListener('click', openSettingsPage);
@@ -1187,6 +1244,15 @@ function bindEvents() {
   $('ytColsPlus').onclick  = () => updateYtGrid('ytColumns', 'ytColsVal', +1);
   $('ytRowsMinus').onclick = () => updateYtGrid('ytRows', 'ytRowsVal', -1);
   $('ytRowsPlus').onclick  = () => updateYtGrid('ytRows', 'ytRowsVal', +1);
+  const updateArticleMoreGrid = (key, valId, delta) => {
+    S[key] = clampInt((S[key] || 1) + delta, 1, 4, key === 'articleMoreColumns' ? 3 : 1);
+    $(valId).textContent = S[key];
+    saveSettings();
+  };
+  $('articleMoreColsMinus').onclick = () => updateArticleMoreGrid('articleMoreColumns', 'articleMoreColsVal', -1);
+  $('articleMoreColsPlus').onclick  = () => updateArticleMoreGrid('articleMoreColumns', 'articleMoreColsVal', +1);
+  $('articleMoreRowsMinus').onclick = () => updateArticleMoreGrid('articleMoreRows', 'articleMoreRowsVal', -1);
+  $('articleMoreRowsPlus').onclick  = () => updateArticleMoreGrid('articleMoreRows', 'articleMoreRowsVal', +1);
   $('addYtBtn').onclick = openAddYtModal;
   $('cancelYt').onclick = closeAddYtModal;
   $('confirmYt').onclick = submitAddYt;

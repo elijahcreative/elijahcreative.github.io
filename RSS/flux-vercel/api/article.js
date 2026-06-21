@@ -124,6 +124,7 @@ function extractArticleForHost(articleUrl, html) {
     desc: metaFirst(html, [['property', 'og:description'], ['name', 'description']]),
     image: metaFirst(html, cfg.image),
     date: metaFirst(html, cfg.date),
+    author: metaFirst(html, [['name', 'author'], ['property', 'article:author'], ['name', 'dc.creator']]),
     content: cfg.content(html, articleUrl.href)
   };
 }
