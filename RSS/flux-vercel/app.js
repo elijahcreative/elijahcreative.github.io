@@ -751,12 +751,20 @@ function renderSidebar() {
   });
   $('feedList').innerHTML = html;
 }
+function destroySortableList(container) {
+  if (container?._fluxSortable) {
+    container._fluxSortable.destroy();
+    container._fluxSortable = null;
+  }
+  container?.classList.remove('sorting');
+}
 function bindSortableList(container, items, afterMove) {
+  destroySortableList(container);
   if (!window.Sortable) {
     console.warn('SortableJS is not available');
     return;
   }
-  Sortable.create(container, {
+  container._fluxSortable = Sortable.create(container, {
     animation: 150,
     handle: '.s-feed-drag',
     draggable: '.s-feed-item',
@@ -792,7 +800,7 @@ function settingsRow(o) {
 }
 function renderSFeeds() {
   const c = $('sFeedList');
-  if (!S.feeds.length) { c.innerHTML = '<div style="font-size:.78rem;color:var(--muted)">Nincs feed.</div>'; return; }
+  if (!S.feeds.length) { destroySortableList(c); c.innerHTML = '<div style="font-size:.78rem;color:var(--muted)">Nincs feed.</div>'; return; }
   c.innerHTML = S.feeds.map((f, i) => settingsRow({
     kind: 'feed', id: f.url, i, total: S.feeds.length, name: f.name, url: f.url,
     title: 'Feed URL — kattints a szerkesztéshez'
@@ -1963,6 +1971,16 @@ function initYtPager(sidebar) {
     };
   });
 }
+function bindYtSidebarClicks(sidebar) {
+  sidebar.onclick = ev => {
+    if (ev.target.closest('.yt-page-btn')) return;
+    const card = ev.target.closest('[data-video-id]');
+    if (card && sidebar.contains(card)) {
+      ev.stopPropagation();
+      openYtVideo(card.dataset.videoId);
+    }
+  };
+}
 function injectYtSidebar() {
   const content = $('content');
   if (!content) return;
@@ -1980,6 +1998,7 @@ function injectYtSidebar() {
     existing.innerHTML = buildYtSidebarHtml();
     placeYtSidebar(content, existing);
     initYtPager(existing);
+    bindYtSidebarClicks(existing);
     return;
   }
   const sidebar = document.createElement('aside');
@@ -1987,8 +2006,10 @@ function injectYtSidebar() {
   sidebar.innerHTML = buildYtSidebarHtml();
   placeYtSidebar(content, sidebar);
   initYtPager(sidebar);
+  bindYtSidebarClicks(sidebar);
 }
 function openYtVideo(videoId) {
+  if (!videoId) return;
   const url = `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}`;
   window.open(url, '_blank', 'noopener');
 }
@@ -1996,6 +2017,7 @@ function renderSYtChannels() {
   const c = $('sYtList');
   if (!c) return;
   if (!S.ytChannels.length) {
+    destroySortableList(c);
     c.innerHTML = '<div style="font-size:.78rem;color:var(--muted);padding:4px 0">Nincs csatorna.</div>';
     return;
   }

@@ -64,7 +64,8 @@ const REMOVE_CLASSES = [
   'grid-block',
   'article-series-box',
   'recommendation-box',
-  'newsletter-box'
+  'newsletter-box',
+  'chart-trader-ad'
 ];
 const STRIP_PATTERNS = [
   /<script\b[\s\S]*?<\/script>/gi,
