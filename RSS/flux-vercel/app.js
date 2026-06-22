@@ -103,6 +103,8 @@ const extractingArticlePromises = new Map();
 let ytVideos = [];
 const ytVideoMap = {};
 let ytLoading = false;
+let ytActiveVideoId = null;
+let ytReturnScrollLeft = 0;
 function ytCacheSignature() {
   return 'yt-cache-v2:' + JSON.stringify(
     (S.ytChannels || []).map(ch => `${ch.idType || 'id'}:${ch.id}`).sort()
@@ -1868,6 +1870,9 @@ function getYtSidebarVideos() {
   return getYtSidebarGroups()
     .flatMap(g => g.videos.map(v => ({ ...v, displayChannelName: g.name })));
 }
+function ytVideoById(videoId) {
+  return getYtSidebarVideos().find(v => v.videoId === videoId) || ytVideos.find(v => v.videoId === videoId);
+}
 function buildYtSidebarHtml() {
   const videos = getYtSidebarVideos();
   if (!videos.length) {
@@ -1876,19 +1881,37 @@ function buildYtSidebarHtml() {
       : 'Még nincs megjeleníthető videó. Ellenőrizd a csatornákat vagy frissíts újra.';
     return `<div class="yt-empty">${e(message)}</div>`;
   }
+  const activeVideo = ytActiveVideoId ? ytVideoById(ytActiveVideoId) : null;
+  if (activeVideo) {
+    const channelName = activeVideo.displayChannelName || activeVideo.channelName || '';
+    const watchUrl = `https://www.youtube.com/watch?v=${encodeURIComponent(activeVideo.videoId)}`;
+    const embedUrl = `https://www.youtube.com/embed/${encodeURIComponent(activeVideo.videoId)}?autoplay=1&playsinline=1&rel=0`;
+    return `<div class="yt-player-head">
+      <div class="yt-player-copy">
+        <div class="yt-player-label">LEJÁTSZÁS</div>
+        <div class="yt-player-title">${e(activeVideo.title)}</div>
+        <div class="yt-player-meta">${e(channelName)}${channelName ? ' · ' : ''}${ytAge(activeVideo.date)}</div>
+      </div>
+      <button class="yt-player-close" type="button" title="Videó bezárása">×</button>
+    </div>
+    <div class="yt-player-frame-wrap">
+      <iframe class="yt-player-frame" src="${e(embedUrl)}" title="${e(activeVideo.title)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+    </div>
+    <a class="yt-player-external" href="${e(watchUrl)}" target="flux-youtube">Megnyitás YouTube-on</a>`;
+  }
   const cols = clampInt(S.ytColumns, 1, 4, 3);
   const rows = clampInt(S.ytRows, 1, 4, 1);
   const pageSize = cols * rows;
   const pages = [];
   for (let i = 0; i < videos.length; i += pageSize) pages.push(videos.slice(i, i + pageSize));
   const cardHtml = v => `
-      <a class="yt-vcard" href="https://www.youtube.com/watch?v=${encodeURIComponent(v.videoId)}" target="_blank" rel="noopener">
+      <button class="yt-vcard" type="button" data-yt-video-id="${e(v.videoId)}">
         <div class="yt-vcard-thumb-wrap"><img class="yt-vcard-thumb" src="${e(v.thumb)}" alt="" loading="lazy" onerror="this.parentNode.style.display='none'"></div>
         <div class="yt-vcard-body">
           <div class="yt-vcard-title">${e(v.title)}</div>
           <div class="yt-vcard-meta"><span class="yt-vcard-channel">${e(v.displayChannelName || v.channelName || '')}</span> · ${ytAge(v.date)}</div>
         </div>
-      </a>`;
+      </button>`;
   const html = pages.map(page => `<div class="yt-page" style="--yt-cols:${cols}">${page.map(cardHtml).join('')}</div>`).join('');
   const pager = pages.length > 1 ? `<div class="yt-pager">
       <button class="yt-page-btn" type="button" data-dir="-1" title="Előző videók">
@@ -1899,6 +1922,45 @@ function buildYtSidebarHtml() {
       </button>
     </div>` : '';
   return `<div class="yt-box-head"><span>LEGFRISSEBB VIDEÓK</span></div><div class="yt-scroll-row">${html}</div>${pager}`;
+}
+function animateYtOpen(card, video) {
+  const img = card.querySelector('.yt-vcard-thumb');
+  if (!img || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+    ytActiveVideoId = video.videoId;
+    injectYtSidebar();
+    return;
+  }
+  const from = img.getBoundingClientRect();
+  const ghost = img.cloneNode();
+  ghost.className = 'yt-player-zoom-ghost';
+  ghost.style.left = `${from.left}px`;
+  ghost.style.top = `${from.top}px`;
+  ghost.style.width = `${from.width}px`;
+  ghost.style.height = `${from.height}px`;
+  document.body.appendChild(ghost);
+  ytActiveVideoId = video.videoId;
+  injectYtSidebar();
+  requestAnimationFrame(() => {
+    const target = document.querySelector('.yt-player-frame-wrap')?.getBoundingClientRect();
+    if (!target) {
+      ghost.remove();
+      return;
+    }
+    ghost.style.left = `${target.left}px`;
+    ghost.style.top = `${target.top}px`;
+    ghost.style.width = `${target.width}px`;
+    ghost.style.height = `${target.height}px`;
+    ghost.style.opacity = '0';
+    setTimeout(() => ghost.remove(), 360);
+  });
+}
+function closeYtPlayer() {
+  ytActiveVideoId = null;
+  injectYtSidebar();
+  requestAnimationFrame(() => {
+    const row = document.querySelector('.yt-sidebar .yt-scroll-row');
+    if (row) row.scrollLeft = ytReturnScrollLeft;
+  });
 }
 function refreshYtFeed(ev) {
   if (ev) ev.stopPropagation();
@@ -1974,7 +2036,20 @@ function initYtPager(sidebar) {
 function bindYtSidebarClicks(sidebar) {
   sidebar.onclick = ev => {
     if (ev.target.closest('.yt-page-btn')) return;
-    if (ev.target.closest('.yt-vcard')) ev.stopPropagation();
+    if (ev.target.closest('.yt-player-close')) {
+      ev.stopPropagation();
+      closeYtPlayer();
+      return;
+    }
+    const card = ev.target.closest('[data-yt-video-id]');
+    if (card && sidebar.contains(card)) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      const video = ytVideoById(card.dataset.ytVideoId);
+      if (!video) return;
+      ytReturnScrollLeft = sidebar.querySelector('.yt-scroll-row')?.scrollLeft || 0;
+      animateYtOpen(card, video);
+    }
   };
 }
 function injectYtSidebar() {
