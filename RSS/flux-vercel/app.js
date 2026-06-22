@@ -1882,13 +1882,13 @@ function buildYtSidebarHtml() {
   const pages = [];
   for (let i = 0; i < videos.length; i += pageSize) pages.push(videos.slice(i, i + pageSize));
   const cardHtml = v => `
-      <div class="yt-vcard" data-video-id="${e(v.videoId)}">
+      <a class="yt-vcard" href="https://www.youtube.com/watch?v=${encodeURIComponent(v.videoId)}" target="_blank" rel="noopener">
         <div class="yt-vcard-thumb-wrap"><img class="yt-vcard-thumb" src="${e(v.thumb)}" alt="" loading="lazy" onerror="this.parentNode.style.display='none'"></div>
         <div class="yt-vcard-body">
           <div class="yt-vcard-title">${e(v.title)}</div>
           <div class="yt-vcard-meta"><span class="yt-vcard-channel">${e(v.displayChannelName || v.channelName || '')}</span> · ${ytAge(v.date)}</div>
         </div>
-      </div>`;
+      </a>`;
   const html = pages.map(page => `<div class="yt-page" style="--yt-cols:${cols}">${page.map(cardHtml).join('')}</div>`).join('');
   const pager = pages.length > 1 ? `<div class="yt-pager">
       <button class="yt-page-btn" type="button" data-dir="-1" title="Előző videók">
@@ -1974,11 +1974,7 @@ function initYtPager(sidebar) {
 function bindYtSidebarClicks(sidebar) {
   sidebar.onclick = ev => {
     if (ev.target.closest('.yt-page-btn')) return;
-    const card = ev.target.closest('[data-video-id]');
-    if (card && sidebar.contains(card)) {
-      ev.stopPropagation();
-      openYtVideo(card.dataset.videoId);
-    }
+    if (ev.target.closest('.yt-vcard')) ev.stopPropagation();
   };
 }
 function injectYtSidebar() {

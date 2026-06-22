@@ -634,7 +634,7 @@ to   { opacity: 1; transform: translateY(0); }
 .yt-refresh-btn { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border: none; border-radius: 999px; background: transparent; color: var(--muted); cursor: pointer; transition: color var(--t), background var(--t), transform var(--t); flex-shrink: 0; }
 .yt-refresh-btn:hover { color: var(--text); background: var(--bg-hover); }
 .yt-refresh-btn.spinning svg { animation: spin .7s linear infinite; }
-.yt-vcard { display: flex; flex-direction: column; gap: 8px; padding: 0; cursor: pointer; border: none; border-radius: var(--radius); background: transparent; min-width: 0; overflow: visible; }
+.yt-vcard { display: flex; flex-direction: column; gap: 8px; padding: 0; cursor: pointer; border: none; border-radius: var(--radius); background: transparent; min-width: 0; overflow: visible; color: inherit; text-decoration: none; }
 .yt-vcard:hover .yt-vcard-title { color: color-mix(in srgb, var(--ac) 74%, #fff); }
 .yt-vcard-thumb-wrap { width: 100%; aspect-ratio: 16/9; border-radius: var(--radius); overflow: hidden; background: rgba(255,255,255,.08); flex-shrink: 0; }
 .yt-vcard-thumb { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s ease; }
