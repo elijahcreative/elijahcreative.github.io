@@ -280,7 +280,18 @@ body { position: relative; display: block; height: 100vh; height: 100dvh; overfl
 .content > .state-box { width: 100%; max-width: none; }
 .magazine-layout > .yt-sidebar { align-self: stretch; width: 100%; }
 .ix-hero-cluster { grid-template-columns: 1fr; }
-.ix-hero-side { grid-template-columns: 1fr 1fr; gap: 16px; }
+.ix-hero-side { grid-template-columns: 1fr; gap: 0; margin-top: 4px; }
+.ix-hero-side .ix-card { display: grid; grid-template-columns: 112px minmax(0, 1fr); column-gap: 12px; row-gap: 4px; align-items: start; padding: 12px 0; margin-bottom: 0; border-top: 1px solid rgba(255,255,255,.22); }
+.ix-hero-side-head + .ix-card { border-top: 0; padding-top: 0; }
+.ix-hero-side .ix-card .ix-img-wrap { grid-row: 1 / span 3; width: 100%; }
+.ix-hero-side .ix-card-img,
+.ix-hero-side .ix-card-nobg { width: 100%; aspect-ratio: 4/3; border-radius: var(--radius); }
+.ix-hero-side .ix-card-title { grid-column: 2; font-size: 1rem; line-height: 1.22; -webkit-line-clamp: 3; }
+.ix-hero-side .ix-card-desc { grid-column: 2; font-size: .84rem; line-height: 1.38; -webkit-line-clamp: 2; }
+.ix-hero-side .ix-card-time { grid-column: 2; margin-top: 1px; }
+.ix-hero-side .ix-text-fill { padding: 12px 0; margin-top: 0; border-top: 1px solid rgba(255,255,255,.22); }
+.ix-hero-side .ix-tf-title { font-size: 1rem; line-height: 1.26; }
+.ix-hero-side .ix-tf-desc { font-size: .84rem; line-height: 1.42; }
 .ix-row.row-a, .ix-row.row-b,
 .yt-wrap .ix-row.row-a, .yt-wrap .ix-row.row-b { grid-template-columns: 1fr; }
 .ix-trio { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -288,8 +299,8 @@ body { position: relative; display: block; height: 100vh; height: 100dvh; overfl
 .ix-spotlight { grid-template-columns: 1fr; }
 .ix-spot-card { grid-template-columns: 42% 58%; }
 .ix-spot-card + .ix-spot-card { border-left: 0; border-top: 0; }
-.ix-col-side { flex-direction: row; gap: 8px; }
-.ix-col-side .ix-card { flex: 1 1 0; min-width: 0; }
+.ix-col-side { flex-direction: column; gap: 0; }
+.ix-col-side .ix-card { flex: 0 0 auto; min-width: 0; }
 .ix-hero-img, .ix-hero-nobg { aspect-ratio: 4/3; }
 .ix-hero-title { font-size: 1.9rem; }
 .yt-wrap { grid-template-columns: 1fr !important; }
