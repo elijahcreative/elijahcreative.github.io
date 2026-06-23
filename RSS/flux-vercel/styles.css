@@ -3,11 +3,11 @@
 [data-theme="dark"] { --bg:       #111111; --bg2:      #1c1c1c; --bg-card:  #1c1c1c; --bg-hover: #252525; --text:     #eeeeee; --text2:    #aaaaaa; --muted:    #666666; --border:   #2c2c2c; --shadow:   0 1px 3px rgba(0,0,0,.4); --shadow-lg:0 4px 16px rgba(0,0,0,.5); }
 [data-preset="default"]   { --ac:#0891b2; --ac2:#0e7490; --acl:#cffafe; }
 [data-preset="nord"]      { --ac:#5e81ac; --ac2:#4c6f94; --acl:#dce5f0; }
-[data-preset="solarized"] { --ac:#268bd2; --ac2:#1a6fa8; --acl:#d0e8f5; }
+[data-preset="solarized"] { --ac:#a8815d; --ac2:#8d6f52; --acl:#ead8c2; }
 [data-preset="rose"]      { --ac:#e11d48; --ac2:#be123c; --acl:#ffe4e6; }
 [data-preset="mono"]      { --ac:#444444; --ac2:#222222; --acl:#e5e5e5; }
 [data-theme="dark"][data-preset="nord"] { --bg:#2e3440; --bg2:#3b4252; --bg-card:#3b4252; --bg-hover:#434c5e; --text:#eceff4; --text2:#d8dee9; --muted:#636f84; --border:#434c5e; --ac:#88c0d0; --ac2:#6db0c2; --acl:#3b4252; }
-[data-theme="dark"][data-preset="solarized"] { --bg:#002b36; --bg2:#073642; --bg-card:#073642; --bg-hover:#0d4758; --text:#eee8d5; --text2:#93a1a1; --muted:#586e75; --border:#0d4758; --ac:#2aa198; --ac2:#229990; --acl:#073642; }
+[data-theme="dark"][data-preset="solarized"] { --bg:#211c18; --bg2:#2b241e; --bg-card:#2b241e; --bg-hover:#352c24; --text:#f2e8d8; --text2:#c9bba7; --muted:#8d7d68; --border:#3c332a; --ac:#c2a07a; --ac2:#aa8964; --acl:#3a2f27; }
 [data-theme="dark"][data-preset="rose"] { --bg:#1a0a0e; --bg2:#2d1420; --bg-card:#2d1420; --bg-hover:#3d1a2a; --text:#fecdd3; --text2:#fda4af; --muted:#9f1239; --border:#3d1a2a; --ac:#fb7185; --ac2:#f43f5e; --acl:#2d1420; }
 [data-theme="dark"][data-preset="mono"] { --bg:#111111; --bg2:#1e1e1e; --bg-card:#1e1e1e; --bg-hover:#2a2a2a; --text:#eeeeee; --text2:#aaaaaa; --muted:#555555; --border:#2a2a2a; --ac:#888888; --ac2:#666666; --acl:#2a2a2a; }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -382,7 +382,7 @@ body.article-modal-open .content { overflow: hidden; }
 .preset-preview { width: 100%; height: 100%; display: flex; flex-direction: column; }
 .pp-top { flex: 1; }
 .pp-bot { height: 35%; display: flex; gap: 2px; padding: 3px; }
-.pp-dot { flex: 1; border-radius: 2px; }
+.pp-dot { flex: 1; border-radius: var(--radius); }
 .preset-name { font-size: .64rem; color: var(--muted); }
 .swatch-row { display: flex; align-items: center; gap: 5px; }
 .swatch { flex: 1; min-width: 0; aspect-ratio: 1; border-radius: var(--radius); cursor: pointer; border: 2px solid transparent; transition: transform var(--t), border-color var(--t); }
@@ -685,6 +685,10 @@ to   { opacity: 1; transform: translateY(0); }
 .v-layout-btn.active { color: var(--ac); border-color: var(--ac); }
 .sp-page .mode-btn.active,
 .sp-page .v-layout-btn.active { background: var(--ac); border-color: var(--ac); color: #fff; box-shadow: none; }
+.sp-page .mode-btn.active:hover,
+.sp-page .mode-btn.active:active,
+.sp-page .v-layout-btn.active:hover,
+.sp-page .v-layout-btn.active:active { background: var(--ac); border-color: var(--ac); color: #fff; }
 .sp-page { position: fixed; inset: 0; background: var(--bg); z-index: 300; display: flex; flex-direction: column; opacity: 0; pointer-events: none; transform: translateY(6px); transition: opacity .18s ease, transform .18s ease; }
 .sp-page.open { opacity: 1; pointer-events: all; transform: translateY(0); }
 .sp-header { display: flex; align-items: center; justify-content: space-between; padding: 0 20px; height: 56px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
@@ -696,7 +700,8 @@ to   { opacity: 1; transform: translateY(0); }
 .sp-nav-item { display: flex; align-items: center; gap: 10px; width: 100%; padding: 11px 20px; background: none; border: none; text-align: left; cursor: pointer; font-size: .85rem; font-weight: 500; color: var(--text2); font-family: inherit; transition: color var(--t), background var(--t); }
 .sp-nav-item:hover { background: var(--bg-hover); color: var(--text); }
 .sp-nav-item.active { color: #fff; background: var(--ac); font-weight: 700; }
-.sp-nav-item.active:hover { color: #fff; background: var(--ac2); }
+.sp-nav-item.active:hover,
+.sp-nav-item.active:active { color: #fff; background: var(--ac); }
 .sp-content { flex: 1; overflow-y: auto; padding: 32px 36px; }
 .sp-section { display: none; }
 .sp-section.active { display: block; max-width: 580px; }

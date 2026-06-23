@@ -35,19 +35,19 @@ function cacheBustUrl(url, bust = false) {
   return bust ? url + (url.includes('?') ? '&' : '?') + '_=' + Date.now() : url;
 }
 const PRESETS = {
-  default: { name: 'Default',
+  default: { name: 'Alap',
     light: { bg:'#ffffff', bg2:'#f5f5f5', card:'#ffffff', hover:'#f0f0f0', text:'#111111', text2:'#555555', muted:'#999999', border:'#e8e8e8', ac:'#0891b2', ac2:'#0e7490', acl:'#cffafe' },
     dark:  { bg:'#111111', bg2:'#1c1c1c', card:'#1c1c1c', hover:'#252525', text:'#eeeeee', text2:'#aaaaaa', muted:'#666666', border:'#2c2c2c', ac:'#22d3ee', ac2:'#0891b2', acl:'#164e63' }
   },
-  nord: { name: 'Nord',
+  nord: { name: 'Fjord',
     light: { bg:'#eceff4', bg2:'#e5e9f0', card:'#ffffff', hover:'#dce5f0', text:'#2e3440', text2:'#4c566a', muted:'#9aa3b0', border:'#d8dee9', ac:'#5e81ac', ac2:'#4c6f94', acl:'#dce5f0' },
     dark:  { bg:'#2e3440', bg2:'#3b4252', card:'#3b4252', hover:'#434c5e', text:'#eceff4', text2:'#d8dee9', muted:'#636f84', border:'#434c5e', ac:'#88c0d0', ac2:'#6db0c2', acl:'#3b4252' }
   },
-  solarized: { name: 'Solar',
-    light: { bg:'#fdf6e3', bg2:'#eee8d5', card:'#fdf6e3', hover:'#e8e0ca', text:'#657b83', text2:'#586e75', muted:'#93a1a1', border:'#d4cdb0', ac:'#268bd2', ac2:'#1a6fa8', acl:'#d0e8f5' },
-    dark:  { bg:'#002b36', bg2:'#073642', card:'#073642', hover:'#0d4758', text:'#eee8d5', text2:'#93a1a1', muted:'#586e75', border:'#0d4758', ac:'#2aa198', ac2:'#229990', acl:'#073642' }
+  solarized: { name: 'Book',
+    light: { bg:'#fff8e8', bg2:'#f7edd6', card:'#fffaf0', hover:'#f1e4c8', text:'#3f372d', text2:'#6b5d4b', muted:'#a6967f', border:'#eadcc3', ac:'#a8815d', ac2:'#8d6f52', acl:'#ead8c2' },
+    dark:  { bg:'#211c18', bg2:'#2b241e', card:'#2b241e', hover:'#352c24', text:'#f2e8d8', text2:'#c9bba7', muted:'#8d7d68', border:'#3c332a', ac:'#c2a07a', ac2:'#aa8964', acl:'#3a2f27' }
   },
-  rose: { name: 'Rose',
+  rose: { name: 'Rózsa',
     light: { bg:'#fff1f2', bg2:'#ffe4e6', card:'#ffffff', hover:'#ffd6da', text:'#1e0a0c', text2:'#7b3040', muted:'#c08090', border:'#fecdd3', ac:'#e11d48', ac2:'#be123c', acl:'#ffe4e6' },
     dark:  { bg:'#1a0a0e', bg2:'#2d1420', card:'#2d1420', hover:'#3d1a2a', text:'#fecdd3', text2:'#fda4af', muted:'#9f1239', border:'#3d1a2a', ac:'#fb7185', ac2:'#f43f5e', acl:'#2d1420' }
   },
@@ -957,19 +957,23 @@ function setLoading(on) {
   }
 }
 function buildSettingsUI() {
-  $('presetGrid').innerHTML = Object.entries(PRESETS).map(([k, p]) => `
+  const darkPreview = S.theme === 'dark' || (S.theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  $('presetGrid').innerHTML = Object.entries(PRESETS).map(([k, p]) => {
+    const preview = darkPreview ? p.dark : p.light;
+    return `
     <div class="preset-wrap">
       <div class="preset-card${S.preset===k?' active':''}" data-preset="${k}">
         <div class="preset-preview">
-          <div class="pp-top" style="background:${p.light.bg}"></div>
-          <div class="pp-bot" style="background:${p.light.card}">
-            <div class="pp-dot" style="background:${p.light.ac}"></div>
-            <div class="pp-dot" style="background:${p.light.bg}"></div>
+          <div class="pp-top" style="background:${preview.bg}"></div>
+          <div class="pp-bot" style="background:${preview.card}">
+            <div class="pp-dot" style="background:${preview.ac}"></div>
+            <div class="pp-dot" style="background:${preview.bg}"></div>
           </div>
         </div>
       </div>
       <div class="preset-name">${p.name}</div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
   $('swatchRow').innerHTML = SWATCHES.map(c => `
     <div class="swatch${S.customAccent===c?' active':''}" style="background:${c}" data-color="${c}"></div>
   `).join('') + `<input type="color" id="accentPicker" title="Egyéni szín" value="${S.customAccent || PRESETS.default.light.ac}">`;
@@ -1295,7 +1299,7 @@ function bindEvents() {
   });
   $('modeBar').addEventListener('click', ev => {
     const b = ev.target.closest('.mode-btn');
-    if (b) { S.theme = b.dataset.mode; saveSettings(); Theme.apply(); }
+    if (b) { S.theme = b.dataset.mode; saveSettings(); Theme.apply(); buildSettingsUI(); }
   });
   $('fontSlider').addEventListener('input', ev => {
     S.fontSize = +ev.target.value;
@@ -1303,7 +1307,7 @@ function bindEvents() {
   });
   $('fontSlider').addEventListener('change', saveSettings);
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-    if (S.theme === 'auto') Theme.apply();
+    if (S.theme === 'auto') { Theme.apply(); buildSettingsUI(); }
   });
   $('configSaveBtn').onclick = () => Config.save();
   $('configLoadBtn').onclick = () => Config.load();
