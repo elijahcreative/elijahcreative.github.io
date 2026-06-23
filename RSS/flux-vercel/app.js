@@ -431,6 +431,7 @@ const Renderer = {
 async function openArticle(id) {
   const a = articleMap[id];
   if (!a) return;
+  if (S.activeSpecialView === 'readLater') markReadLaterRead(id);
   saveReturnScroll();
   const canOpenInside = canExtractArticle(a) || hasReadableRssContent(a);
   if (canOpenInside) pushArticleState();
@@ -555,9 +556,37 @@ function articleMoreHtml(a) {
 function nextArticles(a, limit) {
   const ids = currentArticleIds.length ? currentArticleIds : S.articles.map(aid);
   const current = aid(a);
-  const start = ids.indexOf(current);
-  const ordered = start >= 0 ? ids.slice(start + 1).concat(ids.slice(0, start)) : ids.filter(id => id !== current);
-  return ordered.map(id => articleMap[id]).filter(Boolean).slice(0, limit);
+  const targetWords = articleKeywords(a);
+  const targetCategories = new Set(Array.isArray(a.categories) ? a.categories : []);
+  return ids
+    .map((id, i) => ({ article: articleMap[id], order: i }))
+    .filter(item => item.article && idOfArticle(item.article) !== current)
+    .map(item => ({ ...item, score: relatedArticleScore(a, item.article, targetWords, targetCategories, item.order) }))
+    .sort((a, b) => b.score - a.score)
+    .map(item => item.article)
+    .slice(0, limit);
+}
+function idOfArticle(a) {
+  return aid(a);
+}
+function articleKeywords(a) {
+  const stop = new Set('a az és hogy vagy de meg nem mint van volt lesz egy ezt azt akkor csak már még után alatt felett ahol amikor illetve mert'.split(' '));
+  return new Set(normalizeText(`${a.title || ''} ${a.desc || ''}`)
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+    .split(/\s+/)
+    .filter(w => w.length > 3 && !stop.has(w))
+    .slice(0, 28));
+}
+function relatedArticleScore(base, candidate, baseWords, baseCategories, order) {
+  let score = Math.max(0, 20 - order * .1);
+  if (candidate.feedUrl && candidate.feedUrl === base.feedUrl) score += 40;
+  const candidateCategories = Array.isArray(candidate.categories) ? candidate.categories : [];
+  candidateCategories.forEach(c => { if (baseCategories.has(c)) score += 30; });
+  articleKeywords(candidate).forEach(w => { if (baseWords.has(w)) score += 7; });
+  const deltaHours = Math.abs((new Date(candidate.date) - new Date(base.date)) / 36e5);
+  if (Number.isFinite(deltaHours)) score += Math.max(0, 14 - deltaHours / 6);
+  return score;
 }
 function renderArticleShell(html) {
   if (S.readerMode === 'modal') {
@@ -727,15 +756,23 @@ function updateReadLaterNav() {
   if (!btn) return;
   const active = S.activeSpecialView === 'readLater';
   btn.classList.toggle('active', active);
+  btn.classList.toggle('has-unread', S.readLater.some(item => !item.readAt));
   btn.setAttribute('aria-pressed', active ? 'true' : 'false');
   btn.innerHTML = bookmarkIcon(active, 15);
+}
+function markReadLaterRead(id) {
+  const item = S.readLater.find(item => item.id === id);
+  if (!item || item.readAt) return;
+  item.readAt = new Date().toISOString();
+  saveReadLater();
+  updateReadLaterNav();
 }
 function toggleReadLater(a) {
   const id = aid(a);
   const index = S.readLater.findIndex(item => item.id === id);
   const saved = index === -1;
   if (saved) {
-    S.readLater.unshift({ id, savedAt: new Date().toISOString(), article: articleSnapshot(a) });
+    S.readLater.unshift({ id, savedAt: new Date().toISOString(), readAt: null, article: articleSnapshot(a) });
   } else {
     S.readLater.splice(index, 1);
   }
@@ -1989,7 +2026,8 @@ function buildYtSidebarHtml() {
   if (activeVideo) {
     const channelName = activeVideo.displayChannelName || activeVideo.channelName || '';
     const watchUrl = `https://www.youtube.com/watch?v=${encodeURIComponent(activeVideo.videoId)}`;
-    const embedUrl = `https://www.youtube.com/embed/${encodeURIComponent(activeVideo.videoId)}?autoplay=1&playsinline=1&rel=0`;
+    const origin = location.origin && location.origin !== 'null' ? `&origin=${encodeURIComponent(location.origin)}` : '';
+    const embedUrl = `https://www.youtube.com/embed/${encodeURIComponent(activeVideo.videoId)}?autoplay=1&playsinline=1&rel=0&enablejsapi=1&iv_load_policy=3${origin}`;
     return `<div class="yt-player-head">
       <div class="yt-player-copy">
         <div class="yt-player-label">LEJÁTSZÁS</div>
@@ -1999,7 +2037,7 @@ function buildYtSidebarHtml() {
       <button class="yt-player-close" type="button" title="Videó bezárása">×</button>
     </div>
     <div class="yt-player-frame-wrap">
-      <iframe class="yt-player-frame" src="${e(embedUrl)}" title="${e(activeVideo.title)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      <iframe class="yt-player-frame" src="${e(embedUrl)}" title="${e(activeVideo.title)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen; web-share" allowfullscreen></iframe>
     </div>
     <a class="yt-player-external" href="${e(watchUrl)}" target="flux-youtube">Megnyitás YouTube-on</a>`;
   }

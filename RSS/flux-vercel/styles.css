@@ -31,7 +31,9 @@ body { position: relative; display: block; height: 100vh; height: 100dvh; overfl
 .layout-btn { background: none; border: none; cursor: pointer; padding: 0 12px; border-radius: 0; color: var(--muted); display: flex; align-items: center; justify-content: center; transition: color var(--t), box-shadow var(--t); box-shadow: inset 0 -2px 0 transparent; overflow: hidden; position: relative; }
 .layout-btn:hover { color: var(--text); }
 .layout-btn.active { color: var(--ac); box-shadow: inset 0 -2px 0 var(--ac); }
+.read-later-nav-btn { position: relative; }
 .read-later-nav-btn.active { color: var(--ac); }
+.read-later-nav-btn.has-unread::after { content: ""; position: absolute; top: 16px; right: 8px; width: 4px; height: 4px; border-radius: 50%; background: currentColor; opacity: .85; }
 @keyframes cycleOut { to   { transform: translateY(-7px); opacity: 0; } }
 @keyframes cycleIn  { from { transform: translateY(7px);  opacity: 0; } }
 .cycle-out { animation: cycleOut .13s ease forwards; }
