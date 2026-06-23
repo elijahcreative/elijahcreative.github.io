@@ -379,7 +379,7 @@ const Renderer = {
     const id = aid(a);
     const defs = {
       grid: () => `<div class="card" data-id="${id}">${this._rawImg(a, 'card-img', 'card-no-img')}<div class="card-body"><div class="card-meta">${this._meta(a, 'card-source')}</div><div class="card-title">${e(a.title)}</div>${this._desc(a, 'card-desc')}</div></div>`,
-      list: () => `<div class="list-item" data-id="${id}">${this._rawImg(a, 'list-thumb', 'list-no-thumb')}<div class="list-body"><div class="list-title${isUnreadReadLater(id) ? ' unread-saved' : ''}">${e(a.title)}</div>${this._desc(a, 'list-desc')}<div class="list-meta">${this._meta(a, 'list-source')}</div></div></div>`,
+      list: () => `<div class="list-item${isUnreadReadLater(id) ? ' unread-saved' : ''}" data-id="${id}">${this._rawImg(a, 'list-thumb', 'list-no-thumb')}<div class="list-body"><div class="list-title">${e(a.title)}</div>${this._desc(a, 'list-desc')}<div class="list-meta">${this._meta(a, 'list-source')}</div></div></div>`,
       ix: () => `<div class="ix-card" data-id="${id}">${this._ixImg(a, 'ix-card-img', 'ix-card-nobg')}<div class="ix-card-title">${e(a.title)}</div>${this._desc(a, 'ix-card-desc')}<div class="ix-card-time">${this._meta(a, 'ix-card-source')}</div></div>`,
       fill: () => `<div class="ix-text-fill" data-id="${id}"><div class="ix-tf-title">${e(a.title)}</div>${this._desc(a, 'ix-tf-desc')}</div>`,
       heroMini: () => `<div class="ix-hero-mini" data-id="${id}">${this._rawImg(a, 'ix-hero-mini-img', 'ix-hero-mini-nobg')}<div class="ix-hero-mini-body"><div class="ix-hero-mini-title">${e(a.title)}</div>${this._desc(a, 'ix-hero-mini-desc')}<div class="ix-hero-mini-meta">${this._meta(a, 'ix-hero-mini-source')}</div></div></div>`,
@@ -856,14 +856,18 @@ function renderMobileFeedPanel() {
     const active = S.activeSpecialView !== 'readLater' && (url ? S.activeUrl === url : S.activeUrl === null);
     return `<button class="mobile-feed-option${active ? ' active' : ''}" type="button" data-feed-url="${e(url)}">${e(label)}</button>`;
   };
-  panel.innerHTML = option('', 'Összes') + S.feeds.map(f => option(f.url, f.name)).join('');
+  const feeds = S.feeds.length ? S.feeds : DEFAULT_FEEDS.map(f => ({ name: f.label, url: f.url }));
+  panel.innerHTML = option('', 'Összes') + feeds.map(f => option(f.url, f.name)).join('');
 }
 function closeMobileFeedPanel() {
   $('mobileFeedPanel')?.classList.remove('open');
 }
 function openMobileFeedPanel() {
   renderMobileFeedPanel();
-  $('mobileFeedPanel')?.classList.add('open');
+  const panel = $('mobileFeedPanel');
+  if (!panel) return;
+  panel.scrollTop = 0;
+  panel.classList.add('open');
 }
 function destroySortableList(container) {
   if (container?._fluxSortable) {
