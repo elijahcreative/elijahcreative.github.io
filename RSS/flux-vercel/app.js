@@ -379,7 +379,7 @@ const Renderer = {
     const id = aid(a);
     const defs = {
       grid: () => `<div class="card" data-id="${id}">${this._rawImg(a, 'card-img', 'card-no-img')}<div class="card-body"><div class="card-meta">${this._meta(a, 'card-source')}</div><div class="card-title">${e(a.title)}</div>${this._desc(a, 'card-desc')}</div></div>`,
-      list: () => `<div class="list-item" data-id="${id}">${this._rawImg(a, 'list-thumb', 'list-no-thumb')}<div class="list-body"><div class="list-title">${e(a.title)}</div>${this._desc(a, 'list-desc')}<div class="list-meta">${this._meta(a, 'list-source')}</div></div></div>`,
+      list: () => `<div class="list-item" data-id="${id}">${this._rawImg(a, 'list-thumb', 'list-no-thumb')}<div class="list-body"><div class="list-title${isUnreadReadLater(id) ? ' unread-saved' : ''}">${e(a.title)}</div>${this._desc(a, 'list-desc')}<div class="list-meta">${this._meta(a, 'list-source')}</div></div></div>`,
       ix: () => `<div class="ix-card" data-id="${id}">${this._ixImg(a, 'ix-card-img', 'ix-card-nobg')}<div class="ix-card-title">${e(a.title)}</div>${this._desc(a, 'ix-card-desc')}<div class="ix-card-time">${this._meta(a, 'ix-card-source')}</div></div>`,
       fill: () => `<div class="ix-text-fill" data-id="${id}"><div class="ix-tf-title">${e(a.title)}</div>${this._desc(a, 'ix-tf-desc')}</div>`,
       heroMini: () => `<div class="ix-hero-mini" data-id="${id}">${this._rawImg(a, 'ix-hero-mini-img', 'ix-hero-mini-nobg')}<div class="ix-hero-mini-body"><div class="ix-hero-mini-title">${e(a.title)}</div>${this._desc(a, 'ix-hero-mini-desc')}<div class="ix-hero-mini-meta">${this._meta(a, 'ix-hero-mini-source')}</div></div></div>`,
@@ -751,6 +751,9 @@ function isReadLaterArticle(a) {
   const id = typeof a === 'string' ? a : aid(a);
   return S.readLater.some(item => item.id === id);
 }
+function isUnreadReadLater(id) {
+  return S.activeSpecialView === 'readLater' && S.readLater.some(item => item.id === id && !item.readAt);
+}
 function updateReadLaterNav() {
   const btn = $('readLaterBtn');
   if (!btn) return;
@@ -844,6 +847,23 @@ function renderSidebar() {
     html += `<button class="nav-feed${active?' active':''}" data-feed-url="${e(f.url)}">${e(f.name)}</button>`;
   });
   $('feedList').innerHTML = html;
+  renderMobileFeedPanel();
+}
+function renderMobileFeedPanel() {
+  const panel = $('mobileFeedPanel');
+  if (!panel) return;
+  const option = (url, label) => {
+    const active = S.activeSpecialView !== 'readLater' && (url ? S.activeUrl === url : S.activeUrl === null);
+    return `<button class="mobile-feed-option${active ? ' active' : ''}" type="button" data-feed-url="${e(url)}">${e(label)}</button>`;
+  };
+  panel.innerHTML = option('', 'Összes') + S.feeds.map(f => option(f.url, f.name)).join('');
+}
+function closeMobileFeedPanel() {
+  $('mobileFeedPanel')?.classList.remove('open');
+}
+function openMobileFeedPanel() {
+  renderMobileFeedPanel();
+  $('mobileFeedPanel')?.classList.add('open');
 }
 function destroySortableList(container) {
   if (container?._fluxSortable) {
@@ -1209,7 +1229,38 @@ async function submitAddFeed(forcedInput) {
 }
 function bindEvents() {
   const scrollHome = () => document.querySelector('.content').scrollTo({ top: 0, behavior: 'smooth' });
-  $('homeLogo').addEventListener('click', scrollHome);
+  const logo = $('homeLogo');
+  let logoPressTimer = null;
+  let logoLongPressed = false;
+  const canLongPressLogo = () => window.matchMedia?.('(hover: none), (pointer: coarse)').matches;
+  const clearLogoPress = () => {
+    clearTimeout(logoPressTimer);
+    logoPressTimer = null;
+  };
+  logo.addEventListener('pointerdown', ev => {
+    if (!canLongPressLogo()) return;
+    clearLogoPress();
+    logoLongPressed = false;
+    logoPressTimer = setTimeout(() => {
+      logoLongPressed = true;
+      openMobileFeedPanel();
+    }, 520);
+  });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(type => logo.addEventListener(type, clearLogoPress));
+  logo.addEventListener('contextmenu', ev => {
+    if (!canLongPressLogo()) return;
+    ev.preventDefault();
+  });
+  logo.addEventListener('click', ev => {
+    if (logoLongPressed) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      logoLongPressed = false;
+      return;
+    }
+    closeMobileFeedPanel();
+    scrollHome();
+  });
   document.addEventListener('pointerup', ev => {
     if (!window.matchMedia?.('(max-width: 720px)').matches) return;
     if (ev.clientY > 14) return;
@@ -1218,6 +1269,16 @@ function bindEvents() {
     if (content) content.scrollTo({ top: 0, behavior: 'smooth' });
   }, { passive: true });
   document.addEventListener('click', ev => {
+    const mobileFeed = ev.target.closest('.mobile-feed-option[data-feed-url]');
+    if (mobileFeed) {
+      selectFeed(mobileFeed.dataset.feedUrl || null);
+      closeMobileFeedPanel();
+      return;
+    }
+    const feedPanel = $('mobileFeedPanel');
+    if (feedPanel?.classList.contains('open') && !feedPanel.contains(ev.target) && !logo.contains(ev.target)) {
+      closeMobileFeedPanel();
+    }
     if (ev.target.closest('.read-later-close')) {
       S.activeSpecialView = null;
       renderSidebar();
@@ -2082,10 +2143,13 @@ function animateYtOpen(card, video) {
   document.body.appendChild(ghost);
   ytActiveVideoId = video.videoId;
   injectYtSidebar();
+  const sidebar = document.querySelector('.yt-sidebar');
+  if (sidebar) sidebar.classList.add('yt-player-opening');
   requestAnimationFrame(() => {
     const target = document.querySelector('.yt-player-frame-wrap')?.getBoundingClientRect();
     if (!target) {
       ghost.remove();
+      if (sidebar) sidebar.classList.remove('yt-player-opening');
       return;
     }
     ghost.style.left = `${target.left}px`;
@@ -2093,7 +2157,10 @@ function animateYtOpen(card, video) {
     ghost.style.width = `${target.width}px`;
     ghost.style.height = `${target.height}px`;
     ghost.style.opacity = '0';
-    setTimeout(() => ghost.remove(), 360);
+    setTimeout(() => {
+      ghost.remove();
+      if (sidebar) sidebar.classList.remove('yt-player-opening');
+    }, 360);
   });
 }
 function closeYtPlayer() {
@@ -2194,6 +2261,18 @@ function bindYtSidebarClicks(sidebar) {
     }
   };
 }
+function requestYtAutoplay(sidebar) {
+  const frame = sidebar.querySelector('.yt-player-frame');
+  if (!frame) return;
+  const play = () => {
+    try {
+      frame.contentWindow?.postMessage(JSON.stringify({ event: 'command', func: 'playVideo', args: [] }), 'https://www.youtube.com');
+    } catch(e) {}
+  };
+  frame.addEventListener('load', () => setTimeout(play, 80), { once: true });
+  setTimeout(play, 350);
+  setTimeout(play, 900);
+}
 function injectYtSidebar() {
   const content = $('content');
   if (!content) return;
@@ -2208,18 +2287,23 @@ function injectYtSidebar() {
   if (content.querySelector('.spinner')) return;
   const existing = content.querySelector('.yt-sidebar');
   if (existing) {
+    existing.style.pointerEvents = '';
+    existing.classList.remove('yt-player-opening');
     existing.innerHTML = buildYtSidebarHtml();
     placeYtSidebar(content, existing);
     initYtPager(existing);
     bindYtSidebarClicks(existing);
+    requestYtAutoplay(existing);
     return;
   }
   const sidebar = document.createElement('aside');
   sidebar.className = 'yt-sidebar';
+  sidebar.style.pointerEvents = '';
   sidebar.innerHTML = buildYtSidebarHtml();
   placeYtSidebar(content, sidebar);
   initYtPager(sidebar);
   bindYtSidebarClicks(sidebar);
+  requestYtAutoplay(sidebar);
 }
 function openYtVideo(videoId) {
   if (!videoId) return;
