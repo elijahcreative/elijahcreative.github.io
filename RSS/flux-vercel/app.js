@@ -320,7 +320,7 @@ const Fetcher = {
 };
 const ChevronIcon = '<svg class="chevron" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>';
 const Renderer = {
-  render(articles) {
+  render(articles, layout = S.layout) {
     const el = $('content');
     currentArticleIds = articles.map(aid);
     if (!articles.length) {
@@ -328,7 +328,7 @@ const Renderer = {
       return;
     }
     articles.forEach(a => { articleMap[aid(a)] = a; });
-    el.innerHTML = (this['_' + S.layout] || this._magazine).call(this, articles);
+    el.innerHTML = (this['_' + layout] || this._magazine).call(this, articles);
   },
   _feedName(url)  { return S.feeds.find(f => f.url === url)?.name || ''; },
   _timeLabel(d) {
@@ -959,10 +959,11 @@ function renderArticles() {
       .sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt))
       .map(item => ({ ...item.article, date: new Date(item.article.date) }));
     if (!articles.length) {
-      $('content').innerHTML = `<div class="state-box"><div class="icon">${bookmarkIcon(false, 34)}</div><div class="title">Nincsenek mentett cikkek</div><div class="desc">A cikkolvasóban tudsz cikkeket későbbre menteni.</div></div>`;
+      $('content').innerHTML = `<div class="read-later-view"><div class="read-later-head"><div class="read-later-title">${bookmarkIcon(true, 15)}<span>Mentett cikkek</span></div><button class="read-later-close" type="button" title="Vissza" aria-label="Vissza">×</button></div><div class="state-box"><div class="icon">${bookmarkIcon(false, 34)}</div><div class="title">Nincsenek mentett cikkek</div><div class="desc">A cikkolvasóban tudsz cikkeket későbbre menteni.</div></div></div>`;
       return;
     }
-    Renderer.render(articles);
+    Renderer.render(articles, 'list');
+    $('content').innerHTML = `<div class="read-later-view"><div class="read-later-head"><div class="read-later-title">${bookmarkIcon(true, 15)}<span>Mentett cikkek</span></div><button class="read-later-close" type="button" title="Vissza" aria-label="Vissza">×</button></div>${$('content').innerHTML}</div>`;
     return;
   }
   if (!S.feeds.length) {
@@ -1180,6 +1181,12 @@ function bindEvents() {
     if (content) content.scrollTo({ top: 0, behavior: 'smooth' });
   }, { passive: true });
   document.addEventListener('click', ev => {
+    if (ev.target.closest('.read-later-close')) {
+      S.activeSpecialView = null;
+      renderSidebar();
+      renderArticles();
+      return;
+    }
     const saveBtn = ev.target.closest('.article-save-btn[data-save-id]');
     if (saveBtn) {
       ev.preventDefault();
