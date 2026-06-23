@@ -76,7 +76,9 @@ const SUGGESTIONS = [
 const S = {
   feeds:        [],
   articles:     [],
+  readLater:    [],
   activeUrl:    null,
+  activeSpecialView: null,
   layout:       'magazine',
   theme:        'auto',
   preset:       'default',
@@ -128,6 +130,7 @@ function saveSettings() {
 function saveFeeds()      { Store.set('flux_f', S.feeds); }
 function saveYtChannels() { Store.set('flux_yt', S.ytChannels); }
 function saveArticles()   { Store.set('flux_art', S.articles); }
+function saveReadLater()  { Store.set('flux_read_later', S.readLater); }
 function loadStorage() {
   const s = Store.get('flux_s', {});
   Object.assign(S, {
@@ -157,6 +160,11 @@ function loadStorage() {
   S.ytChannels = Array.isArray(yt) ? yt : [];
   const arts = Store.get('flux_art', []);
   S.articles = Array.isArray(arts) ? arts.map(a => ({ ...a, date: new Date(a.date) })) : [];
+  const readLater = Store.get('flux_read_later', []);
+  S.readLater = Array.isArray(readLater) ? readLater.map(item => ({
+    ...item,
+    article: item.article ? { ...item.article, date: new Date(item.article.date) } : null
+  })).filter(item => item.id && item.article) : [];
 }
 const Theme = {
   apply() {
@@ -512,6 +520,7 @@ function renderArticleLoading(a) {
   renderArticleShell(articleViewHtml(a, { body: '<div class="article-content"><p>Cikk betöltése...</p></div>' }));
 }
 function renderArticleView(a) {
+  articleMap[aid(a)] = a;
   renderArticleShell(articleViewHtml(a, {
     body: `${a.image ? `<img class="article-hero-img" src="${e(a.image)}" alt="">` : ''}
       <div class="article-content">${sanitizeArticleHtml(a.content || a.desc || '')}</div>
@@ -520,10 +529,12 @@ function renderArticleView(a) {
   }));
 }
 function articleViewHtml(a, opts = {}) {
+  const saved = isReadLaterArticle(a);
   return `<article class="article-view">
     <button class="article-back" type="button">← Vissza</button>
     <h1 class="article-title">${e(a.title)}</h1>
     <div class="article-meta">${Renderer._metaHtml(a, 'article-source', { full: true })}</div>
+    <button class="article-save-btn${saved ? ' saved' : ''}" type="button" data-save-id="${aid(a)}" title="${saved ? 'Mentve' : 'Mentés későbbre'}" aria-label="${saved ? 'Mentve' : 'Mentés későbbre'}" aria-pressed="${saved ? 'true' : 'false'}">${bookmarkIcon(saved, 18)}</button>
     ${opts.body || ''}
   </article>`;
 }
@@ -689,6 +700,50 @@ function decodeEntities(text) {
 function normalizeText(text) {
   return decodeEntities(String(text || '')).replace(/\s+/g, ' ').trim();
 }
+function bookmarkIcon(filled = false, size = 15) {
+  return filled
+    ? `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg>`
+    : `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg>`;
+}
+function articleSnapshot(a) {
+  return {
+    id: a.id || '',
+    title: a.title || '',
+    url: a.url || '',
+    feedUrl: a.feedUrl || '',
+    image: a.image || '',
+    desc: a.desc || '',
+    date: a.date instanceof Date ? a.date.toISOString() : a.date,
+    author: a.author || '',
+    categories: Array.isArray(a.categories) ? a.categories : []
+  };
+}
+function isReadLaterArticle(a) {
+  const id = typeof a === 'string' ? a : aid(a);
+  return S.readLater.some(item => item.id === id);
+}
+function updateReadLaterNav() {
+  const btn = $('readLaterBtn');
+  if (!btn) return;
+  const active = S.activeSpecialView === 'readLater';
+  btn.classList.toggle('active', active);
+  btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+  btn.innerHTML = bookmarkIcon(active, 15);
+}
+function toggleReadLater(a) {
+  const id = aid(a);
+  const index = S.readLater.findIndex(item => item.id === id);
+  const saved = index === -1;
+  if (saved) {
+    S.readLater.unshift({ id, savedAt: new Date().toISOString(), article: articleSnapshot(a) });
+  } else {
+    S.readLater.splice(index, 1);
+  }
+  saveReadLater();
+  updateReadLaterNav();
+  toast(saved ? 'Mentve.' : 'Eltávolítva.');
+  return saved;
+}
 function setupHoverTapPopup(trigger, popup, openClass) {
   if (!trigger || !popup) return;
   if (trigger._fluxPopupCleanup) trigger._fluxPopupCleanup();
@@ -745,10 +800,10 @@ function toast(msg) {
   toast._t = setTimeout(() => t.classList.remove('show'), 2400);
 }
 function renderSidebar() {
-  const all = S.activeUrl === null;
+  const all = S.activeUrl === null && S.activeSpecialView !== 'readLater';
   let html = `<button class="nav-feed${all?' active':''}" data-feed-url="">Összes</button>`;
   S.feeds.forEach(f => {
-    const active = S.activeUrl === f.url;
+    const active = S.activeSpecialView !== 'readLater' && S.activeUrl === f.url;
     html += `<button class="nav-feed${active?' active':''}" data-feed-url="${e(f.url)}">${e(f.name)}</button>`;
   });
   $('feedList').innerHTML = html;
@@ -812,7 +867,9 @@ function renderSFeeds() {
 function selectFeed(url) {
   S.activeUrl = url;
   S.activeCategory = null;
+  S.activeSpecialView = null;
   saveSettings();
+  updateReadLaterNav();
   renderSidebar();
   renderArticles();
 }
@@ -889,10 +946,25 @@ function interleaveArticles(articles) {
   return S.feeds.flatMap(f => (byFeed[f.url] || []).sort((a, b) => b.date - a.date));
 }
 function selectCategory(cat) {
+  S.activeSpecialView = null;
   S.activeCategory = (S.activeCategory === cat) ? null : cat;
+  updateReadLaterNav();
   renderArticles();
 }
 function renderArticles() {
+  updateReadLaterNav();
+  if (S.activeSpecialView === 'readLater') {
+    const articles = S.readLater
+      .slice()
+      .sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt))
+      .map(item => ({ ...item.article, date: new Date(item.article.date) }));
+    if (!articles.length) {
+      $('content').innerHTML = `<div class="state-box"><div class="icon">${bookmarkIcon(false, 34)}</div><div class="title">Nincsenek mentett cikkek</div><div class="desc">A cikkolvasóban tudsz cikkeket későbbre menteni.</div></div>`;
+      return;
+    }
+    Renderer.render(articles);
+    return;
+  }
   if (!S.feeds.length) {
     $('content').innerHTML = `<div class="state-box"><div class="icon">📰</div><div class="title">Nincs feed hozzáadva</div><div class="desc">Kattints a "Feed hozzáadása" gombra.</div></div>`;
     injectYtSidebar();
@@ -1108,6 +1180,21 @@ function bindEvents() {
     if (content) content.scrollTo({ top: 0, behavior: 'smooth' });
   }, { passive: true });
   document.addEventListener('click', ev => {
+    const saveBtn = ev.target.closest('.article-save-btn[data-save-id]');
+    if (saveBtn) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      const article = articleMap[saveBtn.dataset.saveId];
+      if (!article) return;
+      const saved = toggleReadLater(article);
+      saveBtn.classList.toggle('saved', saved);
+      saveBtn.setAttribute('aria-pressed', saved ? 'true' : 'false');
+      saveBtn.setAttribute('title', saved ? 'Mentve' : 'Mentés későbbre');
+      saveBtn.setAttribute('aria-label', saved ? 'Mentve' : 'Mentés későbbre');
+      saveBtn.innerHTML = bookmarkIcon(saved, 18);
+      if (S.activeSpecialView === 'readLater' && !saved) renderArticles();
+      return;
+    }
     if (ev.target.closest('.ix-footer-brand')) return scrollHome();
     if (ev.target.closest('.article-back')) closeArticleView();
   });
@@ -1134,6 +1221,12 @@ function bindEvents() {
   $('feedList').addEventListener('click', ev => {
     const btn = ev.target.closest('.nav-feed[data-feed-url]');
     if (btn) selectFeed(btn.dataset.feedUrl || null);
+  });
+  $('readLaterBtn')?.addEventListener('click', () => {
+    S.activeSpecialView = S.activeSpecialView === 'readLater' ? null : 'readLater';
+    S.activeCategory = null;
+    renderSidebar();
+    renderArticles();
   });
   let _pP = undefined, _pA = undefined; // undefined = not previewing
   const pg = $('presetGrid');
@@ -2459,7 +2552,8 @@ const Config = {
       version: 1,
       settings: Object.fromEntries(this.keys.map(k => [k, S[k]])),
       feeds: S.feeds,
-      ytChannels: S.ytChannels
+      ytChannels: S.ytChannels,
+      readLater: S.readLater
     }, null, 2);
   },
   _apply(data) {
@@ -2467,6 +2561,10 @@ const Config = {
     if (data.settings) this.keys.forEach(k => { if (data.settings[k] !== undefined) S[k] = data.settings[k]; });
     if (Array.isArray(data.feeds) && data.feeds.length) S.feeds = data.feeds;
     if (Array.isArray(data.ytChannels)) S.ytChannels = data.ytChannels;
+    if (Array.isArray(data.readLater)) S.readLater = data.readLater.map(item => ({
+      ...item,
+      article: item.article ? { ...item.article, date: new Date(item.article.date) } : null
+    })).filter(item => item.id && item.article);
   },
   save() {
     const blob = new Blob([this._toJSON()], { type: 'application/json' });
@@ -2484,7 +2582,7 @@ const Config = {
       try {
         const text = await input.files[0].text();
         this._apply(JSON.parse(text));
-        saveSettings(); saveFeeds(); saveYtChannels();
+        saveSettings(); saveFeeds(); saveYtChannels(); saveReadLater();
         Theme.apply(); renderSidebar(); renderSFeeds(); renderSYtChannels(); renderArticles();
         refreshAll();
         toast('Config betöltve');

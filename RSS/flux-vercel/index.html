@@ -29,7 +29,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=theme-refine1">
+  <link rel="stylesheet" href="styles.css?v=read-later1">
 </head>
 <body>
 
@@ -44,6 +44,9 @@
   <div class="nav-right">
     <div class="nav-f1" id="navF1"><span class="f1-badge">F1</span></div>
     <div class="nav-weather" id="navWeather" title=""></div>
+    <button class="icon-btn read-later-nav-btn" id="readLaterBtn" title="Mentett cikkek" aria-label="Mentett cikkek" aria-pressed="false">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg>
+    </button>
     <button class="icon-btn" id="viewBtn" title="Nézet">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
     </button>
@@ -389,6 +392,6 @@
 <div class="toast" id="toast"></div>
 
 <script src="drag-order.min.js?v=1"></script>
-<script src="app.js?v=theme-refine1"></script>
+<script src="app.js?v=read-later1"></script>
 </body>
 </html>
