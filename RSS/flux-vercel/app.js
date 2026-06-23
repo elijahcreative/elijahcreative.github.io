@@ -323,14 +323,14 @@ const Renderer = {
     el.innerHTML = (this['_' + S.layout] || this._magazine).call(this, articles);
   },
   _feedName(url)  { return S.feeds.find(f => f.url === url)?.name || ''; },
-  _age(d) {
+  _timeLabel(d) {
     if (!d || isNaN(d)) return '';
-    const s = (Date.now() - d) / 1000;
-    if (s < 60) return 'most';
-    if (s < 3600) return `${Math.floor(s / 60)}p`;
-    if (s < 86400) return `${Math.floor(s / 3600)}ó`;
-    if (s < 604800) return `${Math.floor(s / 86400)}n`;
-    return d.toLocaleDateString('hu-HU', { month:'short', day:'numeric' });
+    const time = d.toLocaleTimeString('hu-HU', { hour: 'numeric', minute: '2-digit' });
+    const dayStart = date => new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const days = Math.round((dayStart(new Date()) - dayStart(d)) / 86400000);
+    if (days <= 0) return time;
+    if (days === 1) return `tegnap ${time}`;
+    return `${['V', 'H', 'K', 'SZE', 'CS', 'P', 'SZO'][d.getDay()]} ${time}`;
   },
   _section(cls, items, render) { return items.length ? `<div class="${cls}">${items.map(render).join('')}</div>` : ''; },
   _desc(a, cls) { return a.desc ? `<div class="${cls}">${e(a.desc)}</div>` : ''; },
@@ -343,7 +343,7 @@ const Renderer = {
   _metaParts(a, feed, opts = {}) {
     const seen = new Set();
     const full = opts.full === true;
-    const parts = full ? [this._age(a.date), feed, a.author, this._category(a)] : [this._age(a.date), feed];
+    const parts = full ? [this._timeLabel(a.date), feed, a.author, this._category(a)] : [this._timeLabel(a.date), feed];
     return parts.map(v => normalizeText(v || '')).filter(v => {
       const key = v.toLowerCase();
       if (!v || seen.has(key)) return false;
