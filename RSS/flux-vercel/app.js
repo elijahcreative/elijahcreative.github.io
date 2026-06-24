@@ -92,6 +92,8 @@ const S = {
   ytColumns:     3,
   ytRows:        1,
   ytSortMode:    'channel',
+  ytMiniCorner:  'tr',
+  ytMiniSize:    'm',
   showYoutube:   true,
   readerMode:    'fullscreen',
   showArticleMore: true,
@@ -107,6 +109,7 @@ const extractingArticlePromises = new Map();
 let ytVideos = [];
 const ytVideoMap = {};
 let ytLoading = false;
+let ytLoadProgress = 0;
 let ytActiveVideoId = null;
 let ytReturnScrollLeft = 0;
 let ytPlayer = null;
@@ -115,6 +118,7 @@ let ytPlaybackIntent = false;
 let ytApiPromise = null;
 let ytPlaybackStartedAt = 0;
 let ytLastKnownTime = 0;
+let ytMiniCollapsed = false;
 function ytCacheSignature() {
   return 'yt-cache-v2:' + JSON.stringify(
     (S.ytChannels || []).map(ch => `${ch.idType || 'id'}:${ch.id}`).sort()
@@ -131,7 +135,7 @@ function clampInt(value, min, max, fallback) {
   const n = Number.parseInt(value, 10);
   return Number.isFinite(n) ? Math.max(min, Math.min(max, n)) : fallback;
 }
-const SETTINGS_KEYS = ['layout','theme','preset','customAccent','fontSize','activeUrl','ytPerChannel','ytMaxChannels','ytColumns','ytRows','ytSortMode','showYoutube','readerMode','showArticleMore','articleMoreColumns','articleMoreRows','lastUpdated','showWeather','showF1'];
+const SETTINGS_KEYS = ['layout','theme','preset','customAccent','fontSize','activeUrl','ytPerChannel','ytMaxChannels','ytColumns','ytRows','ytSortMode','ytMiniCorner','ytMiniSize','showYoutube','readerMode','showArticleMore','articleMoreColumns','articleMoreRows','lastUpdated','showWeather','showF1'];
 function saveSettings() {
   Store.set('flux_s', Object.fromEntries(SETTINGS_KEYS.map(k => [k, S[k]])));
 }
@@ -153,6 +157,8 @@ function loadStorage() {
     ytColumns: clampInt(s.ytColumns, 1, 4, 3),
     ytRows: clampInt(s.ytRows, 1, 4, 1),
     ytSortMode: s.ytSortMode === 'time' ? 'time' : 'channel',
+    ytMiniCorner: ['tl','tr','bl','br'].includes(s.ytMiniCorner) ? s.ytMiniCorner : 'tr',
+    ytMiniSize: ['s','m','l'].includes(s.ytMiniSize) ? s.ytMiniSize : 'm',
     showYoutube: s.showYoutube !== false,
     readerMode: s.readerMode || (window.matchMedia?.('(max-width: 720px)').matches ? 'modal' : 'fullscreen'),
     showArticleMore: s.showArticleMore !== false,
@@ -622,7 +628,7 @@ function renderArticleShell(html) {
   activeArticleMode = 'page';
   closeArticleModal();
   const content = $('content');
-  content.innerHTML = html;
+  preserveActiveYtPlayer(() => { content.innerHTML = html; });
   setScrollTopInstant(content, 0);
 }
 function ensureArticleModal() {
@@ -681,8 +687,12 @@ function restoreArticleList() {
   const content = $('content');
   if (!content) return;
   if (articleListSnapshot !== null) {
-    content.innerHTML = articleListSnapshot;
+    preserveActiveYtPlayer(() => { content.innerHTML = articleListSnapshot; });
     articleListSnapshot = null;
+    if (!content.querySelector('.yt-sidebar.yt-player-active')) {
+      content.querySelectorAll('.yt-sidebar').forEach(sidebar => sidebar.remove());
+      injectYtSidebar();
+    }
     restoreReturnScroll(true);
     return;
   }
@@ -1060,8 +1070,15 @@ function renderArticles() {
   if (S.activeCategory) {
     articles = articles.filter(a => a.categories && a.categories.includes(S.activeCategory));
   }
+  const preservedYtPlayer = $('content').querySelector('.yt-sidebar.yt-player-active');
+  if (preservedYtPlayer) preservedYtPlayer.remove();
   Renderer.render(articles);
-  injectYtSidebar();
+  if (preservedYtPlayer) {
+    placeYtSidebar($('content'), preservedYtPlayer);
+    requestAnimationFrame(syncYtMiniPlayer);
+  } else {
+    injectYtSidebar();
+  }
 }
 const LAYOUT_ICONS = {
   grid:     `<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>`,
@@ -2021,28 +2038,31 @@ async function loadYouTube(bust = false) {
     return;
   }
   const YT_TTL = 30 * 60 * 1000;
-  ytLoading = true;
-  injectYtSidebar();
   let cached = null;
-  if (!bust) {
-    try {
-      cached = JSON.parse(localStorage.getItem('flux_yt_cache') || 'null');
-      if (
-        cached &&
-        cached.sig === ytCacheSignature() &&
-        Date.now() - cached.ts < YT_TTL &&
-        cached.videos?.length
-      ) {
-        ytVideos = cached.videos.map(v => ({ ...v, date: new Date(v.date) }));
-        ytVideos.forEach(v => { ytVideoMap[v.videoId] = v; });
-        ytLoading = false;
-        injectYtSidebar();
-        return;
-      }
-    } catch(e) {}
-  }
+  try {
+    cached = JSON.parse(localStorage.getItem('flux_yt_cache') || 'null');
+    if (cached?.sig === ytCacheSignature() && cached.videos?.length && !ytVideos.length) {
+      ytVideos = cached.videos.map(v => ({ ...v, date: new Date(v.date) }));
+      ytVideos.forEach(v => { ytVideoMap[v.videoId] = v; });
+    }
+    if (!bust && cached && Date.now() - cached.ts < YT_TTL && cached.videos?.length) {
+      ytLoading = false;
+      injectYtSidebar();
+      return;
+    }
+  } catch(e) {}
+  ytLoading = true;
+  ytLoadProgress = 0;
+  if (!ytActiveVideoId) injectYtSidebar();
+  let completed = 0;
   const results = await Promise.all(
-    S.ytChannels.map(ch => fetchYtChannelVideos(ch).catch(() => ({ videos: [], channelName: ch.name })))
+    S.ytChannels.map(async ch => {
+      const result = await fetchYtChannelVideos(ch).catch(() => ({ videos: [], channelName: ch.name }));
+      completed += 1;
+      ytLoadProgress = completed / S.ytChannels.length;
+      if (!ytActiveVideoId) injectYtSidebar();
+      return result;
+    })
   );
   results.forEach((r, i) => {
     if (r.channelName && r.channelName !== S.ytChannels[i].id) S.ytChannels[i].name = r.channelName;
@@ -2070,7 +2090,8 @@ async function loadYouTube(bust = false) {
     } catch(e) {}
   }
   ytLoading = false;
-  injectYtSidebar();
+  ytLoadProgress = 0;
+  if (!ytActiveVideoId) injectYtSidebar();
 }
 function ytAge(d) {
   if (!d || isNaN(d)) return '';
@@ -2124,12 +2145,25 @@ function buildYtSidebarHtml() {
         <div class="yt-player-title">${e(activeVideo.title)}</div>
         <div class="yt-player-meta">${e(channelName)}${channelName ? ' · ' : ''}${ytAge(activeVideo.date)}</div>
       </div>
-      <button class="yt-player-close" type="button" title="Videó bezárása">×</button>
+      <button class="yt-player-close" type="button" data-yt-close title="Videó bezárása">×</button>
     </div>
     <div class="yt-player-stage">
       <div class="yt-player-frame-wrap">
       <iframe class="yt-player-frame" src="${e(embedUrl)}" title="${e(activeVideo.title)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen; web-share" allowfullscreen></iframe>
-        <button class="yt-mini-close yt-player-close" type="button" title="Videó bezárása">×</button>
+        <div class="yt-mini-tools">
+          <button class="yt-mini-tool yt-mini-drag" type="button" data-yt-drag title="Mini player mozgatása" aria-label="Mini player mozgatása">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 5h.01M15 5h.01M9 12h.01M15 12h.01M9 19h.01M15 19h.01"/></svg>
+          </button>
+          <button class="yt-mini-tool" type="button" data-yt-size title="Mini player mérete" aria-label="Mini player mérete">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="5" width="14" height="14" rx="2"/><path d="M9 15l6-6M11 9h4v4"/></svg>
+          </button>
+          <button class="yt-mini-tool" type="button" data-yt-collapse title="Mini player összecsukása" aria-label="Mini player összecsukása">
+            <svg class="yt-collapse-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 12h8M12 8l4 4-4 4"/></svg>
+          </button>
+          <button class="yt-mini-tool" type="button" data-yt-close title="Videó bezárása" aria-label="Videó bezárása">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </div>
       </div>
     </div>
     <a class="yt-player-external" href="${e(watchUrl)}" target="flux-youtube">Megnyitás YouTube-on</a>`;
@@ -2158,9 +2192,9 @@ function buildYtSidebarHtml() {
     </div>` : '';
   const sortByTime = S.ytSortMode === 'time';
   const sortLabel = sortByTime ? 'Időrend szerint' : 'Csatorna szerint';
-  return `<div class="yt-box-head">
-    <span class="yt-box-title">LEGFRISSEBB VIDEÓK</span>
-    <span class="yt-box-line"></span>
+  return `<div class="yt-box-head${ytLoading ? ' is-loading' : ''}" style="--yt-progress:${Math.round(ytLoadProgress * 100)}%">
+    <span class="yt-box-title">${ytLoading ? 'VIDEÓK FRISSÍTÉSE...' : 'LEGFRISSEBB VIDEÓK'}</span>
+    <span class="yt-box-line"><span></span></span>
     <button class="yt-sort-toggle" type="button" data-yt-sort-toggle title="Rendezési mód váltása">
       <span class="yt-sort-label">${sortLabel}</span>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h11l-3-3"/><path d="M17 17H6l3 3"/></svg>
@@ -2205,11 +2239,21 @@ function animateYtOpen(card, video) {
   });
 }
 function closeYtPlayer() {
+  const sidebar = document.querySelector('.yt-sidebar');
   destroyYtPlayer();
   ytActiveVideoId = null;
-  injectYtSidebar();
+  if (!sidebar) {
+    injectYtSidebar();
+    return;
+  }
+  sidebar.classList.remove('yt-player-active', 'yt-player-mini', 'yt-player-collapsed', 'yt-player-opening');
+  applyYtMiniPreferences(sidebar);
+  sidebar.innerHTML = buildYtSidebarHtml();
+  placeYtSidebar($('content'), sidebar);
+  initYtPager(sidebar);
+  bindYtSidebarClicks(sidebar);
   requestAnimationFrame(() => {
-    const row = document.querySelector('.yt-sidebar .yt-scroll-row');
+    const row = sidebar.querySelector('.yt-scroll-row');
     if (row) row.scrollLeft = ytReturnScrollLeft;
   });
 }
@@ -2237,7 +2281,14 @@ function destroyYtPlayer() {
   ytPlaybackIntent = false;
   ytPlaybackStartedAt = 0;
   ytLastKnownTime = 0;
+  ytMiniCollapsed = false;
   document.querySelector('.yt-sidebar')?.classList.remove('yt-player-mini');
+}
+function applyYtMiniPreferences(sidebar) {
+  if (!sidebar) return;
+  sidebar.dataset.miniCorner = S.ytMiniCorner;
+  sidebar.dataset.miniSize = S.ytMiniSize;
+  sidebar.classList.toggle('yt-player-collapsed', ytMiniCollapsed);
 }
 function syncYtMiniPlayer() {
   const sidebar = document.querySelector('.yt-sidebar.yt-player-active');
@@ -2251,6 +2302,52 @@ function syncYtMiniPlayer() {
   const visible = rect.bottom > top && rect.top < window.innerHeight;
   ytMiniEngaged = !visible;
   sidebar.classList.toggle('yt-player-mini', ytMiniEngaged && !visible);
+  applyYtMiniPreferences(sidebar);
+}
+function cycleYtMiniSize() {
+  const sizes = ['s','m','l'];
+  S.ytMiniSize = sizes[(sizes.indexOf(S.ytMiniSize) + 1) % sizes.length];
+  saveSettings();
+  applyYtMiniPreferences(document.querySelector('.yt-sidebar'));
+}
+function toggleYtMiniCollapsed() {
+  ytMiniCollapsed = !ytMiniCollapsed;
+  applyYtMiniPreferences(document.querySelector('.yt-sidebar'));
+}
+function startYtMiniDrag(ev, sidebar) {
+  if (!sidebar.classList.contains('yt-player-mini') || ytMiniCollapsed) return;
+  const frame = sidebar.querySelector('.yt-player-frame-wrap');
+  if (!frame) return;
+  ev.preventDefault();
+  ev.stopPropagation();
+  const start = frame.getBoundingClientRect();
+  const dx = ev.clientX - start.left;
+  const dy = ev.clientY - start.top;
+  frame.classList.add('dragging');
+  const move = moveEv => {
+    const left = Math.max(8, Math.min(window.innerWidth - start.width - 8, moveEv.clientX - dx));
+    const top = Math.max(8, Math.min(window.innerHeight - start.height - 8, moveEv.clientY - dy));
+    Object.assign(frame.style, { left:`${left}px`, top:`${top}px`, right:'auto', bottom:'auto' });
+  };
+  const end = endEv => {
+    const rect = frame.getBoundingClientRect();
+    const vertical = rect.top + rect.height / 2 < window.innerHeight / 2 ? 't' : 'b';
+    const horizontal = rect.left + rect.width / 2 < window.innerWidth / 2 ? 'l' : 'r';
+    S.ytMiniCorner = vertical + horizontal;
+    saveSettings();
+    frame.classList.remove('dragging');
+    frame.style.removeProperty('left');
+    frame.style.removeProperty('top');
+    frame.style.removeProperty('right');
+    frame.style.removeProperty('bottom');
+    window.removeEventListener('pointermove', move);
+    window.removeEventListener('pointerup', end);
+    window.removeEventListener('pointercancel', end);
+    applyYtMiniPreferences(sidebar);
+  };
+  window.addEventListener('pointermove', move);
+  window.addEventListener('pointerup', end);
+  window.addEventListener('pointercancel', end);
 }
 async function setupYtPlayer(sidebar) {
   const frame = sidebar.querySelector('.yt-player-frame');
@@ -2361,7 +2458,24 @@ function initYtPager(sidebar) {
   });
 }
 function bindYtSidebarClicks(sidebar) {
+  sidebar.onpointerdown = ev => {
+    const drag = ev.target.closest('[data-yt-drag]');
+    if (drag) {
+      startYtMiniDrag(ev, sidebar);
+    }
+  };
   sidebar.onclick = ev => {
+    if (ev.target.closest('[data-yt-drag]')) return;
+    if (ev.target.closest('[data-yt-size]')) {
+      ev.preventDefault();
+      cycleYtMiniSize();
+      return;
+    }
+    if (ev.target.closest('[data-yt-collapse]')) {
+      ev.preventDefault();
+      toggleYtMiniCollapsed();
+      return;
+    }
     if (ev.target.closest('[data-yt-sort-toggle]')) {
       S.ytSortMode = S.ytSortMode === 'time' ? 'channel' : 'time';
       saveSettings();
@@ -2369,7 +2483,8 @@ function bindYtSidebarClicks(sidebar) {
       return;
     }
     if (ev.target.closest('.yt-page-btn')) return;
-    if (ev.target.closest('.yt-player-close')) {
+    if (ev.target.closest('[data-yt-close]')) {
+      ev.preventDefault();
       ev.stopPropagation();
       closeYtPlayer();
       return;
@@ -2392,6 +2507,16 @@ function bindYtSidebarClicks(sidebar) {
       animateYtOpen(card, video);
     }
   };
+}
+function preserveActiveYtPlayer(render) {
+  const content = $('content');
+  const player = content?.querySelector('.yt-sidebar.yt-player-active');
+  if (player) player.remove();
+  render();
+  if (!player || !content) return;
+  content.querySelectorAll('.yt-sidebar').forEach(sidebar => sidebar.remove());
+  placeYtSidebar(content, player);
+  requestAnimationFrame(syncYtMiniPlayer);
 }
 function requestYtAutoplay(sidebar) {
   const frame = sidebar.querySelector('.yt-player-frame');
@@ -2423,6 +2548,7 @@ function injectYtSidebar() {
     existing.style.pointerEvents = '';
     existing.classList.remove('yt-player-opening');
     existing.classList.toggle('yt-player-active', !!ytActiveVideoId);
+    applyYtMiniPreferences(existing);
     existing.innerHTML = buildYtSidebarHtml();
     placeYtSidebar(content, existing);
     initYtPager(existing);
@@ -2433,6 +2559,7 @@ function injectYtSidebar() {
   const sidebar = document.createElement('aside');
   sidebar.className = 'yt-sidebar';
   sidebar.classList.toggle('yt-player-active', !!ytActiveVideoId);
+  applyYtMiniPreferences(sidebar);
   sidebar.style.pointerEvents = '';
   sidebar.innerHTML = buildYtSidebarHtml();
   placeYtSidebar(content, sidebar);
