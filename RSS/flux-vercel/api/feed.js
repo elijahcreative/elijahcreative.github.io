@@ -34,6 +34,16 @@ module.exports = async function handler(req, res) {
   try {
     const parsedUrl = parseUrlInput(input);
     if (parsedUrl) {
+      if (req.query?.content === '1') {
+        const content = await fetchText(parsedUrl.href);
+        if (!looksLikeFeed(content)) {
+          sendJson(res, 422, { error: 'invalid_feed' });
+          return;
+        }
+        sendJson(res, 200, { content });
+        return;
+      }
+
       const direct = await validateFeed(parsedUrl.href).catch(() => null);
       if (direct) {
         sendJson(res, 200, { feed: direct });

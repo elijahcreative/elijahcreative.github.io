@@ -5,6 +5,7 @@ const ARTICLE_API = '/api/article?url=';
 const YOUTUBE_API = '/api/youtube?input=';
 const FEED_API    = '/api/feed?input=';
 const CACHE_TTL   = 5 * 60 * 1000; // 5 minutes
+const FEED_ARTICLE_LIMIT = 20;
 const ARTICLE_HOSTS = new Set(['telex.hu','www.telex.hu','index.hu','www.index.hu','hvg.hu','www.hvg.hu','portfolio.hu','www.portfolio.hu']);
 try { history.scrollRestoration = 'manual'; } catch(e) {}
 let activeArticleMode = null;
@@ -90,6 +91,7 @@ const S = {
   ytMaxChannels: 5,
   ytColumns:     3,
   ytRows:        1,
+  ytSortMode:    'channel',
   showYoutube:   true,
   readerMode:    'fullscreen',
   showArticleMore: true,
@@ -123,7 +125,7 @@ function clampInt(value, min, max, fallback) {
   const n = Number.parseInt(value, 10);
   return Number.isFinite(n) ? Math.max(min, Math.min(max, n)) : fallback;
 }
-const SETTINGS_KEYS = ['layout','theme','preset','customAccent','fontSize','activeUrl','ytPerChannel','ytMaxChannels','ytColumns','ytRows','showYoutube','readerMode','showArticleMore','articleMoreColumns','articleMoreRows','lastUpdated','showWeather','showF1'];
+const SETTINGS_KEYS = ['layout','theme','preset','customAccent','fontSize','activeUrl','ytPerChannel','ytMaxChannels','ytColumns','ytRows','ytSortMode','showYoutube','readerMode','showArticleMore','articleMoreColumns','articleMoreRows','lastUpdated','showWeather','showF1'];
 function saveSettings() {
   Store.set('flux_s', Object.fromEntries(SETTINGS_KEYS.map(k => [k, S[k]])));
 }
@@ -144,6 +146,7 @@ function loadStorage() {
     ytMaxChannels: s.ytMaxChannels || 5,
     ytColumns: clampInt(s.ytColumns, 1, 4, 3),
     ytRows: clampInt(s.ytRows, 1, 4, 1),
+    ytSortMode: s.ytSortMode === 'time' ? 'time' : 'channel',
     showYoutube: s.showYoutube !== false,
     readerMode: s.readerMode || (window.matchMedia?.('(max-width: 720px)').matches ? 'modal' : 'fullscreen'),
     showArticleMore: s.showArticleMore !== false,
@@ -228,11 +231,15 @@ const Fetcher = {
   async get(url, bust = false) {
     const cached = this._cache.get(url);
     if (!bust && cached && Date.now() - cached.ts < CACHE_TTL) return cached.data;
-    const articles = await this._fetchAny(url, bust);
+    const articles = (await this._fetchAny(url, bust) || [])
+      .sort((a, b) => b.date - a.date)
+      .slice(0, FEED_ARTICLE_LIMIT);
     this._cache.set(url, { data: articles, ts: Date.now() });
     return articles;
   },
-  _fetchAny(url, bust) {
+  async _fetchAny(url, bust) {
+    const complete = await this._viaFeedApi(url, bust).catch(() => null);
+    if (complete?.length) return complete;
     const attempts = [
       () => this._direct(url, bust),
       () => this._viaCorsproxy(url, bust),
@@ -243,6 +250,14 @@ const Fetcher = {
       .catch(() => null);
   },
   async _fromText(url, bust, load) { return this._parseXML(await load(cacheBustUrl(url, bust)), url); },
+  async _viaFeedApi(url, bust = false) {
+    const cb = bust ? '&_=' + Date.now() : '';
+    const r = await fetchT(FEED_API + encodeURIComponent(url) + '&content=1' + cb, { cache: 'no-store' }, 12000);
+    if (!r.ok) throw new Error('http');
+    const d = await r.json();
+    if (!d.content) throw new Error('empty');
+    return this._parseXML(d.content, url);
+  },
   _direct(url, bust = false) {
     return this._fromText(url, bust, async feedUrl => {
       const r = await fetchT(feedUrl, { cache: 'no-store' });
@@ -395,7 +410,8 @@ const Renderer = {
   _reader(articles) { return this._section('reader-layout', articles, a => this._card(a, 'reader')); },
   _footer(articles) {
     const updated = S.lastUpdated ? new Date(S.lastUpdated) : null;
-    const parts = [`${S.feeds.length} feed`, `${articles.length} cikk`];
+    const feedCount = new Set(articles.map(a => a.feedUrl).filter(Boolean)).size;
+    const parts = [`${feedCount} feed`, `${articles.length} cikk`];
     if (updated && !isNaN(updated)) parts.push(`frissítve ${updated.toLocaleTimeString('hu-HU', { hour:'2-digit', minute:'2-digit' })}`);
     return `<footer class="ix-footer"><button class="ix-footer-brand" type="button"><span class="ix-footer-mark"></span>Flux</button>${parts.map(p => `<span class="ix-footer-sep">·</span><span>${e(p)}</span>`).join('')}</footer>`;
   },
@@ -411,8 +427,8 @@ const Renderer = {
     const rowSep = '<div class="ix-section-separator"><span></span><span></span><span></span></div>';
     const sideHtml = side.length ? `<div class="ix-hero-cluster"><div class="ix-hero-main">${heroHtml}</div><div class="ix-hero-side"><div class="ix-hero-side-head"><span>FONTOS</span></div>${this._card(side[0], 'ix')}${side.slice(1).map(a => this._card(a, 'heroMini')).join('')}</div></div>${heroSep}` : `<div class="ix-hero-main">${heroHtml}</div>${heroSep}`;
     const rows = [1, 0].map(row => {
+      if (pool.length - idx < 2) return '';
       const [big] = take(1), [small] = take(1), fills = take(2);
-      if (!big || !small) return '';
       const sideCol = `<div class="ix-col-side">${this._card(small, 'ix')}${fills.map(a => this._card(a, 'fill')).join('')}</div>`;
       return `<div class="ix-row ${row ? 'row-b' : 'row-a'}">${row ? sideCol + this._card(big, 'ix') : this._card(big, 'ix') + sideCol}</div>${rowSep}`;
     }).join('');
@@ -2073,8 +2089,11 @@ function getYtSidebarGroups() {
   return groups;
 }
 function getYtSidebarVideos() {
-  return getYtSidebarGroups()
+  const videos = getYtSidebarGroups()
     .flatMap(g => g.videos.map(v => ({ ...v, displayChannelName: g.name })));
+  return S.ytSortMode === 'time'
+    ? videos.sort((a, b) => b.date - a.date)
+    : videos;
 }
 function ytVideoById(videoId) {
   return getYtSidebarVideos().find(v => v.videoId === videoId) || ytVideos.find(v => v.videoId === videoId);
@@ -2128,7 +2147,16 @@ function buildYtSidebarHtml() {
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
       </button>
     </div>` : '';
-  return `<div class="yt-box-head"><span>LEGFRISSEBB VIDEÓK</span></div><div class="yt-scroll-row">${html}</div>${pager}`;
+  const sortByTime = S.ytSortMode === 'time';
+  const sortLabel = sortByTime ? 'Időrend szerint' : 'Csatorna szerint';
+  return `<div class="yt-box-head">
+    <span class="yt-box-title">LEGFRISSEBB VIDEÓK</span>
+    <span class="yt-box-line"></span>
+    <button class="yt-sort-toggle" type="button" data-yt-sort-toggle title="Rendezési mód váltása">
+      <span class="yt-sort-label">${sortLabel}</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h11l-3-3"/><path d="M17 17H6l3 3"/></svg>
+    </button>
+  </div><div class="yt-scroll-row">${html}</div>${pager}`;
 }
 function animateYtOpen(card, video) {
   const img = card.querySelector('.yt-vcard-thumb');
@@ -2248,6 +2276,12 @@ function initYtPager(sidebar) {
 }
 function bindYtSidebarClicks(sidebar) {
   sidebar.onclick = ev => {
+    if (ev.target.closest('[data-yt-sort-toggle]')) {
+      S.ytSortMode = S.ytSortMode === 'time' ? 'channel' : 'time';
+      saveSettings();
+      injectYtSidebar();
+      return;
+    }
     if (ev.target.closest('.yt-page-btn')) return;
     if (ev.target.closest('.yt-player-close')) {
       ev.stopPropagation();

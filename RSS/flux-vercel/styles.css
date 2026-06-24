@@ -677,9 +677,14 @@ to   { opacity: 1; transform: translateY(0); }
 .yt-sidebar.has-left::before,
 .yt-sidebar.has-right::after { opacity: 1; }
 .magazine-layout > .yt-sidebar { align-self: center; width: 100%; max-width: 100%; margin-top: 18px; margin-bottom: 42px; }
-.yt-box-head { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 10px; align-items: center; margin-bottom: 18px; }
-.yt-box-head span { color: rgba(255,255,255,.58); font-size: .68rem; font-weight: 200; letter-spacing: .11em; text-transform: uppercase; line-height: 1; }
-.yt-box-head::after { content: ""; height: 1px; background: rgba(255,255,255,.16); }
+.yt-box-head { display: grid; grid-template-columns: max-content minmax(0, 1fr) max-content; gap: 10px; align-items: center; margin-bottom: 18px; }
+.yt-box-title { color: rgba(255,255,255,.58); font-size: .68rem; font-weight: 200; letter-spacing: .11em; text-transform: uppercase; line-height: 1; }
+.yt-box-line { height: 1px; background: rgba(255,255,255,.16); }
+.yt-sort-toggle { display: inline-flex; align-items: center; gap: 7px; border: 0; padding: 3px 0; background: transparent; color: rgba(255,255,255,.58); font-family: inherit; cursor: pointer; }
+.yt-sort-label { font-size: .68rem; font-weight: 400; line-height: 1; white-space: nowrap; }
+.yt-sort-toggle svg { opacity: .62; transition: opacity var(--t); }
+.yt-sort-toggle:hover { color: rgba(255,255,255,.82); }
+.yt-sort-toggle:hover svg { opacity: 1; }
 .yt-scroll-row { display: flex; gap: 20px; overflow-x: auto; overflow-y: hidden; padding: 0 0 10px; scrollbar-width: thin; scrollbar-color: var(--yt-panel-line) transparent; scroll-behavior: smooth; overscroll-behavior-x: contain; touch-action: pan-x pan-y; scroll-snap-type: x mandatory; }
 .yt-scroll-row::-webkit-scrollbar { height: 5px; }
 .yt-scroll-row::-webkit-scrollbar-track { background: transparent; }
@@ -721,7 +726,9 @@ to   { opacity: 1; transform: translateY(0); }
 .yt-sidebar::before,
 .yt-sidebar::after { top: 66px; bottom: 58px; width: 34px; }
 .yt-box-head { margin-bottom: 14px; gap: 8px; }
-.yt-box-head span { font-size: .58rem; letter-spacing: .09em; }
+.yt-box-title { font-size: .58rem; letter-spacing: .09em; }
+.yt-sort-toggle { gap: 5px; }
+.yt-sort-label { font-size: .58rem; }
 .yt-scroll-row { gap: 14px; padding: 0 2px 10px; scrollbar-width: none; }
 .yt-scroll-row::-webkit-scrollbar { display: none; }
 .yt-page { gap: 14px; }
