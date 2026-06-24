@@ -109,6 +109,12 @@ const ytVideoMap = {};
 let ytLoading = false;
 let ytActiveVideoId = null;
 let ytReturnScrollLeft = 0;
+let ytPlayer = null;
+let ytMiniEngaged = false;
+let ytPlaybackIntent = false;
+let ytApiPromise = null;
+let ytPlaybackStartedAt = 0;
+let ytLastKnownTime = 0;
 function ytCacheSignature() {
   return 'yt-cache-v2:' + JSON.stringify(
     (S.ytChannels || []).map(ch => `${ch.idType || 'id'}:${ch.id}`).sort()
@@ -2120,8 +2126,11 @@ function buildYtSidebarHtml() {
       </div>
       <button class="yt-player-close" type="button" title="Videó bezárása">×</button>
     </div>
-    <div class="yt-player-frame-wrap">
+    <div class="yt-player-stage">
+      <div class="yt-player-frame-wrap">
       <iframe class="yt-player-frame" src="${e(embedUrl)}" title="${e(activeVideo.title)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen; web-share" allowfullscreen></iframe>
+        <button class="yt-mini-close yt-player-close" type="button" title="Videó bezárása">×</button>
+      </div>
     </div>
     <a class="yt-player-external" href="${e(watchUrl)}" target="flux-youtube">Megnyitás YouTube-on</a>`;
   }
@@ -2196,12 +2205,88 @@ function animateYtOpen(card, video) {
   });
 }
 function closeYtPlayer() {
+  destroyYtPlayer();
   ytActiveVideoId = null;
   injectYtSidebar();
   requestAnimationFrame(() => {
     const row = document.querySelector('.yt-sidebar .yt-scroll-row');
     if (row) row.scrollLeft = ytReturnScrollLeft;
   });
+}
+function loadYtPlayerApi() {
+  if (window.YT?.Player) return Promise.resolve(window.YT);
+  if (ytApiPromise) return ytApiPromise;
+  ytApiPromise = new Promise((resolve, reject) => {
+    const previousReady = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = () => {
+      if (previousReady) previousReady();
+      resolve(window.YT);
+    };
+    const script = document.createElement('script');
+    script.src = 'https://www.youtube.com/iframe_api';
+    script.async = true;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+  return ytApiPromise;
+}
+function destroyYtPlayer() {
+  try { ytPlayer?.destroy(); } catch(e) {}
+  ytPlayer = null;
+  ytMiniEngaged = false;
+  ytPlaybackIntent = false;
+  ytPlaybackStartedAt = 0;
+  ytLastKnownTime = 0;
+  document.querySelector('.yt-sidebar')?.classList.remove('yt-player-mini');
+}
+function syncYtMiniPlayer() {
+  const sidebar = document.querySelector('.yt-sidebar.yt-player-active');
+  const stage = sidebar?.querySelector('.yt-player-stage');
+  if (!sidebar || !stage) {
+    ytMiniEngaged = false;
+    return;
+  }
+  const rect = stage.getBoundingClientRect();
+  const top = $('navbar')?.getBoundingClientRect().bottom || 0;
+  const visible = rect.bottom > top && rect.top < window.innerHeight;
+  ytMiniEngaged = !visible;
+  sidebar.classList.toggle('yt-player-mini', ytMiniEngaged && !visible);
+}
+async function setupYtPlayer(sidebar) {
+  const frame = sidebar.querySelector('.yt-player-frame');
+  if (!frame) return;
+  ytPlaybackIntent = true;
+  ytPlaybackStartedAt = Date.now();
+  requestYtAutoplay(sidebar);
+  try {
+    const YT = await loadYtPlayerApi();
+    if (!frame.isConnected || !ytActiveVideoId) return;
+    ytPlayer = new YT.Player(frame, {
+      events: {
+        onReady: ev => {
+          ytPlayer = ev.target;
+          try { ev.target.playVideo(); } catch(e) {}
+        },
+        onStateChange: ev => {
+          const currentTime = Number(ev.target?.getCurrentTime?.()) || 0;
+          ytLastKnownTime = currentTime;
+          if (ev.data === 1) {
+            ytPlaybackIntent = true;
+            ytPlaybackStartedAt = Date.now() - currentTime * 1000;
+          } else if (ev.data === 0 || ev.data === 2) {
+            ytPlaybackIntent = false;
+          }
+          syncYtMiniPlayer();
+        }
+      }
+    });
+  } catch(e) {}
+}
+function getYtPlaybackTime() {
+  const exact = Number(ytPlayer?.getCurrentTime?.());
+  if (Number.isFinite(exact) && exact > 0) return exact;
+  if (ytPlaybackIntent && ytPlaybackStartedAt) return (Date.now() - ytPlaybackStartedAt) / 1000;
+  return ytLastKnownTime;
 }
 function refreshYtFeed(ev) {
   if (ev) ev.stopPropagation();
@@ -2224,6 +2309,7 @@ function mergeSplitLayouts(container) {
 function removeYtSidebar() {
   const content = $('content');
   if (!content) return;
+  destroyYtPlayer();
   content.querySelectorAll('.yt-wrap').forEach(wrap => {
     const parent = wrap.parentElement;
     const mainDiv = wrap.firstElementChild;
@@ -2288,6 +2374,14 @@ function bindYtSidebarClicks(sidebar) {
       closeYtPlayer();
       return;
     }
+    const external = ev.target.closest('.yt-player-external');
+    if (external) {
+      const seconds = Math.max(0, Math.floor(getYtPlaybackTime()));
+      const videoId = ytActiveVideoId;
+      if (videoId) external.href = `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}${seconds ? `&t=${seconds}s` : ''}`;
+      try { ytPlayer?.pauseVideo?.(); } catch(e) {}
+      return;
+    }
     const card = ev.target.closest('[data-yt-video-id]');
     if (card && sidebar.contains(card)) {
       ev.preventDefault();
@@ -2325,23 +2419,26 @@ function injectYtSidebar() {
   if (content.querySelector('.spinner')) return;
   const existing = content.querySelector('.yt-sidebar');
   if (existing) {
+    destroyYtPlayer();
     existing.style.pointerEvents = '';
     existing.classList.remove('yt-player-opening');
+    existing.classList.toggle('yt-player-active', !!ytActiveVideoId);
     existing.innerHTML = buildYtSidebarHtml();
     placeYtSidebar(content, existing);
     initYtPager(existing);
     bindYtSidebarClicks(existing);
-    requestYtAutoplay(existing);
+    setupYtPlayer(existing);
     return;
   }
   const sidebar = document.createElement('aside');
   sidebar.className = 'yt-sidebar';
+  sidebar.classList.toggle('yt-player-active', !!ytActiveVideoId);
   sidebar.style.pointerEvents = '';
   sidebar.innerHTML = buildYtSidebarHtml();
   placeYtSidebar(content, sidebar);
   initYtPager(sidebar);
   bindYtSidebarClicks(sidebar);
-  requestYtAutoplay(sidebar);
+  setupYtPlayer(sidebar);
 }
 function openYtVideo(videoId) {
   if (!videoId) return;
@@ -2773,7 +2870,9 @@ const Config = {
   const navbar = document.getElementById('navbar');
   contentEl.addEventListener('scroll', () => {
     navbar.classList.toggle('scrolled', contentEl.scrollTop > 10);
+    syncYtMiniPlayer();
   }, { passive: true });
+  window.addEventListener('resize', syncYtMiniPlayer, { passive: true });
   if (S.feeds.length) {
     renderArticles(); // azonnali megjelenítés cache-ből
     refreshAll();     // háttérben frissítés, nem blokkol
