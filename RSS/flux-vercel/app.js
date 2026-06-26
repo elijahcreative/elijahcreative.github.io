@@ -2778,6 +2778,11 @@ function f1CountryHu(countryEn) {
 }
 function f1DateLabel(date) {
   if (!date || Number.isNaN(date.getTime())) return '';
+  const today = new Date();
+  const dayStart = d => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  const dayDiff = Math.round((dayStart(date) - dayStart(today)) / 86400000);
+  if (dayDiff === 0) return 'MA';
+  if (dayDiff === 1) return 'HOLNAP';
   return `${F1_HU[date.getMonth()].toUpperCase()}. ${date.getDate()}`;
 }
 function f1TimeLabel(date) {
@@ -2856,10 +2861,13 @@ function buildF1Model(races, standingsRaw) {
       ...ev,
       state,
       statusLabel: '',
+      isCurrent: false,
       dateLabel: f1DateLabel(ev.start),
       timeLabel: f1TimeLabel(ev.start)
     };
   });
+  const currentIndex = liveIndex >= 0 ? liveIndex : nextIndex;
+  if (currentIndex >= 0) events[currentIndex].isCurrent = true;
   if (liveIndex >= 0) events[liveIndex].statusLabel = 'Élő';
   else if (nextIndex >= 0) events[nextIndex].statusLabel = 'Következő';
   const standingsTop5 = standingsRaw
@@ -2870,7 +2878,7 @@ function buildF1Model(races, standingsRaw) {
     .slice(selectedIndex + 1, selectedIndex + 5)
     .map(r => ({ city: r.City || stripF1Country(r.Country), dateLabel: f1ShortDate(parseF1Date(r.Race)) }));
   return {
-    version: 2,
+    version: 3,
     city,
     countryEn,
     countryHu,
@@ -2891,7 +2899,7 @@ function renderF1(f1) {
   el.style.display = '';
   const ticker = f1.standingsTop5.map(s => `<span>${e(s.name)} ${e(s.points)}</span>`).join('');
   const eventHtml = f1.events.map(ev => `
-    <div class="f1-event ${ev.state} ${ev.kind}">
+    <div class="f1-event ${ev.state} ${ev.kind}${ev.isCurrent ? ' current' : ''}">
       <div class="f1-event-status">${ev.statusLabel}</div>
       <div class="f1-event-dot"></div>
       <div class="f1-event-label">${e(ev.label)}</div>
@@ -2924,7 +2932,7 @@ async function loadF1() {
   if (!S.showF1) { clearWidget('navF1'); return; }
   try {
     const cached = JSON.parse(localStorage.getItem('flux_f1') || 'null');
-    if (cached?.version === 2 && Date.now() - cached.ts < F1_TTL) { renderF1(cached); return; }
+    if (cached?.version === 3 && Date.now() - cached.ts < F1_TTL) { renderF1(cached); return; }
   } catch(e) {}
   try {
     const [racesJ, standingsJ] = await Promise.all([
