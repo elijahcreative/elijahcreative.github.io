@@ -2766,6 +2766,30 @@ const F1_COUNTRY_HU = {
   Qatar: 'Katar',
   UAE: 'Abu-Dzabi'
 };
+const F1_FLAG_MAP = {
+  Bahrain: 'https://img.icons8.com/color/96/bahrain-circular.png',
+  'Saudi Arabia': 'https://img.icons8.com/color/96/saudi-arabia-circular.png',
+  Australia: 'https://img.icons8.com/color/96/australia-circular.png',
+  Japan: 'https://img.icons8.com/color/96/japan-circular.png',
+  China: 'https://img.icons8.com/color/96/china-circular.png',
+  USA: 'https://img.icons8.com/color/96/usa-circular.png',
+  Italy: 'https://img.icons8.com/color/96/italy-circular.png',
+  Monaco: 'https://img.icons8.com/color/96/monaco-circular.png',
+  Canada: 'https://img.icons8.com/color/96/canada-circular.png',
+  Spain: 'https://img.icons8.com/color/96/spain-circular.png',
+  Austria: 'https://img.icons8.com/color/96/austria-circular.png',
+  UK: 'https://img.icons8.com/color/96/great-britain-circular.png',
+  Belgium: 'https://img.icons8.com/color/96/belgium-circular.png',
+  Hungary: 'https://img.icons8.com/color/96/hungary-circular.png',
+  Netherlands: 'https://img.icons8.com/color/96/netherlands-circular.png',
+  Azerbaijan: 'https://img.icons8.com/color/96/azerbaijan-circular.png',
+  Singapore: 'https://img.icons8.com/color/96/singapore-circular.png',
+  Mexico: 'https://img.icons8.com/color/96/mexico-circular.png',
+  Brazil: 'https://img.icons8.com/color/96/brazil-circular.png',
+  Qatar: 'https://img.icons8.com/color/96/qatar-circular.png',
+  'U.A. Emirates': 'https://img.icons8.com/color/96/united-arab-emirates-circular.png',
+  UAE: 'https://img.icons8.com/color/96/united-arab-emirates-circular.png'
+};
 const F1_WEEKDAYS = ['V','H','K','SZE','CS','P','SZO'];
 function parseF1Date(value) {
   return value ? new Date(value) : null;
@@ -2775,6 +2799,9 @@ function stripF1Country(country) {
 }
 function f1CountryHu(countryEn) {
   return F1_COUNTRY_HU[countryEn] || countryEn;
+}
+function f1FlagUrl(countryEn) {
+  return F1_FLAG_MAP[countryEn] || '';
 }
 function f1DateLabel(date) {
   if (!date || Number.isNaN(date.getTime())) return '';
@@ -2837,6 +2864,7 @@ function buildF1Model(races, standingsRaw) {
   const race = races[selectedIndex] || races[0] || {};
   const countryEn = stripF1Country(race.Country);
   const countryHu = f1CountryHu(countryEn);
+  const flagUrl = f1FlagUrl(countryEn);
   const city = race.City || countryEn || 'F1';
   const specs = f1EventSpecs(race);
   let liveIndex = -1;
@@ -2878,12 +2906,14 @@ function buildF1Model(races, standingsRaw) {
     .slice(selectedIndex + 1, selectedIndex + 5)
     .map(r => ({ city: r.City || stripF1Country(r.Country), dateLabel: f1ShortDate(parseF1Date(r.Race)) }));
   return {
-    version: 3,
+    version: 5,
     city,
     countryEn,
     countryHu,
+    flagUrl,
     events,
     progress: Math.max(progress, 0),
+    activeProgress: Math.max(progress, currentIndex, 0),
     liveEvent: liveIndex >= 0 ? events[liveIndex] : null,
     nextEvent: nextIndex >= 0 ? events[nextIndex] : null,
     countdown: nextIndex >= 0 ? f1CountdownTo(events[nextIndex].start, nowMs) : '',
@@ -2908,19 +2938,25 @@ function renderF1(f1) {
     </div>`).join('');
   const upcoming = f1.upcoming.map(r => `<span>${e(r.city.toUpperCase())} ${e(r.dateLabel)}</span>`).join('');
   const navStatus = f1.liveEvent ? 'Élő' : f1.nextEvent ? f1.countdown : 'Vége';
-  const progressWidth = `${Math.min(Math.max(Number(f1.progress) || 0, 0), 4) * 25}%`;
+  const progress = Math.min(Math.max(Number(f1.activeProgress ?? f1.progress) || 0, 0), 4);
+  const progressHtml = [1, 2, 3, 4].map(i => `<span class="f1-track-seg f1-track-seg-${i}${i <= progress ? ' active' : ''}"></span>`).join('');
+  const flag = f1.flagUrl ? `<span class="f1-flag"><img src="${e(f1.flagUrl)}" alt=""></span>` : '<span class="f1-flag is-empty"></span>';
   el.innerHTML = `
     <span class="f1-badge">
-      <span>${e(f1.city)}<span class="f1-nav-country">, ${e(f1.countryHu)}</span></span>
-      <span class="f1-badge-sep">|</span>
-      <span>${e(navStatus)}</span>
+      ${flag}
+      <span class="f1-badge-city">${e(f1.city)}</span>
+      <span class="f1-badge-countdown">${e(navStatus)}</span>
     </span>
     <div class="f1-popup" id="f1Popup">
-      <div class="f1-card" style="--f1-progress-width:${progressWidth}">
+      <div class="f1-card">
         <div class="f1-ticker">${ticker}</div>
-        <div class="f1-title"><span>${e(f1.city)}</span> <strong>${e(f1.countryEn)}</strong></div>
+        <div class="f1-title">
+          <span class="f1-title-city">${e(f1.city)}</span>
+          ${flag}
+          <strong class="f1-title-country">${e(f1.countryEn)}</strong>
+        </div>
         <div class="f1-track">
-          <div class="f1-trackline"><span class="f1-trackline-fill"></span></div>
+          <div class="f1-trackline">${progressHtml}</div>
           <div class="f1-events">${eventHtml}</div>
         </div>
         <div class="f1-upcoming">${upcoming}</div>
@@ -2932,7 +2968,7 @@ async function loadF1() {
   if (!S.showF1) { clearWidget('navF1'); return; }
   try {
     const cached = JSON.parse(localStorage.getItem('flux_f1') || 'null');
-    if (cached?.version === 3 && Date.now() - cached.ts < F1_TTL) { renderF1(cached); return; }
+    if (cached?.version === 5 && Date.now() - cached.ts < F1_TTL) { renderF1(cached); return; }
   } catch(e) {}
   try {
     const [racesJ, standingsJ] = await Promise.all([
