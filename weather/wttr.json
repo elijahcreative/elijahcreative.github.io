@@ -1,35 +1,35 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "39",
-      "FeelsLikeF": "102",
+      "FeelsLikeC": "29",
+      "FeelsLikeF": "85",
       "cloudcover": "0",
-      "humidity": "18",
-      "observation_time": "04:42 PM",
+      "humidity": "33",
+      "observation_time": "07:42 PM",
       "precipInches": "0.0",
       "precipMM": "0.0",
-      "pressure": "1016",
+      "pressure": "1017",
       "pressureInches": "30",
-      "temp_C": "39",
-      "temp_F": "103",
-      "uvIndex": "1",
+      "temp_C": "30",
+      "temp_F": "86",
+      "uvIndex": "0",
       "visibility": "10",
       "visibilityMiles": "6",
       "weatherCode": "113",
       "weatherDesc": [
         {
-          "value": "Sunny"
+          "value": "Clear "
         }
       ],
       "weatherIconUrl": [
         {
-          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0001_sunny.png"
+          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0008_clear_sky_night.png"
         }
       ],
-      "winddir16Point": "NNE",
-      "winddirDegree": "32",
-      "windspeedKmph": "5",
-      "windspeedMiles": "3"
+      "winddir16Point": "ENE",
+      "winddirDegree": "63",
+      "windspeedKmph": "18",
+      "windspeedMiles": "11"
     }
   ],
   "nearest_area": [
@@ -408,16 +408,16 @@
           "chanceofsunshine": "96",
           "chanceofthunder": "0",
           "chanceofwindy": "0",
-          "cloudcover": "0",
+          "cloudcover": "5",
           "diffRad": "88.0",
-          "humidity": "18",
+          "humidity": "13",
           "precipInches": "0.0",
           "precipMM": "0.0",
-          "pressure": "1016",
+          "pressure": "1013",
           "pressureInches": "30",
           "shortRad": "653.8",
-          "tempC": "39",
-          "tempF": "103",
+          "tempC": "40",
+          "tempF": "105",
           "time": "1800",
           "uvIndex": "1",
           "visibility": "10",
@@ -459,16 +459,16 @@
           "chanceofsunshine": "94",
           "chanceofthunder": "0",
           "chanceofwindy": "2",
-          "cloudcover": "9",
+          "cloudcover": "0",
           "diffRad": "5.9",
-          "humidity": "34",
+          "humidity": "33",
           "precipInches": "0.0",
           "precipMM": "0.0",
-          "pressure": "1016",
+          "pressure": "1017",
           "pressureInches": "30",
           "shortRad": "12.4",
-          "tempC": "32",
-          "tempF": "90",
+          "tempC": "30",
+          "tempF": "86",
           "time": "2100",
           "uvIndex": "0",
           "visibility": "10",
