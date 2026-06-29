@@ -1,30 +1,30 @@
 {
   "Podiums": [
     {
-      "Country": "🇪🇸 Spain",
-      "City": "Barcelona",
+      "Country": "🇦🇹 Austria",
+      "City": "Spielberg",
       "Message": "Race ?"
     },
     {
       "Place": "1",
-      "Name": "Hamilton",
-      "Team": "Ferrari",
+      "Name": "Russell",
+      "Team": "Mercedes",
       "Points": "+25",
-      "Total": "115"
+      "Total": "131"
     },
     {
       "Place": "2",
-      "Name": "Russell",
-      "Team": "Mercedes",
+      "Name": "Verstappen",
+      "Team": "Red Bull",
       "Points": "+18",
-      "Total": "106"
+      "Total": "73"
     },
     {
       "Place": "3",
-      "Name": "Norris",
-      "Team": "McLaren",
+      "Name": "Antonelli",
+      "Team": "Mercedes",
       "Points": "+15",
-      "Total": "73"
+      "Total": "171"
     }
   ]
 }
