@@ -169,47 +169,51 @@
             <button class="mode-btn reader-mode-btn" data-reader-mode="modal">Felugró lap</button>
           </div>
         </div>
-        <label class="sp-setting-row">
-          <span>
-            <span class="sp-setting-title">Továbbiak</span>
-            <span class="sp-setting-desc">Kapcsolódó következő cikkek a cikkolvasó alján.</span>
-          </span>
-          <input class="switch-input" type="checkbox" data-setting="showArticleMore">
-          <span class="switch-ui"></span>
-        </label>
-        <div class="sp-stepper-row">
-          <span class="sp-stepper-label">Oszlopok száma</span>
-          <div style="display:flex;align-items:center;gap:8px">
-            <button class="icon-btn" id="articleMoreColsMinus" style="padding:0 8px;font-size:1rem;line-height:1">−</button>
-            <span id="articleMoreColsVal" style="font-size:.95rem;font-weight:700;min-width:20px;text-align:center"></span>
-            <button class="icon-btn" id="articleMoreColsPlus" style="padding:0 8px;font-size:1rem;line-height:1">+</button>
+        <div class="sp-setting-card">
+          <label class="sp-setting-row">
+            <span>
+              <span class="sp-setting-title">Továbbiak</span>
+              <span class="sp-setting-desc">Kapcsolódó következő cikkek a cikkolvasó alján.</span>
+            </span>
+            <input class="switch-input" type="checkbox" data-setting="showArticleMore">
+            <span class="switch-ui"></span>
+          </label>
+          <div class="sp-stepper-row">
+            <span class="sp-stepper-label">Oszlopok száma</span>
+            <div class="sp-stepper-controls">
+              <button class="icon-btn" id="articleMoreColsMinus">−</button>
+              <span class="sp-stepper-value" id="articleMoreColsVal"></span>
+              <button class="icon-btn" id="articleMoreColsPlus">+</button>
+            </div>
           </div>
-        </div>
-        <div class="sp-stepper-row">
-          <span class="sp-stepper-label">Sorok száma</span>
-          <div style="display:flex;align-items:center;gap:8px">
-            <button class="icon-btn" id="articleMoreRowsMinus" style="padding:0 8px;font-size:1rem;line-height:1">−</button>
-            <span id="articleMoreRowsVal" style="font-size:.95rem;font-weight:700;min-width:20px;text-align:center"></span>
-            <button class="icon-btn" id="articleMoreRowsPlus" style="padding:0 8px;font-size:1rem;line-height:1">+</button>
+          <div class="sp-stepper-row">
+            <span class="sp-stepper-label">Sorok száma</span>
+            <div class="sp-stepper-controls">
+              <button class="icon-btn" id="articleMoreRowsMinus">−</button>
+              <span class="sp-stepper-value" id="articleMoreRowsVal"></span>
+              <button class="icon-btn" id="articleMoreRowsPlus">+</button>
+            </div>
           </div>
         </div>
         <div class="sp-mini-label">Widgetek</div>
-        <label class="sp-setting-row">
-          <span>
-            <span class="sp-setting-title">Időjárás</span>
-            <span class="sp-setting-desc">Felső sáv időjárás widget.</span>
-          </span>
-          <input class="switch-input" type="checkbox" data-setting="showWeather">
-          <span class="switch-ui"></span>
-        </label>
-        <label class="sp-setting-row">
-          <span>
-            <span class="sp-setting-title">F1</span>
-            <span class="sp-setting-desc">Felső sáv Forma-1 widget.</span>
-          </span>
-          <input class="switch-input" type="checkbox" data-setting="showF1">
-          <span class="switch-ui"></span>
-        </label>
+        <div class="sp-setting-card">
+          <label class="sp-setting-row">
+            <span>
+              <span class="sp-setting-title">Időjárás</span>
+              <span class="sp-setting-desc">Felső sáv időjárás widget.</span>
+            </span>
+            <input class="switch-input" type="checkbox" data-setting="showWeather">
+            <span class="switch-ui"></span>
+          </label>
+          <label class="sp-setting-row">
+            <span>
+              <span class="sp-setting-title">F1</span>
+              <span class="sp-setting-desc">Felső sáv Forma-1 widget.</span>
+            </span>
+            <input class="switch-input" type="checkbox" data-setting="showF1">
+            <span class="switch-ui"></span>
+          </label>
+        </div>
       </div>
 
       <div class="sp-section" id="sp-feeds">
@@ -224,7 +228,7 @@
         </div>
         <div class="sp-mini-label">Aktív feedek</div>
         <div class="s-feed-list" id="sFeedList"></div>
-        <button class="btn btn-ghost" id="addFeedBtn" style="width:100%;margin-top:10px;justify-content:center;display:flex;gap:6px;align-items:center">
+        <button class="btn btn-ghost sp-add-btn" id="addFeedBtn">
           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>
           Feed hozzáadása
         </button>
@@ -241,31 +245,33 @@
           </div>
         </div>
         <div class="sp-mini-label">Megjelenítés</div>
-        <label class="sp-setting-row">
-          <span>
-            <span class="sp-setting-title">YouTube sáv</span>
-            <span class="sp-setting-desc">A követett csatornák videói megjelennek a feedben.</span>
-          </span>
-          <input class="switch-input" type="checkbox" data-setting="showYoutube">
-          <span class="switch-ui"></span>
-        </label>
+        <div class="sp-setting-card">
+          <label class="sp-setting-row">
+            <span>
+              <span class="sp-setting-title">YouTube sáv</span>
+              <span class="sp-setting-desc">A követett csatornák videói megjelennek a feedben.</span>
+            </span>
+            <input class="switch-input" type="checkbox" data-setting="showYoutube">
+            <span class="switch-ui"></span>
+          </label>
+        </div>
         <div class="sp-setting-card">
           <div class="sp-setting-card-title">Tartalmi korlátok</div>
           <div class="sp-setting-card-desc">Add meg, hány csatornából és csatornánként hány videóból épüljön fel a YouTube sáv.</div>
           <div class="sp-stepper-row">
             <span class="sp-stepper-label">Megjelenített csatornák</span>
-            <div style="display:flex;align-items:center;gap:8px">
-              <button class="icon-btn" id="ytMaxMinus" style="padding:0 8px;font-size:1rem;line-height:1">−</button>
-              <span id="ytMaxVal" style="font-size:.95rem;font-weight:700;min-width:20px;text-align:center"></span>
-              <button class="icon-btn" id="ytMaxPlus" style="padding:0 8px;font-size:1rem;line-height:1">+</button>
+            <div class="sp-stepper-controls">
+              <button class="icon-btn" id="ytMaxMinus">−</button>
+              <span class="sp-stepper-value" id="ytMaxVal"></span>
+              <button class="icon-btn" id="ytMaxPlus">+</button>
             </div>
           </div>
           <div class="sp-stepper-row">
             <span class="sp-stepper-label">Videók csatornánként</span>
-            <div style="display:flex;align-items:center;gap:8px">
-              <button class="icon-btn" id="ytPerMinus" style="padding:0 8px;font-size:1rem;line-height:1">−</button>
-              <span id="ytPerVal" style="font-size:.95rem;font-weight:700;min-width:20px;text-align:center"></span>
-              <button class="icon-btn" id="ytPerPlus" style="padding:0 8px;font-size:1rem;line-height:1">+</button>
+            <div class="sp-stepper-controls">
+              <button class="icon-btn" id="ytPerMinus">−</button>
+              <span class="sp-stepper-value" id="ytPerVal"></span>
+              <button class="icon-btn" id="ytPerPlus">+</button>
             </div>
           </div>
         </div>
@@ -274,24 +280,24 @@
           <div class="sp-setting-card-desc">Állítsd be, hány videó férjen egy lapon oszlopokba és sorokba rendezve.</div>
           <div class="sp-stepper-row">
             <span class="sp-stepper-label">Oszlopok száma</span>
-            <div style="display:flex;align-items:center;gap:8px">
-              <button class="icon-btn" id="ytColsMinus" style="padding:0 8px;font-size:1rem;line-height:1">−</button>
-              <span id="ytColsVal" style="font-size:.95rem;font-weight:700;min-width:20px;text-align:center"></span>
-              <button class="icon-btn" id="ytColsPlus" style="padding:0 8px;font-size:1rem;line-height:1">+</button>
+            <div class="sp-stepper-controls">
+              <button class="icon-btn" id="ytColsMinus">−</button>
+              <span class="sp-stepper-value" id="ytColsVal"></span>
+              <button class="icon-btn" id="ytColsPlus">+</button>
             </div>
           </div>
           <div class="sp-stepper-row">
             <span class="sp-stepper-label">Sorok száma</span>
-            <div style="display:flex;align-items:center;gap:8px">
-              <button class="icon-btn" id="ytRowsMinus" style="padding:0 8px;font-size:1rem;line-height:1">−</button>
-              <span id="ytRowsVal" style="font-size:.95rem;font-weight:700;min-width:20px;text-align:center"></span>
-              <button class="icon-btn" id="ytRowsPlus" style="padding:0 8px;font-size:1rem;line-height:1">+</button>
+            <div class="sp-stepper-controls">
+              <button class="icon-btn" id="ytRowsMinus">−</button>
+              <span class="sp-stepper-value" id="ytRowsVal"></span>
+              <button class="icon-btn" id="ytRowsPlus">+</button>
             </div>
           </div>
         </div>
         <div class="sp-mini-label">Csatornák</div>
         <div class="s-feed-list" id="sYtList"></div>
-        <button class="btn btn-ghost" id="addYtBtn" style="width:100%;margin-top:10px;justify-content:center;display:flex;gap:6px;align-items:center">
+        <button class="btn btn-ghost sp-add-btn" id="addYtBtn">
           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>
           Csatorna hozzáadása
         </button>
@@ -314,7 +320,7 @@
             </div>
             <div class="sp-config-card-title">Exportálás</div>
             <div class="sp-config-card-desc">Elmenti a teljes konfigurációt fájlként.</div>
-            <button class="btn btn-ghost" id="configSaveBtn" style="justify-content:center;margin-top:4px">Mentés</button>
+            <button class="btn btn-ghost sp-config-action" id="configSaveBtn">Mentés</button>
           </div>
           <div class="sp-config-card">
             <div class="sp-config-card-icon">
@@ -322,7 +328,7 @@
             </div>
             <div class="sp-config-card-title">Importálás</div>
             <div class="sp-config-card-desc">Betölt egy korábban mentett Beállítások fájlt.</div>
-            <button class="btn btn-ghost" id="configLoadBtn" style="justify-content:center;margin-top:4px">Betöltés</button>
+            <button class="btn btn-ghost sp-config-action" id="configLoadBtn">Betöltés</button>
           </div>
         </div>
       </div>

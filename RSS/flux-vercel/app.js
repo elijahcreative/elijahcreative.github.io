@@ -2580,9 +2580,8 @@ function renderSYtChannels() {
     c.innerHTML = '<div style="font-size:.78rem;color:var(--muted);padding:4px 0">Nincs csatorna.</div>';
     return;
   }
-  const ytIcon = `<svg width="13" height="13" viewBox="0 0 24 24" fill="#ff0000" style="flex-shrink:0"><path d="M23 7s-.3-2-1.2-2.8C20.7 3 19.4 3 18.8 2.9 15.7 2.7 12 2.7 12 2.7s-3.7 0-6.8.2C4.6 3 3.3 3 2.2 4.2 1.3 5 1 7 1 7S.7 9.3.7 11.6v2.1c0 2.3.3 4.6.3 4.6s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2C7.9 22.5 12 22.5 12 22.5s3.7 0 6.8-.3c.6-.1 1.9-.1 3-1.3.9-.8 1.2-2.8 1.2-2.8s.3-2.3.3-4.6v-2.1C23.3 9.3 23 7 23 7zM9.7 15.5V9.2l6.6 3.2-6.6 3.1z"/></svg>`;
   c.innerHTML = S.ytChannels.map((ch, i) => settingsRow({
-    kind: 'yt', id: ch.id, i, total: S.ytChannels.length, icon: ytIcon,
+    kind: 'yt', id: ch.id, i, total: S.ytChannels.length,
     name: ch.name || ch.id, url: ch.id, title: 'Csatorna handle / ID — kattints a szerkesztéshez',
     placeholder: '@handle vagy channel ID'
   })).join('');
@@ -2756,6 +2755,7 @@ const F1_COUNTRY_HU = {
   Canada: 'Kanada',
   Austria: 'Ausztria',
   UK: 'Nagy-Britannia',
+  'Great Britain': 'Nagy-Britannia',
   Hungary: 'Magyarország',
   Belgium: 'Belgium',
   Netherlands: 'Hollandia',
@@ -2779,6 +2779,7 @@ const F1_FLAG_MAP = {
   Spain: 'https://img.icons8.com/color/96/spain-circular.png',
   Austria: 'https://img.icons8.com/color/96/austria-circular.png',
   UK: 'https://img.icons8.com/color/96/great-britain-circular.png',
+  'Great Britain': 'https://img.icons8.com/color/96/great-britain-circular.png',
   Belgium: 'https://img.icons8.com/color/96/belgium-circular.png',
   Hungary: 'https://img.icons8.com/color/96/hungary-circular.png',
   Netherlands: 'https://img.icons8.com/color/96/netherlands-circular.png',
@@ -2790,6 +2791,29 @@ const F1_FLAG_MAP = {
   'U.A. Emirates': 'https://img.icons8.com/color/96/united-arab-emirates-circular.png',
   UAE: 'https://img.icons8.com/color/96/united-arab-emirates-circular.png'
 };
+const F1_FLAG_EMOJI_MAP = {
+  '🇦🇺': F1_FLAG_MAP.Australia,
+  '🇦🇿': F1_FLAG_MAP.Azerbaijan,
+  '🇧🇭': F1_FLAG_MAP.Bahrain,
+  '🇧🇪': F1_FLAG_MAP.Belgium,
+  '🇧🇷': F1_FLAG_MAP.Brazil,
+  '🇨🇦': F1_FLAG_MAP.Canada,
+  '🇨🇳': F1_FLAG_MAP.China,
+  '🇭🇺': F1_FLAG_MAP.Hungary,
+  '🇮🇹': F1_FLAG_MAP.Italy,
+  '🇯🇵': F1_FLAG_MAP.Japan,
+  '🇲🇽': F1_FLAG_MAP.Mexico,
+  '🇲🇨': F1_FLAG_MAP.Monaco,
+  '🇳🇱': F1_FLAG_MAP.Netherlands,
+  '🇦🇹': F1_FLAG_MAP.Austria,
+  '🇶🇦': F1_FLAG_MAP.Qatar,
+  '🇸🇦': F1_FLAG_MAP['Saudi Arabia'],
+  '🇸🇬': F1_FLAG_MAP.Singapore,
+  '🇪🇸': F1_FLAG_MAP.Spain,
+  '🇦🇪': F1_FLAG_MAP.UAE,
+  '🇬🇧': F1_FLAG_MAP.UK,
+  '🇺🇸': F1_FLAG_MAP.USA
+};
 const F1_WEEKDAYS = ['V','H','K','SZE','CS','P','SZO'];
 function parseF1Date(value) {
   return value ? new Date(value) : null;
@@ -2800,8 +2824,11 @@ function stripF1Country(country) {
 function f1CountryHu(countryEn) {
   return F1_COUNTRY_HU[countryEn] || countryEn;
 }
-function f1FlagUrl(countryEn) {
-  return F1_FLAG_MAP[countryEn] || '';
+function f1FlagEmoji(country) {
+  return String(country || '').match(/[\u{1F1E6}-\u{1F1FF}]{2}/u)?.[0] || '';
+}
+function f1FlagUrl(countryRaw, countryEn) {
+  return F1_FLAG_EMOJI_MAP[f1FlagEmoji(countryRaw)] || F1_FLAG_MAP[countryEn] || '';
 }
 function f1DateLabel(date) {
   if (!date || Number.isNaN(date.getTime())) return '';
@@ -2864,7 +2891,7 @@ function buildF1Model(races, standingsRaw) {
   const race = races[selectedIndex] || races[0] || {};
   const countryEn = stripF1Country(race.Country);
   const countryHu = f1CountryHu(countryEn);
-  const flagUrl = f1FlagUrl(countryEn);
+  const flagUrl = f1FlagUrl(race.Country, countryEn);
   const city = race.City || countryEn || 'F1';
   const specs = f1EventSpecs(race);
   let liveIndex = -1;
@@ -2953,7 +2980,7 @@ function renderF1(f1) {
         <div class="f1-title">
           <span class="f1-title-city">${e(f1.city)}</span>
           ${flag}
-          <strong class="f1-title-country">${e(f1.countryEn)}</strong>
+          <strong class="f1-title-country">${e(f1.countryHu || f1.countryEn)}</strong>
         </div>
         <div class="f1-track">
           <div class="f1-trackline">${progressHtml}</div>
