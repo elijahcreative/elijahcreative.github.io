@@ -2,17 +2,17 @@
   "current_condition": [
     {
       "FeelsLikeC": "32",
-      "FeelsLikeF": "90",
+      "FeelsLikeF": "89",
       "cloudcover": "0",
-      "humidity": "32",
-      "observation_time": "03:22 PM",
+      "humidity": "34",
+      "observation_time": "04:52 PM",
       "precipInches": "0.0",
       "precipMM": "0.0",
-      "pressure": "1010",
+      "pressure": "1009",
       "pressureInches": "30",
-      "temp_C": "34",
-      "temp_F": "93",
-      "uvIndex": "2",
+      "temp_C": "33",
+      "temp_F": "92",
+      "uvIndex": "1",
       "visibility": "10",
       "visibilityMiles": "6",
       "weatherCode": "116",
@@ -26,17 +26,17 @@
           "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0002_sunny_intervals.png"
         }
       ],
-      "winddir16Point": "E",
-      "winddirDegree": "99",
-      "windspeedKmph": "10",
-      "windspeedMiles": "6"
+      "winddir16Point": "SSE",
+      "winddirDegree": "152",
+      "windspeedKmph": "16",
+      "windspeedMiles": "10"
     }
   ],
   "nearest_area": [
     {
       "areaName": [
         {
-          "value": "Kis-Gellerthegy"
+          "value": "Buda"
         }
       ],
       "country": [
@@ -44,7 +44,7 @@
           "value": "Hungary"
         }
       ],
-      "latitude": "47.483",
+      "latitude": "47.500",
       "longitude": "19.033",
       "population": "0",
       "region": [
@@ -54,7 +54,7 @@
       ],
       "weatherUrl": [
         {
-          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.483,19.033"
+          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.5,19.033"
         }
       ]
     }
@@ -408,16 +408,16 @@
           "chanceofsunshine": "20",
           "chanceofthunder": "0",
           "chanceofwindy": "1",
-          "cloudcover": "53",
+          "cloudcover": "0",
           "diffRad": "211.6",
-          "humidity": "24",
+          "humidity": "34",
           "precipInches": "0.0",
           "precipMM": "0.0",
-          "pressure": "1007",
+          "pressure": "1009",
           "pressureInches": "30",
           "shortRad": "556.1",
-          "tempC": "36",
-          "tempF": "97",
+          "tempC": "33",
+          "tempF": "92",
           "time": "1800",
           "uvIndex": "1",
           "visibility": "10",
