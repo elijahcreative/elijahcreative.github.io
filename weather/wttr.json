@@ -2,34 +2,34 @@
   "current_condition": [
     {
       "FeelsLikeC": "27",
-      "FeelsLikeF": "81",
-      "cloudcover": "0",
-      "humidity": "33",
-      "observation_time": "06:22 PM",
+      "FeelsLikeF": "80",
+      "cloudcover": "50",
+      "humidity": "45",
+      "observation_time": "07:52 PM",
       "precipInches": "0.0",
-      "precipMM": "0.1",
-      "pressure": "1014",
+      "precipMM": "0.0",
+      "pressure": "1015",
       "pressureInches": "30",
-      "temp_C": "28",
-      "temp_F": "82",
+      "temp_C": "26",
+      "temp_F": "80",
       "uvIndex": "0",
       "visibility": "10",
       "visibilityMiles": "6",
-      "weatherCode": "176",
+      "weatherCode": "122",
       "weatherDesc": [
         {
-          "value": "Patchy rain nearby"
+          "value": "Shower In Vicinity"
         }
       ],
       "weatherIconUrl": [
         {
-          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0009_light_rain_showers.png"
+          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0004_black_low_cloud.png"
         }
       ],
-      "winddir16Point": "NNW",
-      "winddirDegree": "338",
-      "windspeedKmph": "9",
-      "windspeedMiles": "5"
+      "winddir16Point": "NE",
+      "winddirDegree": "37",
+      "windspeedKmph": "4",
+      "windspeedMiles": "3"
     }
   ],
   "nearest_area": [
@@ -459,24 +459,24 @@
           "chanceofsunshine": "61",
           "chanceofthunder": "0",
           "chanceofwindy": "0",
-          "cloudcover": "30",
+          "cloudcover": "50",
           "diffRad": "3.5",
-          "humidity": "44",
+          "humidity": "45",
           "precipInches": "0.0",
           "precipMM": "0.0",
-          "pressure": "1014",
+          "pressure": "1015",
           "pressureInches": "30",
           "shortRad": "6.4",
           "tempC": "26",
-          "tempF": "78",
+          "tempF": "80",
           "time": "2100",
           "uvIndex": "0",
           "visibility": "10",
           "visibilityMiles": "6",
-          "weatherCode": "116",
+          "weatherCode": "122",
           "weatherDesc": [
             {
-              "value": "Partly Cloudy "
+              "value": "Overcast"
             }
           ],
           "weatherIconUrl": [
