@@ -61,17 +61,18 @@ const SWATCHES = ['#2563eb','#7c3aed','#db2777','#e11d48','#ea580c','#ca8a04','#
 const FEED_COLORS = ['#ef4444','#f97316','#eab308','#22c55e','#14b8a6','#3b82f6','#8b5cf6','#ec4899'];
 const DEFAULT_FEEDS = [
   { url: 'https://telex.hu/rss',            name: 'Telex',     color: '#ef4444' },
-  { url: 'https://index.hu/24ora/rss',       name: 'Index',     color: '#f97316' },
   { url: 'https://444.hu/feed',              name: '444',       color: '#3b82f6' },
-  { url: 'https://hvg.hu/rss',               name: 'HVG',       color: '#22c55e' }
+  { url: 'https://hvg.hu/rss',               name: 'HVG',       color: '#22c55e' },
+  { url: 'https://24.hu/feed/',              name: '24.hu',     color: '#14b8a6' }
 ];
 const SUGGESTIONS = [
   { label: 'Telex',     url: 'https://telex.hu/rss' },
-  { label: 'Index',     url: 'https://index.hu/24ora/rss' },
   { label: '444',       url: 'https://444.hu/feed' },
   { label: 'HVG',       url: 'https://hvg.hu/rss' },
+  { label: '24.hu',     url: 'https://24.hu/feed/' },
   { label: 'Portfolio', url: 'https://www.portfolio.hu/rss/all.xml' },
-  { label: 'G7',        url: 'https://g7.hu/feed' },
+  { label: 'Qubit',     url: 'https://qubit.hu/feed' },
+  { label: 'Forbes',    url: 'https://forbes.hu/feed/' },
   { label: 'Euronews',  url: 'https://feeds.euronews.com/euronews/hu/home' }
 ];
 const S = {
@@ -372,7 +373,7 @@ const Renderer = {
   _metaHtml(a, sourceCls, opts = {}) {
     const feed = this._feedName(a.feedUrl);
     return this._metaParts(a, feed, opts).map((part, i) =>
-      `${i ? '<span>|</span>' : ''}<span${part === feed && sourceCls ? ` class="${sourceCls}"` : ''}>${e(part)}</span>`
+      `${i ? '<span class="meta-sep" aria-hidden="true"></span>' : ''}<span${part === feed && sourceCls ? ` class="${sourceCls}"` : ''}>${e(part)}</span>`
     ).join('');
   },
   _metaParts(a, feed, opts = {}) {
@@ -2965,13 +2966,15 @@ function renderF1(f1) {
     </div>`).join('');
   const upcoming = f1.upcoming.map(r => `<span>${e(r.city.toUpperCase())} ${e(r.dateLabel)}</span>`).join('');
   const navStatus = f1.liveEvent ? 'Élő' : f1.nextEvent ? f1.countdown : 'Vége';
+  const navEvent = f1.liveEvent?.label || f1.nextEvent?.label || f1.city;
   const progress = Math.min(Math.max(Number(f1.activeProgress ?? f1.progress) || 0, 0), 4);
   const progressHtml = [1, 2, 3, 4].map(i => `<span class="f1-track-seg f1-track-seg-${i}${i <= progress ? ' active' : ''}"></span>`).join('');
   const flag = f1.flagUrl ? `<span class="f1-flag"><img src="${e(f1.flagUrl)}" alt=""></span>` : '<span class="f1-flag is-empty"></span>';
   el.innerHTML = `
     <span class="f1-badge">
       ${flag}
-      <span class="f1-badge-city">${e(f1.city)}</span>
+      <span class="f1-badge-city f1-badge-place">${e(f1.city)}</span>
+      <span class="f1-badge-city f1-badge-event">${e(navEvent)}</span>
       <span class="f1-badge-countdown">${e(navStatus)}</span>
     </span>
     <div class="f1-popup" id="f1Popup">

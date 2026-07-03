@@ -1,14 +1,13 @@
 const FEED_DIRECTORY = [
   { name: 'Telex', url: 'https://telex.hu/rss', site: 'telex.hu', tags: ['hírek', 'news', 'magyar'] },
-  { name: 'Index', url: 'https://index.hu/24ora/rss', site: 'index.hu', tags: ['hírek', 'news', 'magyar'] },
+  { name: 'Index', url: 'https://index.hu/24ora/rss', site: 'index.hu', tags: [] },
   { name: '444', url: 'https://444.hu/feed', site: '444.hu', tags: ['hírek', 'news', 'magyar'] },
   { name: 'HVG', url: 'https://hvg.hu/rss', site: 'hvg.hu', tags: ['hírek', 'news', 'magyar'] },
-  { name: 'Portfolio', url: 'https://www.portfolio.hu/rss/all.xml', site: 'portfolio.hu', tags: ['gazdaság', 'business', 'finance'] },
-  { name: 'G7', url: 'https://g7.hu/feed', site: 'g7.hu', tags: ['gazdaság', 'business'] },
-  { name: 'Euronews magyarul', url: 'https://feeds.euronews.com/euronews/hu/home', site: 'euronews.com', tags: ['hírek', 'európa', 'world'] },
   { name: '24.hu', url: 'https://24.hu/feed/', site: '24.hu', tags: ['hírek', 'news', 'magyar'] },
-  { name: 'Forbes Magyarország', url: 'https://forbes.hu/feed/', site: 'forbes.hu', tags: ['business', 'üzlet'] },
+  { name: 'Portfolio', url: 'https://www.portfolio.hu/rss/all.xml', site: 'portfolio.hu', tags: ['gazdaság', 'business', 'finance'] },
   { name: 'Qubit', url: 'https://qubit.hu/feed', site: 'qubit.hu', tags: ['tudomány', 'science', 'tech'] },
+  { name: 'Forbes Magyarország', url: 'https://forbes.hu/feed/', site: 'forbes.hu', tags: ['business', 'üzlet', 'gazdaság'] },
+  { name: 'Euronews magyarul', url: 'https://feeds.euronews.com/euronews/hu/home', site: 'euronews.com', tags: ['hírek', 'európa', 'world'] },
   { name: 'Prohardver', url: 'https://prohardver.hu/hirfolyam/anyagok/rss.xml', site: 'prohardver.hu', tags: ['tech', 'hardver'] },
   { name: 'The Verge', url: 'https://www.theverge.com/rss/index.xml', site: 'theverge.com', tags: ['tech', 'technology'] },
   { name: 'Wired', url: 'https://www.wired.com/feed/rss', site: 'wired.com', tags: ['tech', 'science'] },
@@ -18,7 +17,6 @@ const FEED_DIRECTORY = [
   { name: 'The Guardian', url: 'https://www.theguardian.com/world/rss', site: 'theguardian.com', tags: ['news', 'world'] },
   { name: 'NPR News', url: 'https://feeds.npr.org/1001/rss.xml', site: 'npr.org', tags: ['news', 'world'] }
 ];
-
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET') {
     sendJson(res, 405, { error: 'method_not_allowed' });
