@@ -358,7 +358,7 @@ const Renderer = {
     articles.forEach(a => { articleMap[aid(a)] = a; });
     el.innerHTML = (this['_' + layout] || this._magazine).call(this, articles);
   },
-  _feedName(url)  { return S.feeds.find(f => f.url === url)?.name || ''; },
+  _feedName(url)  { return S.feeds.find(f => f.url === url)?.name || DEFAULT_FEEDS.find(f => f.url === url)?.name || ''; },
   _timeLabel(d) {
     if (!d || isNaN(d)) return '';
     const time = d.toLocaleTimeString('hu-HU', { hour: 'numeric', minute: '2-digit' });
@@ -371,7 +371,7 @@ const Renderer = {
   _section(cls, items, render) { return items.length ? `<div class="${cls}">${items.map(render).join('')}</div>` : ''; },
   _desc(a, cls) { return a.desc ? `<div class="${cls}">${e(a.desc)}</div>` : ''; },
   _metaHtml(a, sourceCls, opts = {}) {
-    const feed = this._feedName(a.feedUrl);
+    const feed = a.feedName || this._feedName(a.feedUrl);
     return this._metaParts(a, feed, opts).map((part, i) =>
       `${i ? '<span class="meta-sep" aria-hidden="true"></span>' : ''}<span${part === feed && sourceCls ? ` class="${sourceCls}"` : ''}>${e(part)}</span>`
     ).join('');
@@ -483,6 +483,53 @@ async function openArticle(id) {
     return;
   }
   renderArticleView(a);
+}
+async function openArticleUrl(url) {
+  let articleUrl;
+  try {
+    articleUrl = new URL(url);
+  } catch(e) {
+    return;
+  }
+  if (!/^https?:$/.test(articleUrl.protocol)) return;
+
+  const normalized = articleUrl.href.replace(/\/+$/, '');
+  const existing = S.articles.find(a => (a.url || '').replace(/\/+$/, '') === normalized);
+  if (existing) {
+    openArticle(aid(existing));
+    return;
+  }
+
+  const fallback = {
+    id: articleUrl.href,
+    url: articleUrl.href,
+    feedUrl: 'https://telex.hu/rss',
+    feedName: articleUrl.hostname.replace(/^www\./, '') === 'telex.hu' ? 'Telex' : '',
+    title: 'Cikk betöltése...',
+    desc: '',
+    content: '',
+    image: '',
+    date: new Date()
+  };
+  if (!canExtractArticle(fallback)) {
+    window.location.href = articleUrl.href;
+    return;
+  }
+  pushArticleState();
+  renderArticleLoading(fallback);
+  const extracted = await fetchExtractedArticle(fallback).catch(() => null);
+  if (extracted && hasReadableRssContent(extracted)) {
+    renderArticleView({ ...fallback, ...extracted, author: extracted.author || fallback.author, date: extracted.date ? new Date(extracted.date) : fallback.date });
+    return;
+  }
+  window.location.href = articleUrl.href;
+}
+function openUrlParam() {
+  try {
+    return new URLSearchParams(location.search).get('open') || '';
+  } catch(e) {
+    return '';
+  }
 }
 function toggleReader(id) {
   openArticle(id);
@@ -3074,8 +3121,12 @@ const Config = {
     syncYtMiniPlayer();
   }, { passive: true });
   window.addEventListener('resize', syncYtMiniPlayer, { passive: true });
+  const initialOpenUrl = openUrlParam();
   if (S.feeds.length) {
     renderArticles(); // azonnali megjelenítés cache-ből
-    refreshAll();     // háttérben frissítés, nem blokkol
+    const refreshPromise = refreshAll(); // háttérben frissítés, nem blokkol
+    if (initialOpenUrl) refreshPromise.finally(() => openArticleUrl(initialOpenUrl));
+  } else if (initialOpenUrl) {
+    openArticleUrl(initialOpenUrl);
   }
 })();
