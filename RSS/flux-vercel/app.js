@@ -495,12 +495,7 @@ async function openArticleUrl(url) {
 
   const normalized = articleUrl.href.replace(/\/+$/, '');
   const existing = S.articles.find(a => (a.url || '').replace(/\/+$/, '') === normalized);
-  if (existing) {
-    openArticle(aid(existing));
-    return;
-  }
-
-  const fallback = {
+  const fallback = existing || {
     id: articleUrl.href,
     url: articleUrl.href,
     feedUrl: 'https://telex.hu/rss',
@@ -512,6 +507,11 @@ async function openArticleUrl(url) {
     date: new Date()
   };
   if (!canExtractArticle(fallback)) {
+    if (hasReadableRssContent(fallback)) {
+      pushArticleState();
+      renderArticleView(fallback);
+      return;
+    }
     window.location.href = articleUrl.href;
     return;
   }
@@ -520,6 +520,10 @@ async function openArticleUrl(url) {
   const extracted = await fetchExtractedArticle(fallback).catch(() => null);
   if (extracted && hasReadableRssContent(extracted)) {
     renderArticleView({ ...fallback, ...extracted, author: extracted.author || fallback.author, date: extracted.date ? new Date(extracted.date) : fallback.date });
+    return;
+  }
+  if (hasReadableRssContent(fallback)) {
+    renderArticleView(fallback);
     return;
   }
   window.location.href = articleUrl.href;
@@ -665,6 +669,7 @@ function relatedArticleScore(base, candidate, baseWords, baseCategories, order) 
   return score;
 }
 function renderArticleShell(html) {
+  document.documentElement.removeAttribute('data-open-article');
   if (S.readerMode === 'modal') {
     activeArticleMode = 'modal';
     const layer = ensureArticleModal();
@@ -1163,12 +1168,13 @@ async function refreshAll(bust = false) {
   const newSig = S.articles.slice(0, 40).map(a => a.id).join('|');
   const changed = bust || newSig !== prevSig;
   S.lastUpdated = new Date().toISOString();
-  if (changed) renderArticles();
+  if (changed && !activeArticleMode) renderArticles();
   saveArticles();
   saveSettings();
   if (hadArticles) toast(changed ? 'Frissítve.' : 'Nincs új cikk.');
 }
 function setLoading(on) {
+  if (activeArticleMode) return;
   if (on) {
     const content = $('content');
     const hasContent = content.querySelector('.ix-article, .ix-card, .ix-text-fill, .ix-hero');
@@ -3122,11 +3128,11 @@ const Config = {
   }, { passive: true });
   window.addEventListener('resize', syncYtMiniPlayer, { passive: true });
   const initialOpenUrl = openUrlParam();
-  if (S.feeds.length) {
-    renderArticles(); // azonnali megjelenítés cache-ből
-    const refreshPromise = refreshAll(); // háttérben frissítés, nem blokkol
-    if (initialOpenUrl) refreshPromise.finally(() => openArticleUrl(initialOpenUrl));
-  } else if (initialOpenUrl) {
+  if (initialOpenUrl) {
     openArticleUrl(initialOpenUrl);
+    if (S.feeds.length) refreshAll();
+  } else if (S.feeds.length) {
+    renderArticles(); // azonnali megjelenítés cache-ből
+    refreshAll();     // háttérben frissítés, nem blokkol
   }
 })();
