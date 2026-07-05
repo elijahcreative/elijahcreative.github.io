@@ -1,8 +1,8 @@
 {
   "Podiums": [
     {
-      "Country": "🇦🇹 Austria",
-      "City": "Spielberg",
+      "Country": "🇬🇧 Great Britain",
+      "City": "Silverstone",
       "Message": "Race ?"
     },
     {
@@ -10,21 +10,21 @@
       "Name": "Russell",
       "Team": "Mercedes",
       "Points": "+25",
-      "Total": "131"
+      "Total": "136"
     },
     {
       "Place": "2",
       "Name": "Verstappen",
       "Team": "Red Bull",
       "Points": "+18",
-      "Total": "73"
+      "Total": "76"
     },
     {
       "Place": "3",
       "Name": "Antonelli",
       "Team": "Mercedes",
       "Points": "+15",
-      "Total": "171"
+      "Total": "179"
     }
   ]
 }
