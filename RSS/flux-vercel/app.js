@@ -1619,10 +1619,6 @@ function clearWidget(id) {
   el.innerHTML = id === 'navF1' ? '<span class="f1-badge">F1</span>' : '';
   el.style.display = 'none';
 }
-const WX_CDNS = {
-  line: 'https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/line/all/',
-  fill: 'https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/fill/all/'
-};
 const WX_ICONS = {
   0: ['clear-day','clear-night'],
   1: ['partly-cloudy-day','partly-cloudy-night'],
@@ -1641,73 +1637,72 @@ const WX_ICONS = {
   96:['thunderstorms-rain','thunderstorms-rain'],
   99:['thunderstorms-rain','thunderstorms-rain']
 };
-const _wxSvgCache = {};
-let _wxUid = 0;
-async function _wxFetch(name, variant = 'line') {
-  const key = `${variant}:${name}`;
-  if (_wxSvgCache[key]) return _wxSvgCache[key];
-  try {
-    const r = await fetch((WX_CDNS[variant] || WX_CDNS.line) + name + '.svg');
-    _wxSvgCache[key] = r.ok ? await r.text() : '';
-  } catch(e) { _wxSvgCache[key] = ''; }
-  return _wxSvgCache[key];
-}
-function wxFallbackIcon(name, size) {
-  const s = Math.max(11, size);
-  const stroke = 'currentColor';
-  const cloud = `<path d="M7.5 ${s*.64}h${s*.5}a${s*.2} ${s*.2} 0 0 0 .02-${s*.4} ${s*.3} ${s*.3} 0 0 0-${s*.58}-.08A${s*.36} ${s*.36} 0 0 0 ${s*.25} ${s*.46}a${s*.24} ${s*.24} 0 0 0 .02 ${s*.18}" fill="none" stroke="${stroke}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>`;
-  let body;
-  if (name.includes('rain') || name.includes('drizzle')) {
-    body = `${cloud}<path d="M${s*.38} ${s*.75}l-${s*.05} ${s*.12}M${s*.55} ${s*.75}l-${s*.05} ${s*.12}M${s*.72} ${s*.75}l-${s*.05} ${s*.12}" stroke="${stroke}" stroke-width="1.7" stroke-linecap="round"/>`;
-  } else if (name.includes('snow')) {
-    body = `${cloud}<path d="M${s*.42} ${s*.8}h.01M${s*.58} ${s*.84}h.01M${s*.74} ${s*.8}h.01" stroke="${stroke}" stroke-width="2.5" stroke-linecap="round"/>`;
-  } else if (name.includes('cloud') || name.includes('overcast') || name.includes('fog')) {
-    body = `${cloud}${name.includes('fog') ? `<path d="M${s*.25} ${s*.82}h${s*.5}M${s*.32} ${s*.92}h${s*.36}" stroke="${stroke}" stroke-width="1.5" stroke-linecap="round"/>` : ''}`;
-  } else if (name.includes('wind')) {
-    body = `<path d="M${s*.18} ${s*.38}h${s*.46}a${s*.12} ${s*.12} 0 1 0-${s*.12}-${s*.12}M${s*.16} ${s*.54}h${s*.62}M${s*.2} ${s*.7}h${s*.42}a${s*.12} ${s*.12} 0 1 1-${s*.12} ${s*.12}" fill="none" stroke="${stroke}" stroke-width="1.8" stroke-linecap="round"/>`;
-  } else if (name.includes('raindrop')) {
-    body = `<path d="M${s*.5} ${s*.16}C${s*.36} ${s*.38} ${s*.26} ${s*.52} ${s*.26} ${s*.66}a${s*.24} ${s*.24} 0 0 0 ${s*.48} 0c0-${s*.14}-${s*.1}-${s*.28}-${s*.24}-${s*.5}Z" fill="none" stroke="${stroke}" stroke-width="1.8" stroke-linejoin="round"/>`;
-  } else {
-    body = `<circle cx="${s*.5}" cy="${s*.5}" r="${s*.22}" fill="none" stroke="${stroke}" stroke-width="1.8"/><path d="M${s*.5} ${s*.1}v${s*.1}M${s*.5} ${s*.8}v${s*.1}M${s*.1} ${s*.5}h${s*.1}M${s*.8} ${s*.5}h${s*.1}M${s*.22} ${s*.22}l${s*.07} ${s*.07}M${s*.71} ${s*.71}l${s*.07} ${s*.07}M${s*.78} ${s*.22}l-${s*.07} ${s*.07}M${s*.29} ${s*.71}l-${s*.07} ${s*.07}" stroke="${stroke}" stroke-width="1.6" stroke-linecap="round"/>`;
-  }
-  return `<svg width="${size}" height="${size}" viewBox="0 0 ${s} ${s}" fill="none" style="display:block;flex-shrink:0;color:var(--ac);overflow:visible">${body}</svg>`;
-}
-function wxInline(svgText, size, name = '') {
-  if (!svgText) return wxFallbackIcon('clear-day', size);
-  const p = 'wx' + (_wxUid++);
-  let svg = svgText
-    .replace(/\bid="([^"]+)"/g,    `id="${p}$1"`)
-    .replace(/url\(#([^)]+)\)/g,   `url(#${p}$1)`)
-    .replace(/href="#([^"]+)"/g,   `href="#${p}$1"`);
-  if (name === 'wind') {
-    svg = svg
-      .replace(/<animateTransform\b[^>]*\/>/gi, '')
-      .replace(/<animate\b[^>]*\/>/gi, '');
-  }
+function wxFluxIcon(name, size) {
   const dark = document.documentElement.getAttribute('data-theme') === 'dark';
-  const colors = dark
-    ? {
-      '#e5e7eb': '#cbd5e1',
-      '#d1d5db': '#94a3b8',
-      '#9ca3af': '#94a3b8',
-      '#374151': '#cbd5e1',
-      '#2885c7': '#38bdf8',
-      '#72b8d4': '#bae6fd',
-      '#72b9d5': '#93c5fd'
-    }
-    : {
-      '#e5e7eb': '#64748b',
-      '#d1d5db': '#64748b',
-      '#9ca3af': '#475569',
-      '#374151': '#334155',
-      '#2885c7': '#0369a1',
-      '#72b8d4': '#0284c7',
-      '#72b9d5': '#2563eb'
-    };
-  Object.entries(colors).forEach(([from, to]) => {
-    svg = svg.replace(new RegExp(from, 'gi'), to);
-  });
-  return svg.replace(/<svg\b/, `<svg width="${size}" height="${size}" style="display:block;flex-shrink:0;overflow:visible"`);
+  const bg = 'var(--bg)';
+  const cloud = dark ? '#cbd5e1' : '#475569';
+  const sun = '#f59e0b';
+  const moon = dark ? '#93c5fd' : '#2563eb';
+  const rain = dark ? '#7dd3fc' : '#0ea5e9';
+  const snow = dark ? '#bae6fd' : '#0284c7';
+  const bolt = '#facc15';
+  const mist = dark ? '#94a3b8' : '#64748b';
+  const isNight = name.includes('night');
+  const hasCloud = name.includes('cloud') || name.includes('overcast') || name.includes('rain') || name.includes('drizzle') || name.includes('snow') || name.includes('thunderstorms') || name.includes('fog');
+  const isRaindrop = name === 'raindrop';
+  const weather = name.includes('thunderstorms') ? 'storm'
+    : name.includes('snow') ? 'snow'
+    : !isRaindrop && (name.includes('rain') || name.includes('drizzle')) ? 'rain'
+    : name.includes('fog') ? 'fog'
+    : '';
+  const sunGlyph = (cx = 32, cy = 32, r = 9, color = sun, width = 4) => {
+    const inner = r + 4;
+    const outer = r + 9;
+    const d1 = Math.round((r + 4) * .7);
+    const d2 = Math.round((r + 9) * .7);
+    return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="${width}"/><path d="M${cx} ${cy - outer}v${outer - inner}M${cx} ${cy + inner}v${outer - inner}M${cx - outer} ${cy}h${outer - inner}M${cx + inner} ${cy}h${outer - inner}M${cx - d2} ${cy - d2}l${d2 - d1} ${d2 - d1}M${cx + d1} ${cy + d1}l${d2 - d1} ${d2 - d1}M${cx + d2} ${cy - d2}l-${d2 - d1} ${d2 - d1}M${cx - d1} ${cy + d1}l-${d2 - d1} ${d2 - d1}" stroke="${color}" stroke-width="${width}" stroke-linecap="round"/>`;
+  };
+  const sunIcon = (cx = 32, cy = 32, r = 9) => sunGlyph(cx, cy, r);
+  const sunHalo = (cx = 32, cy = 32, r = 9) => sunGlyph(cx, cy, r, bg, 10);
+  const moonIcon = `<path d="M42 36c-10 3-20-4-20-15 0-5 2-9 6-12-10 2-17 10-17 21 0 12 10 22 22 22 8 0 15-4 19-11-3 1-6 1-10-5z" fill="${moon}"/>`;
+  const cloudPath = 'M19 44h26a11 11 0 0 0 1-22 16 16 0 0 0-30-3 12 12 0 0 0 3 25z';
+  const compactCloudPath = 'M19 42h27a10 10 0 0 0 0-20 15 15 0 0 0-28-3 12 12 0 0 0 1 23z';
+  const drawCloud = (path, fillInside = true, halo = true) => `${halo ? `<path d="${path}" fill="none" stroke="${bg}" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>` : ''}<path d="${path}" fill="${fillInside ? bg : 'none'}" stroke="${cloud}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const cloudIcon = drawCloud(cloudPath);
+  const compactCloud = drawCloud(compactCloudPath, false);
+  let body = '';
+  if (name === 'raindrop') {
+    body = size <= 14
+      ? `<path d="M32 14C25 25 21 34 21 41c0 7 5 12 11 12s11-5 11-12c0-7-4-16-11-27z" fill="${rain}"/>`
+      : `<path d="M32 9C22 23 17 33 17 42c0 9 6 15 15 15s15-6 15-15c0-9-5-19-15-33z" fill="${rain}"/>`;
+  } else if (name === 'uv-index') {
+    body = `<circle cx="32" cy="32" r="15" fill="${sun}"/><path d="M32 7v6M32 51v6M7 32h6M51 32h6M14 14l4 4M46 46l4 4M50 14l-4 4M18 46l-4 4" stroke="${sun}" stroke-width="4" stroke-linecap="round"/>`;
+  } else if (name === 'wind') {
+    body = `<path d="M10 23h30a7 7 0 1 0-7-7M8 34h45M14 45h28a7 7 0 1 1-7 7" fill="none" stroke="${cloud}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`;
+  } else if (name === 'sunset') {
+    body = `<path d="M12 43h40M20 36a12 12 0 0 1 24 0" fill="none" stroke="${sun}" stroke-width="5" stroke-linecap="round"/><path d="M32 10v10M23 19l4 4M41 19l-4 4" stroke="${sun}" stroke-width="4" stroke-linecap="round"/>`;
+  } else if (name.includes('clear')) {
+    body = isNight ? moonIcon : sunIcon();
+  } else if (name.includes('partly-cloudy')) {
+    body = `${drawCloud(compactCloudPath, true, false)}${isNight ? `<g transform="translate(-2 -3) scale(.82)">${moonIcon}</g>` : `<circle cx="19" cy="17" r="21" fill="${bg}"/>${sunIcon(19, 17, 7.5)}`}`;
+  } else if (hasCloud) {
+    body = cloudIcon;
+  } else {
+    body = sunIcon();
+  }
+  if (weather === 'fog') {
+    body += `<path d="M14 51h36M20 58h24" stroke="${mist}" stroke-width="4" stroke-linecap="round"/>`;
+  }
+  if (weather === 'rain') {
+    body += `<path d="M23 50l-3 7M34 50l-3 7M45 50l-3 7" stroke="${rain}" stroke-width="5" stroke-linecap="round"/>`;
+  }
+  if (weather === 'snow') {
+    body += `<path d="M23 53h.1M34 57h.1M45 53h.1" stroke="${snow}" stroke-width="7" stroke-linecap="round"/>`;
+  }
+  if (weather === 'storm') {
+    body += `<path d="M33 47l-8 13h8l-3 9 11-16h-8l4-6z" fill="${bolt}"/><path d="M47 50l-3 7" stroke="${rain}" stroke-width="5" stroke-linecap="round"/>`;
+  }
+  return `<svg width="${size}" height="${size}" viewBox="0 0 64 64" fill="none" style="display:block;flex-shrink:0;overflow:visible" aria-hidden="true">${body}</svg>`;
 }
 function wxIconName(code, isDay) {
   const pair = WX_ICONS[code] || ['not-available','not-available'];
@@ -1740,32 +1735,12 @@ async function loadWeather() {
     const hourSlots  = (w.hours || []).slice(1, 7).map(hr => ({
       ...hr, isSunset: parseInt(hr.time) === sunsetHourRx
     }));
-    const dayCodes   = (w.days  || []).map(d => wxIconName(d.code, true));
-    const hasSunset  = hourSlots.some(hr => hr.isSunset);
-    const hourIconNames = hourSlots.map(hr => {
-      const hrIsDay = parseInt(hr.time) >= 6 && parseInt(hr.time) < 21;
-      return wxIconName(hr.code, hrIsDay);
-    });
-    const allNames   = [
-      wxIconName(w.code, isDay),
-      ...hourIconNames,
-      ...dayCodes,
-      'wind',
-      ...(hasSunset ? ['sunset'] : [])
-    ];
-    await Promise.all([
-      ...[...new Set(allNames)].map(n => _wxFetch(n)),
-      _wxFetch('raindrop', 'fill'),
-      _wxFetch('uv-index', 'fill')
-    ]);
-    const ic = (name, size, variant = 'line') => _wxSvgCache[`${variant}:${name}`]
-      ? wxInline(_wxSvgCache[`${variant}:${name}`], size, name)
-      : wxFallbackIcon(name, size);
+    const ic = (name, size) => wxFluxIcon(name, size);
     const mainSvg = ic(wxIconName(w.code, isDay), 52);
     const navSvg  = ic(wxIconName(w.code, isDay), 22);
     const hourlyHtml = hourSlots.map(hr => {
       const hrIsDay = parseInt(hr.time) >= 6 && parseInt(hr.time) < 21;
-      const rainHint = Number(hr.precip) > 0 ? `<span class="wx-hour-rain">${hr.precip}%${ic('raindrop', 9, 'fill')}</span>` : '<span class="wx-hour-rain"></span>';
+      const rainHint = Number(hr.precip) > 0 ? `<span class="wx-hour-rain">${hr.precip}%${ic('raindrop', 9)}</span>` : '<span class="wx-hour-rain"></span>';
       if (hr.isSunset) {
         return `<div class="wx-hour">
           <span class="wx-hour-time" style="color:var(--ac);font-weight:600">${w.sunsetTime}</span>
@@ -1796,8 +1771,8 @@ async function loadWeather() {
         </div>
         <div class="wx-bottom-row">
           <div class="wx-meta">
-            ${w.precip0 > 0 ? `<span>${ic('raindrop', 14, 'fill')}${w.precip0}%</span>` : ''}
-            <span>${ic('uv-index', 14, 'fill')}UV ${w.uv}</span>
+            ${w.precip0 > 0 ? `<span>${ic('raindrop', 14)}${w.precip0}%</span>` : ''}
+            <span>${ic('uv-index', 14)}UV ${w.uv}</span>
             <span>${ic('wind', 14)}${wind} km/h</span>
           </div>
           <div class="wx-minmax"><span style="color:#60a5fa">↓${w.tmin}°</span>&nbsp; <span style="color:#f97316">↑${w.tmax}°</span></div>
@@ -1809,7 +1784,7 @@ async function loadWeather() {
             <span class="wx-fday">${i === 0 ? 'Holnap' : HU[day.dow]}</span>
             <span class="wx-ficon">${ic(wxIconName(day.code, true), 20)}</span>
             <span class="wx-fcond">${WX_LABELS[day.code] || ''}</span>
-            <span class="wx-frain">${day.precip > 0 ? `${day.precip}%${ic('raindrop', 11, 'fill')}` : ''}</span>
+            <span class="wx-frain">${day.precip > 0 ? `${day.precip}%${ic('raindrop', 11)}` : ''}</span>
             <span class="wx-ftemp-min">${day.tmin}°</span>
             <span class="wx-ftemp-max">${day.tmax}°</span>
           </div>`;
