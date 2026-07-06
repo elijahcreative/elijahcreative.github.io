@@ -2943,6 +2943,7 @@ function buildF1Model(races, standingsRaw) {
   const futureIndex = races.findIndex(race => f1RaceSelectionEnd(race) > nowMs);
   const selectedIndex = futureIndex >= 0 ? futureIndex : Math.max(0, races.length - 1);
   const race = races[selectedIndex] || races[0] || {};
+  const countryRaw = String(race.Country || '').trim();
   const countryEn = stripF1Country(race.Country);
   const countryHu = f1CountryHu(countryEn);
   const flagUrl = f1FlagUrl(race.Country, countryEn);
@@ -2987,8 +2988,9 @@ function buildF1Model(races, standingsRaw) {
     .slice(selectedIndex + 1, selectedIndex + 5)
     .map(r => ({ city: r.City || stripF1Country(r.Country), dateLabel: f1ShortDate(parseF1Date(r.Race)) }));
   return {
-    version: 5,
+    version: 6,
     city,
+    countryRaw,
     countryEn,
     countryHu,
     flagUrl,
@@ -3023,6 +3025,7 @@ function renderF1(f1) {
   const progress = Math.min(Math.max(Number(f1.activeProgress ?? f1.progress) || 0, 0), 4);
   const progressHtml = [1, 2, 3, 4].map(i => `<span class="f1-track-seg f1-track-seg-${i}${i <= progress ? ' active' : ''}"></span>`).join('');
   const flag = f1.flagUrl ? `<span class="f1-flag"><img src="${e(f1.flagUrl)}" alt=""></span>` : '<span class="f1-flag is-empty"></span>';
+  const titleCountry = f1.countryRaw || f1.countryHu || f1.countryEn;
   el.innerHTML = `
     <span class="f1-badge">
       ${flag}
@@ -3033,11 +3036,7 @@ function renderF1(f1) {
     <div class="f1-popup" id="f1Popup">
       <div class="f1-card">
         <div class="f1-ticker">${ticker}</div>
-        <div class="f1-title">
-          <span class="f1-title-city">${e(f1.city)}</span>
-          ${flag}
-          <strong class="f1-title-country">${e(f1.countryHu || f1.countryEn)}</strong>
-        </div>
+        <div class="f1-title f1-title-combined"><span>${e(f1.city)}</span><strong>${e(titleCountry)}</strong></div>
         <div class="f1-track">
           <div class="f1-trackline">${progressHtml}</div>
           <div class="f1-events">${eventHtml}</div>
@@ -3051,7 +3050,7 @@ async function loadF1() {
   if (!S.showF1) { clearWidget('navF1'); return; }
   try {
     const cached = JSON.parse(localStorage.getItem('flux_f1') || 'null');
-    if (cached?.version === 5 && Date.now() - cached.ts < F1_TTL) { renderF1(cached); return; }
+    if (cached?.version === 6 && Date.now() - cached.ts < F1_TTL) { renderF1(cached); return; }
   } catch(e) {}
   try {
     const [racesJ, standingsJ] = await Promise.all([

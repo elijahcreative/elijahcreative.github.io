@@ -614,6 +614,27 @@ to   { opacity: 1; transform: translateY(0); }
 .card-img { transition: transform .4s ease; }
 .card:hover .card-img { transform: scale(1.04); }
 .yt-vcard:hover .yt-vcard-thumb { transform: scale(1.04); }
+@media (hover: none), (pointer: coarse) {
+.card:hover { transform: none; box-shadow: var(--shadow); }
+.list-item:hover,
+.ix-strip-item:hover,
+.reader-item-head:hover { background: transparent; }
+.ix-hero:hover .ix-hero-title,
+.ix-card:hover .ix-card-title,
+.ix-text-fill:hover .ix-tf-title,
+.ix-mini:hover .ix-mini-title,
+.ix-strip-item:hover .ix-strip-title,
+.article-more-card:hover .article-more-card-title { color: var(--text); }
+.ix-hero-side .ix-card:hover .ix-card-title,
+.ix-hero-side .ix-hero-mini:hover .ix-hero-mini-title,
+.ix-spot-card:hover .ix-spot-title { color: #fff !important; }
+.ix-hero:hover .ix-hero-img,
+.ix-card:hover .ix-card-img,
+.ix-spot-card:hover .ix-spot-img-clip .ix-spot-img,
+.ix-mini:hover .ix-mini-img,
+.card:hover .card-img,
+.yt-vcard:hover .yt-vcard-thumb { transform: none; }
+}
 .nav-f1 { display: flex; align-items: center; padding: 4px 8px; border-radius: var(--radius); cursor: default; flex-shrink: 0; position: relative; }
 .f1-badge { font-family: var(--font-sans); font-size: .95rem; font-weight: 500; color: var(--text); line-height: 1; cursor: default; user-select: none; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
 .f1-badge-city { font-weight: 700; }
@@ -637,6 +658,7 @@ to   { opacity: 1; transform: translateY(0); }
 .f1-ticker span,
 .f1-upcoming span { min-width: max-content; overflow: visible; text-overflow: clip; white-space: nowrap; }
 .f1-title { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; column-gap: .36em; margin: 11px 0 8px; text-align: center; font-style: italic; text-transform: uppercase; letter-spacing: .095em; font-size: clamp(1.16rem, 2.9vw, 1.48rem); line-height: .95; white-space: nowrap; overflow: visible; text-overflow: clip; }
+.f1-title-combined { display: block; }
 .f1-title strong { font-weight: 900; letter-spacing: .02em; }
 .f1-title span { font-weight: 400; color: color-mix(in srgb, var(--text) 72%, transparent); }
 .f1-title-city { justify-self: end; min-width: 0; overflow: visible; text-overflow: clip; }
