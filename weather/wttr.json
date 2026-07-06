@@ -1,18 +1,18 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "21",
-      "FeelsLikeF": "71",
+      "FeelsLikeC": "20",
+      "FeelsLikeF": "68",
       "cloudcover": "0",
-      "humidity": "73",
-      "observation_time": "04:49 PM",
+      "humidity": "83",
+      "observation_time": "07:50 PM",
       "precipInches": "0.0",
       "precipMM": "0.0",
       "pressure": "1016",
       "pressureInches": "30",
-      "temp_C": "21",
-      "temp_F": "71",
-      "uvIndex": "1",
+      "temp_C": "20",
+      "temp_F": "68",
+      "uvIndex": "0",
       "visibility": "10",
       "visibilityMiles": "6",
       "weatherCode": "116",
@@ -23,20 +23,20 @@
       ],
       "weatherIconUrl": [
         {
-          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0002_sunny_intervals.png"
+          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0004_black_low_cloud.png"
         }
       ],
       "winddir16Point": "WNW",
-      "winddirDegree": "302",
-      "windspeedKmph": "21",
-      "windspeedMiles": "13"
+      "winddirDegree": "291",
+      "windspeedKmph": "10",
+      "windspeedMiles": "6"
     }
   ],
   "nearest_area": [
     {
       "areaName": [
         {
-          "value": "Buda"
+          "value": "Var"
         }
       ],
       "country": [
@@ -44,8 +44,8 @@
           "value": "Hungary"
         }
       ],
-      "latitude": "47.500",
-      "longitude": "19.033",
+      "latitude": "47.517",
+      "longitude": "19.050",
       "population": "0",
       "region": [
         {
@@ -54,7 +54,7 @@
       ],
       "weatherUrl": [
         {
-          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.5,19.033"
+          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.517,19.05"
         }
       ]
     }
@@ -390,8 +390,8 @@
         {
           "DewPointC": "10",
           "DewPointF": "51",
-          "FeelsLikeC": "27",
-          "FeelsLikeF": "80",
+          "FeelsLikeC": "26",
+          "FeelsLikeF": "79",
           "HeatIndexC": "26",
           "HeatIndexF": "79",
           "WindChillC": "27",
@@ -408,16 +408,16 @@
           "chanceofsunshine": "47",
           "chanceofthunder": "0",
           "chanceofwindy": "2",
-          "cloudcover": "0",
+          "cloudcover": "37",
           "diffRad": "134.5",
-          "humidity": "73",
+          "humidity": "36",
           "precipInches": "0.0",
           "precipMM": "0.0",
-          "pressure": "1016",
+          "pressure": "1015",
           "pressureInches": "30",
           "shortRad": "442.3",
-          "tempC": "21",
-          "tempF": "71",
+          "tempC": "27",
+          "tempF": "80",
           "time": "1800",
           "uvIndex": "1",
           "visibility": "10",
@@ -441,8 +441,8 @@
         {
           "DewPointC": "11",
           "DewPointF": "52",
-          "FeelsLikeC": "25",
-          "FeelsLikeF": "76",
+          "FeelsLikeC": "23",
+          "FeelsLikeF": "74",
           "HeatIndexC": "25",
           "HeatIndexF": "76",
           "WindChillC": "23",
@@ -459,16 +459,16 @@
           "chanceofsunshine": "68",
           "chanceofthunder": "0",
           "chanceofwindy": "1",
-          "cloudcover": "27",
+          "cloudcover": "0",
           "diffRad": "4.7",
-          "humidity": "47",
+          "humidity": "83",
           "precipInches": "0.0",
           "precipMM": "0.0",
           "pressure": "1016",
           "pressureInches": "30",
           "shortRad": "10.1",
-          "tempC": "23",
-          "tempF": "74",
+          "tempC": "20",
+          "tempF": "68",
           "time": "2100",
           "uvIndex": "0",
           "visibility": "10",
