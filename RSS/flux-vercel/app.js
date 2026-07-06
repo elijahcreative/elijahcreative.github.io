@@ -1619,7 +1619,10 @@ function clearWidget(id) {
   el.innerHTML = id === 'navF1' ? '<span class="f1-badge">F1</span>' : '';
   el.style.display = 'none';
 }
-const WX_CDN = 'https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/fill/all/';
+const WX_CDNS = {
+  line: 'https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/line/all/',
+  fill: 'https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/fill/all/'
+};
 const WX_ICONS = {
   0: ['clear-day','clear-night'],
   1: ['partly-cloudy-day','partly-cloudy-night'],
@@ -1640,13 +1643,14 @@ const WX_ICONS = {
 };
 const _wxSvgCache = {};
 let _wxUid = 0;
-async function _wxFetch(name) {
-  if (_wxSvgCache[name]) return _wxSvgCache[name];
+async function _wxFetch(name, variant = 'line') {
+  const key = `${variant}:${name}`;
+  if (_wxSvgCache[key]) return _wxSvgCache[key];
   try {
-    const r = await fetch(WX_CDN + name + '.svg');
-    _wxSvgCache[name] = r.ok ? await r.text() : '';
-  } catch(e) { _wxSvgCache[name] = ''; }
-  return _wxSvgCache[name];
+    const r = await fetch((WX_CDNS[variant] || WX_CDNS.line) + name + '.svg');
+    _wxSvgCache[key] = r.ok ? await r.text() : '';
+  } catch(e) { _wxSvgCache[key] = ''; }
+  return _wxSvgCache[key];
 }
 function wxFallbackIcon(name, size) {
   const s = Math.max(11, size);
@@ -1668,20 +1672,41 @@ function wxFallbackIcon(name, size) {
   }
   return `<svg width="${size}" height="${size}" viewBox="0 0 ${s} ${s}" fill="none" style="display:block;flex-shrink:0;color:var(--ac);overflow:visible">${body}</svg>`;
 }
-function wxInline(svgText, size) {
+function wxInline(svgText, size, name = '') {
   if (!svgText) return wxFallbackIcon('clear-day', size);
   const p = 'wx' + (_wxUid++);
   let svg = svgText
     .replace(/\bid="([^"]+)"/g,    `id="${p}$1"`)
     .replace(/url\(#([^)]+)\)/g,   `url(#${p}$1)`)
     .replace(/href="#([^"]+)"/g,   `href="#${p}$1"`);
-  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
-  if (!dark) {
+  if (name === 'wind') {
     svg = svg
-      .replace(/#f3f7fe/gi, '#bfdbfe')  // cloud fill light  → blue-200
-      .replace(/#deeafb/gi, '#93c5fd')  // cloud fill darker → blue-300
-      .replace(/#e6effc/gi, '#93c5fd'); // cloud stroke      → blue-300
+      .replace(/<animateTransform\b[^>]*\/>/gi, '')
+      .replace(/<animate\b[^>]*\/>/gi, '');
   }
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const colors = dark
+    ? {
+      '#e5e7eb': '#cbd5e1',
+      '#d1d5db': '#94a3b8',
+      '#9ca3af': '#94a3b8',
+      '#374151': '#cbd5e1',
+      '#2885c7': '#38bdf8',
+      '#72b8d4': '#bae6fd',
+      '#72b9d5': '#93c5fd'
+    }
+    : {
+      '#e5e7eb': '#64748b',
+      '#d1d5db': '#64748b',
+      '#9ca3af': '#475569',
+      '#374151': '#334155',
+      '#2885c7': '#0369a1',
+      '#72b8d4': '#0284c7',
+      '#72b9d5': '#2563eb'
+    };
+  Object.entries(colors).forEach(([from, to]) => {
+    svg = svg.replace(new RegExp(from, 'gi'), to);
+  });
   return svg.replace(/<svg\b/, `<svg width="${size}" height="${size}" style="display:block;flex-shrink:0;overflow:visible"`);
 }
 function wxIconName(code, isDay) {
@@ -1716,7 +1741,6 @@ async function loadWeather() {
       ...hr, isSunset: parseInt(hr.time) === sunsetHourRx
     }));
     const dayCodes   = (w.days  || []).map(d => wxIconName(d.code, true));
-    const uvName     = `uv-index-${Math.min(Math.max(w.uv, 1), 11)}`;
     const hasSunset  = hourSlots.some(hr => hr.isSunset);
     const hourIconNames = hourSlots.map(hr => {
       const hrIsDay = parseInt(hr.time) >= 6 && parseInt(hr.time) < 21;
@@ -1726,28 +1750,35 @@ async function loadWeather() {
       wxIconName(w.code, isDay),
       ...hourIconNames,
       ...dayCodes,
-      uvName, 'wind', 'raindrop',
+      'wind',
       ...(hasSunset ? ['sunset'] : [])
     ];
-    await Promise.all([...new Set(allNames)].map(n => _wxFetch(n)));
-    const ic = (name, size) => _wxSvgCache[name]
-      ? wxInline(_wxSvgCache[name], size)
+    await Promise.all([
+      ...[...new Set(allNames)].map(n => _wxFetch(n)),
+      _wxFetch('raindrop', 'fill'),
+      _wxFetch('uv-index', 'fill')
+    ]);
+    const ic = (name, size, variant = 'line') => _wxSvgCache[`${variant}:${name}`]
+      ? wxInline(_wxSvgCache[`${variant}:${name}`], size, name)
       : wxFallbackIcon(name, size);
     const mainSvg = ic(wxIconName(w.code, isDay), 52);
     const navSvg  = ic(wxIconName(w.code, isDay), 22);
     const hourlyHtml = hourSlots.map(hr => {
       const hrIsDay = parseInt(hr.time) >= 6 && parseInt(hr.time) < 21;
+      const rainHint = Number(hr.precip) > 0 ? `<span class="wx-hour-rain">${hr.precip}%${ic('raindrop', 9, 'fill')}</span>` : '<span class="wx-hour-rain"></span>';
       if (hr.isSunset) {
         return `<div class="wx-hour">
           <span class="wx-hour-time" style="color:var(--ac);font-weight:600">${w.sunsetTime}</span>
           <div class="wx-hour-icon">${ic('sunset', 24)}</div>
           <span class="wx-hour-temp">${hr.temp}°</span>
+          ${rainHint}
         </div>`;
       }
       return `<div class="wx-hour">
         <span class="wx-hour-time">${hr.time || ''}</span>
         <div class="wx-hour-icon">${ic(wxIconName(hr.code, hrIsDay), 24)}</div>
         <span class="wx-hour-temp">${hr.temp}°</span>
+        ${rainHint}
       </div>`;
     }).join('');
     el.innerHTML = `
@@ -1765,8 +1796,8 @@ async function loadWeather() {
         </div>
         <div class="wx-bottom-row">
           <div class="wx-meta">
-            ${w.precip0 > 0 ? `<span>${ic('raindrop', 14)}${w.precip0}%</span>` : ''}
-            <span>${ic(uvName, 14)}UV ${w.uv}</span>
+            ${w.precip0 > 0 ? `<span>${ic('raindrop', 14, 'fill')}${w.precip0}%</span>` : ''}
+            <span>${ic('uv-index', 14, 'fill')}UV ${w.uv}</span>
             <span>${ic('wind', 14)}${wind} km/h</span>
           </div>
           <div class="wx-minmax"><span style="color:#60a5fa">↓${w.tmin}°</span>&nbsp; <span style="color:#f97316">↑${w.tmax}°</span></div>
@@ -1778,7 +1809,7 @@ async function loadWeather() {
             <span class="wx-fday">${i === 0 ? 'Holnap' : HU[day.dow]}</span>
             <span class="wx-ficon">${ic(wxIconName(day.code, true), 20)}</span>
             <span class="wx-fcond">${WX_LABELS[day.code] || ''}</span>
-            <span class="wx-frain">${day.precip > 0 ? `${day.precip}%${ic('raindrop', 11)}` : ''}</span>
+            <span class="wx-frain">${day.precip > 0 ? `${day.precip}%${ic('raindrop', 11, 'fill')}` : ''}</span>
             <span class="wx-ftemp-min">${day.tmin}°</span>
             <span class="wx-ftemp-max">${day.tmax}°</span>
           </div>`;
@@ -1789,7 +1820,7 @@ async function loadWeather() {
   }
   try {
     const cached = JSON.parse(localStorage.getItem('flux_wx') || 'null');
-    const fresh = cached && Date.now() - cached.ts < WX_TTL && cached.uv !== undefined && cached.hours && cached.hours.length && cached.days && cached.days.length && cached.sunsetTime;
+    const fresh = cached && Date.now() - cached.ts < WX_TTL && cached.uv !== undefined && cached.hours && cached.hours.length && cached.hours[0]?.precip !== undefined && cached.days && cached.days.length && cached.sunsetTime;
     const newFormat = fresh && !String(cached.hours[0]?.time || '').includes(':');
     if (fresh && newFormat) { renderWx(cached); return; }
   } catch(e) {}
@@ -1811,7 +1842,7 @@ async function loadWeather() {
     }
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
       `&current=temperature_2m,weathercode,apparent_temperature,relative_humidity_2m,wind_speed_10m,uv_index` +
-      `&hourly=temperature_2m,weathercode` +
+      `&hourly=temperature_2m,weathercode,precipitation_probability` +
       `&daily=temperature_2m_max,temperature_2m_min,weathercode,precipitation_probability_max,sunset` +
       `&timezone=auto&forecast_days=7`;
     const d = await fetchT(url, {}, 10000).then(r => r.json());
@@ -1828,6 +1859,7 @@ async function loadWeather() {
           time:     String(hourOfDay),
           temp:     Math.round(d.hourly.temperature_2m[hi]),
           code:     d.hourly.weathercode[hi],
+          precip:   d.hourly.precipitation_probability?.[hi] ?? 0,
           isSunset: hourOfDay === sunsetHour
         });
       }
