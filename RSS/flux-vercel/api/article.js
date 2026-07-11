@@ -39,7 +39,7 @@ const SOURCE_CONFIG = [
     host: 'telex.hu',
     image: [['property', 'og:image']],
     date: [['name', 'article:published_time']],
-    content: (html, url) => cleanupArticleContent(extractElementByClass(html, 'article-html-content') || '', url)
+    content: (html, url) => cleanupArticleContent(extractElementsByClass(html, 'article-html-content').join('\n'), url)
   }
 ];
 const REMOVE_IDS = ['googlePrefBanner'];
@@ -153,6 +153,17 @@ function joinLeadBody(rawLead, rawBody, sourceUrl) {
 function extractElementByClass(html, className) {
   const span = elementSpan(html, { className });
   return span ? html.slice(span.innerStart, span.innerEnd) : '';
+}
+function extractElementsByClass(html, className) {
+  const chunks = [];
+  let offset = 0;
+  while (offset < html.length) {
+    const span = elementSpan(html.slice(offset), { className });
+    if (!span) break;
+    chunks.push(html.slice(offset + span.innerStart, offset + span.innerEnd));
+    offset += span.end;
+  }
+  return chunks;
 }
 function extractElementByClassFrom(html, className, start) {
   const span = elementSpan(html.slice(start), { className });
