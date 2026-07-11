@@ -785,6 +785,11 @@ function sanitizeArticleHtml(html) {
   const d = document.createElement('div');
   d.innerHTML = html || '';
   d.querySelectorAll('script, style, iframe, object, embed, form, input, button').forEach(el => el.remove());
+  d.querySelectorAll('.hint_box svg').forEach(svg => {
+    svg.classList.add('article-hint-icon');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.setAttribute('focusable', 'false');
+  });
   d.querySelectorAll('*').forEach(el => {
     [...el.attributes].forEach(attr => {
       const name = attr.name.toLowerCase();
