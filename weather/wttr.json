@@ -1,18 +1,18 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "26",
-      "FeelsLikeF": "78",
+      "FeelsLikeC": "27",
+      "FeelsLikeF": "80",
       "cloudcover": "0",
-      "humidity": "32",
-      "observation_time": "12:38 PM",
+      "humidity": "30",
+      "observation_time": "02:08 PM",
       "precipInches": "0.0",
       "precipMM": "0.0",
       "pressure": "1016",
       "pressureInches": "30",
-      "temp_C": "26",
-      "temp_F": "79",
-      "uvIndex": "4",
+      "temp_C": "27",
+      "temp_F": "81",
+      "uvIndex": "2",
       "visibility": "10",
       "visibilityMiles": "6",
       "weatherCode": "116",
@@ -26,17 +26,17 @@
           "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0002_sunny_intervals.png"
         }
       ],
-      "winddir16Point": "NW",
-      "winddirDegree": "323",
-      "windspeedKmph": "23",
-      "windspeedMiles": "14"
+      "winddir16Point": "NNW",
+      "winddirDegree": "329",
+      "windspeedKmph": "21",
+      "windspeedMiles": "13"
     }
   ],
   "nearest_area": [
     {
       "areaName": [
         {
-          "value": "Buda"
+          "value": "Ferencvaros"
         }
       ],
       "country": [
@@ -44,8 +44,8 @@
           "value": "Hungary"
         }
       ],
-      "latitude": "47.500",
-      "longitude": "19.033",
+      "latitude": "47.467",
+      "longitude": "19.083",
       "population": "0",
       "region": [
         {
@@ -54,7 +54,7 @@
       ],
       "weatherUrl": [
         {
-          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.5,19.033"
+          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.467,19.083"
         }
       ]
     }
