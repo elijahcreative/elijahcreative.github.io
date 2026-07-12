@@ -4,15 +4,15 @@
       "FeelsLikeC": "26",
       "FeelsLikeF": "79",
       "cloudcover": "0",
-      "humidity": "32",
-      "observation_time": "03:38 PM",
+      "humidity": "37",
+      "observation_time": "05:08 PM",
       "precipInches": "0.0",
       "precipMM": "0.0",
       "pressure": "1016",
       "pressureInches": "30",
-      "temp_C": "27",
-      "temp_F": "81",
-      "uvIndex": "2",
+      "temp_C": "26",
+      "temp_F": "79",
+      "uvIndex": "1",
       "visibility": "10",
       "visibilityMiles": "6",
       "weatherCode": "116",
@@ -27,9 +27,9 @@
         }
       ],
       "winddir16Point": "NNW",
-      "winddirDegree": "328",
-      "windspeedKmph": "22",
-      "windspeedMiles": "14"
+      "winddirDegree": "329",
+      "windspeedKmph": "21",
+      "windspeedMiles": "13"
     }
   ],
   "nearest_area": [
@@ -77,8 +77,8 @@
           "sunset": "08:39 PM"
         }
       ],
-      "avgtempC": "23",
-      "avgtempF": "74",
+      "avgtempC": "24",
+      "avgtempF": "75",
       "date": "2026-07-12",
       "hourly": [
         {
@@ -408,16 +408,16 @@
           "chanceofsunshine": "61",
           "chanceofthunder": "0",
           "chanceofwindy": "2",
-          "cloudcover": "30",
+          "cloudcover": "0",
           "diffRad": "142.8",
-          "humidity": "35",
+          "humidity": "37",
           "precipInches": "0.0",
           "precipMM": "0.0",
-          "pressure": "1015",
+          "pressure": "1016",
           "pressureInches": "30",
           "shortRad": "429.0",
-          "tempC": "27",
-          "tempF": "80",
+          "tempC": "26",
+          "tempF": "79",
           "time": "1800",
           "uvIndex": "1",
           "visibility": "10",
@@ -490,8 +490,8 @@
           "windspeedMiles": "7"
         }
       ],
-      "maxtempC": "27",
-      "maxtempF": "81",
+      "maxtempC": "28",
+      "maxtempF": "82",
       "mintempC": "19",
       "mintempF": "66",
       "sunHour": "16.0",
@@ -925,7 +925,7 @@
       "maxtempC": "31",
       "maxtempF": "89",
       "mintempC": "18",
-      "mintempF": "64",
+      "mintempF": "65",
       "sunHour": "15.0",
       "totalSnow_cm": "0.0",
       "uvIndex": "8"
@@ -941,8 +941,8 @@
           "sunset": "08:38 PM"
         }
       ],
-      "avgtempC": "27",
-      "avgtempF": "81",
+      "avgtempC": "28",
+      "avgtempF": "82",
       "date": "2026-07-14",
       "hourly": [
         {
@@ -1354,10 +1354,10 @@
           "windspeedMiles": "4"
         }
       ],
-      "maxtempC": "33",
-      "maxtempF": "92",
-      "mintempC": "20",
-      "mintempF": "68",
+      "maxtempC": "34",
+      "maxtempF": "94",
+      "mintempC": "21",
+      "mintempF": "70",
       "sunHour": "15.0",
       "totalSnow_cm": "0.0",
       "uvIndex": "7"
