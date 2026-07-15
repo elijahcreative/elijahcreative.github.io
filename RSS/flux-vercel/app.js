@@ -6,7 +6,7 @@ const YOUTUBE_API = '/api/youtube?input=';
 const FEED_API    = '/api/feed?input=';
 const CACHE_TTL   = 5 * 60 * 1000; // 5 minutes
 const FEED_ARTICLE_LIMIT = 20;
-const ARTICLE_HOSTS = new Set(['telex.hu','www.telex.hu','index.hu','www.index.hu','hvg.hu','www.hvg.hu','portfolio.hu','www.portfolio.hu']);
+const ARTICLE_HOSTS = new Set(['telex.hu','www.telex.hu','index.hu','www.index.hu','hvg.hu','www.hvg.hu','portfolio.hu','www.portfolio.hu','444.hu','www.444.hu','24.hu','www.24.hu']);
 try { history.scrollRestoration = 'manual'; } catch(e) {}
 let activeArticleMode = null;
 let articleListSnapshot = null;
@@ -341,8 +341,13 @@ const Fetcher = {
     return d.textContent || '';
   },
   _img(html) {
-    const m = html.match(/<img[^>]+src=["']([^"']+)["']/i);
-    return m ? m[1] : null;
+    const src = html.match(/<img\b[^>]*(?:src|data-src|data-original)=["']([^"']+)["']/i)?.[1]
+      || html.match(/<img\b[^>]*srcset=["']([^"']+)["']/i)?.[1]?.split(',')[0]?.trim().split(/\s+/)[0];
+    return src ? this._cleanImg(src) : null;
+  },
+  _cleanImg(src) {
+    const url = decodeEntities(String(src || '').trim());
+    return url.startsWith('//') ? 'https:' + url : url;
   },
   bust(url) { this._cache.delete(url); }
 };

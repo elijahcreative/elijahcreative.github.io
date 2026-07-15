@@ -6,7 +6,11 @@ const ARTICLE_HOSTS = new Set([
   'hvg.hu',
   'www.hvg.hu',
   'portfolio.hu',
-  'www.portfolio.hu'
+  'www.portfolio.hu',
+  '444.hu',
+  'www.444.hu',
+  '24.hu',
+  'www.24.hu'
 ]);
 const SOURCE_CONFIG = [
   {
@@ -40,6 +44,20 @@ const SOURCE_CONFIG = [
     image: [['property', 'og:image']],
     date: [['name', 'article:published_time']],
     content: (html, url) => cleanupArticleContent(extractElementsByClass(html, 'article-html-content').join('\n'), url)
+  },
+  {
+    source: '444',
+    host: '444.hu',
+    image: [['property', 'og:image'], ['name', 'twitter:image']],
+    date: [['property', 'article:published_time']],
+    content: (html, url) => extract444Content(html, url)
+  },
+  {
+    source: '24',
+    host: '24.hu',
+    image: [['property', 'og:image'], ['property', 'og:image:secure_url'], ['name', 'twitter:image']],
+    date: [['property', 'article:published_time'], ['itemprop', 'datePublished']],
+    content: (html, url) => joinLeadBody(extractElementByClass(html, 'o-post__lead'), extractElementByClass(html, 'o-post__body'), url)
   }
 ];
 const REMOVE_IDS = ['googlePrefBanner'];
@@ -65,14 +83,19 @@ const REMOVE_CLASSES = [
   'article-series-box',
   'recommendation-box',
   'newsletter-box',
-  'chart-trader-ad'
+  'chart-trader-ad',
+  'banner-container',
+  'm-articleWidget',
+  'm-articleListWidget',
+  'article_box_border_szponzibox'
 ];
 const STRIP_PATTERNS = [
   /<script\b[\s\S]*?<\/script>/gi,
   /<style\b[\s\S]*?<\/style>/gi,
   /<iframe\b[\s\S]*?<\/iframe>/gi,
   /<p\b[^>]*class=["'][^"']*\bad\b[^"']*["'][^>]*>[\s\S]*?<\/p>/gi,
-  /<div\b[^>]*class=["'][^"']*\bplaceholder\b[^"']*["'][^>]*>[\s\S]*?<\/div>/gi
+  /<div\b[^>]*class=["'][^"']*\bplaceholder\b[^"']*["'][^>]*>[\s\S]*?<\/div>/gi,
+  /<p>\s*The post[\s\S]*?first appeared on[\s\S]*?<\/p>/gi
 ];
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -149,6 +172,55 @@ function joinLeadBody(rawLead, rawBody, sourceUrl) {
   const body = cleanupArticleContent(rawBody || '', sourceUrl);
   const content = [lead ? `<p>${lead}</p>` : '', body].join('\n').trim();
   return content;
+}
+function extract444Content(html, sourceUrl) {
+  const article = extract444Article(html, sourceUrl);
+  if (!article) return '';
+  const blocks = flatten444Blocks(article.body);
+  const content = blocks.map(block => render444Block(block, sourceUrl)).filter(Boolean).join('\n');
+  return cleanupArticleContent(content, sourceUrl);
+}
+function extract444Article(html, sourceUrl) {
+  const raw = extractElementById(html, 'shoebox-apollo-cache');
+  if (!raw) return null;
+  let data;
+  try {
+    data = JSON.parse(raw);
+  } catch {
+    return null;
+  }
+  const cache = data.cache || data;
+  const articles = Object.values(cache).filter(item => item && Array.isArray(item.body));
+  const wanted = normalizeArticleUrl(sourceUrl);
+  return articles.find(item => normalizeArticleUrl(item.url) === wanted) || articles[0] || null;
+}
+function flatten444Blocks(value) {
+  if (!value) return [];
+  if (Array.isArray(value)) return value.flatMap(flatten444Blocks);
+  if (typeof value === 'object') {
+    if (value.type) return [value];
+    return Object.values(value).flatMap(flatten444Blocks);
+  }
+  return [];
+}
+function render444Block(block, sourceUrl) {
+  const type = String(block.type || '').replace(/^core\//, '');
+  const content = String(block.content || '').trim();
+  if (type === 'paragraph') return content ? `<p>${content}</p>` : '';
+  if (type === 'heading') return content ? `<h3>${content}</h3>` : '';
+  if (type === 'quote' || type === 'blockquote') return content ? `<blockquote>${content}</blockquote>` : '';
+  if (type === 'list') return content;
+  if (type !== 'image') return '';
+
+  const media = block.params?.mediaItem || {};
+  const src = media.url || block.params?.src || '';
+  if (!src) return '';
+  const caption = [block.content, media.caption, media.author]
+    .map(part => plainText(part || ''))
+    .filter(Boolean)
+    .join(' ');
+  const img = `<img src="${escapeAttr(absoluteUrl(src, sourceUrl))}" alt="${escapeAttr(caption)}">`;
+  return caption ? `<figure>${img}<figcaption>${escapeHtml(caption)}</figcaption></figure>` : img;
 }
 function extractElementByClass(html, className) {
   const span = elementSpan(html, { className });
@@ -256,6 +328,35 @@ function decodeHtml(text) {
     .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>');
+}
+function normalizeArticleUrl(url) {
+  try {
+    const u = new URL(url);
+    u.hash = '';
+    u.search = '';
+    return u.href.replace(/\/+$/, '');
+  } catch {
+    return String(url || '').split(/[?#]/)[0].replace(/\/+$/, '');
+  }
+}
+function absoluteUrl(url, sourceUrl) {
+  try {
+    if (String(url).startsWith('//')) return 'https:' + url;
+    return new URL(url, sourceUrl).href;
+  } catch {
+    return url;
+  }
+}
+function escapeHtml(text) {
+  return String(text || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+function escapeAttr(text) {
+  return escapeHtml(text).replace(/`/g, '&#96;');
 }
 function escapeRe(text) {
   return String(text).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
