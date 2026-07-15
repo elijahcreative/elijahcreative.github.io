@@ -315,11 +315,11 @@ const Fetcher = {
     const doc = new DOMParser().parseFromString(xml, 'application/xml');
     return [...doc.querySelectorAll('item, entry')].map(el => {
       const qs = s => el.querySelector(s)?.textContent?.trim() || '';
-      const link = qs('link') || el.querySelector('link')?.getAttribute('href') || '';
-      const desc = qs('description') || qs('summary');
-      const content = qs('content\\:encoded') || qs('content') || desc;
-      const enc = el.querySelector('enclosure')?.getAttribute('url');
-      const media = el.querySelector('media\\:content, media\\:thumbnail')?.getAttribute('url');
+      const link = this._xmlText(el, ['link']) || el.querySelector('link')?.getAttribute('href') || '';
+      const desc = this._xmlText(el, ['description', 'summary']);
+      const content = this._xmlText(el, ['content:encoded', 'encoded', 'content']) || desc;
+      const enc = this._xmlAttr(el, ['enclosure'], 'url') || this._xmlAttr(el, ['enclosure'], 'thumbnail');
+      const media = this._xmlAttr(el, ['media:content', 'media:thumbnail'], 'url');
       const author = qs('dc\\:creator') || el.querySelector('author > name')?.textContent?.trim() || qs('author');
       return {
         id:         qs('guid') || qs('id') || link,
@@ -334,6 +334,22 @@ const Fetcher = {
         feedUrl
       };
     });
+  },
+  _xmlText(el, names) {
+    for (const name of names) {
+      const found = el.getElementsByTagName(name)[0] || el.querySelector(name.replace(':', '\\:'));
+      const text = found?.textContent?.trim();
+      if (text) return text;
+    }
+    return '';
+  },
+  _xmlAttr(el, names, attr) {
+    for (const name of names) {
+      const found = el.getElementsByTagName(name)[0] || el.querySelector(name.replace(':', '\\:'));
+      const value = found?.getAttribute(attr);
+      if (value) return value;
+    }
+    return '';
   },
   _strip(html) {
     const d = document.createElement('div');

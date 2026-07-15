@@ -50,7 +50,7 @@ const SOURCE_CONFIG = [
     host: '444.hu',
     image: [['property', 'og:image'], ['name', 'twitter:image']],
     date: [['property', 'article:published_time']],
-    content: (html, url) => extract444Content(html, url)
+    content: (html, url, ctx) => extract444Content(html, url, ctx)
   },
   {
     source: '24',
@@ -141,15 +141,16 @@ async function handleArticle(req, res) {
 }
 function extractArticleForHost(articleUrl, html) {
   const cfg = SOURCE_CONFIG.find(s => articleUrl.hostname.includes(s.host)) || SOURCE_CONFIG.at(-1);
+  const image = metaFirst(html, cfg.image);
   return {
     source: cfg.source,
     url: articleUrl.href,
     title: metaFirst(html, [['property', 'og:title']]) || textBetween(html, '<h1', '</h1>'),
     desc: metaFirst(html, [['property', 'og:description'], ['name', 'description']]),
-    image: metaFirst(html, cfg.image),
+    image,
     date: metaFirst(html, cfg.date),
     author: metaFirst(html, [['name', 'author'], ['property', 'article:author'], ['name', 'dc.creator']]),
-    content: cfg.content(html, articleUrl.href)
+    content: cfg.content(html, articleUrl.href, { image })
   };
 }
 function extractIndexLiveblogEntry(html, sourceUrl) {
@@ -173,11 +174,20 @@ function joinLeadBody(rawLead, rawBody, sourceUrl) {
   const content = [lead ? `<p>${lead}</p>` : '', body].join('\n').trim();
   return content;
 }
-function extract444Content(html, sourceUrl) {
+function extract444Content(html, sourceUrl, ctx = {}) {
   const article = extract444Article(html, sourceUrl);
   if (!article) return '';
   const blocks = flatten444Blocks(article.body);
-  const content = blocks.map(block => render444Block(block, sourceUrl)).filter(Boolean).join('\n');
+  const seenImages = new Set();
+  const content = blocks.map(block => {
+    const src = imageSrc444(block);
+    if (src) {
+      const key = imageKey(src);
+      if (!key || seenImages.has(key) || imageKey(ctx.image) === key) return '';
+      seenImages.add(key);
+    }
+    return render444Block(block, sourceUrl);
+  }).filter(Boolean).join('\n');
   return cleanupArticleContent(content, sourceUrl);
 }
 function extract444Article(html, sourceUrl) {
@@ -213,7 +223,7 @@ function render444Block(block, sourceUrl) {
   if (type !== 'image') return '';
 
   const media = block.params?.mediaItem || {};
-  const src = media.url || block.params?.src || '';
+  const src = imageSrc444(block);
   if (!src) return '';
   const caption = [block.content, media.caption, media.author]
     .map(part => plainText(part || ''))
@@ -221,6 +231,10 @@ function render444Block(block, sourceUrl) {
     .join(' ');
   const img = `<img src="${escapeAttr(absoluteUrl(src, sourceUrl))}" alt="${escapeAttr(caption)}">`;
   return caption ? `<figure>${img}<figcaption>${escapeHtml(caption)}</figcaption></figure>` : img;
+}
+function imageSrc444(block) {
+  if (!block || String(block.type || '').replace(/^core\//, '') !== 'image') return '';
+  return block.params?.mediaItem?.url || block.params?.src || '';
 }
 function extractElementByClass(html, className) {
   const span = elementSpan(html, { className });
@@ -345,6 +359,16 @@ function absoluteUrl(url, sourceUrl) {
     return new URL(url, sourceUrl).href;
   } catch {
     return url;
+  }
+}
+function imageKey(url) {
+  if (!url) return '';
+  const cleanName = name => String(name || '').replace(/-(?:xs|sm|md|lg|xl|full)(?=\.[a-z0-9]+$)/i, '');
+  try {
+    const u = new URL(String(url).startsWith('//') ? 'https:' + url : url);
+    return cleanName(u.pathname.split('/').filter(Boolean).pop() || '');
+  } catch {
+    return cleanName(String(url).split(/[?#]/)[0].split('/').filter(Boolean).pop() || '');
   }
 }
 function escapeHtml(text) {
