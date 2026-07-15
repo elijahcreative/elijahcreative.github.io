@@ -806,6 +806,7 @@ function sanitizeArticleHtml(html) {
   const d = document.createElement('div');
   d.innerHTML = html || '';
   d.querySelectorAll('script, style, iframe, object, embed, form, input, button').forEach(el => el.remove());
+  normalizeArticleImageCaptions(d);
   d.querySelectorAll('.hint_box svg').forEach(svg => {
     svg.classList.add('article-hint-icon');
     svg.setAttribute('aria-hidden', 'true');
@@ -820,6 +821,22 @@ function sanitizeArticleHtml(html) {
     });
   });
   return d.innerHTML;
+}
+function normalizeArticleImageCaptions(root) {
+  root.querySelectorAll('figcaption, .article-image-meta, .wp-caption-text, .caption, .image-caption, .photo-caption, .figure-caption').forEach(el => {
+    el.classList.add('article-image-meta');
+  });
+  root.querySelectorAll('img').forEach(img => {
+    const block = img.closest('figure') || img;
+    const next = block.nextElementSibling;
+    if (next && next.matches('p, div') && isImageCreditText(next.textContent)) {
+      next.classList.add('article-image-meta');
+    }
+  });
+}
+function isImageCreditText(text) {
+  const value = normalizeText(text);
+  return value.length > 0 && value.length <= 180 && /(^|\b)(fotó|foto|photo|kép|képek|forrás|source|mti|getty|reuters|afp|ap|epa|facebook|instagram|youtube|linkedin)(\b|:)/i.test(value);
 }
 function aid(a) {
   const src = a.id || a.url || a.title || '';

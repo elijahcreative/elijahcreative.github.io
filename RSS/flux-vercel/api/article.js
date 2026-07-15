@@ -225,16 +225,25 @@ function render444Block(block, sourceUrl) {
   const media = block.params?.mediaItem || {};
   const src = imageSrc444(block);
   if (!src) return '';
-  const caption = [block.content, media.caption, media.author]
-    .map(part => plainText(part || ''))
-    .filter(Boolean)
-    .join(' ');
+  const captionParts = uniqueTextParts([block.content, media.caption, media.author]);
+  const caption = captionParts.join(' ');
   const img = `<img src="${escapeAttr(absoluteUrl(src, sourceUrl))}" alt="${escapeAttr(caption)}">`;
-  return caption ? `<figure>${img}<figcaption>${escapeHtml(caption)}</figcaption></figure>` : img;
+  return captionParts.length ? `<figure>${img}<figcaption class="article-image-meta">${captionParts.map((part, i) =>
+    `${i ? '<span class="meta-sep" aria-hidden="true"></span>' : ''}<span>${escapeHtml(part)}</span>`
+  ).join('')}</figcaption></figure>` : img;
 }
 function imageSrc444(block) {
   if (!block || String(block.type || '').replace(/^core\//, '') !== 'image') return '';
   return block.params?.mediaItem?.url || block.params?.src || '';
+}
+function uniqueTextParts(parts) {
+  const seen = new Set();
+  return parts.map(part => plainText(part || '')).filter(part => {
+    const key = part.toLowerCase();
+    if (!part || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 function extractElementByClass(html, className) {
   const span = elementSpan(html, { className });

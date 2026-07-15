@@ -372,10 +372,16 @@ body { position: relative; display: block; height: 100vh; height: 100dvh; overfl
 .article-save-btn.saved { color: var(--ac); }
 .article-hero-img { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: var(--radius); margin-bottom: 22px; }
 .article-content { color: var(--text2); font-size: 1.02rem; line-height: 1.85; }
+.article-content figure { margin: 18px 0 1.15em; }
+.article-content figure img { display: block; margin: 0; }
 .article-content img { max-width: 100%; height: auto; border-radius: var(--radius-sm); margin: 14px 0; }
+.article-content figcaption,
+.article-content .article-image-meta { color: var(--muted); font-size: .8rem; font-weight: 500; line-height: 1.35; text-transform: uppercase; margin-top: 7px; display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
 .article-content svg { max-width: 1.1em; max-height: 1.1em; }
 .article-content p { margin: 0 0 1.05em; }
 .article-content p:first-child { color: var(--text); font-size: 1.12em; font-weight: 700; line-height: 1.72; }
+.article-content p.article-image-meta,
+.article-content p.article-image-meta:first-child { color: var(--muted); font-size: .8rem; font-weight: 500; line-height: 1.35; margin: 7px 0 1.15em; }
 .article-content a { color: var(--ac); font-weight: 700; text-decoration: none; }
 .article-content a:hover { text-decoration: underline; }
 .article-content .hint_box { display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 10px; align-items: start; margin: 1.4em 0 0; color: var(--muted); font-size: .88rem; line-height: 1.55; }
