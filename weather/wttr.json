@@ -1,18 +1,18 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "21",
-      "FeelsLikeF": "70",
+      "FeelsLikeC": "24",
+      "FeelsLikeF": "76",
       "cloudcover": "75",
-      "humidity": "88",
-      "observation_time": "05:08 AM",
+      "humidity": "83",
+      "observation_time": "08:08 AM",
       "precipInches": "0.0",
-      "precipMM": "0.0",
+      "precipMM": "0.5",
       "pressure": "1017",
       "pressureInches": "30",
-      "temp_C": "21",
-      "temp_F": "70",
-      "uvIndex": "0",
+      "temp_C": "22",
+      "temp_F": "72",
+      "uvIndex": "2",
       "visibility": "10",
       "visibilityMiles": "6",
       "weatherCode": "296",
@@ -26,8 +26,8 @@
           "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0017_cloudy_with_light_rain.png"
         }
       ],
-      "winddir16Point": "E",
-      "winddirDegree": "88",
+      "winddir16Point": "SSW",
+      "winddirDegree": "209",
       "windspeedKmph": "4",
       "windspeedMiles": "2"
     }
@@ -255,34 +255,34 @@
           "chanceofsunshine": "8",
           "chanceofthunder": "0",
           "chanceofwindy": "0",
-          "cloudcover": "84",
+          "cloudcover": "75",
           "diffRad": "155.8",
-          "humidity": "44",
+          "humidity": "83",
           "precipInches": "0.0",
           "precipMM": "0.5",
           "pressure": "1017",
           "pressureInches": "30",
           "shortRad": "298.7",
-          "tempC": "26",
-          "tempF": "79",
+          "tempC": "22",
+          "tempF": "72",
           "time": "900",
           "uvIndex": "2",
-          "visibility": "9",
-          "visibilityMiles": "5",
-          "weatherCode": "176",
+          "visibility": "10",
+          "visibilityMiles": "6",
+          "weatherCode": "296",
           "weatherDesc": [
             {
-              "value": "Patchy rain nearby"
+              "value": "Light rain"
             }
           ],
           "weatherIconUrl": [
             {
-              "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0009_light_rain_showers.png"
+              "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0017_cloudy_with_light_rain.png"
             }
           ],
           "winddir16Point": "SSW",
           "winddirDegree": "209",
-          "windspeedKmph": "3",
+          "windspeedKmph": "4",
           "windspeedMiles": "2"
         },
         {
