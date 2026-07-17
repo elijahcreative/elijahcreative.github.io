@@ -1,18 +1,18 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "34",
-      "FeelsLikeF": "93",
+      "FeelsLikeC": "32",
+      "FeelsLikeF": "90",
       "cloudcover": "0",
-      "humidity": "28",
-      "observation_time": "02:18 PM",
+      "humidity": "32",
+      "observation_time": "03:48 PM",
       "precipInches": "0.0",
       "precipMM": "0.0",
-      "pressure": "1012",
+      "pressure": "1011",
       "pressureInches": "30",
       "temp_C": "34",
       "temp_F": "94",
-      "uvIndex": "3",
+      "uvIndex": "1",
       "visibility": "10",
       "visibilityMiles": "6",
       "weatherCode": "113",
@@ -26,8 +26,8 @@
           "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0001_sunny.png"
         }
       ],
-      "winddir16Point": "N",
-      "winddirDegree": "10",
+      "winddir16Point": "NNE",
+      "winddirDegree": "20",
       "windspeedKmph": "4",
       "windspeedMiles": "2"
     }
@@ -78,7 +78,7 @@
         }
       ],
       "avgtempC": "29",
-      "avgtempF": "85",
+      "avgtempF": "84",
       "date": "2026-07-17",
       "hourly": [
         {
@@ -490,11 +490,11 @@
           "windspeedMiles": "4"
         }
       ],
-      "maxtempC": "35",
-      "maxtempF": "96",
+      "maxtempC": "36",
+      "maxtempF": "97",
       "mintempC": "22",
       "mintempF": "72",
-      "sunHour": "15.0",
+      "sunHour": "12.0",
       "totalSnow_cm": "0.0",
       "uvIndex": "8"
     },
@@ -509,8 +509,8 @@
           "sunset": "08:34 PM"
         }
       ],
-      "avgtempC": "29",
-      "avgtempF": "85",
+      "avgtempC": "27",
+      "avgtempF": "80",
       "date": "2026-07-18",
       "hourly": [
         {
@@ -922,10 +922,10 @@
           "windspeedMiles": "13"
         }
       ],
-      "maxtempC": "35",
-      "maxtempF": "95",
-      "mintempC": "25",
-      "mintempF": "76",
+      "maxtempC": "32",
+      "maxtempF": "90",
+      "mintempC": "21",
+      "mintempF": "70",
       "sunHour": "15.0",
       "totalSnow_cm": "0.0",
       "uvIndex": "8"
@@ -941,8 +941,8 @@
           "sunset": "08:33 PM"
         }
       ],
-      "avgtempC": "26",
-      "avgtempF": "80",
+      "avgtempC": "27",
+      "avgtempF": "81",
       "date": "2026-07-19",
       "hourly": [
         {
@@ -1354,11 +1354,11 @@
           "windspeedMiles": "5"
         }
       ],
-      "maxtempC": "32",
-      "maxtempF": "90",
+      "maxtempC": "35",
+      "maxtempF": "95",
       "mintempC": "20",
-      "mintempF": "69",
-      "sunHour": "15.0",
+      "mintempF": "68",
+      "sunHour": "14.0",
       "totalSnow_cm": "0.0",
       "uvIndex": "8"
     }
