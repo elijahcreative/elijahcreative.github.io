@@ -1,30 +1,30 @@
 {
   "Podiums": [
     {
-      "Country": "🇬🇧 Great Britain",
-      "City": "Silverstone",
+      "Country": "🇧🇪 Belgium",
+      "City": "Stavelot",
       "Message": "Race ?"
     },
     {
       "Place": "1",
-      "Name": "Leclerc",
-      "Team": "Ferrari",
+      "Name": "Antonelli",
+      "Team": "Mercedes",
       "Points": "+25",
-      "Total": "108"
+      "Total": "204"
     },
     {
       "Place": "2",
-      "Name": "Russell",
-      "Team": "Mercedes",
+      "Name": "Leclerc",
+      "Team": "Ferrari",
       "Points": "+18",
-      "Total": "154"
+      "Total": "126"
     },
     {
       "Place": "3",
-      "Name": "Hamilton",
-      "Team": "Ferrari",
+      "Name": "Verstappen",
+      "Team": "Red Bull",
       "Points": "+15",
-      "Total": "147"
+      "Total": "91"
     }
   ]
 }
