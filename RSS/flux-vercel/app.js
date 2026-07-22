@@ -96,6 +96,7 @@ const S = {
   ytMiniCorner:  'tr',
   ytMiniSize:    'm',
   showYoutube:   true,
+  sectionView:   false,
   readerMode:    'fullscreen',
   showArticleMore: true,
   articleMoreColumns: 3,
@@ -136,7 +137,21 @@ function clampInt(value, min, max, fallback) {
   const n = Number.parseInt(value, 10);
   return Number.isFinite(n) ? Math.max(min, Math.min(max, n)) : fallback;
 }
-const SETTINGS_KEYS = ['layout','theme','preset','customAccent','fontSize','activeUrl','ytPerChannel','ytMaxChannels','ytColumns','ytRows','ytSortMode','ytMiniCorner','ytMiniSize','showYoutube','readerMode','showArticleMore','articleMoreColumns','articleMoreRows','lastUpdated','showWeather','showF1'];
+const SETTINGS_KEYS = ['layout','theme','preset','customAccent','fontSize','activeUrl','ytPerChannel','ytMaxChannels','ytColumns','ytRows','ytSortMode','ytMiniCorner','ytMiniSize','showYoutube','sectionView','readerMode','showArticleMore','articleMoreColumns','articleMoreRows','lastUpdated','showWeather','showF1'];
+const SECTION_RULES = [
+  { id: 'kozelet',  label: 'Közélet',  keys: ['belfold', 'kozelet', 'politika', 'valasztas', 'kormany', 'onkormanyzat'] },
+  { id: 'kulfold',  label: 'Külföld',  keys: ['kulfold', 'vilag', 'europa', 'eu', 'usa', 'ukrajna', 'oroszorszag'] },
+  { id: 'gazdasag', label: 'Gazdaság', keys: ['gazdasag', 'uzlet', 'penz', 'penzugy', 'tozsde', 'makro', 'vallalat', 'ingatlan'] },
+  { id: 'tech',     label: 'Technológia', keys: ['tech', 'technologia', 'tudomany', 'digital', 'ai', 'mesterséges intelligencia', 'hardver', 'szoftver'] },
+  { id: 'kultura',  label: 'Kultúra',  keys: ['kultura', 'film', 'zene', 'konyv', 'szinhaz', 'media'] },
+  { id: 'sport',    label: 'Sport',    keys: ['sport', 'foci', 'forma-1', 'formula-1', 'f1', 'tenisz'] },
+  { id: 'eletmod',  label: 'Életmód',  keys: ['eletmod', 'egeszseg', 'gasztro', 'utazas', 'otthon', 'auto'] },
+  { id: 'velemeny', label: 'Vélemény', keys: ['velemeny', 'publicisztika', 'kommentar', 'elemzes', 'interju'] }
+];
+const MAGAZINE_TOPIC_INSERTS = [
+  { id: 'gazdasag', label: 'Gazdaság', icon: 'chart', subtitle: 'piacok, cégek, pénz' },
+  { id: 'tech', label: 'Technológia', icon: 'chip', subtitle: 'digitális világ és tudomány' }
+];
 function saveSettings() {
   Store.set('flux_s', Object.fromEntries(SETTINGS_KEYS.map(k => [k, S[k]])));
 }
@@ -161,6 +176,7 @@ function loadStorage() {
     ytMiniCorner: ['tl','tr','bl','br'].includes(s.ytMiniCorner) ? s.ytMiniCorner : 'tr',
     ytMiniSize: ['s','m','l'].includes(s.ytMiniSize) ? s.ytMiniSize : 'm',
     showYoutube: s.showYoutube !== false,
+    sectionView: s.sectionView === true,
     readerMode: s.readerMode || (window.matchMedia?.('(max-width: 720px)').matches ? 'modal' : 'fullscreen'),
     showArticleMore: s.showArticleMore !== false,
     articleMoreColumns: clampInt(s.articleMoreColumns, 1, 4, 3),
@@ -450,32 +466,75 @@ const Renderer = {
     return `<footer class="ix-footer"><button class="ix-footer-brand" type="button"><span class="ix-footer-mark"></span>Flux</button>${parts.map(p => `<span class="ix-footer-sep">·</span><span>${e(p)}</span>`).join('')}</footer>`;
   },
   _magazine(articles) {
+    const used = new Set();
     const pool = [...articles.filter(a => a.image), ...articles.filter(a => !a.image)];
     let idx = 0;
-    const take = n => pool.slice(idx, idx += n);
+    const take = n => {
+      const items = [];
+      while (idx < pool.length && items.length < n) {
+        const item = pool[idx++];
+        if (!item || used.has(aid(item))) continue;
+        used.add(aid(item));
+        items.push(item);
+      }
+      return items;
+    };
+    const topicBox = topic => {
+      if (!S.sectionView) return '';
+      const html = this._magazineTopicBox(articles, topic, used);
+      return html || '';
+    };
     const [hero] = take(1);
     if (!hero) return '';
     const heroHtml = `<div class="ix-hero" data-id="${aid(hero)}">${this._ixImg(hero, 'ix-hero-img', 'ix-hero-nobg', 'hero-wrap')}<div class="ix-hero-body"><div class="ix-hero-title">${e(hero.title)}</div>${this._desc(hero, 'ix-hero-desc')}<div class="ix-hero-time">${this._meta(hero, 'ix-hero-source')}</div></div></div>`;
     const side = take(4);
     const heroSep = '<div class="ix-hero-separator"><span></span><span></span><span></span></div>';
     const rowSep = '<div class="ix-section-separator"><span></span><span></span><span></span></div>';
-    const sideHtml = side.length ? `<div class="ix-hero-cluster"><div class="ix-hero-main">${heroHtml}</div><div class="ix-hero-side"><div class="ix-hero-side-head"><span>FONTOS</span></div>${this._card(side[0], 'ix')}${side.slice(1).map(a => this._card(a, 'heroMini')).join('')}</div></div>${heroSep}` : `<div class="ix-hero-main">${heroHtml}</div>${heroSep}`;
-    const rows = [1, 0].map(row => {
-      if (pool.length - idx < 2) return '';
-      const [big] = take(1), [small] = take(1), fills = take(2);
+    const hasYoutubeSlot = S.showYoutube && S.ytChannels.length;
+    const sideHtml = side.length ? `<div class="ix-hero-cluster"><div class="ix-hero-main">${heroHtml}</div><div class="ix-hero-side"><div class="ix-hero-side-head"><span>FONTOS</span></div>${this._card(side[0], 'ix')}${side.slice(1).map(a => this._card(a, 'heroMini')).join('')}</div></div>${hasYoutubeSlot ? '' : heroSep}` : `<div class="ix-hero-main">${heroHtml}</div>${hasYoutubeSlot ? '' : heroSep}`;
+    const rows = [1, 0].map((row, i) => {
+      const rowItems = take(4);
+      if (rowItems.length < 2) return '';
+      const [big, small, ...fills] = rowItems;
       const sideCol = `<div class="ix-col-side">${this._card(small, 'ix')}${fills.map(a => this._card(a, 'fill')).join('')}</div>`;
-      return `<div class="ix-row ${row ? 'row-b' : 'row-a'}">${row ? sideCol + this._card(big, 'ix') : this._card(big, 'ix') + sideCol}</div>${rowSep}`;
+      const topicHtml = topicBox(MAGAZINE_TOPIC_INSERTS[i]);
+      return `<div class="ix-row ${row ? 'row-b' : 'row-a'}">${row ? sideCol + this._card(big, 'ix') : this._card(big, 'ix') + sideCol}</div>${topicHtml || rowSep}`;
     }).join('');
     const trioHtml = this._section('ix-trio', take(3), a => this._card(a, 'ix'));
     const miniHtml = items => this._section('ix-mini-grid', items, a => this._card(a, 'mini'));
     const mini1Html = miniHtml(take(7));
-    const rest = pool.slice(idx);
+    const rest = pool.slice(idx).filter(a => !used.has(aid(a)));
     const stripItems = rest.slice(-10);
     const mini2Html = miniHtml(rest.slice(0, -10));
     const stripCols = [stripItems.slice(0, 4), stripItems.slice(4, 7), stripItems.slice(7, 10)];
     const stripHtml = stripItems.length ? `<div class="ix-strip">${stripCols.map((col, i) => `<div class="ix-strip-col">${col.map(a => this._card(a, i ? 'strip' : 'strip', !i)).join('')}</div>`).join('')}</div>` : '';
     const stripSep = stripItems.length ? rowSep.replace('ix-section-separator', 'ix-section-separator ix-strip-separator') : '';
     return `<div class="magazine-layout">${sideHtml}${rows}${trioHtml}${mini1Html}${mini2Html}${stripSep}${stripHtml}${this._footer(articles)}</div>`;
+  },
+  _magazineTopicBox(articles, topic, used) {
+    if (!topic) return '';
+    const items = articles
+      .filter(a => !used.has(aid(a)) && primarySectionRule(a)?.id === topic.id)
+      .sort((a, b) => b.date - a.date);
+    if (items.length < 2) return '';
+    const photoItems = items.filter(a => a.image).slice(0, 4);
+    const photoIds = new Set(photoItems.map(aid));
+    const miniItems = items.filter(a => !photoIds.has(aid(a)) && a.image).slice(0, 4);
+    const miniIds = new Set(miniItems.map(aid));
+    const textItems = items.filter(a => !photoIds.has(aid(a)) && !miniIds.has(aid(a))).slice(0, 9);
+    [...photoItems, ...miniItems, ...textItems].forEach(a => used.add(aid(a)));
+    return `<section class="ix-topic-box ix-topic-box-${e(topic.id)}">
+      <div class="ix-topic-box-head">${topicIcon(topic.icon)}<span>${e(topic.label)}</span><em>— ${e(topic.subtitle || '')}</em></div>
+      ${photoItems.length ? `<div class="ix-topic-photo-row count-${photoItems.length}">${photoItems.map(a => this._topicPhotoItem(a)).join('')}</div>` : ''}
+      ${miniItems.length ? `<div class="ix-topic-mini-row">${miniItems.map(a => this._topicMiniItem(a)).join('')}</div>` : ''}
+      ${textItems.length ? `<div class="ix-topic-link-list">${textItems.map(a => `<div class="ix-topic-link" data-id="${aid(a)}"><div class="ix-topic-link-title">${e(a.title)}</div><div class="ix-topic-link-meta">${this._meta(a, 'ix-topic-link-source')}</div></div>`).join('')}</div>` : ''}
+    </section>`;
+  },
+  _topicPhotoItem(a) {
+    return `<div class="ix-topic-photo-item" data-id="${aid(a)}">${this._ixImg(a, 'ix-topic-photo-img', 'ix-topic-photo-nobg')}<div class="ix-topic-photo-title">${e(a.title)}</div>${this._desc(a, 'ix-topic-photo-desc')}<div class="ix-topic-photo-meta">${this._meta(a, 'ix-topic-photo-source')}</div></div>`;
+  },
+  _topicMiniItem(a) {
+    return `<div class="ix-topic-mini-item" data-id="${aid(a)}">${this._rawImg(a, 'ix-topic-mini-img', 'ix-topic-mini-nobg')}<div class="ix-topic-mini-body"><div class="ix-topic-mini-title">${e(a.title)}</div><div class="ix-topic-mini-meta">${this._meta(a, 'ix-topic-mini-source')}</div></div></div>`;
   }
 };
 async function openArticle(id) {
@@ -990,6 +1049,43 @@ function renderMobileFeedPanel() {
 function closeMobileFeedPanel() {
   $('mobileFeedPanel')?.classList.remove('open');
 }
+function currentFeedArticles() {
+  return S.activeUrl
+    ? S.articles.filter(a => a.feedUrl === S.activeUrl).sort((a, b) => b.date - a.date)
+    : interleaveArticles(S.articles);
+}
+function primarySectionRule(article) {
+  const tokens = sectionTokens(article);
+  return SECTION_RULES.find(rule => tokens.some(token =>
+    rule.keys.some(rawKey => sectionTokenMatches(token, normalizeSectionText(rawKey)))
+  )) || null;
+}
+function sectionTokens(article) {
+  const categories = Array.isArray(article.categories) ? article.categories : String(article.categories || '').split(',');
+  return categories.map(normalizeSectionText).filter(isUsableSectionToken);
+}
+function normalizeSectionText(text) {
+  return String(text || '')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9-]+/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+}
+function isUsableSectionToken(token) {
+  return token.length >= 3 && token.length <= 40 && !/^https?/.test(token);
+}
+function sectionTokenMatches(token, key) {
+  return token === key || (key.length >= 5 && token.includes(key)) || (token.length >= 5 && key.includes(token));
+}
+function topicIcon(type) {
+  const icons = {
+    chart: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-8"/></svg>',
+    chip: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M9 3v4M15 3v4M9 17v4M15 17v4M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>'
+  };
+  return `<span class="ix-topic-icon">${icons[type] || icons.chart}</span>`;
+}
 function openMobileFeedPanel() {
   renderMobileFeedPanel();
   const panel = $('mobileFeedPanel');
@@ -1160,12 +1256,11 @@ function renderArticles() {
     injectYtSidebar();
     return;
   }
-  let articles = S.activeUrl
-    ? S.articles.filter(a => a.feedUrl === S.activeUrl).sort((a,b) => b.date - a.date)
-    : interleaveArticles(S.articles);
+  let articles = currentFeedArticles();
   if (S.activeCategory) {
     articles = articles.filter(a => a.categories && a.categories.includes(S.activeCategory));
   }
+  if (S.sectionView) renderSidebar();
   const preservedYtPlayer = $('content').querySelector('.yt-sidebar.yt-player-active');
   if (preservedYtPlayer) preservedYtPlayer.remove();
   Renderer.render(articles);
@@ -1464,7 +1559,7 @@ function bindEvents() {
     row.dataset.kind === 'feed' ? deleteFeed(id) : deleteYtChannel(id);
   });
   $('feedList').addEventListener('click', ev => {
-    const btn = ev.target.closest('.nav-feed[data-feed-url]');
+    const btn = ev.target.closest('[data-feed-url]');
     if (btn) selectFeed(btn.dataset.feedUrl || null);
   });
   $('readLaterBtn')?.addEventListener('click', () => {
@@ -1529,6 +1624,14 @@ function bindEvents() {
   _vPanel.addEventListener('click', ev => {
     const btn = ev.target.closest('.v-layout-btn[data-layout]');
     if (btn) { setLayout(btn.dataset.layout); _vPanel.classList.remove('open'); }
+  });
+  _vPanel.addEventListener('change', ev => {
+    const input = ev.target.closest('[data-setting]');
+    if (!input || !(input.dataset.setting in S)) return;
+    S[input.dataset.setting] = input.type === 'checkbox' ? input.checked : input.value;
+    saveSettings();
+    renderSidebar();
+    renderArticles();
   });
   window.addEventListener('popstate', () => {
     if (history.state?.flux === 'article') return;
