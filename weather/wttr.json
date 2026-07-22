@@ -1,17 +1,17 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "24",
-      "FeelsLikeF": "75",
+      "FeelsLikeC": "19",
+      "FeelsLikeF": "66",
       "cloudcover": "0",
-      "humidity": "29",
-      "observation_time": "07:11 PM",
+      "humidity": "40",
+      "observation_time": "08:41 PM",
       "precipInches": "0.0",
       "precipMM": "0.0",
       "pressure": "1016",
       "pressureInches": "30",
-      "temp_C": "23",
-      "temp_F": "74",
+      "temp_C": "19",
+      "temp_F": "66",
       "uvIndex": "0",
       "visibility": "10",
       "visibilityMiles": "6",
@@ -27,9 +27,9 @@
         }
       ],
       "winddir16Point": "NW",
-      "winddirDegree": "317",
-      "windspeedKmph": "10",
-      "windspeedMiles": "6"
+      "winddirDegree": "311",
+      "windspeedKmph": "7",
+      "windspeedMiles": "4"
     }
   ],
   "nearest_area": [
@@ -441,8 +441,8 @@
         {
           "DewPointC": "5",
           "DewPointF": "42",
-          "FeelsLikeC": "24",
-          "FeelsLikeF": "74",
+          "FeelsLikeC": "22",
+          "FeelsLikeF": "71",
           "HeatIndexC": "24",
           "HeatIndexF": "74",
           "WindChillC": "22",
@@ -459,16 +459,16 @@
           "chanceofsunshine": "96",
           "chanceofthunder": "0",
           "chanceofwindy": "1",
-          "cloudcover": "0",
+          "cloudcover": "5",
           "diffRad": "2.2",
-          "humidity": "29",
+          "humidity": "34",
           "precipInches": "0.0",
           "precipMM": "0.0",
           "pressure": "1016",
           "pressureInches": "30",
           "shortRad": "4.6",
-          "tempC": "23",
-          "tempF": "74",
+          "tempC": "22",
+          "tempF": "71",
           "time": "2100",
           "uvIndex": "0",
           "visibility": "10",
