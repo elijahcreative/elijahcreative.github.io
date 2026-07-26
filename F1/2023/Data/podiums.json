@@ -1,30 +1,30 @@
 {
   "Podiums": [
     {
-      "Country": "🇧🇪 Belgium",
-      "City": "Stavelot",
+      "Country": "🇭🇺 Hungary",
+      "City": "Mogyoród",
       "Message": "Race ?"
     },
     {
       "Place": "1",
-      "Name": "Antonelli",
-      "Team": "Mercedes",
+      "Name": "Norris",
+      "Team": "McLaren",
       "Points": "+25",
-      "Total": "204"
+      "Total": "128"
     },
     {
       "Place": "2",
-      "Name": "Leclerc",
-      "Team": "Ferrari",
+      "Name": "Verstappen",
+      "Team": "Red Bull",
       "Points": "+18",
-      "Total": "126"
+      "Total": "109"
     },
     {
       "Place": "3",
-      "Name": "Verstappen",
-      "Team": "Red Bull",
+      "Name": "Antonelli",
+      "Team": "Mercedes",
       "Points": "+15",
-      "Total": "91"
+      "Total": "219"
     }
   ]
 }
