@@ -5,6 +5,7 @@ const ARTICLE_API = '/api/article?url=';
 const YOUTUBE_API = '/api/youtube?input=';
 const FEED_API    = '/api/feed?input=';
 const CACHE_TTL   = 5 * 60 * 1000; // 5 minutes
+const ARTICLE_CACHE_TTL = 10 * 60 * 1000;
 const FEED_ARTICLE_LIMIT = 20;
 const ARTICLE_HOSTS = new Set(['telex.hu','www.telex.hu','index.hu','www.index.hu','hvg.hu','www.hvg.hu','portfolio.hu','www.portfolio.hu','444.hu','www.444.hu','24.hu','www.24.hu']);
 try { history.scrollRestoration = 'manual'; } catch(e) {}
@@ -159,6 +160,10 @@ function saveFeeds()      { Store.set('flux_f', S.feeds); }
 function saveYtChannels() { Store.set('flux_yt', S.ytChannels); }
 function saveArticles()   { Store.set('flux_art', S.articles); }
 function saveReadLater()  { Store.set('flux_read_later', S.readLater); }
+function isArticleCacheFresh() {
+  const ts = Date.parse(S.lastUpdated || '');
+  return Number.isFinite(ts) && Date.now() - ts < ARTICLE_CACHE_TTL;
+}
 function loadStorage() {
   const s = Store.get('flux_s', {});
   Object.assign(S, {
@@ -1293,10 +1298,12 @@ async function refreshAll(bust = false) {
   if (bust) S.feeds.forEach(f => Fetcher.bust(f.url));
   const prevSig = S.articles.slice(0, 40).map(a => a.id).join('|');
   const hadArticles = S.articles.length > 0;
+  let loadedAny = false;
   setLoading(true);
   await Promise.all(S.feeds.map(async f => {
     const arts = await Fetcher.get(f.url, bust).catch(() => null);
     if (arts && arts.length) {
+      loadedAny = true;
       S.articles = S.articles.filter(a => a.feedUrl !== f.url);
       S.articles.push(...arts);
     }
@@ -1304,12 +1311,18 @@ async function refreshAll(bust = false) {
   S.articles.sort((a, b) => b.date - a.date);
   setLoading(false);
   const newSig = S.articles.slice(0, 40).map(a => a.id).join('|');
-  const changed = bust || newSig !== prevSig;
-  S.lastUpdated = new Date().toISOString();
-  if (changed && !activeArticleMode) renderArticles();
-  saveArticles();
-  saveSettings();
-  if (hadArticles) toast(changed ? 'Frissítve.' : 'Nincs új cikk.');
+  const changed = newSig !== prevSig;
+  const hasVisibleArticles = Boolean($('content')?.querySelector('.ix-article, .ix-card, .ix-text-fill, .ix-hero, .grid-layout, .list-layout, .reader-layout, .magazine-layout'));
+  if (loadedAny) {
+    S.lastUpdated = new Date().toISOString();
+    if ((changed || !hasVisibleArticles) && !activeArticleMode) renderArticles();
+    saveArticles();
+    saveSettings();
+  } else if (hadArticles && !activeArticleMode) {
+    renderArticles();
+  }
+  if (hadArticles) toast(loadedAny ? (changed ? 'Frissítve.' : 'Nincs új cikk.') : 'Nem sikerült frissíteni.');
+  return { changed, loadedAny };
 }
 function setLoading(on) {
   if (activeArticleMode) return;
@@ -2952,26 +2965,28 @@ const F1_DATA_BASE = 'https://elijahcreative.github.io/F1/2023/Data';
 const F1_TTL  = 30 * 60 * 1000;
 const F1_COUNTRY_HU = {
   Australia: 'Ausztrália',
-  China: 'Kína',
-  Japan: 'Japán',
-  Bahrain: 'Bahrein',
-  USA: 'USA',
-  Italy: 'Olaszország',
-  Monaco: 'Monaco',
-  Spain: 'Spanyolország',
-  Canada: 'Kanada',
+  Azerbaijan: 'Azerbajdzsán',
   Austria: 'Ausztria',
+  Bahrain: 'Bahrein',
+  Belgium: 'Belgium',
+  Brazil: 'Brazília',
+  Canada: 'Kanada',
+  China: 'Kína',
+  Hungary: 'Magyarország',
+  Italy: 'Olaszország',
+  Japan: 'Japán',
+  Monaco: 'Monaco',
+  Mexico: 'Mexikó',
+  Netherlands: 'Hollandia',
+  Qatar: 'Katar',
+  'Saudi Arabia': 'Szaúd-Arábia',
+  Singapore: 'Szingapúr',
+  Spain: 'Spanyolország',
   UK: 'Nagy-Britannia',
   'Great Britain': 'Nagy-Britannia',
-  Hungary: 'Magyarország',
-  Belgium: 'Belgium',
-  Netherlands: 'Hollandia',
-  Azerbaijan: 'Azerbajdzsán',
-  Singapore: 'Szingapúr',
-  Mexico: 'Mexikó',
-  Brazil: 'Brazília',
-  Qatar: 'Katar',
-  UAE: 'Abu-Dzabi'
+  USA: 'Egyesült Államok',
+  'U.A. Emirates': 'Egyesült Arab Emírségek',
+  UAE: 'Egyesült Arab Emírségek'
 };
 const F1_FLAG_MAP = {
   Bahrain: 'https://img.icons8.com/color/96/bahrain-circular.png',
@@ -3066,17 +3081,17 @@ function f1EventSpecs(race) {
   const raw = sprint
     ? [
         ['FP1', 'FP1', 'practice'],
-        ['Sprintqual', 'SQ', 'practice'],
+        ['Sprintqual', 'SP IDŐMÉRŐ', 'practice'],
         ['Sprint', 'SPRINT', 'practice'],
-        ['Qual', 'QUAL', 'qual'],
-        ['Race', 'RACE', 'race']
+        ['Qual', 'IDŐMÉRŐ', 'qual'],
+        ['Race', 'FUTAM', 'race']
       ]
     : [
         ['FP1', 'FP1', 'practice'],
         ['FP2', 'FP2', 'practice'],
         ['FP3', 'FP3', 'practice'],
-        ['Qual', 'QUAL', 'qual'],
-        ['Race', 'RACE', 'race']
+        ['Qual', 'IDŐMÉRŐ', 'qual'],
+        ['Race', 'FUTAM', 'race']
       ];
   return raw.map(([key, label, kind]) => ({
     key,
@@ -3141,7 +3156,7 @@ function buildF1Model(races, standingsRaw) {
     .slice(selectedIndex + 1, selectedIndex + 5)
     .map(r => ({ city: r.City || stripF1Country(r.Country), dateLabel: f1ShortDate(parseF1Date(r.Race)) }));
   return {
-    version: 6,
+    version: 8,
     city,
     countryRaw,
     countryEn,
@@ -3178,7 +3193,8 @@ function renderF1(f1) {
   const progress = Math.min(Math.max(Number(f1.activeProgress ?? f1.progress) || 0, 0), 4);
   const progressHtml = [1, 2, 3, 4].map(i => `<span class="f1-track-seg f1-track-seg-${i}${i <= progress ? ' active' : ''}"></span>`).join('');
   const flag = f1.flagUrl ? `<span class="f1-flag"><img src="${e(f1.flagUrl)}" alt=""></span>` : '<span class="f1-flag is-empty"></span>';
-  const titleCountry = f1.countryRaw || f1.countryHu || f1.countryEn;
+  const titleFlag = f1FlagEmoji(f1.countryRaw);
+  const titleCountry = `${titleFlag ? `${titleFlag} ` : ''}${f1.countryHu || f1.countryEn}`;
   el.innerHTML = `
     <span class="f1-badge">
       ${flag}
@@ -3203,7 +3219,7 @@ async function loadF1() {
   if (!S.showF1) { clearWidget('navF1'); return; }
   try {
     const cached = JSON.parse(localStorage.getItem('flux_f1') || 'null');
-    if (cached?.version === 6 && Date.now() - cached.ts < F1_TTL) { renderF1(cached); return; }
+    if (cached?.version === 8 && Date.now() - cached.ts < F1_TTL) { renderF1(cached); return; }
   } catch(e) {}
   try {
     const [racesJ, standingsJ] = await Promise.all([
@@ -3284,7 +3300,11 @@ const Config = {
     openArticleUrl(initialOpenUrl);
     if (S.feeds.length) refreshAll();
   } else if (S.feeds.length) {
-    renderArticles(); // azonnali megjelenítés cache-ből
-    refreshAll();     // háttérben frissítés, nem blokkol
+    if (S.articles.length && isArticleCacheFresh()) {
+      renderArticles();
+      refreshAll();
+    } else {
+      refreshAll(true);
+    }
   }
 })();
