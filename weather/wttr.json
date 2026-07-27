@@ -1,42 +1,42 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "21",
-      "FeelsLikeF": "70",
-      "cloudcover": "32",
-      "humidity": "28",
-      "observation_time": "12:01 PM",
+      "FeelsLikeC": "24",
+      "FeelsLikeF": "74",
+      "cloudcover": "75",
+      "humidity": "65",
+      "observation_time": "03:01 PM",
       "precipInches": "0.0",
       "precipMM": "0.0",
-      "pressure": "1011",
+      "pressure": "1000",
       "pressureInches": "30",
-      "temp_C": "31",
-      "temp_F": "88",
-      "uvIndex": "7",
+      "temp_C": "23",
+      "temp_F": "74",
+      "uvIndex": "3",
       "visibility": "10",
       "visibilityMiles": "6",
-      "weatherCode": "116",
+      "weatherCode": "353",
       "weatherDesc": [
         {
-          "value": "Partly Cloudy "
+          "value": "Light rain shower"
         }
       ],
       "weatherIconUrl": [
         {
-          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0002_sunny_intervals.png"
+          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0009_light_rain_showers.png"
         }
       ],
-      "winddir16Point": "WNW",
-      "winddirDegree": "298",
-      "windspeedKmph": "31",
-      "windspeedMiles": "19"
+      "winddir16Point": "NW",
+      "winddirDegree": "313",
+      "windspeedKmph": "32",
+      "windspeedMiles": "20"
     }
   ],
   "nearest_area": [
     {
       "areaName": [
         {
-          "value": "Erzsebetvaros"
+          "value": "Kis-Gellerthegy"
         }
       ],
       "country": [
@@ -44,8 +44,8 @@
           "value": "Hungary"
         }
       ],
-      "latitude": "47.517",
-      "longitude": "19.117",
+      "latitude": "47.483",
+      "longitude": "19.033",
       "population": "0",
       "region": [
         {
@@ -54,7 +54,7 @@
       ],
       "weatherUrl": [
         {
-          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.5,19.083"
+          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.483,19.033"
         }
       ]
     }
