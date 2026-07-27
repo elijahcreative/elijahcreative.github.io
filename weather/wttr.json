@@ -1,42 +1,42 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "20",
-      "FeelsLikeF": "68",
-      "cloudcover": "22",
-      "humidity": "30",
-      "observation_time": "04:32 PM",
+      "FeelsLikeC": "17",
+      "FeelsLikeF": "63",
+      "cloudcover": "15",
+      "humidity": "39",
+      "observation_time": "07:32 PM",
       "precipInches": "0.0",
       "precipMM": "0.0",
-      "pressure": "1013",
+      "pressure": "1015",
       "pressureInches": "30",
-      "temp_C": "28",
-      "temp_F": "83",
-      "uvIndex": "1",
+      "temp_C": "25",
+      "temp_F": "77",
+      "uvIndex": "0",
       "visibility": "10",
       "visibilityMiles": "6",
       "weatherCode": "113",
       "weatherDesc": [
         {
-          "value": "Sunny"
+          "value": "Clear "
         }
       ],
       "weatherIconUrl": [
         {
-          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0001_sunny.png"
+          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0008_clear_sky_night.png"
         }
       ],
-      "winddir16Point": "NNW",
-      "winddirDegree": "327",
-      "windspeedKmph": "22",
-      "windspeedMiles": "14"
+      "winddir16Point": "NW",
+      "winddirDegree": "324",
+      "windspeedKmph": "19",
+      "windspeedMiles": "12"
     }
   ],
   "nearest_area": [
     {
       "areaName": [
         {
-          "value": "Buda"
+          "value": "Var"
         }
       ],
       "country": [
@@ -44,8 +44,8 @@
           "value": "Hungary"
         }
       ],
-      "latitude": "47.500",
-      "longitude": "19.033",
+      "latitude": "47.517",
+      "longitude": "19.050",
       "population": "0",
       "region": [
         {
@@ -54,7 +54,7 @@
       ],
       "weatherUrl": [
         {
-          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.5,19.033"
+          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.517,19.05"
         }
       ]
     }
@@ -388,34 +388,34 @@
           "windspeedMiles": "17"
         },
         {
-          "DewPointC": "9",
-          "DewPointF": "48",
-          "FeelsLikeC": "27",
-          "FeelsLikeF": "81",
-          "HeatIndexC": "27",
-          "HeatIndexF": "81",
+          "DewPointC": "10",
+          "DewPointF": "50",
+          "FeelsLikeC": "28",
+          "FeelsLikeF": "82",
+          "HeatIndexC": "28",
+          "HeatIndexF": "82",
           "WindChillC": "28",
           "WindChillF": "83",
-          "WindGustKmph": "25",
-          "WindGustMiles": "16",
+          "WindGustKmph": "31",
+          "WindGustMiles": "19",
           "chanceoffog": "0",
           "chanceoffrost": "0",
-          "chanceofhightemp": "21",
-          "chanceofovercast": "5",
+          "chanceofhightemp": "15",
+          "chanceofovercast": "2",
           "chanceofrain": "1",
           "chanceofremdry": "99",
           "chanceofsnow": "0",
-          "chanceofsunshine": "77",
+          "chanceofsunshine": "90",
           "chanceofthunder": "0",
           "chanceofwindy": "2",
-          "cloudcover": "22",
-          "diffRad": "92.0",
-          "humidity": "30",
+          "cloudcover": "13",
+          "diffRad": "113.5",
+          "humidity": "32",
           "precipInches": "0.0",
           "precipMM": "0.0",
-          "pressure": "1013",
+          "pressure": "1012",
           "pressureInches": "30",
-          "shortRad": "540.2",
+          "shortRad": "474.4",
           "tempC": "28",
           "tempF": "83",
           "time": "1800",
@@ -433,10 +433,10 @@
               "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0001_sunny.png"
             }
           ],
-          "winddir16Point": "NNW",
-          "winddirDegree": "327",
-          "windspeedKmph": "22",
-          "windspeedMiles": "14"
+          "winddir16Point": "NW",
+          "winddirDegree": "320",
+          "windspeedKmph": "27",
+          "windspeedMiles": "17"
         },
         {
           "DewPointC": "10",
