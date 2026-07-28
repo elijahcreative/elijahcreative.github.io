@@ -7,6 +7,7 @@ const FEED_API    = '/api/feed?input=';
 const CACHE_TTL   = 5 * 60 * 1000; // 5 minutes
 const ARTICLE_CACHE_TTL = 10 * 60 * 1000;
 const FEED_ARTICLE_LIMIT = 20;
+const PULL_REFRESH_THRESHOLD = 72;
 const ARTICLE_HOSTS = new Set(['telex.hu','www.telex.hu','index.hu','www.index.hu','hvg.hu','www.hvg.hu','portfolio.hu','www.portfolio.hu','444.hu','www.444.hu','24.hu','www.24.hu']);
 try { history.scrollRestoration = 'manual'; } catch(e) {}
 let activeArticleMode = null;
@@ -1334,6 +1335,84 @@ function setLoading(on) {
     }
   }
 }
+function setupPullToRefresh() {
+  const pull = $('pullRefresh');
+  const content = $('content');
+  if (!pull || !content || !window.matchMedia?.('(pointer: coarse)').matches) return;
+  const icon = pull.querySelector('.pull-refresh-icon');
+  const label = pull.querySelector('.pull-refresh-label');
+  let tracking = false;
+  let refreshing = false;
+  let startX = 0;
+  let startY = 0;
+  let distance = 0;
+
+  const reset = () => {
+    tracking = false;
+    distance = 0;
+    pull.style.removeProperty('--pull-distance');
+    pull.dataset.state = '';
+    pull.setAttribute('aria-hidden', 'true');
+    if (icon) icon.textContent = '↓';
+    if (label) label.textContent = 'HÚZD LE A FRISSÍTÉSHEZ';
+  };
+  const blocked = () => activeArticleMode ||
+    content.scrollTop > 0 ||
+    document.querySelector('.modal.open, .overlay.open, .confirm-bg.open, .sp-page.open, .view-panel.open, .mobile-feed-panel.open, .article-modal-layer.open');
+
+  document.addEventListener('touchstart', ev => {
+    if (refreshing || ev.touches.length !== 1 || blocked()) {
+      tracking = false;
+      return;
+    }
+    tracking = true;
+    startX = ev.touches[0].clientX;
+    startY = ev.touches[0].clientY;
+    distance = 0;
+  }, { passive: true });
+
+  document.addEventListener('touchmove', ev => {
+    if (!tracking || ev.touches.length !== 1) return;
+    const deltaX = ev.touches[0].clientX - startX;
+    const deltaY = ev.touches[0].clientY - startY;
+    if (deltaY <= 0 || Math.abs(deltaX) > deltaY || content.scrollTop > 0) {
+      reset();
+      return;
+    }
+    ev.preventDefault();
+    distance = Math.min(104, deltaY * .52);
+    const ready = distance >= PULL_REFRESH_THRESHOLD;
+    pull.style.setProperty('--pull-distance', `${distance}px`);
+    pull.dataset.state = ready ? 'ready' : 'pulling';
+    pull.setAttribute('aria-hidden', 'false');
+    if (icon) icon.textContent = ready ? '↑' : '↓';
+    if (label) label.textContent = ready ? 'ENGEDD EL A FRISSÍTÉSHEZ' : 'HÚZD LE A FRISSÍTÉSHEZ';
+  }, { passive: false });
+
+  const finish = async () => {
+    if (!tracking) return;
+    const shouldRefresh = distance >= PULL_REFRESH_THRESHOLD;
+    tracking = false;
+    if (!shouldRefresh) {
+      reset();
+      return;
+    }
+    refreshing = true;
+    pull.dataset.state = 'refreshing';
+    pull.style.setProperty('--pull-distance', '52px');
+    if (icon) icon.textContent = '↻';
+    if (label) label.textContent = 'FRISSÍTÉS';
+    try {
+      await refreshAll(true);
+    } finally {
+      refreshing = false;
+      setTimeout(reset, 450);
+    }
+  };
+
+  document.addEventListener('touchend', finish, { passive: true });
+  document.addEventListener('touchcancel', reset, { passive: true });
+}
 function buildSettingsUI() {
   const darkPreview = S.theme === 'dark' || (S.theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
   $('presetGrid').innerHTML = Object.entries(PRESETS).map(([k, p]) => {
@@ -1823,7 +1902,8 @@ function wxFluxIcon(name, size) {
   };
   const sunIcon = (cx = 32, cy = 32, r = 9) => sunGlyph(cx, cy, r);
   const sunHalo = (cx = 32, cy = 32, r = 9) => sunGlyph(cx, cy, r, bg, 10);
-  const moonIcon = `<path d="M42 36c-10 3-20-4-20-15 0-5 2-9 6-12-10 2-17 10-17 21 0 12 10 22 22 22 8 0 15-4 19-11-3 1-6 1-10-5z" fill="${moon}"/>`;
+  const moonIcon = (cx = 32, cy = 32, r = 18) =>
+    `<path d="M${cx + r * .64} ${cy + r * .44}A${r} ${r} 0 1 1 ${cx + r * .12} ${cy - r * .94}A${r * .78} ${r * .78} 0 1 0 ${cx + r * .64} ${cy + r * .44}z" fill="${moon}"/>`;
   const cloudPath = 'M19 44h26a11 11 0 0 0 1-22 16 16 0 0 0-30-3 12 12 0 0 0 3 25z';
   const compactCloudPath = 'M19 42h27a10 10 0 0 0 0-20 15 15 0 0 0-28-3 12 12 0 0 0 1 23z';
   const drawCloud = (path, fillInside = true, halo = true) => `${halo ? `<path d="${path}" fill="none" stroke="${bg}" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>` : ''}<path d="${path}" fill="${fillInside ? bg : 'none'}" stroke="${cloud}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`;
@@ -1841,9 +1921,9 @@ function wxFluxIcon(name, size) {
   } else if (name === 'sunset') {
     body = `<path d="M12 43h40M20 36a12 12 0 0 1 24 0" fill="none" stroke="${sun}" stroke-width="5" stroke-linecap="round"/><path d="M32 10v10M23 19l4 4M41 19l-4 4" stroke="${sun}" stroke-width="4" stroke-linecap="round"/>`;
   } else if (name.includes('clear')) {
-    body = isNight ? moonIcon : sunIcon();
+    body = isNight ? moonIcon() : sunIcon();
   } else if (name.includes('partly-cloudy')) {
-    body = `${drawCloud(compactCloudPath, true, false)}${isNight ? `<g transform="translate(-2 -3) scale(.82)">${moonIcon}</g>` : `<circle cx="19" cy="17" r="21" fill="${bg}"/>${sunIcon(19, 17, 7.5)}`}`;
+    body = `${drawCloud(compactCloudPath, true, false)}${isNight ? moonIcon(24, 20, 11) : `<circle cx="19" cy="17" r="21" fill="${bg}"/>${sunIcon(19, 17, 7.5)}`}`;
   } else if (hasCloud) {
     body = cloudIcon;
   } else {
@@ -3285,6 +3365,7 @@ const Config = {
   renderSidebar();
   bindEvents();
   setupArticlePrefetch();
+  setupPullToRefresh();
   updateLayoutBtns();
   syncWidgets();
   loadYouTube();
