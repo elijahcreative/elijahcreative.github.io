@@ -8,10 +8,10 @@ const CACHE_TTL   = 5 * 60 * 1000; // 5 minutes
 const ARTICLE_CACHE_TTL = 10 * 60 * 1000;
 const FEED_ARTICLE_LIMIT = 20;
 const PULL_REFRESH_THRESHOLD = 72;
+const ARTICLE_SWIPE_BACK_THRESHOLD = 78;
 const ARTICLE_HOSTS = new Set(['telex.hu','www.telex.hu','index.hu','www.index.hu','hvg.hu','www.hvg.hu','portfolio.hu','www.portfolio.hu','444.hu','www.444.hu','24.hu','www.24.hu']);
 try { history.scrollRestoration = 'manual'; } catch(e) {}
 let activeArticleMode = null;
-let articleListSnapshot = null;
 let currentArticleIds = [];
 function fetchT(url, opts = {}, ms = 8000) {
   const ctrl = new AbortController();
@@ -759,6 +759,7 @@ function renderArticleShell(html) {
   if (S.readerMode === 'modal') {
     activeArticleMode = 'modal';
     const layer = ensureArticleModal();
+    layer.classList.remove('article-swipe-dismissed');
     layer.querySelector('.article-sheet').innerHTML = html;
     document.body.classList.add('article-modal-open');
     requestAnimationFrame(() => layer.classList.add('open'));
@@ -766,9 +767,10 @@ function renderArticleShell(html) {
   }
   activeArticleMode = 'page';
   closeArticleModal();
-  const content = $('content');
-  preserveActiveYtPlayer(() => { content.innerHTML = html; });
-  setScrollTopInstant(content, 0);
+  const layer = ensureArticlePageLayer();
+  layer.innerHTML = html;
+  setScrollTopInstant(layer, 0);
+  requestAnimationFrame(() => layer.classList.add('open'));
 }
 function ensureArticleModal() {
   let layer = $('articleModalLayer');
@@ -791,24 +793,53 @@ function closeArticleModal() {
   if (layer) {
     layer.classList.remove('open');
     setTimeout(() => {
-      if (!layer.classList.contains('open')) layer.querySelector('.article-sheet').innerHTML = '';
+      if (!layer.classList.contains('open')) {
+        layer.querySelector('.article-sheet').innerHTML = '';
+        layer.classList.remove('article-swipe-dismissed');
+      }
     }, 260);
   }
   document.body.classList.remove('article-modal-open');
+}
+function ensureArticlePageLayer() {
+  let layer = $('articlePageLayer');
+  if (!layer) {
+    layer = document.createElement('div');
+    layer.id = 'articlePageLayer';
+    layer.className = 'article-page-layer';
+    layer.addEventListener('click', ev => {
+      const item = ev.target.closest('[data-id]');
+      if (item && layer.contains(item)) openArticle(item.dataset.id);
+    });
+    document.body.appendChild(layer);
+  }
+  return layer;
+}
+function closeArticlePageLayer() {
+  const layer = $('articlePageLayer');
+  if (layer) {
+    layer.classList.remove('open', 'article-swipe-surface', 'article-swipe-active', 'article-swipe-cancel', 'article-swipe-close');
+    layer.style.removeProperty('--article-swipe-x');
+    layer.style.removeProperty('--article-swipe-shadow');
+    setTimeout(() => {
+      if (!layer.classList.contains('open')) layer.innerHTML = '';
+    }, 240);
+  }
 }
 function closeArticleView(fromHistory = false) {
   if (!fromHistory && history.state?.flux === 'article') {
     history.back();
     return;
   }
+  finishArticleClose();
+}
+function finishArticleClose() {
+  const mode = activeArticleMode;
   closeArticleModal();
-  if (activeArticleMode === 'modal') {
-    activeArticleMode = null;
-    clearReturnScroll();
-    return;
-  }
+  if (mode === 'page') closeArticlePageLayer();
   activeArticleMode = null;
-  restoreArticleList();
+  restoreReturnScroll(true);
+  clearReturnScroll();
 }
 function pushArticleState() {
   if (history.state?.flux === 'article') return;
@@ -819,24 +850,7 @@ function saveReturnScroll() {
   try {
     const content = $('content');
     window._fluxReturnScrollTop = content ? content.scrollTop : 0;
-    articleListSnapshot = (content && S.readerMode !== 'modal') ? content.innerHTML : null;
   } catch(e) {}
-}
-function restoreArticleList() {
-  const content = $('content');
-  if (!content) return;
-  if (articleListSnapshot !== null) {
-    preserveActiveYtPlayer(() => { content.innerHTML = articleListSnapshot; });
-    articleListSnapshot = null;
-    if (!content.querySelector('.yt-sidebar.yt-player-active')) {
-      content.querySelectorAll('.yt-sidebar').forEach(sidebar => sidebar.remove());
-      injectYtSidebar();
-    }
-    restoreReturnScroll(true);
-    return;
-  }
-  renderArticles();
-  restoreReturnScroll();
 }
 function restoreReturnScroll(immediate = false) {
   try {
@@ -854,7 +868,6 @@ function restoreReturnScroll(immediate = false) {
 }
 function clearReturnScroll() {
   window._fluxReturnScrollTop = null;
-  articleListSnapshot = null;
 }
 function setScrollTopInstant(el, top) {
   const prev = el.style.scrollBehavior;
@@ -1411,6 +1424,152 @@ function setupPullToRefresh() {
   };
 
   document.addEventListener('touchend', finish, { passive: true });
+  document.addEventListener('touchcancel', reset, { passive: true });
+}
+function setupArticleSwipeBack() {
+  if (!window.matchMedia?.('(pointer: coarse)').matches) return;
+  const cfg = {
+    startSlop: 14,
+    verticalCancel: 36,
+    verticalLimit: 90,
+    nativeEdgeWidth: 28,
+    horizontalBias: 1.25,
+    dragFriction: .96,
+    backdropReveal: 72,
+    maxDragRatio: .9,
+    closeMs: 350,
+    cancelMs: 260
+  };
+  let gesture = null;
+
+  const articleTarget = target => {
+    if (!activeArticleMode || !target?.closest) return null;
+    return target.closest('.article-view');
+  };
+  const swipeSurfaceFor = view => {
+    if (activeArticleMode === 'modal') return view.closest('.article-sheet') || view;
+    return view.closest('.article-page-layer') || view;
+  };
+  const clearView = view => {
+    view.classList.remove('article-swipe-surface', 'article-swipe-active', 'article-swipe-cancel', 'article-swipe-close');
+    view.style.removeProperty('--article-swipe-x');
+    view.style.removeProperty('--article-swipe-shadow');
+  };
+  const setUnderlayX = x => {
+    document.body.style.setProperty('--article-underlay-x', `${x}px`);
+  };
+  const clearUnderlay = () => {
+    document.body.classList.remove('article-swipe-reveal', 'article-swipe-underlay-cancel', 'article-swipe-underlay-close');
+    document.body.style.removeProperty('--article-underlay-x');
+    $('articleModalLayer')?.classList.remove('article-swipe-underlay');
+  };
+  const revealUnderlay = () => {
+    document.body.classList.add('article-swipe-reveal');
+    if (activeArticleMode === 'modal') {
+      $('articleModalLayer')?.classList.add('article-swipe-underlay');
+    }
+  };
+  const reset = () => {
+    if (gesture?.view) clearView(gesture.view);
+    clearUnderlay();
+    gesture = null;
+  };
+  const setDrag = dx => {
+    if (!gesture?.view) return;
+    const dragX = Math.min(window.innerWidth * cfg.maxDragRatio, dx * cfg.dragFriction);
+    const progress = Math.min(1, dragX / window.innerWidth);
+    const underlayX = -cfg.backdropReveal * (1 - progress);
+    const shadow = Math.min(1, dragX / (window.innerWidth * .45));
+    revealUnderlay();
+    setUnderlayX(underlayX);
+    gesture.view.classList.add('article-swipe-surface', 'article-swipe-active');
+    gesture.view.style.setProperty('--article-swipe-x', `${dragX}px`);
+    gesture.view.style.setProperty('--article-swipe-shadow', String(shadow));
+  };
+  const cancel = () => {
+    const view = gesture?.view;
+    gesture = null;
+    if (!view) return;
+    view.classList.add('article-swipe-cancel');
+    document.body.classList.add('article-swipe-underlay-cancel');
+    view.style.setProperty('--article-swipe-x', '0px');
+    view.style.setProperty('--article-swipe-shadow', '0');
+    setUnderlayX(-cfg.backdropReveal);
+    setTimeout(() => {
+      clearView(view);
+      clearUnderlay();
+    }, cfg.cancelMs);
+  };
+  const commit = () => {
+    const view = gesture?.view;
+    gesture = null;
+    if (!view) return closeArticleView();
+    view.classList.add('article-swipe-close');
+    document.body.classList.add('article-swipe-underlay-close');
+    view.style.setProperty('--article-swipe-x', `${window.innerWidth}px`);
+    view.style.setProperty('--article-swipe-shadow', '1');
+    setUnderlayX(0);
+    setTimeout(() => {
+      const shouldPopHistory = history.state?.flux === 'article';
+      if (activeArticleMode === 'modal') $('articleModalLayer')?.classList.add('article-swipe-dismissed');
+      finishArticleClose();
+      clearView(view);
+      clearUnderlay();
+      if (shouldPopHistory) history.back();
+    }, cfg.closeMs);
+  };
+
+  document.addEventListener('touchstart', ev => {
+    const article = articleTarget(ev.target);
+    if (ev.touches.length !== 1 || !article || ev.touches[0].clientX <= cfg.nativeEdgeWidth) {
+      reset();
+      return;
+    }
+    gesture = {
+      state: 'tracking',
+      view: swipeSurfaceFor(article),
+      startX: ev.touches[0].clientX,
+      startY: ev.touches[0].clientY,
+      lastX: ev.touches[0].clientX,
+      lastY: ev.touches[0].clientY
+    };
+  }, { passive: true });
+
+  document.addEventListener('touchmove', ev => {
+    if (!gesture || ev.touches.length !== 1) return;
+    gesture.lastX = ev.touches[0].clientX;
+    gesture.lastY = ev.touches[0].clientY;
+    const dx = gesture.lastX - gesture.startX;
+    const dy = gesture.lastY - gesture.startY;
+    const absX = Math.abs(dx);
+    const absY = Math.abs(dy);
+
+    if (dx < -cfg.startSlop || (absY > cfg.verticalCancel && absY > absX)) {
+      reset();
+      return;
+    }
+    if (dx > cfg.startSlop && absX > absY * cfg.horizontalBias) {
+      gesture.state = 'dragging';
+      setDrag(dx);
+      ev.preventDefault();
+    }
+  }, { passive: false });
+
+  document.addEventListener('touchend', ev => {
+    if (!gesture) return;
+    const dx = gesture.lastX - gesture.startX;
+    const dy = gesture.lastY - gesture.startY;
+    const shouldClose = gesture.state === 'dragging' &&
+      dx >= ARTICLE_SWIPE_BACK_THRESHOLD &&
+      Math.abs(dy) < cfg.verticalLimit;
+
+    if (shouldClose) {
+      ev.preventDefault();
+      commit();
+      return;
+    }
+    gesture.state === 'dragging' ? cancel() : reset();
+  }, { passive: false });
   document.addEventListener('touchcancel', reset, { passive: true });
 }
 function buildSettingsUI() {
@@ -3366,6 +3525,7 @@ const Config = {
   bindEvents();
   setupArticlePrefetch();
   setupPullToRefresh();
+  setupArticleSwipeBack();
   updateLayoutBtns();
   syncWidgets();
   loadYouTube();
