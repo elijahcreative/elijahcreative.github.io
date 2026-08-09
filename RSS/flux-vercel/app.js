@@ -12,6 +12,10 @@ const ARTICLE_SWIPE_BACK_THRESHOLD = 78;
 const ARTICLE_HOSTS = new Set(['telex.hu','www.telex.hu','index.hu','www.index.hu','hvg.hu','www.hvg.hu','portfolio.hu','www.portfolio.hu','444.hu','www.444.hu','24.hu','www.24.hu']);
 try { history.scrollRestoration = 'manual'; } catch(e) {}
 let activeArticleMode = null;
+let pendingArticleSwipeClose = false;
+let pendingArticleScrollTop = 0;
+let lastClosedArticle = null;
+const articleScrollPositions = new Map();
 let currentArticleIds = [];
 function fetchT(url, opts = {}, ms = 8000) {
   const ctrl = new AbortController();
@@ -546,10 +550,11 @@ const Renderer = {
 async function openArticle(id) {
   const a = articleMap[id];
   if (!a) return;
+  pendingArticleScrollTop = history.state?.flux === 'article' && history.state.articleId === id
+    ? articleScrollTopFor(id)
+    : 0;
   if (S.activeSpecialView === 'readLater') markReadLaterRead(id);
   saveReturnScroll();
-  const canOpenInside = canExtractArticle(a) || hasReadableRssContent(a);
-  if (canOpenInside) pushArticleState();
   if (canExtractArticle(a)) {
     const cached = extractedArticleCache.get(a.url);
     if (cached) {
@@ -592,16 +597,17 @@ async function openArticleUrl(url) {
     image: '',
     date: new Date()
   };
+  pendingArticleScrollTop = history.state?.flux === 'article' && history.state.articleId === aid(fallback)
+    ? articleScrollTopFor(aid(fallback))
+    : 0;
   if (!canExtractArticle(fallback)) {
     if (hasReadableRssContent(fallback)) {
-      pushArticleState();
       renderArticleView(fallback);
       return;
     }
     window.location.href = articleUrl.href;
     return;
   }
-  pushArticleState();
   renderArticleLoading(fallback);
   const extracted = await fetchExtractedArticle(fallback).catch(() => null);
   if (extracted && hasReadableRssContent(extracted)) {
@@ -684,7 +690,9 @@ function setupArticlePrefetch() {
   }, { passive: true });
 }
 function renderArticleLoading(a) {
-  renderArticleShell(articleViewHtml(a, { body: '<div class="article-content"><p>Cikk betöltése...</p></div>' }));
+  const restoreTop = pendingArticleScrollTop;
+  renderArticleShell(articleViewHtml(a, { body: '<div class="article-content"><p>Cikk betöltése...</p></div>' }), aid(a));
+  pendingArticleScrollTop = restoreTop;
 }
 function renderArticleView(a) {
   articleMap[aid(a)] = a;
@@ -693,11 +701,11 @@ function renderArticleView(a) {
       <div class="article-content">${sanitizeArticleHtml(a.content || a.desc || '')}</div>
       <a class="reader-ext" href="${e(a.url)}" target="_self" rel="noopener">Eredeti cikk megnyitása</a>
       ${articleMoreHtml(a)}`
-  }));
+  }), aid(a));
 }
 function articleViewHtml(a, opts = {}) {
   const saved = isReadLaterArticle(a);
-  return `<article class="article-view">
+  return `<article class="article-view" data-article-id="${e(aid(a))}">
     <button class="article-back" type="button">← Vissza</button>
     <h1 class="article-title">${e(a.title)}</h1>
     <div class="article-meta">${Renderer._metaHtml(a, 'article-source', { full: true })}</div>
@@ -754,23 +762,48 @@ function relatedArticleScore(base, candidate, baseWords, baseCategories, order) 
   if (Number.isFinite(deltaHours)) score += Math.max(0, 14 - deltaHours / 6);
   return score;
 }
-function renderArticleShell(html) {
+function renderArticleShell(html, articleId = '') {
+  const stateTop = history.state?.flux === 'article' && history.state.articleId === articleId
+    ? articleScrollTopFor(articleId)
+    : 0;
+  const currentScroller = activeArticleMode === 'modal'
+    ? $('articleModalLayer')?.querySelector('.article-scroll')
+    : $('articlePageLayer')?.querySelector('.article-page-scroll');
+  const currentView = currentScroller?.querySelector('.article-view');
+  const currentTop = currentView?.dataset.articleId === articleId
+    ? Math.max(0, currentScroller.scrollTop)
+    : 0;
+  const restoreTop = Math.max(pendingArticleScrollTop, stateTop, currentTop);
   document.documentElement.removeAttribute('data-open-article');
   if (S.readerMode === 'modal') {
     activeArticleMode = 'modal';
     const layer = ensureArticleModal();
     layer.classList.remove('article-swipe-dismissed');
-    layer.querySelector('.article-sheet').innerHTML = html;
+    const scroll = layer.querySelector('.article-scroll');
+    scroll.innerHTML = html;
+    setScrollTopInstant(scroll, restoreTop);
+    pendingArticleScrollTop = 0;
     document.body.classList.add('article-modal-open');
-    requestAnimationFrame(() => layer.classList.add('open'));
+    requestAnimationFrame(() => {
+      if (!activeArticleMode) return;
+      layer.classList.add('open');
+      if (articleId && history.state?.flux !== 'article') pushArticleState(articleId);
+    });
     return;
   }
   activeArticleMode = 'page';
   closeArticleModal();
   const layer = ensureArticlePageLayer();
-  layer.innerHTML = html;
-  setScrollTopInstant(layer, 0);
-  requestAnimationFrame(() => layer.classList.add('open'));
+  layer.innerHTML = `<div class="article-page-scroll">${html}</div>`;
+  const scroll = layer.querySelector('.article-page-scroll');
+  scroll.addEventListener('scroll', saveArticleHistoryScroll, { passive: true });
+  setScrollTopInstant(scroll, restoreTop);
+  pendingArticleScrollTop = 0;
+  requestAnimationFrame(() => {
+    if (!activeArticleMode) return;
+    layer.classList.add('open');
+    if (articleId && history.state?.flux !== 'article') pushArticleState(articleId);
+  });
 }
 function ensureArticleModal() {
   let layer = $('articleModalLayer');
@@ -778,7 +811,8 @@ function ensureArticleModal() {
     layer = document.createElement('div');
     layer.id = 'articleModalLayer';
     layer.className = 'article-modal-layer';
-    layer.innerHTML = '<div class="article-sheet"></div>';
+    layer.innerHTML = '<div class="article-sheet"><div class="article-scroll"></div></div>';
+    layer.querySelector('.article-scroll').addEventListener('scroll', saveArticleHistoryScroll, { passive: true });
     layer.addEventListener('click', ev => {
       if (ev.target === layer) closeArticleView();
       const item = ev.target.closest('[data-id]');
@@ -792,12 +826,9 @@ function closeArticleModal() {
   const layer = $('articleModalLayer');
   if (layer) {
     layer.classList.remove('open');
-    setTimeout(() => {
-      if (!layer.classList.contains('open')) {
-        layer.querySelector('.article-sheet').innerHTML = '';
-        layer.classList.remove('article-swipe-dismissed');
-      }
-    }, 260);
+    layer.classList.remove('article-swipe-dismissed');
+    const scroll = layer.querySelector('.article-scroll');
+    if (scroll) scroll.scrollTop = 0;
   }
   document.body.classList.remove('article-modal-open');
 }
@@ -818,16 +849,16 @@ function ensureArticlePageLayer() {
 function closeArticlePageLayer() {
   const layer = $('articlePageLayer');
   if (layer) {
-    layer.classList.remove('open', 'article-swipe-surface', 'article-swipe-active', 'article-swipe-cancel', 'article-swipe-close');
+    layer.classList.remove('open', 'article-swipe-surface', 'article-swipe-active', 'article-swipe-cancel', 'article-swipe-close', 'article-swipe-forward-open');
     layer.style.removeProperty('--article-swipe-x');
     layer.style.removeProperty('--article-swipe-shadow');
-    setTimeout(() => {
-      if (!layer.classList.contains('open')) layer.innerHTML = '';
-    }, 240);
+    const scroll = layer.querySelector('.article-page-scroll');
+    if (scroll) scroll.scrollTop = 0;
   }
 }
 function closeArticleView(fromHistory = false) {
   if (!fromHistory && history.state?.flux === 'article') {
+    saveArticleHistoryScroll();
     history.back();
     return;
   }
@@ -835,21 +866,67 @@ function closeArticleView(fromHistory = false) {
 }
 function finishArticleClose() {
   const mode = activeArticleMode;
+  const closedScroller = mode === 'modal'
+    ? $('articleModalLayer')?.querySelector('.article-scroll')
+    : $('articlePageLayer')?.querySelector('.article-page-scroll');
+  const closedArticleId = closedScroller?.querySelector('.article-view')?.dataset.articleId;
+  if (closedArticleId && history.state?.flux !== 'article') {
+    const scrollTop = Math.max(0, Number(closedScroller.scrollTop) || 0, articleScrollPositions.get(closedArticleId) || 0);
+    lastClosedArticle = { id: closedArticleId, mode, scrollTop };
+  }
   closeArticleModal();
   if (mode === 'page') closeArticlePageLayer();
+  const swipeClasses = ['article-swipe-surface', 'article-swipe-active', 'article-swipe-cancel', 'article-swipe-close', 'article-swipe-forward-open'];
+  [$('articleModalLayer')?.querySelector('.article-sheet'), $('articlePageLayer')].forEach(surface => {
+    if (!surface) return;
+    surface.classList.remove(...swipeClasses);
+    surface.style.removeProperty('--article-swipe-x');
+    surface.style.removeProperty('--article-swipe-shadow');
+  });
+  document.body.classList.remove('article-swipe-reveal', 'article-swipe-underlay-cancel', 'article-swipe-underlay-close');
+  document.body.style.removeProperty('--article-underlay-x');
+  $('articleModalLayer')?.classList.remove('article-swipe-underlay');
   activeArticleMode = null;
   restoreReturnScroll(true);
   clearReturnScroll();
 }
-function pushArticleState() {
-  if (history.state?.flux === 'article') return;
-  try { history.pushState({ flux: 'article' }, '', location.href); } catch(e) {}
+function pushArticleState(articleId = '') {
+  const sameArticle = history.state?.flux === 'article' && history.state.articleId === articleId;
+  const nextState = { flux: 'article', articleId };
+  if (sameArticle) {
+    nextState.articleScrollTop = articleScrollTopFor(articleId);
+  }
+  try {
+    if (history.state?.flux === 'article') {
+      history.replaceState(nextState, '', location.href);
+      return;
+    }
+    history.pushState(nextState, '', location.href);
+  } catch(e) {}
 }
 function $(id) { return document.getElementById(id); }
 function saveReturnScroll() {
   try {
     const content = $('content');
     window._fluxReturnScrollTop = content ? content.scrollTop : 0;
+  } catch(e) {}
+}
+function articleScrollTopFor(articleId) {
+  const stateTop = history.state?.flux === 'article' && history.state.articleId === articleId
+    ? Math.max(0, Number(history.state.articleScrollTop) || 0)
+    : 0;
+  return Math.max(stateTop, articleScrollPositions.get(articleId) || 0);
+}
+function saveArticleHistoryScroll() {
+  if (history.state?.flux !== 'article') return;
+  const scroller = activeArticleMode === 'modal'
+    ? $('articleModalLayer')?.querySelector('.article-scroll')
+    : $('articlePageLayer')?.querySelector('.article-page-scroll');
+  if (!scroller) return;
+  try {
+    const top = Math.max(0, scroller.scrollTop);
+    articleScrollPositions.set(history.state.articleId, top);
+    history.replaceState({ ...history.state, articleScrollTop: top }, '', location.href);
   } catch(e) {}
 }
 function restoreReturnScroll(immediate = false) {
@@ -1451,7 +1528,7 @@ function setupArticleSwipeBack() {
     return view.closest('.article-page-layer') || view;
   };
   const clearView = view => {
-    view.classList.remove('article-swipe-surface', 'article-swipe-active', 'article-swipe-cancel', 'article-swipe-close');
+    view.classList.remove('article-swipe-surface', 'article-swipe-active', 'article-swipe-cancel', 'article-swipe-close', 'article-swipe-forward-open');
     view.style.removeProperty('--article-swipe-x');
     view.style.removeProperty('--article-swipe-shadow');
   };
@@ -1469,8 +1546,17 @@ function setupArticleSwipeBack() {
       $('articleModalLayer')?.classList.add('article-swipe-underlay');
     }
   };
+  const closePreparedForward = current => {
+    if (!current?.view) return;
+    clearView(current.view);
+    if (current.mode === 'modal') closeArticleModal();
+    else closeArticlePageLayer();
+    activeArticleMode = null;
+  };
   const reset = () => {
-    if (gesture?.view) clearView(gesture.view);
+    const current = gesture;
+    if (current?.kind === 'forward') closePreparedForward(current);
+    else if (current?.view) clearView(current.view);
     clearUnderlay();
     gesture = null;
   };
@@ -1500,40 +1586,112 @@ function setupArticleSwipeBack() {
       clearUnderlay();
     }, cfg.cancelMs);
   };
+  const prepareForward = () => {
+    const record = lastClosedArticle;
+    if (!record || activeArticleMode) return null;
+    const layer = record.mode === 'modal' ? $('articleModalLayer') : $('articlePageLayer');
+    const scroll = record.mode === 'modal'
+      ? layer?.querySelector('.article-scroll')
+      : layer?.querySelector('.article-page-scroll');
+    const article = scroll?.querySelector(`.article-view[data-article-id="${CSS.escape(record.id)}"]`);
+    if (!layer || !scroll || !article) return null;
+    const view = record.mode === 'modal' ? layer.querySelector('.article-sheet') : layer;
+    activeArticleMode = record.mode;
+    setScrollTopInstant(scroll, record.scrollTop ?? articleScrollTopFor(record.id));
+    if (record.mode === 'modal') document.body.classList.add('article-modal-open');
+    layer.classList.add('open');
+    view.classList.add('article-swipe-surface', 'article-swipe-active');
+    view.style.setProperty('--article-swipe-x', `${window.innerWidth}px`);
+    view.style.setProperty('--article-swipe-shadow', '1');
+    return { id: record.id, mode: record.mode, view, scroll, scrollTop: record.scrollTop };
+  };
+  const setForwardDrag = dx => {
+    if (!gesture?.view) return;
+    const dragX = Math.min(window.innerWidth * cfg.maxDragRatio, dx * cfg.dragFriction);
+    const progress = Math.min(1, dragX / window.innerWidth);
+    gesture.view.style.setProperty('--article-swipe-x', `${window.innerWidth - dragX}px`);
+    gesture.view.style.setProperty('--article-swipe-shadow', String(1 - progress));
+  };
+  const cancelForward = () => {
+    const current = gesture;
+    gesture = null;
+    if (!current?.view) return reset();
+    current.view.classList.add('article-swipe-cancel');
+    current.view.style.setProperty('--article-swipe-x', `${window.innerWidth}px`);
+    current.view.style.setProperty('--article-swipe-shadow', '1');
+    setTimeout(() => closePreparedForward(current), cfg.cancelMs);
+  };
+  const commitForward = () => {
+    const current = gesture;
+    gesture = null;
+    if (!current?.view) return reset();
+    current.view.classList.add('article-swipe-forward-open');
+    current.view.style.setProperty('--article-swipe-x', '0px');
+    current.view.style.setProperty('--article-swipe-shadow', '0');
+    setTimeout(() => {
+      clearView(current.view);
+      setScrollTopInstant(current.scroll, current.scrollTop ?? articleScrollTopFor(current.id));
+      lastClosedArticle = null;
+      if (history.state?.flux !== 'article') history.forward();
+    }, cfg.closeMs);
+  };
   const commit = () => {
     const view = gesture?.view;
     gesture = null;
     if (!view) return closeArticleView();
+    const shouldPopHistory = history.state?.flux === 'article';
+    saveArticleHistoryScroll();
+    if (shouldPopHistory) {
+      pendingArticleSwipeClose = true;
+      // Change history while the reader is still intact, so native forward
+      // navigation can restore the complete reader state.
+      history.back();
+    }
     view.classList.add('article-swipe-close');
     document.body.classList.add('article-swipe-underlay-close');
     view.style.setProperty('--article-swipe-x', `${window.innerWidth}px`);
     view.style.setProperty('--article-swipe-shadow', '1');
     setUnderlayX(0);
     setTimeout(() => {
-      const shouldPopHistory = history.state?.flux === 'article';
-      if (activeArticleMode === 'modal') $('articleModalLayer')?.classList.add('article-swipe-dismissed');
+      pendingArticleSwipeClose = false;
       finishArticleClose();
-      clearView(view);
-      clearUnderlay();
-      if (shouldPopHistory) history.back();
     }, cfg.closeMs);
   };
 
   document.addEventListener('touchstart', ev => {
+    if (ev.touches.length !== 1) {
+      reset();
+      return;
+    }
+    const point = ev.touches[0];
+    if (!activeArticleMode && lastClosedArticle && history.state?.flux !== 'article' && point.clientX >= window.innerWidth - cfg.nativeEdgeWidth) {
+      // Keep Safari's native forward card from running beside the Flux card.
+      ev.preventDefault();
+      gesture = {
+        kind: 'forward',
+        state: 'tracking',
+        startX: point.clientX,
+        startY: point.clientY,
+        lastX: point.clientX,
+        lastY: point.clientY
+      };
+      return;
+    }
     const article = articleTarget(ev.target);
-    if (ev.touches.length !== 1 || !article || ev.touches[0].clientX <= cfg.nativeEdgeWidth) {
+    if (!article || point.clientX <= cfg.nativeEdgeWidth) {
       reset();
       return;
     }
     gesture = {
+      kind: 'back',
       state: 'tracking',
       view: swipeSurfaceFor(article),
-      startX: ev.touches[0].clientX,
-      startY: ev.touches[0].clientY,
-      lastX: ev.touches[0].clientX,
-      lastY: ev.touches[0].clientY
+      startX: point.clientX,
+      startY: point.clientY,
+      lastX: point.clientX,
+      lastY: point.clientY
     };
-  }, { passive: true });
+  }, { passive: false });
 
   document.addEventListener('touchmove', ev => {
     if (!gesture || ev.touches.length !== 1) return;
@@ -1543,6 +1701,32 @@ function setupArticleSwipeBack() {
     const dy = gesture.lastY - gesture.startY;
     const absX = Math.abs(dx);
     const absY = Math.abs(dy);
+
+    if (gesture.kind === 'forward') {
+      const forwardDx = gesture.startX - gesture.lastX;
+      if (forwardDx < -cfg.startSlop || (absY > cfg.verticalCancel && absY > absX)) {
+        gesture.view ? cancelForward() : reset();
+        return;
+      }
+      if (forwardDx > cfg.startSlop && absX > absY * cfg.horizontalBias) {
+        if (!gesture.view) {
+          const prepared = prepareForward();
+          if (!prepared) {
+            reset();
+            return;
+          }
+          gesture.view = prepared.view;
+          gesture.scroll = prepared.scroll;
+          gesture.scrollTop = prepared.scrollTop;
+          gesture.mode = prepared.mode;
+          gesture.articleId = prepared.id;
+        }
+        gesture.state = 'forward-dragging';
+        setForwardDrag(forwardDx);
+        ev.preventDefault();
+      }
+      return;
+    }
 
     if (dx < -cfg.startSlop || (absY > cfg.verticalCancel && absY > absX)) {
       reset();
@@ -1557,6 +1741,21 @@ function setupArticleSwipeBack() {
 
   document.addEventListener('touchend', ev => {
     if (!gesture) return;
+    if (gesture.kind === 'forward') {
+      const dx = gesture.startX - gesture.lastX;
+      const shouldOpen = gesture.state === 'forward-dragging' &&
+        dx >= ARTICLE_SWIPE_BACK_THRESHOLD &&
+        Math.abs(gesture.lastY - gesture.startY) < cfg.verticalLimit;
+      if (shouldOpen) {
+        ev.preventDefault();
+        commitForward();
+      } else if (gesture.view) {
+        cancelForward();
+      } else {
+        reset();
+      }
+      return;
+    }
     const dx = gesture.lastX - gesture.startX;
     const dy = gesture.lastY - gesture.startY;
     const shouldClose = gesture.state === 'dragging' &&
@@ -1885,7 +2084,13 @@ function bindEvents() {
     renderArticles();
   });
   window.addEventListener('popstate', () => {
-    if (history.state?.flux === 'article') return;
+    if (history.state?.flux === 'article') {
+      if (activeArticleMode) return;
+      const articleId = history.state.articleId;
+      if (articleId && articleMap[articleId]) openArticle(articleId);
+      return;
+    }
+    if (pendingArticleSwipeClose) return;
     closeArticleView(true);
   });
   const _spPage = $('settingsPage');
