@@ -5,14 +5,14 @@
       "FeelsLikeF": "89",
       "cloudcover": "1",
       "humidity": "12",
-      "observation_time": "01:27 PM",
+      "observation_time": "02:57 PM",
       "precipInches": "0.0",
       "precipMM": "0.0",
-      "pressure": "1015",
+      "pressure": "1014",
       "pressureInches": "30",
       "temp_C": "34",
-      "temp_F": "93",
-      "uvIndex": "5",
+      "temp_F": "94",
+      "uvIndex": "3",
       "visibility": "10",
       "visibilityMiles": "6",
       "weatherCode": "113",
@@ -26,8 +26,8 @@
           "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0001_sunny.png"
         }
       ],
-      "winddir16Point": "ESE",
-      "winddirDegree": "110",
+      "winddir16Point": "ENE",
+      "winddirDegree": "57",
       "windspeedKmph": "4",
       "windspeedMiles": "2"
     }
@@ -36,7 +36,7 @@
     {
       "areaName": [
         {
-          "value": "Kis-Gellerthegy"
+          "value": "Var"
         }
       ],
       "country": [
@@ -44,8 +44,8 @@
           "value": "Hungary"
         }
       ],
-      "latitude": "47.483",
-      "longitude": "19.033",
+      "latitude": "47.517",
+      "longitude": "19.050",
       "population": "0",
       "region": [
         {
@@ -54,7 +54,7 @@
       ],
       "weatherUrl": [
         {
-          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.483,19.033"
+          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.517,19.05"
         }
       ]
     }
@@ -345,8 +345,8 @@
           "HeatIndexF": "89",
           "WindChillC": "34",
           "WindChillF": "93",
-          "WindGustKmph": "11",
-          "WindGustMiles": "7",
+          "WindGustKmph": "2",
+          "WindGustMiles": "2",
           "chanceoffog": "0",
           "chanceoffrost": "0",
           "chanceofhightemp": "96",
@@ -384,8 +384,8 @@
           ],
           "winddir16Point": "ESE",
           "winddirDegree": "110",
-          "windspeedKmph": "4",
-          "windspeedMiles": "2"
+          "windspeedKmph": "2",
+          "windspeedMiles": "1"
         },
         {
           "DewPointC": "0",
