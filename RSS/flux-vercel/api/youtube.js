@@ -8,12 +8,14 @@ module.exports = async function handler(req, res) {
   }
 
   const input = String(Array.isArray(req.query?.input) ? req.query.input[0] : req.query?.input || '').trim();
+  const fresh = String(Array.isArray(req.query?.fresh) ? req.query.fresh[0] : req.query?.fresh || '') === '1';
   if (!input) {
     sendJson(res, 400, { error: 'missing_input' });
     return;
   }
 
   try {
+    res.setHeader('Cache-Control', fresh ? 'no-store' : 'public, s-maxage=300, stale-while-revalidate=60');
     const parsed = parseInput(input);
     if (!parsed) {
       const results = await searchChannels(input);
@@ -31,16 +33,18 @@ module.exports = async function handler(req, res) {
       return;
     }
 
-    const feed = await fetchChannelFeed(resolved.id);
+    const feed = await fetchChannelVideos(resolved.id);
     const channelName = feed.channelName || resolved.name || resolved.id;
     sendJson(res, 200, {
       id: resolved.id,
       idType: 'id',
       name: channelName,
       channelName,
+      source: feed.source,
       videos: feed.videos
     });
   } catch (err) {
+    res.setHeader('Cache-Control', 'no-store');
     sendJson(res, 502, { error: 'youtube_lookup_failed' });
   }
 };
@@ -186,6 +190,90 @@ async function fetchChannelFeed(channelId) {
   return { channelName, videos };
 }
 
+async function fetchChannelVideos(channelId) {
+  try {
+    const feed = await fetchChannelFeed(channelId);
+    if (feed.videos.length) return { ...feed, source: 'rss' };
+  } catch (err) {}
+
+  const page = await fetchChannelPageVideos(channelId);
+  if (!page.videos.length) throw new Error('channel_videos_not_found');
+  return { ...page, source: 'page' };
+}
+
+async function fetchChannelPageVideos(channelId) {
+  const html = await fetchText(`https://www.youtube.com/channel/${encodeURIComponent(channelId)}/videos`);
+  const data = extractInitialData(html);
+  if (!data) return { channelName: channelId, videos: [] };
+
+  const channelName = extractChannelNameFromHtml(html) || channelId;
+  const models = [];
+  walk(data, value => {
+    const model = value?.lockupViewModel;
+    if (model?.contentType === 'LOCKUP_CONTENT_TYPE_VIDEO') models.push(model);
+  });
+
+  const seen = new Set();
+  const videos = [];
+  for (const model of models) {
+    const videoId = model.contentId;
+    const modelMetadata = model.metadata?.lockupMetadataViewModel;
+    const title = modelMetadata?.title?.content || '';
+    if (!videoId || !title || seen.has(videoId)) continue;
+    seen.add(videoId);
+    const parts = modelMetadata?.metadata?.contentMetadataViewModel?.metadataRows
+      ?.flatMap(row => row.metadataParts || [])
+      .map(part => part.text?.content || '') || [];
+    const relativeDate = parts.find(part => /ago|streamed|premiered|scheduled/i.test(part)) || '';
+    videos.push({
+      videoId,
+      title: decodeHtml(title),
+      date: relativeDateToIso(relativeDate),
+      thumb: `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`,
+      channelName,
+      channelId
+    });
+    if (videos.length >= 15) break;
+  }
+  return { channelName, videos };
+}
+
+function extractInitialData(html) {
+  const marker = ['var ytInitialData = ', 'window["ytInitialData"] = ', 'ytInitialData = ']
+    .find(candidate => html.includes(candidate));
+  if (!marker) return null;
+  const start = html.indexOf(marker);
+  if (start < 0) return null;
+  const jsonStart = start + marker.length;
+  const jsonEnd = html.indexOf(';</script>', jsonStart);
+  if (jsonEnd < 0) return null;
+  try { return JSON.parse(html.slice(jsonStart, jsonEnd)); } catch (err) { return null; }
+}
+
+function walk(value, visit) {
+  if (!value || typeof value !== 'object') return;
+  visit(value);
+  Object.values(value).forEach(child => walk(child, visit));
+}
+
+function relativeDateToIso(text) {
+  const value = String(text || '').toLowerCase();
+  const scheduled = Date.parse(value.replace(/^scheduled for\s+/, ''));
+  if (value.startsWith('scheduled for') && Number.isFinite(scheduled)) return new Date(scheduled).toISOString();
+  const match = value.match(/(\d+)\s+(second|minute|hour|day|week|month|year)s?/);
+  if (!match) return new Date().toISOString();
+  const unitMs = {
+    second: 1000,
+    minute: 60 * 1000,
+    hour: 60 * 60 * 1000,
+    day: 24 * 60 * 60 * 1000,
+    week: 7 * 24 * 60 * 60 * 1000,
+    month: 30 * 24 * 60 * 60 * 1000,
+    year: 365 * 24 * 60 * 60 * 1000
+  }[match[2]];
+  return new Date(Date.now() - Number(match[1]) * unitMs).toISOString();
+}
+
 function extractChannelIdFromHtml(html) {
   if (!html) return null;
   return firstMatch(html, /"externalId":"(UC[A-Za-z0-9_-]{22})"/) ||
@@ -209,9 +297,12 @@ function extractChannelNameFromHtml(html) {
 
 async function fetchText(url) {
   const response = await fetch(url, {
+    cache: 'no-store',
+    signal: AbortSignal.timeout(4500),
     headers: {
       accept: 'text/html,application/xhtml+xml,application/xml,text/xml;q=0.9,*/*;q=0.8',
       'accept-language': 'en-US,en;q=0.8',
+      'cache-control': 'no-cache',
       'user-agent': 'Mozilla/5.0 FluxReader/1.0'
     }
   });

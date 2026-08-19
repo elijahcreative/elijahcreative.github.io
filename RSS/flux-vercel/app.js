@@ -118,6 +118,8 @@ let ytVideos = [];
 const ytVideoMap = {};
 let ytLoading = false;
 let ytLoadProgress = 0;
+let ytRefreshState = 'idle';
+let ytLoadRequestId = 0;
 let ytActiveVideoId = null;
 let ytReturnScrollLeft = 0;
 let ytPlayer = null;
@@ -131,9 +133,6 @@ function ytCacheSignature() {
   return 'yt-cache-v2:' + JSON.stringify(
     (S.ytChannels || []).map(ch => `${ch.idType || 'id'}:${ch.id}`).sort()
   );
-}
-function ytChannelCountFromVideos(videos) {
-  return new Set((videos || []).map(v => v.channelId).filter(Boolean)).size;
 }
 const Store = {
   get(key, fallback) { try { return JSON.parse(localStorage.getItem(key) || 'null') ?? fallback; } catch(e) { return fallback; } },
@@ -1493,7 +1492,7 @@ function setupPullToRefresh() {
     if (icon) icon.textContent = '↻';
     if (label) label.textContent = 'FRISSÍTÉS';
     try {
-      await refreshAll(true);
+      await Promise.all([refreshAll(true), loadYouTube(true)]);
     } finally {
       refreshing = false;
       setTimeout(reset, 450);
@@ -2584,8 +2583,9 @@ async function resolveYtInputToChannel(parsed) {
   }
   return null;
 }
-async function fetchYtLookup(input) {
-  const response = await fetchT(YOUTUBE_API + encodeURIComponent(input), { cache: 'no-store' }, 15000);
+async function fetchYtLookup(input, fresh = false) {
+  const suffix = fresh ? '&fresh=1' : '';
+  const response = await fetchT(YOUTUBE_API + encodeURIComponent(input) + suffix, { cache: 'no-store' }, 15000);
   if (!response.ok) return null;
   const data = await response.json();
   if (Array.isArray(data?.results)) {
@@ -2647,61 +2647,25 @@ async function fetchYtVideosFromChannelPage(url, channelId, channelName) {
   const html = await fetchYtPage(url);
   return parseYtVideosFromHtml(html, channelId, channelName);
 }
-async function fetchYtChannelVideos(ch) {
-  if (ch.idType === 'handle') {
-    return fetchYtVideosFromChannelPage(`https://www.youtube.com/@${ch.id}/videos`, ch.id, ch.name);
-  }
-  if (ch.idType === 'url') {
-    return fetchYtVideosFromChannelPage(ch.id.replace(/\/+$/, '') + '/videos', ch.id, ch.name);
-  }
-  const param = ch.idType === 'id' ? `channel_id=${ch.id}` : `user=${ch.id}`;
-  const feedUrl = `https://www.youtube.com/feeds/videos.xml?${param}`;
-  try {
-    const r = await fetchT(RSS2JSON + encodeURIComponent(feedUrl), { cache: 'no-store' });
-    if (r.ok) {
-      const d = await r.json();
-      if (d.status === 'ok' && Array.isArray(d.items) && d.items.length) {
-        const channelName = normalizeText(d.feed?.title || ch.name || ch.id);
-        const videos = d.items.slice(0, 15).map(i => {
-          const link = i.link || '';
-          const videoId = link.match(/[?&]v=([^&]+)/)?.[1] || '';
-          return {
-            videoId,
-            title: normalizeText(i.title || ''),
-            date: new Date(i.pubDate),
-            thumb: i.thumbnail || (videoId ? `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg` : ''),
-            channelName,
-            channelId: ch.id
-          };
-        }).filter(v => v.videoId);
-        if (videos.length) return { videos, channelName };
-      }
-    }
-  } catch(e) {}
-  const xml = await firstResult(proxyTextAttempts(feedUrl), Boolean);
-  if (!xml) return { videos: [], channelName: ch.name };
-  const doc = new DOMParser().parseFromString(xml, 'application/xml');
-  const entries = [...doc.querySelectorAll('entry')];
-  if (!entries.length) return { videos: [], channelName: ch.name };
-  const channelName = normalizeText(doc.querySelector('author > name')?.textContent?.trim() || ch.name || ch.id);
-  const videos = entries.slice(0, 15).map(el => {
-    const link = el.querySelector('link')?.getAttribute('href') || '';
-    const videoId = link.match(/[?&]v=([^&]+)/)?.[1] || '';
-    const title = normalizeText(el.querySelector('title')?.textContent?.trim() || '');
-    const published = el.querySelector('published')?.textContent || '';
-    const thumb = videoId ? `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg` : '';
-    return { videoId, title, date: new Date(published), thumb, channelName, channelId: ch.id };
-  }).filter(v => v.videoId);
-  return { videos, channelName };
+async function fetchYtChannelVideos(ch, fresh = false) {
+  const input = ch.idType === 'handle' ? `@${ch.id}` : ch.id;
+  const data = await fetchYtLookup(input, fresh);
+  if (!data?.id || !Array.isArray(data.videos)) throw new Error('youtube_channel_failed');
+  return {
+    ok: true,
+    channelName: data.name || ch.name,
+    videos: data.videos.map(video => ({ ...video, channelId: ch.id }))
+  };
 }
 async function loadYouTube(bust = false) {
+  const requestId = ++ytLoadRequestId;
   if (!S.ytChannels.length) {
     ytLoading = false;
+    ytRefreshState = 'idle';
     ytVideos = [];
     removeYtSidebar();
     return;
   }
-  const YT_TTL = 30 * 60 * 1000;
   let cached = null;
   try {
     cached = JSON.parse(localStorage.getItem('flux_yt_cache') || 'null');
@@ -2709,51 +2673,65 @@ async function loadYouTube(bust = false) {
       ytVideos = cached.videos.map(v => ({ ...v, date: new Date(v.date) }));
       ytVideos.forEach(v => { ytVideoMap[v.videoId] = v; });
     }
-    if (!bust && cached && Date.now() - cached.ts < YT_TTL && cached.videos?.length) {
-      ytLoading = false;
-      injectYtSidebar();
-      return;
-    }
   } catch(e) {}
   ytLoading = true;
+  ytRefreshState = 'loading';
   ytLoadProgress = 0;
   if (!ytActiveVideoId) injectYtSidebar();
   let completed = 0;
+  const updateProgress = () => {
+    document.querySelector('.yt-box-head')?.style.setProperty('--yt-progress', `${Math.round(ytLoadProgress * 100)}%`);
+  };
+  const progressTimer = setInterval(() => {
+    if (requestId !== ytLoadRequestId) {
+      clearInterval(progressTimer);
+      return;
+    }
+    const completedFloor = completed / S.ytChannels.length;
+    ytLoadProgress = Math.min(.92, Math.max(completedFloor, ytLoadProgress + .006));
+    updateProgress();
+  }, 90);
   const results = await Promise.all(
     S.ytChannels.map(async ch => {
-      const result = await fetchYtChannelVideos(ch).catch(() => ({ videos: [], channelName: ch.name }));
+      const result = await fetchYtChannelVideos(ch, bust).catch(() => ({ ok: false, videos: [], channelName: ch.name }));
       completed += 1;
-      ytLoadProgress = completed / S.ytChannels.length;
-      if (!ytActiveVideoId) injectYtSidebar();
       return result;
     })
   );
+  clearInterval(progressTimer);
+  if (requestId !== ytLoadRequestId) return;
+  ytLoadProgress = 1;
+  updateProgress();
+  await new Promise(resolve => setTimeout(resolve, 180));
+  if (requestId !== ytLoadRequestId) return;
   results.forEach((r, i) => {
     if (r.channelName && r.channelName !== S.ytChannels[i].id) S.ytChannels[i].name = r.channelName;
   });
   saveYtChannels();
-  const freshVideos = results.flatMap(r => r.videos).sort((a, b) => b.date - a.date);
-  const expectedChannels = S.ytChannels.length;
-  const freshChannelCount = ytChannelCountFromVideos(freshVideos);
   const cachedVideos = (cached && cached.sig === ytCacheSignature() && cached.videos?.length)
     ? cached.videos.map(v => ({ ...v, date: new Date(v.date) }))
     : [];
-  const cachedChannelCount = ytChannelCountFromVideos(cachedVideos);
-  ytVideos = freshVideos;
-  if (freshChannelCount < expectedChannels && cachedChannelCount > freshChannelCount) {
-    ytVideos = cachedVideos;
-  }
+  const cachedByChannel = cachedVideos.reduce((groups, video) => {
+    (groups[video.channelId] ||= []).push(video);
+    return groups;
+  }, {});
+  const failed = results.filter(result => !result.ok).length;
+  ytVideos = results.flatMap((result, index) => result.ok
+    ? result.videos
+    : (cachedByChannel[S.ytChannels[index].id] || [])
+  ).sort((a, b) => b.date - a.date);
   ytVideos.forEach(v => { ytVideoMap[v.videoId] = v; });
-  if (freshChannelCount >= expectedChannels || !cachedChannelCount) {
+  if (ytVideos.length) {
     try {
       localStorage.setItem('flux_yt_cache', JSON.stringify({
         ts: Date.now(),
         sig: ytCacheSignature(),
-        videos: freshVideos
+        videos: ytVideos
       }));
     } catch(e) {}
   }
   ytLoading = false;
+  ytRefreshState = failed === results.length ? 'failed' : failed ? 'partial' : 'idle';
   ytLoadProgress = 0;
   if (!ytActiveVideoId) injectYtSidebar();
 }
@@ -2856,8 +2834,13 @@ function buildYtSidebarHtml() {
     </div>` : '';
   const sortByTime = S.ytSortMode === 'time';
   const sortLabel = sortByTime ? 'Időrend szerint' : 'Csatorna szerint';
+  const refreshTitle = ytRefreshState === 'failed'
+    ? 'A VIDEÓK NEM FRISSÜLTEK'
+    : ytRefreshState === 'partial'
+      ? 'A VIDEÓK RÉSZBEN FRISSÜLTEK'
+      : 'LEGFRISSEBB VIDEÓK';
   return `<div class="yt-box-head${ytLoading ? ' is-loading' : ''}" style="--yt-progress:${Math.round(ytLoadProgress * 100)}%">
-    <span class="yt-box-title">${ytLoading ? 'VIDEÓK FRISSÍTÉSE...' : 'LEGFRISSEBB VIDEÓK'}</span>
+    <span class="yt-box-title">${ytLoading ? 'VIDEÓK FRISSÍTÉSE...' : refreshTitle}</span>
     <span class="yt-box-line"><span></span></span>
     <button class="yt-sort-toggle" type="button" data-yt-sort-toggle title="Rendezési mód váltása">
       <span class="yt-sort-label">${sortLabel}</span>
@@ -3049,10 +3032,9 @@ function getYtPlaybackTime() {
   if (ytPlaybackIntent && ytPlaybackStartedAt) return (Date.now() - ytPlaybackStartedAt) / 1000;
   return ytLastKnownTime;
 }
-function refreshYtFeed(ev) {
+async function refreshYtFeed(ev) {
   if (ev) ev.stopPropagation();
-  try { localStorage.removeItem('flux_yt_cache'); } catch(e) {}
-  loadYouTube(true);
+  await loadYouTube(true);
 }
 function mergeSplitLayouts(container) {
   if (!container) return;
@@ -3733,7 +3715,8 @@ const Config = {
   setupArticleSwipeBack();
   updateLayoutBtns();
   syncWidgets();
-  loadYouTube();
+  const navigation = performance.getEntriesByType?.('navigation')?.[0];
+  loadYouTube(navigation?.type === 'reload');
   const contentEl = document.getElementById('content');
   const navbar = document.getElementById('navbar');
   contentEl.addEventListener('scroll', () => {

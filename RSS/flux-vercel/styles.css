@@ -816,7 +816,7 @@ to   { opacity: 1; transform: translateY(0); }
 .yt-box-head { display: grid; grid-template-columns: max-content minmax(0, 1fr) max-content; gap: 10px; align-items: center; margin-bottom: 18px; }
 .yt-box-title { color: rgba(255,255,255,.58); font-size: .68rem; font-weight: 200; letter-spacing: .11em; text-transform: uppercase; line-height: 1; }
 .yt-box-line { height: 1px; background: rgba(255,255,255,.16); overflow: hidden; }
-.yt-box-line span { display: block; width: var(--yt-progress, 0%); height: 100%; background: rgba(255,255,255,.52); transition: width .35s ease; }
+.yt-box-line span { display: block; width: var(--yt-progress, 0%); height: 100%; background: rgba(255,255,255,.52); transition: width .16s linear; }
 .yt-sort-toggle { display: inline-flex; align-items: center; gap: 7px; border: 0; padding: 3px 0; background: transparent; color: rgba(255,255,255,.58); font-family: inherit; cursor: pointer; }
 .yt-sort-label { font-size: .68rem; font-weight: 400; line-height: 1; white-space: nowrap; }
 .yt-sort-toggle svg { opacity: .62; transition: opacity var(--t); }
