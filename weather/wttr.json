@@ -1,42 +1,42 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "23",
-      "FeelsLikeF": "74",
-      "cloudcover": "100",
+      "FeelsLikeC": "24",
+      "FeelsLikeF": "75",
+      "cloudcover": "94",
       "humidity": "72",
-      "observation_time": "03:01 AM",
+      "observation_time": "04:31 AM",
       "precipInches": "0.0",
-      "precipMM": "0.0",
+      "precipMM": "0.2",
       "pressure": "1011",
       "pressureInches": "30",
-      "temp_C": "23",
-      "temp_F": "73",
+      "temp_C": "22",
+      "temp_F": "72",
       "uvIndex": "0",
       "visibility": "10",
       "visibilityMiles": "6",
-      "weatherCode": "122",
+      "weatherCode": "353",
       "weatherDesc": [
         {
-          "value": "Overcast "
+          "value": "Light rain shower"
         }
       ],
       "weatherIconUrl": [
         {
-          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0004_black_low_cloud.png"
+          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0009_light_rain_showers.png"
         }
       ],
-      "winddir16Point": "WNW",
-      "winddirDegree": "287",
-      "windspeedKmph": "9",
-      "windspeedMiles": "6"
+      "winddir16Point": "NNW",
+      "winddirDegree": "346",
+      "windspeedKmph": "4",
+      "windspeedMiles": "2"
     }
   ],
   "nearest_area": [
     {
       "areaName": [
         {
-          "value": "Var"
+          "value": "Buda"
         }
       ],
       "country": [
@@ -44,8 +44,8 @@
           "value": "Hungary"
         }
       ],
-      "latitude": "47.517",
-      "longitude": "19.050",
+      "latitude": "47.500",
+      "longitude": "19.033",
       "population": "0",
       "region": [
         {
@@ -54,7 +54,7 @@
       ],
       "weatherUrl": [
         {
-          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.517,19.05"
+          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.5,19.033"
         }
       ]
     }
