@@ -378,21 +378,37 @@
 <!-- Add Feed Modal -->
 <div class="modal" id="addModal">
   <div class="modal-title">Feed hozzáadása</div>
-  <div class="form-group">
-    <label class="form-label" for="feedUrl">Feed keresése vagy RSS URL</label>
-    <input type="text" class="form-input" id="feedUrl" placeholder="telex, portfolio.hu vagy https://.../rss">
-    <div class="form-hint">Név alapján választható találatokat ad, RSS/Atom URL alapján közvetlenül hozzáad.</div>
+  <div class="feed-add-tabs" role="tablist" aria-label="Feed hozzáadási mód">
+    <button class="feed-add-tab active" id="feedSearchTab" type="button" role="tab" aria-selected="true" aria-controls="feedSearchPanel" data-feed-tab="search">Keresés</button>
+    <button class="feed-add-tab" id="feedOffersTab" type="button" role="tab" aria-selected="false" aria-controls="feedOffersPanel" data-feed-tab="offers">Ajánlatok</button>
+  </div>
+  <div class="feed-tab-panel active" id="feedSearchPanel" role="tabpanel" aria-labelledby="feedSearchTab">
+    <div class="form-group">
+      <label class="form-label" for="feedUrl">Feed neve, webcíme vagy RSS URL</label>
+      <div class="feed-search-row">
+        <input type="text" class="form-input" id="feedUrl" placeholder="Feed neve vagy URL">
+        <button class="btn btn-primary feed-search-btn" id="searchFeedBtn" type="button">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          Keresés
+        </button>
+      </div>
+      <div class="form-hint">Név vagy webcím alapján kereshetsz. RSS/Atom URL-t is elfogad.</div>
+    </div>
+    <div class="feed-choice-list" id="feedChoiceList"></div>
+  </div>
+  <div class="feed-tab-panel" id="feedOffersPanel" role="tabpanel" aria-labelledby="feedOffersTab" hidden>
+    <div class="form-label">Ajánlott feedek</div>
+    <div class="form-hint">Válassz a szerkesztett híroldalak közül.</div>
     <div class="suggestions" id="suggestions"></div>
   </div>
-  <div class="feed-choice-list" id="feedChoiceList"></div>
   <div class="form-group">
     <label class="form-label" for="feedName">Név (opcionális)</label>
-    <input type="text" class="form-input" id="feedName" placeholder="Automatikusan töltődik ki">
+    <input type="text" class="form-input" id="feedName" placeholder="Automatikusan töltődik ki" disabled>
   </div>
   <div class="err" id="feedErr">Nem sikerült betölteni a feedet. Ellenőrizd az URL-t.</div>
   <div class="modal-foot">
     <button class="btn btn-ghost" id="cancelAdd">Mégse</button>
-    <button class="btn btn-primary" id="confirmAdd">Hozzáadás</button>
+    <button class="btn btn-primary" id="confirmAdd" disabled>Hozzáadás</button>
   </div>
 </div>
 

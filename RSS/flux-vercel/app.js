@@ -1800,7 +1800,7 @@ function buildSettingsUI() {
     if (input.type === 'checkbox' && input.dataset.setting in S) input.checked = !!S[input.dataset.setting];
   });
   $('suggestions').innerHTML = SUGGESTIONS.map(s =>
-    `<span class="chip" data-url="${e(s.url)}" data-label="${e(s.label)}">${s.label}</span>`
+    `<button class="chip" type="button" data-url="${e(s.url)}" data-label="${e(s.label)}">${e(s.label)}</button>`
   ).join('');
 }
 function setPreset(p) {
@@ -1809,13 +1809,36 @@ function setPreset(p) {
 function setAccent(c) {
   S.customAccent = c; saveSettings(); Theme.apply(); Theme._syncUI();
 }
+let pendingFeed = null;
+function clearFeedSelection() {
+  pendingFeed = null;
+  $('feedName').value = '';
+  $('feedName').disabled = true;
+  $('confirmAdd').disabled = true;
+  document.querySelectorAll('#addModal .feed-choice.active, #addModal .chip.active').forEach(el => el.classList.remove('active'));
+}
+function setFeedAddTab(tab) {
+  document.querySelectorAll('.feed-add-tab').forEach(button => {
+    const active = button.dataset.feedTab === tab;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-selected', String(active));
+  });
+  document.querySelectorAll('.feed-tab-panel').forEach(panel => {
+    const active = panel.id === (tab === 'offers' ? 'feedOffersPanel' : 'feedSearchPanel');
+    panel.classList.toggle('active', active);
+    panel.hidden = !active;
+  });
+  $('feedErr').classList.remove('show');
+  clearFeedSelection();
+  if (tab === 'search') setTimeout(() => $('feedUrl').focus(), 0);
+}
 function openAddModal() {
   $('feedUrl').value = '';
-  $('feedName').value = '';
+  $('feedErr').textContent = 'Nem sikerült betölteni a feedet. Ellenőrizd az URL-t.';
   $('feedErr').classList.remove('show');
   clearFeedChoices();
-  $('confirmAdd').disabled = false;
   $('confirmAdd').textContent = 'Hozzáadás';
+  setFeedAddTab('search');
   $('addModal').classList.add('open');
   $('overlay').classList.add('open');
   setTimeout(() => $('feedUrl').focus(), 80);
@@ -1824,6 +1847,7 @@ function closeAddModal() {
   $('addModal').classList.remove('open');
   $('overlay').classList.remove('open');
   clearFeedChoices();
+  clearFeedSelection();
 }
 function clearFeedChoices() {
   const list = $('feedChoiceList');
@@ -1831,7 +1855,7 @@ function clearFeedChoices() {
   list.innerHTML = '';
   list.classList.remove('show');
 }
-function renderFeedChoices(results) {
+function renderFeedChoices(results, selectFirst = false) {
   const list = $('feedChoiceList');
   if (!list) return;
   list.innerHTML = results.map(r => `<button class="feed-choice" type="button" data-url="${e(r.url)}" data-name="${e(r.name)}">
@@ -1842,6 +1866,18 @@ function renderFeedChoices(results) {
     </span>
   </button>`).join('');
   list.classList.toggle('show', results.length > 0);
+  if (selectFirst && results[0]) {
+    selectFeed(results[0].url, results[0].name, list.querySelector('.feed-choice'));
+  }
+}
+function selectFeed(url, name, element) {
+  pendingFeed = { url, name: name || '' };
+  $('feedName').value = name || '';
+  $('feedName').disabled = false;
+  $('confirmAdd').disabled = false;
+  $('feedErr').classList.remove('show');
+  document.querySelectorAll('#addModal .feed-choice.active, #addModal .chip.active').forEach(el => el.classList.remove('active'));
+  element?.classList.add('active');
 }
 async function fetchFeedLookup(input) {
   const response = await fetchT(FEED_API + encodeURIComponent(input), { cache: 'no-store' }, 12000);
@@ -1854,40 +1890,45 @@ async function fetchFeedLookup(input) {
 function isLikelyFeedUrl(input) {
   return /^https?:\/\//i.test(input) || /\.[a-z]{2,}(?:\/|$)/i.test(input);
 }
-async function submitAddFeed(forcedInput) {
-  let input = (typeof forcedInput === 'string' ? forcedInput : $('feedUrl').value).trim();
+async function searchFeeds() {
+  const input = $('feedUrl').value.trim();
   if (!input) return;
-  let url = input;
-  if (S.feeds.find(f => f.url === url)) { toast('Ez a feed már létezik.'); closeAddModal(); return; }
-  const btn = $('confirmAdd');
+  const btn = $('searchFeedBtn');
   btn.disabled = true;
-  btn.textContent = 'Betöltés...';
   $('feedErr').classList.remove('show');
   clearFeedChoices();
+  clearFeedSelection();
   const lookup = await fetchFeedLookup(input).catch(() => null);
   if (lookup?.results) {
     if (!lookup.results.length) {
       $('feedErr').textContent = 'Nem találtam feedet. Próbálj pontosabb nevet vagy weboldal/RSS URL-t.';
       $('feedErr').classList.add('show');
-      btn.disabled = false; btn.textContent = 'Hozzáadás';
+      btn.disabled = false;
       return;
     }
-    renderFeedChoices(lookup.results);
-    btn.disabled = false; btn.textContent = 'Hozzáadás';
+    renderFeedChoices(lookup.results, true);
+    btn.disabled = false;
     return;
   }
   if (lookup?.feed?.url) {
-    url = lookup.feed.url;
-    if (!$('feedName').value.trim()) $('feedName').value = lookup.feed.name || '';
-  } else if (!isLikelyFeedUrl(input)) {
-    $('feedErr').textContent = 'Nem találtam feedet. Próbálj pontosabb nevet vagy weboldal/RSS URL-t.';
-    $('feedErr').classList.add('show');
-    btn.disabled = false; btn.textContent = 'Hozzáadás';
+    renderFeedChoices([lookup.feed], true);
+    btn.disabled = false;
     return;
-  } else if (!url.startsWith('http')) {
-    url = 'https://' + url;
   }
+  $('feedErr').textContent = isLikelyFeedUrl(input)
+    ? 'Nem találtam érvényes RSS vagy Atom feedet ezen a címen.'
+    : 'Nem találtam feedet. Próbálj pontosabb nevet vagy webcímet.';
+  $('feedErr').classList.add('show');
+  btn.disabled = false;
+}
+async function addSelectedFeed() {
+  if (!pendingFeed?.url) return;
+  const { url } = pendingFeed;
   if (S.feeds.find(f => f.url === url)) { toast('Ez a feed már létezik.'); closeAddModal(); return; }
+  const btn = $('confirmAdd');
+  btn.disabled = true;
+  btn.textContent = 'Betöltés...';
+  $('feedErr').classList.remove('show');
   const articles = await Fetcher.get(url).catch(() => []);
   if (!articles.length) {
     $('feedErr').textContent = 'Nem sikerült betölteni a feedet. Ellenőrizd az URL-t.';
@@ -1897,7 +1938,8 @@ async function submitAddFeed(forcedInput) {
   }
   let name = $('feedName').value.trim();
   if (!name) {
-    try { name = new URL(url).hostname.replace(/^www\./,'').split('.')[0]; name = name[0].toUpperCase() + name.slice(1); }
+    name = pendingFeed.name;
+    try { name ||= new URL(url).hostname.replace(/^www\./,'').split('.')[0]; name = name[0].toUpperCase() + name.slice(1); }
     catch(e) { name = url; }
   }
   S.feeds.push({ url, name });
@@ -2136,21 +2178,23 @@ function bindEvents() {
   $('suggestions').addEventListener('click', ev => {
     const chip = ev.target.closest('.chip[data-url]');
     if (!chip) return;
-    clearFeedChoices();
-    $('feedUrl').value = chip.dataset.url;
-    $('feedName').value = chip.dataset.label;
+    selectFeed(chip.dataset.url, chip.dataset.label, chip);
   });
   $('feedChoiceList').addEventListener('click', ev => {
     const choice = ev.target.closest('.feed-choice[data-url]');
     if (!choice) return;
-    $('feedUrl').value = choice.dataset.url;
-    $('feedName').value = choice.dataset.name || '';
-    submitAddFeed(choice.dataset.url);
+    selectFeed(choice.dataset.url, choice.dataset.name, choice);
+  });
+  $('addModal').querySelector('.feed-add-tabs').addEventListener('click', ev => {
+    const tab = ev.target.closest('.feed-add-tab[data-feed-tab]');
+    if (tab) setFeedAddTab(tab.dataset.feedTab);
   });
   $('addFeedBtn').onclick = openAddModal;
   $('cancelAdd').onclick = closeAddModal;
-  $('confirmAdd').onclick = submitAddFeed;
-  $('feedUrl').addEventListener('keydown', ev => { if (ev.key === 'Enter') submitAddFeed(); });
+  $('searchFeedBtn').onclick = searchFeeds;
+  $('confirmAdd').onclick = addSelectedFeed;
+  $('feedUrl').addEventListener('input', clearFeedSelection);
+  $('feedUrl').addEventListener('keydown', ev => { if (ev.key === 'Enter') searchFeeds(); });
   const updateYtPer = delta => {
     S.ytPerChannel = Math.max(1, Math.min(10, (S.ytPerChannel || 3) + delta));
     $('ytPerVal').textContent = S.ytPerChannel;
