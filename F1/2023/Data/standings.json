@@ -1,43 +1,43 @@
 {
   "Standings": [
     {
-      "After": "After Hungary"
+      "After": "After Netherlands"
     },
     {
       "Place": "1",
       "Name": "Antonelli",
       "Team": "Mercedes",
-      "Points": "219"
+      "Points": "242"
     },
     {
       "Place": "2",
-      "Name": "Hamilton",
-      "Team": "Ferrari",
-      "Points": "169"
+      "Name": "Russell",
+      "Team": "Mercedes",
+      "Points": "183"
     },
     {
       "Place": "3",
-      "Name": "Russell",
-      "Team": "Mercedes",
-      "Points": "160"
+      "Name": "Hamilton",
+      "Team": "Ferrari",
+      "Points": "183"
     },
     {
       "Place": "4",
-      "Name": "Leclerc",
-      "Team": "Ferrari",
-      "Points": "138"
+      "Name": "Norris",
+      "Team": "McLaren",
+      "Points": "159"
     },
     {
       "Place": "5",
-      "Name": "Norris",
-      "Team": "McLaren",
-      "Points": "128"
+      "Name": "Leclerc",
+      "Team": "Ferrari",
+      "Points": "155"
     },
     {
       "Place": "6",
       "Name": "Verstappen",
       "Team": "Red Bull",
-      "Points": "109"
+      "Points": "112"
     }
   ]
 }

@@ -1,8 +1,8 @@
 {
   "Podiums": [
     {
-      "Country": "🇭🇺 Hungary",
-      "City": "Mogyoród",
+      "Country": "🇳🇱 Netherlands",
+      "City": "Zandvoort",
       "Message": "Race ?"
     },
     {
@@ -10,21 +10,21 @@
       "Name": "Norris",
       "Team": "McLaren",
       "Points": "+25",
-      "Total": "128"
+      "Total": "159"
     },
     {
       "Place": "2",
-      "Name": "Verstappen",
-      "Team": "Red Bull",
+      "Name": "Antonelli",
+      "Team": "Mercedes",
       "Points": "+18",
-      "Total": "109"
+      "Total": "242"
     },
     {
       "Place": "3",
-      "Name": "Antonelli",
+      "Name": "Russell",
       "Team": "Mercedes",
       "Points": "+15",
-      "Total": "219"
+      "Total": "183"
     }
   ]
 }
