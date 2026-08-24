@@ -396,6 +396,10 @@ const ChevronIcon = '<svg class="chevron" width="15" height="15" viewBox="0 0 24
 const Renderer = {
   render(articles, layout = S.layout) {
     const el = $('content');
+    const isFlip = layout === 'flip';
+    hideFlipOverlay();
+    flipOverlayKey = '';
+    el.classList.toggle('flip-view', isFlip);
     currentArticleIds = articles.map(aid);
     if (!articles.length) {
       el.innerHTML = `<div class="state-box"><div class="icon">📭</div><div class="title">Nincsenek cikkek</div><div class="desc">A feed üres vagy nem töltődött be.</div></div>`;
@@ -403,6 +407,7 @@ const Renderer = {
     }
     articles.forEach(a => { articleMap[aid(a)] = a; });
     el.innerHTML = (this['_' + layout] || this._magazine).call(this, articles);
+    if (isFlip) requestAnimationFrame(setupFlipView);
   },
   _feedName(url)  { return S.feeds.find(f => f.url === url)?.name || DEFAULT_FEEDS.find(f => f.url === url)?.name || ''; },
   _timeLabel(d) {
@@ -467,6 +472,82 @@ const Renderer = {
   _grid(articles) { return this._section('grid-layout', articles, a => this._card(a, 'grid')); },
   _list(articles) { return this._section('list-layout', articles, a => this._card(a, 'list')); },
   _reader(articles) { return this._section('reader-layout', articles, a => this._card(a, 'reader')); },
+  _flipStory(a, role = 'support', eager = false) {
+    const id = aid(a);
+    const media = a.image
+      ? `<img src="${e(a.image)}" alt="" loading="${eager ? 'eager' : 'lazy'}" onerror="this.parentNode.classList.add('no-image');this.remove()">`
+      : '<span aria-hidden="true">FLUX</span>';
+    return `<div class="flip-story flip-story-${role}" data-id="${id}">
+      <div class="flip-story-media${a.image ? '' : ' no-image'}">${media}</div>
+      <div class="flip-story-copy">
+        <div class="flip-story-meta">${this._meta(a, 'flip-story-source')}</div>
+        <div class="flip-story-title">${e(a.title)}</div>
+        ${this._desc(a, 'flip-story-desc')}
+      </div>
+    </div>`;
+  },
+  _flipPage(page, index, total) {
+    const roles = page.template === 'cover'
+      ? ['lead', 'tile', 'tile']
+      : page.template === 'feature'
+        ? ['feature']
+        : page.items.map(() => 'brief');
+    const stories = page.items.map((a, i) => this._flipStory(a, roles[i], index < 2)).join('');
+    const heading = page.template === 'briefs'
+      ? `<div class="flip-briefs-heading"><span>${e(page.heading || 'Hírek')}</span><span>${String(index + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}</span></div>`
+      : '';
+    return `<section class="flip-page template-${page.template}" data-flip-anchor="${e(aid(page.items[0]))}">
+      <div class="flip-page-stage">${heading}<div class="flip-page-grid">${stories}</div></div>
+    </section>`;
+  },
+  _flip(articles) {
+    const pages = [];
+    const pool = [...articles];
+    const pattern = [
+      { template: 'cover', count: 3 },
+      { template: 'feature', count: 1 },
+      { template: 'briefs', count: 3 }
+    ];
+    let patternIndex = 0;
+    while (pool.length) {
+      const spec = pattern[patternIndex++ % pattern.length];
+      const items = [];
+      const sources = new Set();
+      let heading = '';
+      if (spec.template === 'briefs') {
+        const windowItems = pool.slice(0, 40);
+        const group = SECTION_RULES
+          .map(rule => ({ rule, items: windowItems.filter(a => primarySectionRule(a)?.id === rule.id) }))
+          .filter(candidate => candidate.items.length >= 3)
+          .sort((a, b) => windowItems.indexOf(a.items[0]) - windowItems.indexOf(b.items[0]))[0];
+        if (group) {
+          heading = group.rule.label;
+          group.items.slice(0, 3).forEach(item => {
+            items.push(item);
+            pool.splice(pool.indexOf(item), 1);
+          });
+        }
+      }
+      while (pool.length && items.length < spec.count) {
+        const windowSize = Math.min(20, pool.length);
+        let pick = pool.slice(0, windowSize).findIndex(a => a.image && !sources.has(a.feedUrl));
+        if (pick < 0) pick = pool.slice(0, windowSize).findIndex(a => !sources.has(a.feedUrl));
+        if (pick < 0) pick = 0;
+        const [item] = pool.splice(pick, 1);
+        items.push(item);
+        sources.add(item.feedUrl);
+      }
+      pages.push({ type: 'stories', template: spec.template, heading, items });
+    }
+    if (S.showYoutube && S.ytChannels.length) pages.splice(Math.min(1, pages.length), 0, { type: 'youtube' });
+    const total = pages.length;
+    return `<div class="flip-layout">${pages.map((page, index) => page.type === 'youtube'
+      ? `<section class="flip-page flip-page-youtube" data-flip-anchor="youtube">
+          <div class="flip-page-stage" data-flip-youtube></div>
+        </section>`
+      : this._flipPage(page, index, total)
+    ).join('')}</div>`;
+  },
   _footer(articles) {
     const updated = S.lastUpdated ? new Date(S.lastUpdated) : null;
     const feedCount = new Set(articles.map(a => a.feedUrl).filter(Boolean)).size;
@@ -546,6 +627,324 @@ const Renderer = {
     return `<div class="ix-topic-mini-item" data-id="${aid(a)}">${this._rawImg(a, 'ix-topic-mini-img', 'ix-topic-mini-nobg')}<div class="ix-topic-mini-body"><div class="ix-topic-mini-title">${e(a.title)}</div><div class="ix-topic-mini-meta">${this._meta(a, 'ix-topic-mini-source')}</div></div></div>`;
   }
 };
+let flipResizeTimer = 0;
+let flipYtCompact = null;
+let flipOverlay = null;
+let flipOverlayKey = '';
+let flipPageIndex = 0;
+let flipGesture = null;
+let flipAnimating = false;
+let flipAnimationTimer = 0;
+let flipPrimeToken = 0;
+let flipHalfHeight = 0;
+let flipPerspective = 0;
+const FLIP_COMMIT_PROGRESS = .25;
+const FLIP_CAST_SHADOW_MAX = .5;
+const FLIP_CAST_SHADOW_SIZE = 72;
+function currentFlipAnchor() {
+  if (S.layout !== 'flip') return null;
+  const content = $('content');
+  const pages = [...content.querySelectorAll('.flip-page')];
+  if (!pages.length) return null;
+  const index = Math.max(0, Math.min(pages.length - 1, flipPageIndex));
+  const page = pages[index];
+  return page.querySelector('[data-id]')?.dataset.id || page.dataset.flipAnchor || null;
+}
+function restoreFlipAnchor(anchor) {
+  if (!anchor || S.layout !== 'flip') return;
+  const content = $('content');
+  const story = [...content.querySelectorAll('.flip-story[data-id]')].find(item => item.dataset.id === anchor);
+  const page = story?.closest('.flip-page') || [...content.querySelectorAll('.flip-page')].find(item => item.dataset.flipAnchor === anchor);
+  if (!page) return;
+  const pages = [...content.querySelectorAll('.flip-page')];
+  setFlipPage(pages.indexOf(page));
+}
+function ensureFlipOverlay() {
+  if (flipOverlay) return flipOverlay;
+  flipOverlay = document.createElement('div');
+  flipOverlay.className = 'flip-turn-overlay';
+  flipOverlay.setAttribute('aria-hidden', 'true');
+  flipOverlay.innerHTML = `
+    <div class="flip-turn-compensator">
+      <div class="flip-turn-scene">
+        <div class="flip-turn-flap">
+          <div class="flip-turn-face flip-turn-front"></div>
+          <div class="flip-turn-face flip-turn-back"></div>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(flipOverlay);
+  return flipOverlay;
+}
+function flipStageClone(page) {
+  const wrapper = document.createElement('div');
+  wrapper.className = `flip-turn-page-copy ${[...page.classList]
+    .filter(name => name.startsWith('template-') || name === 'flip-page-youtube')
+    .join(' ')}`;
+  const clone = page.querySelector('.flip-page-stage').cloneNode(true);
+  clone.querySelectorAll('[id]').forEach(node => node.removeAttribute('id'));
+  clone.querySelectorAll('iframe, video, script').forEach(node => node.remove());
+  clone.querySelectorAll('img').forEach(img => {
+    img.loading = 'eager';
+    img.decoding = 'sync';
+  });
+  clone.classList.add('flip-turn-copy');
+  clone.setAttribute('inert', '');
+  wrapper.appendChild(clone);
+  return wrapper;
+}
+function prepareFlipOverlay(currentPage, nextPage, index) {
+  const overlay = ensureFlipOverlay();
+  const key = `${index}:${currentPage.dataset.flipAnchor}:${nextPage.dataset.flipAnchor}`;
+  if (flipOverlayKey === key) return;
+  flipOverlayKey = key;
+  overlay.querySelector('.flip-turn-front').replaceChildren(flipStageClone(currentPage));
+  overlay.querySelector('.flip-turn-back').replaceChildren(flipStageClone(nextPage));
+}
+function setFlipTurnPages(currentPage, nextPage) {
+  const pages = currentPage.closest('.flip-layout')?.querySelectorAll('.flip-page') || [];
+  pages.forEach(page => page.classList.remove('is-turn-top', 'is-turn-bottom'));
+  currentPage.classList.add('is-turn-top');
+  nextPage.classList.add('is-turn-bottom');
+}
+function clearFlipTurnPages() {
+  document.querySelectorAll('.flip-page.is-turn-top, .flip-page.is-turn-bottom')
+    .forEach(page => page.classList.remove('is-turn-top', 'is-turn-bottom'));
+  $('content')?.classList.remove('flip-front-visible', 'flip-back-visible');
+}
+function positionFlipOverlay(page) {
+  const rect = page.getBoundingClientRect();
+  page.parentElement.style.setProperty('--flip-page-height', `${rect.height}px`);
+  page.parentElement.style.setProperty('--flip-half-height', `${rect.height / 2}px`);
+  flipOverlay.style.left = `${rect.left}px`;
+  flipOverlay.style.top = `${rect.top}px`;
+  flipOverlay.style.width = `${rect.width}px`;
+  flipOverlay.style.height = `${rect.height}px`;
+  flipOverlay.style.setProperty('--flip-page-height', `${rect.height}px`);
+  flipOverlay.style.setProperty('--flip-half-height', `${rect.height / 2}px`);
+  flipHalfHeight = rect.height / 2;
+  flipPerspective = parseFloat(getComputedStyle(flipOverlay.querySelector('.flip-turn-scene')).perspective) || 0;
+}
+function setFlipAngle(flap, angle) {
+  const depth = flipHalfHeight * Math.sin(angle * Math.PI / 180);
+  const scale = flipPerspective ? 1 - depth / flipPerspective : 1;
+  flipOverlay.querySelector('.flip-turn-compensator').style.transform = `scaleY(${scale})`;
+  flap.style.transform = `rotateX(${angle}deg)`;
+  flipOverlay.classList.toggle('is-edge-on', Math.abs(angle - 90) < .5);
+  const content = $('content');
+  content?.classList.toggle('flip-front-visible', angle <= 90);
+  content?.classList.toggle('flip-back-visible', angle > 90);
+}
+function setFlipCastShadow(angle, direction) {
+  const radians = angle * Math.PI / 180;
+  const depth = flipHalfHeight * Math.sin(radians);
+  const scale = flipPerspective ? 1 - depth / flipPerspective : 1;
+  const progress = direction > 0 ? angle / 180 : (180 - angle) / 180;
+  const strength = Math.abs(progress * 2 - 1) * FLIP_CAST_SHADOW_MAX;
+  const edgeY = flipHalfHeight + flipHalfHeight * Math.cos(radians) * scale;
+  const above = angle > 90;
+  const alpha = strength * .72;
+  flipOverlay.style.backgroundImage = above
+    ? `linear-gradient(to bottom, transparent, rgba(0,0,0,${alpha}) 88%, transparent)`
+    : `linear-gradient(to bottom, transparent, rgba(0,0,0,${alpha}) 12%, transparent)`;
+  flipOverlay.style.backgroundPosition = `0 ${above ? edgeY - FLIP_CAST_SHADOW_SIZE : edgeY}px`;
+}
+function hideFlipOverlay() {
+  cancelAnimationFrame(flipAnimationTimer);
+  flipAnimationTimer = 0;
+  flipOverlay?.classList.remove('is-active');
+}
+async function primeFlipOverlay() {
+  if (S.layout !== 'flip' || flipAnimating) return;
+  const content = $('content');
+  const pages = [...content.querySelectorAll('.flip-page')];
+  if (pages.length < 2) return;
+  const token = ++flipPrimeToken;
+  const pairIndex = Math.min(flipPageIndex, pages.length - 2);
+  const currentPage = pages[pairIndex];
+  const nextPage = pages[pairIndex + 1];
+  prepareFlipOverlay(currentPage, nextPage, pairIndex);
+  positionFlipOverlay(pages[flipPageIndex]);
+  const flap = flipOverlay.querySelector('.flip-turn-flap');
+  flap.style.transition = 'none';
+  const angle = flipPageIndex === pairIndex ? 0 : 180;
+  setFlipAngle(flap, angle);
+  flipOverlay.style.backgroundImage = 'none';
+  flipOverlay.classList.add('is-ready');
+  await Promise.all([...flipOverlay.querySelectorAll('img')].map(img => {
+    if (img.decode) return img.decode().catch(() => {});
+    if (img.complete) return Promise.resolve();
+    return new Promise(resolve => {
+      img.addEventListener('load', resolve, { once: true });
+      img.addEventListener('error', resolve, { once: true });
+    });
+  }));
+  if (token !== flipPrimeToken || S.layout !== 'flip') return;
+  flipOverlay.getBoundingClientRect();
+  flap.getBoundingClientRect();
+}
+function setFlipPage(index) {
+  const content = $('content');
+  const pages = [...content.querySelectorAll('.flip-page')];
+  if (!pages.length) return;
+  flipPageIndex = Math.max(0, Math.min(pages.length - 1, index));
+  pages.forEach((page, pageIndex) => page.classList.toggle('is-current', pageIndex === flipPageIndex));
+  clearFlipTurnPages();
+  content.scrollTop = 0;
+}
+function beginFlipGesture(direction, startY = 0) {
+  if (flipAnimating || S.layout !== 'flip') return false;
+  const content = $('content');
+  const pages = [...content.querySelectorAll('.flip-page')];
+  const pairIndex = direction > 0 ? flipPageIndex : flipPageIndex - 1;
+  if (pairIndex < 0 || pairIndex >= pages.length - 1) return false;
+  const currentPage = pages[pairIndex];
+  const nextPage = pages[pairIndex + 1];
+  if (currentPage.querySelector('iframe') || nextPage.querySelector('iframe')) return false;
+  prepareFlipOverlay(currentPage, nextPage, pairIndex);
+  positionFlipOverlay(pages[flipPageIndex]);
+  setFlipTurnPages(currentPage, nextPage);
+  const angle = direction > 0 ? 0 : 180;
+  const flap = flipOverlay.querySelector('.flip-turn-flap');
+  flap.style.transition = 'none';
+  setFlipAngle(flap, angle);
+  setFlipCastShadow(angle, direction);
+  flipOverlay.classList.add('is-ready');
+  flipOverlay.classList.add('is-active');
+  flipGesture = { axis: 'y', direction, pairIndex, startY, progress: 0, angle };
+  return true;
+}
+function handleFlipTouchStart(event) {
+  if (flipAnimating || event.touches.length !== 1) return;
+  const touch = event.touches[0];
+  flipGesture = { startX: touch.clientX, startY: touch.clientY, axis: '', direction: 0, progress: 0 };
+}
+function handleFlipTouchMove(event) {
+  if (!flipGesture || event.touches.length !== 1 || flipAnimating) return;
+  const touch = event.touches[0];
+  const dx = touch.clientX - flipGesture.startX;
+  const dy = touch.clientY - flipGesture.startY;
+  if (!flipGesture.axis) {
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < 6) return;
+    flipGesture.axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+    if (flipGesture.axis === 'x') return;
+    const direction = dy < 0 ? 1 : -1;
+    const startX = flipGesture.startX;
+    const startY = flipGesture.startY;
+    if (!beginFlipGesture(direction, startY)) {
+      flipGesture = null;
+      return;
+    }
+    flipGesture.startX = startX;
+  }
+  if (flipGesture.axis !== 'y') return;
+  event.preventDefault();
+  const distance = Math.abs(touch.clientY - flipGesture.startY);
+  const travel = Math.min(280, Math.max(160, window.innerHeight * .36));
+  const progress = Math.min(1, distance / travel);
+  flipGesture.progress = progress;
+  flipGesture.angle = flipGesture.direction > 0 ? progress * 180 : (1 - progress) * 180;
+  const flap = flipOverlay.querySelector('.flip-turn-flap');
+  setFlipAngle(flap, flipGesture.angle);
+  setFlipCastShadow(flipGesture.angle, flipGesture.direction);
+}
+function handleFlipTouchEnd() {
+  if (!flipGesture) return;
+  if (flipGesture.axis !== 'y' || !('pairIndex' in flipGesture)) {
+    flipGesture = null;
+    return;
+  }
+  finishFlipGesture(flipGesture.progress > FLIP_COMMIT_PROGRESS);
+}
+function handleFlipTouchCancel() {
+  if (!flipGesture) return;
+  if (flipGesture.axis === 'y' && 'pairIndex' in flipGesture) finishFlipGesture(false);
+  else flipGesture = null;
+}
+function handleFlipWheel(event) {
+  if (!event.deltaY) return;
+  event.preventDefault();
+  if (flipAnimating) return;
+  const direction = event.deltaY > 0 ? 1 : -1;
+  if (!beginFlipGesture(direction)) return;
+  requestAnimationFrame(() => requestAnimationFrame(() => finishFlipGesture(true)));
+}
+function finishFlipGesture(complete) {
+  if (!flipGesture || flipAnimating) return;
+  const gesture = flipGesture;
+  const flap = flipOverlay.querySelector('.flip-turn-flap');
+  const targetAngle = complete ? (gesture.direction > 0 ? 180 : 0) : (gesture.direction > 0 ? 0 : 180);
+  const startAngle = gesture.angle;
+  const duration = 560;
+  const startTime = performance.now();
+  flipAnimating = true;
+  flap.style.transition = 'none';
+  cancelAnimationFrame(flipAnimationTimer);
+  const finish = () => {
+    setFlipAngle(flap, targetAngle);
+    setFlipCastShadow(targetAngle, gesture.direction);
+    const targetPage = complete
+      ? (gesture.direction > 0 ? gesture.pairIndex + 1 : gesture.pairIndex)
+      : flipPageIndex;
+    setFlipPage(targetPage);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        hideFlipOverlay();
+        flipGesture = null;
+        flipAnimating = false;
+        primeFlipOverlay();
+      });
+    });
+  };
+  const animate = now => {
+    const progress = Math.min(1, (now - startTime) / duration);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const angle = startAngle + (targetAngle - startAngle) * eased;
+    gesture.angle = angle;
+    setFlipAngle(flap, angle);
+    setFlipCastShadow(angle, gesture.direction);
+    if (progress < 1) flipAnimationTimer = requestAnimationFrame(animate);
+    else finish();
+  };
+  flipAnimationTimer = requestAnimationFrame(animate);
+}
+function handleFlipResize() {
+  if (S.layout !== 'flip') return;
+  hideFlipOverlay();
+  flipGesture = null;
+  flipAnimating = false;
+  requestAnimationFrame(() => setFlipPage(flipPageIndex));
+  const compact = window.matchMedia('(max-width: 600px)').matches;
+  if (flipYtCompact === compact) return;
+  flipYtCompact = compact;
+  clearTimeout(flipResizeTimer);
+  flipResizeTimer = setTimeout(injectYtSidebar, 100);
+}
+function setupFlipView() {
+  const content = $('content');
+  if (!content || !content.classList.contains('flip-view')) return;
+  flipOverlayKey = '';
+  flipPrimeToken++;
+  hideFlipOverlay();
+  flipGesture = null;
+  flipAnimating = false;
+  const pages = [...content.querySelectorAll('.flip-page')];
+  if (pages.length) {
+    flipPageIndex = Math.max(0, Math.min(pages.length - 1, flipPageIndex));
+    setFlipPage(flipPageIndex);
+    requestAnimationFrame(primeFlipOverlay);
+  }
+  flipYtCompact = window.matchMedia('(max-width: 600px)').matches;
+  if (!content._flipViewBound) {
+    content._flipViewBound = true;
+    content.addEventListener('touchstart', handleFlipTouchStart, { passive: true });
+    content.addEventListener('touchmove', handleFlipTouchMove, { passive: false });
+    content.addEventListener('touchend', handleFlipTouchEnd, { passive: true });
+    content.addEventListener('touchcancel', handleFlipTouchCancel, { passive: true });
+    content.addEventListener('wheel', handleFlipWheel, { passive: false });
+    window.addEventListener('resize', handleFlipResize, { passive: true });
+  }
+}
 async function openArticle(id) {
   const a = articleMap[id];
   if (!a) return;
@@ -1339,6 +1738,7 @@ function renderArticles() {
       .sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt))
       .map(item => ({ ...item.article, date: new Date(item.article.date) }));
     if (!articles.length) {
+      $('content').classList.remove('flip-view');
       $('content').innerHTML = `<div class="read-later-view"><div class="read-later-head"><div class="read-later-title">${bookmarkIcon(true, 15)}<span>Mentett cikkek</span></div><button class="read-later-close" type="button" title="Vissza" aria-label="Vissza">×</button></div><div class="state-box"><div class="icon">${bookmarkIcon(false, 34)}</div><div class="title">Nincsenek mentett cikkek</div><div class="desc">A cikkolvasóban tudsz cikkeket későbbre menteni.</div></div></div>`;
       return;
     }
@@ -1347,6 +1747,7 @@ function renderArticles() {
     return;
   }
   if (!S.feeds.length) {
+    $('content').classList.remove('flip-view');
     $('content').innerHTML = `<div class="state-box"><div class="icon">📰</div><div class="title">Nincs feed hozzáadva</div><div class="desc">Kattints a "Feed hozzáadása" gombra.</div></div>`;
     injectYtSidebar();
     return;
@@ -1356,6 +1757,7 @@ function renderArticles() {
     articles = articles.filter(a => a.categories && a.categories.includes(S.activeCategory));
   }
   if (S.sectionView) renderSidebar();
+  const flipAnchor = currentFlipAnchor();
   const preservedYtPlayer = $('content').querySelector('.yt-sidebar.yt-player-active');
   if (preservedYtPlayer) preservedYtPlayer.remove();
   Renderer.render(articles);
@@ -1365,14 +1767,16 @@ function renderArticles() {
   } else {
     injectYtSidebar();
   }
+  if (flipAnchor) requestAnimationFrame(() => restoreFlipAnchor(flipAnchor));
 }
 const LAYOUT_ICONS = {
   grid:     `<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>`,
   list:     `<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="5" y1="4" x2="14" y2="4"/><line x1="5" y1="8" x2="14" y2="8"/><line x1="5" y1="12" x2="14" y2="12"/><circle cx="2" cy="4" r="1" fill="currentColor" stroke="none"/><circle cx="2" cy="8" r="1" fill="currentColor" stroke="none"/><circle cx="2" cy="12" r="1" fill="currentColor" stroke="none"/></svg>`,
   magazine: `<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="9" height="9" rx="1.5"/><rect x="12" y="1" width="3" height="4" rx="1"/><rect x="12" y="7" width="3" height="3" rx="1"/><rect x="1" y="12" width="14" height="3" rx="1"/></svg>`,
-  reader:   `<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="4" x2="14" y2="4"/><line x1="2" y1="7" x2="14" y2="7"/><line x1="2" y1="10" x2="10" y2="10"/><line x1="2" y1="13" x2="7" y2="13"/></svg>`
+  reader:   `<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="4" x2="14" y2="4"/><line x1="2" y1="7" x2="14" y2="7"/><line x1="2" y1="10" x2="10" y2="10"/><line x1="2" y1="13" x2="7" y2="13"/></svg>`,
+  flip:     `<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M2 2.5h8.5A1.5 1.5 0 0 1 12 4v9.5H3.5A1.5 1.5 0 0 1 2 12V2.5Z"/><path d="M12 5.5h2v8H5.5"/><path d="M4.5 5h5M4.5 7.5h3.5"/></svg>`
 };
-const LAYOUT_ORDER = ['magazine','grid','list','reader'];
+const LAYOUT_ORDER = ['magazine','flip','grid','list','reader'];
 function updateLayoutBtns() {
   document.querySelectorAll('.v-layout-btn[data-layout]').forEach(b =>
     b.classList.toggle('active', b.dataset.layout === S.layout)
@@ -1402,7 +1806,7 @@ async function refreshAll(bust = false) {
   setLoading(false);
   const newSig = S.articles.slice(0, 40).map(a => a.id).join('|');
   const changed = newSig !== prevSig;
-  const hasVisibleArticles = Boolean($('content')?.querySelector('.ix-article, .ix-card, .ix-text-fill, .ix-hero, .grid-layout, .list-layout, .reader-layout, .magazine-layout'));
+  const hasVisibleArticles = Boolean($('content')?.querySelector('.ix-article, .ix-card, .ix-text-fill, .ix-hero, .grid-layout, .list-layout, .reader-layout, .magazine-layout, .flip-layout'));
   if (loadedAny) {
     S.lastUpdated = new Date().toISOString();
     if ((changed || !hasVisibleArticles) && !activeArticleMode) renderArticles();
@@ -1418,7 +1822,7 @@ function setLoading(on) {
   if (activeArticleMode) return;
   if (on) {
     const content = $('content');
-    const hasContent = content.querySelector('.ix-article, .ix-card, .ix-text-fill, .ix-hero');
+    const hasContent = content.querySelector('.ix-article, .ix-card, .ix-text-fill, .ix-hero, .flip-story');
     if (!hasContent) {
       content.innerHTML = `<div class="state-box"><div class="spinner"></div></div>`;
     }
@@ -1447,6 +1851,7 @@ function setupPullToRefresh() {
   };
   const blocked = () => activeArticleMode ||
     content.scrollTop > 0 ||
+    (S.layout === 'flip' && flipPageIndex > 0) ||
     document.querySelector('.modal.open, .overlay.open, .confirm-bg.open, .sp-page.open, .view-panel.open, .mobile-feed-panel.open, .article-modal-layer.open');
 
   document.addEventListener('touchstart', ev => {
@@ -1464,7 +1869,7 @@ function setupPullToRefresh() {
     if (!tracking || ev.touches.length !== 1) return;
     const deltaX = ev.touches[0].clientX - startX;
     const deltaY = ev.touches[0].clientY - startY;
-    if (deltaY <= 0 || Math.abs(deltaX) > deltaY || content.scrollTop > 0) {
+    if (deltaY <= 0 || Math.abs(deltaX) > deltaY || blocked()) {
       reset();
       return;
     }
@@ -2854,8 +3259,10 @@ function buildYtSidebarHtml() {
     </div>
     <a class="yt-player-external" href="${e(watchUrl)}" target="flux-youtube">Megnyitás YouTube-on</a>`;
   }
-  const cols = clampInt(S.ytColumns, 1, 4, 3);
-  const rows = clampInt(S.ytRows, 1, 4, 1);
+  const flipView = S.layout === 'flip';
+  const compactFlip = flipView && window.matchMedia('(max-width: 600px)').matches;
+  const cols = compactFlip ? 1 : flipView ? 4 : clampInt(S.ytColumns, 1, 4, 3);
+  const rows = compactFlip ? 4 : flipView ? 1 : clampInt(S.ytRows, 1, 4, 1);
   const pageSize = cols * rows;
   const pages = [];
   for (let i = 0; i < videos.length; i += pageSize) pages.push(videos.slice(i, i + pageSize));
@@ -2867,7 +3274,7 @@ function buildYtSidebarHtml() {
           <div class="yt-vcard-meta"><span class="yt-vcard-channel">${e(v.displayChannelName || v.channelName || '')}</span> · ${ytAge(v.date)}</div>
         </div>
       </button>`;
-  const html = pages.map(page => `<div class="yt-page" style="--yt-cols:${cols}">${page.map(cardHtml).join('')}</div>`).join('');
+  const html = pages.map(page => `<div class="yt-page" style="--yt-cols:${cols};--yt-rows:${rows}">${page.map(cardHtml).join('')}</div>`).join('');
   const pager = pages.length > 1 ? `<div class="yt-pager">
       <button class="yt-page-btn" type="button" data-dir="-1" title="Előző videók">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
@@ -2945,7 +3352,10 @@ function closeYtPlayer() {
   bindYtSidebarClicks(sidebar);
   requestAnimationFrame(() => {
     const row = sidebar.querySelector('.yt-scroll-row');
-    if (row) row.scrollLeft = ytReturnScrollLeft;
+    if (!row) return;
+    row.style.scrollBehavior = 'auto';
+    row.scrollLeft = ytReturnScrollLeft;
+    requestAnimationFrame(() => row.style.removeProperty('scroll-behavior'));
   });
 }
 function loadYtPlayerApi() {
@@ -3111,6 +3521,11 @@ function removeYtSidebar() {
   mergeSplitLayouts(content);
 }
 function placeYtSidebar(content, sidebar) {
+  const flipSlot = content.querySelector('[data-flip-youtube]');
+  if (flipSlot) {
+    flipSlot.appendChild(sidebar);
+    return;
+  }
   const magLayout = content.querySelector('.magazine-layout');
   const heroCluster = magLayout?.querySelector('.ix-hero-cluster');
   if (magLayout && heroCluster) {
