@@ -634,6 +634,7 @@ let flipOverlayKey = '';
 let flipPageIndex = 0;
 let flipGesture = null;
 let flipAnimating = false;
+let flipRewinding = false;
 let flipAnimationTimer = 0;
 let flipPrimeToken = 0;
 let flipHalfHeight = 0;
@@ -869,13 +870,13 @@ function handleFlipWheel(event) {
   if (!beginFlipGesture(direction)) return;
   requestAnimationFrame(() => requestAnimationFrame(() => finishFlipGesture(true)));
 }
-function finishFlipGesture(complete) {
-  if (!flipGesture || flipAnimating) return;
+function finishFlipGesture(complete, options = {}) {
+  if (!flipGesture || flipAnimating) return false;
   const gesture = flipGesture;
   const flap = flipOverlay.querySelector('.flip-turn-flap');
   const targetAngle = complete ? (gesture.direction > 0 ? 180 : 0) : (gesture.direction > 0 ? 0 : 180);
   const startAngle = gesture.angle;
-  const duration = 560;
+  const duration = options.duration ?? 560;
   const startTime = performance.now();
   flipAnimating = true;
   flap.style.transition = 'none';
@@ -892,13 +893,14 @@ function finishFlipGesture(complete) {
         hideFlipOverlay();
         flipGesture = null;
         flipAnimating = false;
-        primeFlipOverlay();
+        if (options.prime !== false) primeFlipOverlay();
+        options.done?.();
       });
     });
   };
   const animate = now => {
     const progress = Math.min(1, (now - startTime) / duration);
-    const eased = 1 - Math.pow(1 - progress, 3);
+    const eased = options.linear ? progress : 1 - Math.pow(1 - progress, 3);
     const angle = startAngle + (targetAngle - startAngle) * eased;
     gesture.angle = angle;
     setFlipAngle(flap, angle);
@@ -907,6 +909,38 @@ function finishFlipGesture(complete) {
     else finish();
   };
   flipAnimationTimer = requestAnimationFrame(animate);
+  return true;
+}
+async function rewindFlipToStart() {
+  if (S.layout !== 'flip' || flipPageIndex <= 0 || flipAnimating || flipRewinding) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    setFlipPage(0);
+    primeFlipOverlay();
+    return;
+  }
+  flipRewinding = true;
+  const stepDuration = Math.max(72, Math.min(135, 700 / flipPageIndex));
+  while (flipPageIndex > 0) {
+    if (S.layout !== 'flip') break;
+    if (!beginFlipGesture(-1)) {
+      const previousIndex = flipPageIndex;
+      setFlipPage(previousIndex - 1);
+      if (flipPageIndex === previousIndex) break;
+      continue;
+    }
+    const lastPage = flipPageIndex === 1;
+    const completed = await new Promise(resolve => {
+      const started = finishFlipGesture(true, {
+        duration: lastPage ? Math.max(180, stepDuration) : stepDuration,
+        linear: !lastPage,
+        prime: lastPage,
+        done: () => resolve(true)
+      });
+      if (!started) resolve(false);
+    });
+    if (!completed) break;
+  }
+  flipRewinding = false;
 }
 function handleFlipResize() {
   if (S.layout !== 'flip') return;
@@ -2390,6 +2424,10 @@ function bindEvents() {
       return;
     }
     closeMobileFeedPanel();
+    if (S.layout === 'flip') {
+      rewindFlipToStart();
+      return;
+    }
     scrollHome();
   });
   document.addEventListener('pointerup', ev => {
