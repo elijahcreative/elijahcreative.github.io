@@ -635,6 +635,9 @@ let flipPageIndex = 0;
 let flipGesture = null;
 let flipAnimating = false;
 let flipRewinding = false;
+let flipWheelDelta = 0;
+let flipWheelLastTime = 0;
+let flipWheelGestureActive = false;
 let flipAnimationTimer = 0;
 let flipPrimeToken = 0;
 let flipHalfHeight = 0;
@@ -642,6 +645,8 @@ let flipPerspective = 0;
 const FLIP_COMMIT_PROGRESS = .25;
 const FLIP_CAST_SHADOW_MAX = .5;
 const FLIP_CAST_SHADOW_SIZE = 72;
+const FLIP_WHEEL_THRESHOLD = 48;
+const FLIP_WHEEL_GESTURE_GAP = 180;
 function currentFlipAnchor() {
   if (S.layout !== 'flip') return null;
   const content = $('content');
@@ -863,12 +868,28 @@ function handleFlipTouchCancel() {
   else flipGesture = null;
 }
 function handleFlipWheel(event) {
-  if (!event.deltaY) return;
+  const multiplier = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? window.innerHeight : 1;
+  const delta = event.deltaY * multiplier;
+  if (!delta) return;
   event.preventDefault();
-  if (flipAnimating) return;
-  const direction = event.deltaY > 0 ? 1 : -1;
+  const now = performance.now();
+  if (now - flipWheelLastTime > FLIP_WHEEL_GESTURE_GAP) {
+    flipWheelDelta = 0;
+    flipWheelGestureActive = false;
+  }
+  flipWheelLastTime = now;
+  if (flipAnimating || flipRewinding || flipWheelGestureActive) {
+    flipWheelGestureActive = true;
+    return;
+  }
+  if (flipWheelDelta && Math.sign(delta) !== Math.sign(flipWheelDelta)) flipWheelDelta = 0;
+  flipWheelDelta += delta;
+  if (Math.abs(flipWheelDelta) < FLIP_WHEEL_THRESHOLD) return;
+  const direction = flipWheelDelta > 0 ? 1 : -1;
+  flipWheelDelta = 0;
+  flipWheelGestureActive = true;
   if (!beginFlipGesture(direction)) return;
-  requestAnimationFrame(() => requestAnimationFrame(() => finishFlipGesture(true)));
+  finishFlipGesture(true);
 }
 function finishFlipGesture(complete, options = {}) {
   if (!flipGesture || flipAnimating) return false;
@@ -947,6 +968,8 @@ function handleFlipResize() {
   hideFlipOverlay();
   flipGesture = null;
   flipAnimating = false;
+  flipWheelDelta = 0;
+  flipWheelGestureActive = false;
   requestAnimationFrame(() => setFlipPage(flipPageIndex));
   const compact = window.matchMedia('(max-width: 600px)').matches;
   if (flipYtCompact === compact) return;
@@ -2306,10 +2329,10 @@ function renderFeedChoices(results, selectFirst = false) {
   </button>`).join('');
   list.classList.toggle('show', results.length > 0);
   if (selectFirst && results[0]) {
-    selectFeed(results[0].url, results[0].name, list.querySelector('.feed-choice'));
+    selectFeedCandidate(results[0].url, results[0].name, list.querySelector('.feed-choice'));
   }
 }
-function selectFeed(url, name, element) {
+function selectFeedCandidate(url, name, element) {
   pendingFeed = { url, name: name || '' };
   $('feedName').value = name || '';
   $('feedName').disabled = false;
@@ -2621,12 +2644,12 @@ function bindEvents() {
   $('suggestions').addEventListener('click', ev => {
     const chip = ev.target.closest('.chip[data-url]');
     if (!chip) return;
-    selectFeed(chip.dataset.url, chip.dataset.label, chip);
+    selectFeedCandidate(chip.dataset.url, chip.dataset.label, chip);
   });
   $('feedChoiceList').addEventListener('click', ev => {
     const choice = ev.target.closest('.feed-choice[data-url]');
     if (!choice) return;
-    selectFeed(choice.dataset.url, choice.dataset.name, choice);
+    selectFeedCandidate(choice.dataset.url, choice.dataset.name, choice);
   });
   $('addModal').querySelector('.feed-add-tabs').addEventListener('click', ev => {
     const tab = ev.target.closest('.feed-add-tab[data-feed-tab]');
