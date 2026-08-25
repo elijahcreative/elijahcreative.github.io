@@ -909,15 +909,15 @@ function finishFlipGesture(complete, options = {}) {
       ? (gesture.direction > 0 ? gesture.pairIndex + 1 : gesture.pairIndex)
       : flipPageIndex;
     setFlipPage(targetPage);
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        hideFlipOverlay();
-        flipGesture = null;
-        flipAnimating = false;
-        if (options.prime !== false) primeFlipOverlay();
-        options.done?.();
-      });
-    });
+    const settle = () => {
+      hideFlipOverlay();
+      flipGesture = null;
+      flipAnimating = false;
+      if (options.prime !== false) primeFlipOverlay();
+      options.done?.();
+    };
+    if (options.chain) settle();
+    else requestAnimationFrame(() => requestAnimationFrame(settle));
   };
   const animate = now => {
     const progress = Math.min(1, (now - startTime) / duration);
@@ -940,7 +940,7 @@ async function rewindFlipToStart() {
     return;
   }
   flipRewinding = true;
-  const stepDuration = Math.max(72, Math.min(135, 700 / flipPageIndex));
+  const startIndex = flipPageIndex;
   while (flipPageIndex > 0) {
     if (S.layout !== 'flip') break;
     if (!beginFlipGesture(-1)) {
@@ -950,11 +950,14 @@ async function rewindFlipToStart() {
       continue;
     }
     const lastPage = flipPageIndex === 1;
+    const rewindProgress = startIndex === 1 ? 1 : (startIndex - flipPageIndex) / (startIndex - 1);
+    const stepDuration = Math.round(72 + 228 * rewindProgress * rewindProgress);
     const completed = await new Promise(resolve => {
       const started = finishFlipGesture(true, {
-        duration: lastPage ? Math.max(180, stepDuration) : stepDuration,
+        duration: stepDuration,
         linear: !lastPage,
         prime: lastPage,
+        chain: !lastPage,
         done: () => resolve(true)
       });
       if (!started) resolve(false);
