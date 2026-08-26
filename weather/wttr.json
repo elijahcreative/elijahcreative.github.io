@@ -3,9 +3,9 @@
     {
       "FeelsLikeC": "18",
       "FeelsLikeF": "64",
-      "cloudcover": "54",
-      "humidity": "54",
-      "observation_time": "04:30 AM",
+      "cloudcover": "6",
+      "humidity": "53",
+      "observation_time": "06:00 AM",
       "precipInches": "0.0",
       "precipMM": "0.0",
       "pressure": "1017",
@@ -15,19 +15,19 @@
       "uvIndex": "0",
       "visibility": "10",
       "visibilityMiles": "6",
-      "weatherCode": "116",
+      "weatherCode": "113",
       "weatherDesc": [
         {
-          "value": "Partly Cloudy "
+          "value": "Sunny"
         }
       ],
       "weatherIconUrl": [
         {
-          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0002_sunny_intervals.png"
+          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0001_sunny.png"
         }
       ],
       "winddir16Point": "NW",
-      "winddirDegree": "319",
+      "winddirDegree": "321",
       "windspeedKmph": "8",
       "windspeedMiles": "5"
     }
@@ -36,7 +36,7 @@
     {
       "areaName": [
         {
-          "value": "Buda"
+          "value": "Budapest"
         }
       ],
       "country": [
@@ -45,8 +45,8 @@
         }
       ],
       "latitude": "47.500",
-      "longitude": "19.033",
-      "population": "0",
+      "longitude": "19.083",
+      "population": "1741041",
       "region": [
         {
           "value": "Budapest"
@@ -54,7 +54,7 @@
       ],
       "weatherUrl": [
         {
-          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.5,19.033"
+          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.5,19.083"
         }
       ]
     }
