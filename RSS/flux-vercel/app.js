@@ -109,7 +109,9 @@ const S = {
   articleMoreRows: 1,
   lastUpdated:   null,
   showWeather:   true,
-  showF1:        true
+  showF1:        false,
+  showReadLater: true,
+  showShare:     true
 };
 const articleMap = {};
 const extractedArticleCache = new Map();
@@ -142,7 +144,7 @@ function clampInt(value, min, max, fallback) {
   const n = Number.parseInt(value, 10);
   return Number.isFinite(n) ? Math.max(min, Math.min(max, n)) : fallback;
 }
-const SETTINGS_KEYS = ['layout','theme','preset','customAccent','fontSize','activeUrl','ytPerChannel','ytMaxChannels','ytColumns','ytRows','ytSortMode','ytMiniCorner','ytMiniSize','showYoutube','sectionView','readerMode','showArticleMore','articleMoreColumns','articleMoreRows','lastUpdated','showWeather','showF1'];
+const SETTINGS_KEYS = ['layout','theme','preset','customAccent','fontSize','activeUrl','ytPerChannel','ytMaxChannels','ytColumns','ytRows','ytSortMode','ytMiniCorner','ytMiniSize','showYoutube','sectionView','readerMode','showArticleMore','articleMoreColumns','articleMoreRows','lastUpdated','showWeather','showF1','showReadLater','showShare'];
 const SECTION_RULES = [
   { id: 'kozelet',  label: 'Közélet',  keys: ['belfold', 'kozelet', 'politika', 'valasztas', 'kormany', 'onkormanyzat'] },
   { id: 'kulfold',  label: 'Külföld',  keys: ['kulfold', 'vilag', 'europa', 'eu', 'usa', 'ukrajna', 'oroszorszag'] },
@@ -186,13 +188,15 @@ function loadStorage() {
     ytMiniSize: ['s','m','l'].includes(s.ytMiniSize) ? s.ytMiniSize : 'm',
     showYoutube: s.showYoutube !== false,
     sectionView: s.sectionView === true,
-    readerMode: s.readerMode || (window.matchMedia?.('(max-width: 720px)').matches ? 'modal' : 'fullscreen'),
+    readerMode: s.readerMode || 'fullscreen',
     showArticleMore: s.showArticleMore !== false,
     articleMoreColumns: clampInt(s.articleMoreColumns, 1, 4, 3),
     articleMoreRows: clampInt(s.articleMoreRows, 1, 4, 1),
     lastUpdated: s.lastUpdated || null,
     showWeather: s.showWeather !== false,
-    showF1: s.showF1 !== false
+    showF1: s.showF1 === true,
+    showReadLater: s.showReadLater !== false,
+    showShare: s.showShare !== false
   });
   const f = Store.get('flux_f', null);
   S.feeds = (f && f.length) ? f : [...DEFAULT_FEEDS];
@@ -253,6 +257,8 @@ const Theme = {
     return '#' + [r,g,b].map(v => v.toString(16).padStart(2,'0')).join('');
   },
   _syncUI() {
+    document.documentElement.dataset.readLaterEnabled = S.showReadLater ? 'true' : 'false';
+    document.documentElement.dataset.shareEnabled = S.showShare ? 'true' : 'false';
     document.querySelectorAll('.mode-btn[data-mode]').forEach(b => b.classList.toggle('active', b.dataset.mode === S.theme));
     document.querySelectorAll('.reader-mode-btn[data-reader-mode]').forEach(b => b.classList.toggle('active', b.dataset.readerMode === S.readerMode));
     document.querySelectorAll('[data-setting]').forEach(input => {
@@ -261,6 +267,7 @@ const Theme = {
     document.querySelectorAll('.preset-card').forEach(b => b.classList.toggle('active', b.dataset.preset === S.preset));
     document.querySelectorAll('.swatch').forEach(b => b.classList.toggle('active', b.dataset.color === S.customAccent));
     const sl = $('fontSlider'); if (sl) sl.value = S.fontSize;
+    updateReadLaterNav();
     updateLayoutBtns();
   }
 };
@@ -1167,7 +1174,10 @@ function articleViewHtml(a, opts = {}) {
     <button class="article-back" type="button">← Vissza</button>
     <h1 class="article-title">${e(a.title)}</h1>
     <div class="article-meta">${Renderer._metaHtml(a, 'article-source', { full: true })}</div>
-    <button class="article-save-btn${saved ? ' saved' : ''}" type="button" data-save-id="${aid(a)}" title="${saved ? 'Mentve' : 'Mentés későbbre'}" aria-label="${saved ? 'Mentve' : 'Mentés későbbre'}" aria-pressed="${saved ? 'true' : 'false'}">${bookmarkIcon(saved, 18)}</button>
+    <div class="article-action-row">
+      <button class="article-save-btn${saved ? ' saved' : ''}" type="button" data-save-id="${aid(a)}" title="${saved ? 'Mentve' : 'Mentés későbbre'}" aria-label="${saved ? 'Mentve' : 'Mentés későbbre'}" aria-pressed="${saved ? 'true' : 'false'}">${bookmarkIcon(saved, 18)}</button>
+      <button class="article-share-btn" type="button" data-share-id="${aid(a)}" title="Megosztás" aria-label="Megosztás">${shareIcon(18)}</button>
+    </div>
     ${opts.body || ''}
   </article>`;
 }
@@ -1475,6 +1485,45 @@ function bookmarkIcon(filled = false, size = 15) {
     ? `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg>`
     : `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg>`;
 }
+function shareIcon(size = 18) {
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V3"/><path d="m7 8 5-5 5 5"/><path d="M5 11v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8"/></svg>`;
+}
+async function shareArticle(a) {
+  if (!a || !S.showShare) return;
+  const sharedUrl = new URL(location.href);
+  sharedUrl.search = '';
+  sharedUrl.hash = '';
+  sharedUrl.searchParams.set('open', a.url || location.href);
+  const url = sharedUrl.href;
+  const data = { title: a.title || document.title, url };
+  if (window.isSecureContext && typeof navigator.share === 'function' && (!navigator.canShare || navigator.canShare(data))) {
+    try {
+      const result = navigator.share(data);
+      if (!result || typeof result.then !== 'function') throw new Error('share-unavailable');
+      await result;
+      return;
+    } catch (error) {
+      if (error?.name === 'AbortError') return;
+    }
+  }
+  try {
+    if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(url);
+    else {
+      const input = document.createElement('textarea');
+      input.value = url;
+      input.setAttribute('readonly', '');
+      input.style.position = 'fixed';
+      input.style.opacity = '0';
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('copy');
+      input.remove();
+    }
+    toast(window.isSecureContext ? 'Link másolva.' : 'Link másolva – a natív megosztás HTTPS-en érhető el.');
+  } catch (error) {
+    toast('A megosztás nem érhető el.');
+  }
+}
 function articleSnapshot(a) {
   return {
     id: a.id || '',
@@ -1531,8 +1580,19 @@ function setupHoverTapPopup(trigger, popup, openClass) {
   let closeTimer = null;
   const isOpen = () => popup.classList.contains(openClass);
   const isTouchMode = () => window.matchMedia && window.matchMedia('(hover: none), (pointer: coarse)').matches;
+  const alignToToolbar = () => {
+    if (window.innerWidth <= 900) return;
+    popup.style.setProperty('--widget-popup-top-shift', '0px');
+    const rect = popup.getBoundingClientRect();
+    const transformValue = getComputedStyle(popup).transform;
+    const translateY = transformValue === 'none' ? 0 : new DOMMatrixReadOnly(transformValue).m42;
+    const naturalTop = rect.top - translateY;
+    const toolbarBottom = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 56;
+    popup.style.setProperty('--widget-popup-top-shift', `${toolbarBottom + 10 - naturalTop}px`);
+  };
   const open = () => {
     clearTimeout(closeTimer);
+    if (!isOpen()) alignToToolbar();
     popup.classList.add(openClass);
   };
   const close = () => {
@@ -2495,6 +2555,13 @@ function bindEvents() {
       if (S.activeSpecialView === 'readLater' && !saved) renderArticles();
       return;
     }
+    const shareBtn = ev.target.closest('.article-share-btn[data-share-id]');
+    if (shareBtn) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      shareArticle(articleMap[shareBtn.dataset.shareId]);
+      return;
+    }
     if (ev.target.closest('.ix-footer-brand')) return scrollHome();
     if (ev.target.closest('.article-back')) closeArticleView();
   });
@@ -2523,6 +2590,7 @@ function bindEvents() {
     if (btn) selectFeed(btn.dataset.feedUrl || null);
   });
   $('readLaterBtn')?.addEventListener('click', () => {
+    if (!S.showReadLater) return;
     S.activeSpecialView = S.activeSpecialView === 'readLater' ? null : 'readLater';
     S.activeCategory = null;
     renderSidebar();
@@ -2638,6 +2706,11 @@ function bindEvents() {
     S[input.dataset.setting] = input.type === 'checkbox' ? input.checked : input.value;
     saveSettings();
     if (input.dataset.setting === 'showYoutube') injectYtSidebar();
+    if (input.dataset.setting === 'showReadLater' && !S.showReadLater && S.activeSpecialView === 'readLater') {
+      S.activeSpecialView = null;
+      renderSidebar();
+      renderArticles();
+    }
     syncWidgets();
   });
   $('overlay').onclick = () => { closeAddModal(); closeAddYtModal(); };
@@ -2874,7 +2947,7 @@ async function loadWeather() {
     el.innerHTML = `
       <div class="nav-weather-icon">${navSvg}</div>
       <span class="nav-weather-temp">${w.temp}°</span>
-      <div class="wx-popup" id="wxPopup">
+      <div class="wx-popup nav-widget-popup" id="wxPopup">
         <div class="wx-top">
           <div class="wx-left">
             <div class="wx-big-temp">${w.temp}°</div>
@@ -4151,7 +4224,7 @@ function renderF1(f1) {
       <span class="f1-badge-city f1-badge-event">${e(navEvent)}</span>
       <span class="f1-badge-countdown">${e(navStatus)}</span>
     </span>
-    <div class="f1-popup" id="f1Popup">
+    <div class="f1-popup nav-widget-popup" id="f1Popup">
       <div class="f1-card">
         <div class="f1-ticker">${ticker}</div>
         <div class="f1-title f1-title-combined"><span>${e(f1.city)}</span><strong>${e(titleCountry)}</strong></div>

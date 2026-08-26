@@ -39,7 +39,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=reader-history-10">
+  <link rel="stylesheet" href="styles.css?v=feature-controls-3">
 </head>
 <body>
 <div class="pull-refresh" id="pullRefresh" role="status" aria-live="polite" aria-hidden="true">
@@ -241,6 +241,25 @@
               <span class="sp-setting-desc">Felső sáv Forma-1 widget.</span>
             </span>
             <input class="switch-input" type="checkbox" data-setting="showF1">
+            <span class="switch-ui"></span>
+          </label>
+        </div>
+        <div class="sp-mini-label">Cikkműveletek</div>
+        <div class="sp-setting-card">
+          <label class="sp-setting-row">
+            <span>
+              <span class="sp-setting-title">Mentett cikkek</span>
+              <span class="sp-setting-desc">Mentés gomb a cikkolvasóban és elérés a felső sávból.</span>
+            </span>
+            <input class="switch-input" type="checkbox" data-setting="showReadLater">
+            <span class="switch-ui"></span>
+          </label>
+          <label class="sp-setting-row">
+            <span>
+              <span class="sp-setting-title">Megosztás</span>
+              <span class="sp-setting-desc">Natív megosztás gomb a cikkolvasóban.</span>
+            </span>
+            <input class="switch-input" type="checkbox" data-setting="showShare">
             <span class="switch-ui"></span>
           </label>
         </div>
@@ -446,6 +465,6 @@
 <div class="toast" id="toast"></div>
 
 <script src="drag-order.min.js?v=1"></script>
-<script src="app.js?v=reader-history-10"></script>
+<script src="app.js?v=feature-controls-3"></script>
 </body>
 </html>
