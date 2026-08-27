@@ -1644,7 +1644,7 @@ function shareIcon(size = 18) {
 async function shareArticle(a) {
   if (!a || !S.showShare) return;
   const sharedUrl = new URL('/share', location.origin);
-  sharedUrl.searchParams.set('preview', '3');
+  sharedUrl.searchParams.set('preview', '4');
   sharedUrl.searchParams.set('url', a.url || location.href);
   sharedUrl.searchParams.set('title', normalizeText(a.title || document.title).slice(0, 280));
   if (a.desc) sharedUrl.searchParams.set('description', normalizeText(a.desc).slice(0, 500));
