@@ -507,6 +507,7 @@ const Renderer = {
   },
   _flipPage(page, index, total) {
     const isTextPage = page.template === 'text';
+    const pageNumber = `<span class="flip-page-number" aria-label="${index + 1}. oldal, összesen ${total}">${String(index + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}</span>`;
     const roles = page.template === 'cover'
       ? ['lead', 'tile', 'tile']
       : page.template === 'feature'
@@ -515,13 +516,15 @@ const Renderer = {
     const stories = isTextPage
       ? page.items.map((a, i) => this._flipTextStory(a, i, page.rows, page.items.length)).join('')
       : page.items.map((a, i) => this._flipStory(a, roles[i], index < 2)).join('');
+    const isSectionPage = page.template === 'briefs' && !!page.heading;
     const heading = page.template === 'briefs' || isTextPage
-      ? `<div class="flip-briefs-heading"><span>${e(page.heading || (isTextPage ? 'Röviden' : 'Hírek'))}</span><span>${String(index + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}</span></div>`
+      ? `<div class="flip-briefs-heading${isSectionPage ? ' is-section' : ''}"><span>${e(page.heading || (isTextPage ? 'Röviden' : 'Hírek'))}</span></div>`
       : '';
     const textClass = isTextPage ? ` text-columns-${page.columns}` : '';
+    const briefsClass = page.imagesLeft ? ' briefs-images-left' : '';
     const textStyle = isTextPage ? ` style="--flip-text-rows:${page.rows};--flip-text-columns:${page.columns}"` : '';
-    return `<section class="flip-page template-${page.template}${textClass}" data-flip-anchor="${e(aid(page.items[0]))}"${textStyle}>
-      <div class="flip-page-stage">${heading}<div class="flip-page-grid">${stories}</div></div>
+    return `<section class="flip-page template-${page.template}${textClass}${briefsClass}" data-flip-anchor="${e(aid(page.items[0]))}"${textStyle}>
+      <div class="flip-page-stage">${heading}${pageNumber}<div class="flip-page-grid">${stories}</div></div>
     </section>`;
   },
   _flip(articles) {
@@ -533,19 +536,27 @@ const Renderer = {
       { template: 'feature', count: 1 },
       { template: 'briefs', count: 3 }
     ];
+    const usedSectionIds = new Set();
+    let briefsImagesLeft = false;
     let patternIndex = 0;
     while (pool.length) {
       const spec = pattern[patternIndex++ % pattern.length];
       const items = [];
       const sources = new Set();
       let heading = '';
-      if (spec.template === 'briefs') {
+      if (spec.template === 'briefs' && S.sectionView) {
         const windowItems = pool.slice(0, 40);
-        const group = SECTION_RULES
+        const groups = SECTION_RULES
           .map(rule => ({ rule, items: windowItems.filter(a => primarySectionRule(a)?.id === rule.id) }))
           .filter(candidate => candidate.items.length >= 3)
-          .sort((a, b) => windowItems.indexOf(a.items[0]) - windowItems.indexOf(b.items[0]))[0];
+          .sort((a, b) => windowItems.indexOf(a.items[0]) - windowItems.indexOf(b.items[0]));
+        let group = groups.find(candidate => !usedSectionIds.has(candidate.rule.id));
+        if (!group && groups.length) {
+          usedSectionIds.clear();
+          group = groups[0];
+        }
         if (group) {
+          usedSectionIds.add(group.rule.id);
           heading = group.rule.label;
           group.items.slice(0, 3).forEach(item => {
             items.push(item);
@@ -562,7 +573,9 @@ const Renderer = {
         items.push(item);
         sources.add(item.feedUrl);
       }
-      pages.push({ type: 'stories', template: spec.template, heading, items });
+      const imagesLeft = spec.template === 'briefs' && briefsImagesLeft;
+      if (spec.template === 'briefs') briefsImagesLeft = !briefsImagesLeft;
+      pages.push({ type: 'stories', template: spec.template, heading, imagesLeft, items });
     }
     const textSpec = flipTextPageSpec();
     flipTextLayoutMode = textSpec.mode;
@@ -576,11 +589,13 @@ const Renderer = {
         columns: textSpec.columns
       });
     }
-    if (S.showYoutube && S.ytChannels.length) pages.splice(Math.min(1, pages.length), 0, { type: 'youtube' });
+    if (S.showYoutube) pages.splice(Math.min(1, pages.length), 0, { type: 'youtube' });
     const total = pages.length;
     return `<div class="flip-layout">${pages.map((page, index) => page.type === 'youtube'
       ? `<section class="flip-page flip-page-youtube" data-flip-anchor="youtube">
-          <div class="flip-page-stage" data-flip-youtube></div>
+          <div class="flip-page-stage" data-flip-youtube>
+            <span class="flip-page-number" aria-label="${index + 1}. oldal, összesen ${total}">${String(index + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}</span>
+          </div>
         </section>`
       : this._flipPage(page, index, total)
     ).join('')}</div>`;
@@ -732,7 +747,7 @@ function ensureFlipOverlay() {
 function flipStageClone(page) {
   const wrapper = document.createElement('div');
   wrapper.className = `flip-turn-page-copy ${[...page.classList]
-    .filter(name => name.startsWith('template-') || name === 'flip-page-youtube')
+    .filter(name => name !== 'flip-page' && !name.startsWith('is-'))
     .join(' ')}`;
   const clone = page.querySelector('.flip-page-stage').cloneNode(true);
   clone.querySelectorAll('[id]').forEach(node => node.removeAttribute('id'));
@@ -3404,7 +3419,7 @@ async function loadYouTube(bust = false) {
     ytLoading = false;
     ytRefreshState = 'idle';
     ytVideos = [];
-    removeYtSidebar();
+    S.layout === 'flip' && S.showYoutube ? injectYtSidebar() : removeYtSidebar();
     return;
   }
   let cached = null;
@@ -3511,9 +3526,11 @@ function ytVideoById(videoId) {
 function buildYtSidebarHtml() {
   const videos = getYtSidebarVideos();
   if (!videos.length) {
-    const message = ytLoading
-      ? 'YouTube videók betöltése...'
-      : 'Még nincs megjeleníthető videó. Ellenőrizd a csatornákat vagy frissíts újra.';
+    const message = !S.ytChannels.length
+      ? 'Nincs hozzáadott YouTube-csatorna.'
+      : ytLoading
+        ? 'YouTube videók betöltése...'
+        : 'Még nincs megjeleníthető videó. Ellenőrizd a csatornákat vagy frissíts újra.';
     return `<div class="yt-empty">${e(message)}</div>`;
   }
   const activeVideo = ytActiveVideoId ? ytVideoById(ytActiveVideoId) : null;
@@ -3930,11 +3947,16 @@ function requestYtAutoplay(sidebar) {
 function injectYtSidebar() {
   const content = $('content');
   if (!content) return;
+  const flipLayout = content.querySelector('.flip-layout');
+  if (flipLayout && S.showYoutube !== !!flipLayout.querySelector('[data-flip-youtube]')) {
+    renderArticles();
+    return;
+  }
   if (!S.showYoutube) {
     removeYtSidebar();
     return;
   }
-  if (!S.ytChannels.length) {
+  if (!S.ytChannels.length && S.layout !== 'flip') {
     removeYtSidebar();
     return;
   }
