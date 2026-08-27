@@ -1643,10 +1643,11 @@ function shareIcon(size = 18) {
 }
 async function shareArticle(a) {
   if (!a || !S.showShare) return;
-  const sharedUrl = new URL(location.href);
-  sharedUrl.search = '';
-  sharedUrl.hash = '';
-  sharedUrl.searchParams.set('open', a.url || location.href);
+  const sharedUrl = new URL('/share', location.origin);
+  sharedUrl.searchParams.set('url', a.url || location.href);
+  sharedUrl.searchParams.set('title', normalizeText(a.title || document.title).slice(0, 280));
+  if (a.desc) sharedUrl.searchParams.set('description', normalizeText(a.desc).slice(0, 500));
+  if (a.image && a.image.length <= 2048) sharedUrl.searchParams.set('image', a.image);
   const url = sharedUrl.href;
   const data = { title: a.title || document.title, url };
   if (window.isSecureContext && typeof navigator.share === 'function' && (!navigator.canShare || navigator.canShare(data))) {

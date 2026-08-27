@@ -8,9 +8,16 @@
     },
     "api/feed.js": {
       "maxDuration": 10
+    },
+    "api/share.js": {
+      "maxDuration": 10
     }
   },
   "rewrites": [
+    {
+      "source": "/share",
+      "destination": "/api/share"
+    },
     {
       "source": "/",
       "destination": "/index.html"
