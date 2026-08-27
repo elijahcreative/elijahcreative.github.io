@@ -11,9 +11,16 @@
     },
     "api/share.js": {
       "maxDuration": 10
+    },
+    "api/share-image.js": {
+      "maxDuration": 10
     }
   },
   "rewrites": [
+    {
+      "source": "/share-image",
+      "destination": "/api/share-image"
+    },
     {
       "source": "/share",
       "destination": "/api/share"

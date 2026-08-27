@@ -16,6 +16,7 @@ module.exports = function handler(req, res) {
   const title = cleanText(queryValue(req, 'title'), 280) || 'Cikk a Flux olvasóban';
   const description = cleanText(queryValue(req, 'description'), 500) || 'Olvasd el a cikket a Flux RSS olvasóban.';
   const image = safeHttpUrl(queryValue(req, 'image')) || `${baseUrl}/icons/pwa-512.png`;
+  const previewImage = `${baseUrl}/share-image?v=1&image=${encodeURIComponent(image)}`;
   const readerUrl = `${baseUrl}/?open=${encodeURIComponent(sourceUrl)}`;
   const shareUrl = `${baseUrl}${requestPath(req)}`;
 
@@ -29,7 +30,7 @@ module.exports = function handler(req, res) {
     return;
   }
 
-  res.status(200).send(renderSharePage({ title, description, image, shareUrl, readerUrl }));
+  res.status(200).send(renderSharePage({ title, description, image: previewImage, shareUrl, readerUrl }));
 };
 
 function renderSharePage({ title, description, image, shareUrl, readerUrl }) {

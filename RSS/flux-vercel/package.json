@@ -6,5 +6,8 @@
     "dev": "vercel dev",
     "deploy": "vercel",
     "deploy:prod": "vercel --prod"
+  },
+  "dependencies": {
+    "sharp": "^0.35.4"
   }
 }
