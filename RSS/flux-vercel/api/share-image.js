@@ -58,23 +58,24 @@ async function renderBrandedImage(source) {
   const width = Math.max(1, Math.round(sourceWidth * scale));
   const height = Math.max(1, Math.round(sourceHeight * scale));
   const padding = clamp(Math.round(width * 0.045), 28, 64);
-  const fontSize = clamp(Math.round(width * 0.045), 32, 56);
-  const dotRadius = Math.round(fontSize * 0.11);
+  const fontSize = clamp(Math.round(width * 0.075), 52, 92);
+  const markSize = Math.round(fontSize * (7 / 18.4));
+  const markRadius = Math.round(markSize * (2 / 7));
+  const markGap = markSize;
   const baseline = height - padding;
-  const dotX = padding + dotRadius;
-  const dotY = Math.round(baseline - fontSize * 0.34);
-  const textX = dotX + dotRadius + Math.round(fontSize * 0.27);
+  const markY = Math.round(baseline - fontSize * 0.34 - markSize / 2);
+  const textX = padding + markSize + markGap;
   const overlay = Buffer.from(`
     <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="shade" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="48%" stop-color="#000" stop-opacity="0"/>
-          <stop offset="100%" stop-color="#000" stop-opacity="0.72"/>
+          <stop offset="42%" stop-color="#000" stop-opacity="0"/>
+          <stop offset="100%" stop-color="#000" stop-opacity="0.76"/>
         </linearGradient>
       </defs>
       <rect width="${width}" height="${height}" fill="url(#shade)"/>
-      <circle cx="${dotX}" cy="${dotY}" r="${dotRadius}" fill="#0891b2"/>
-      <text x="${textX}" y="${baseline}" fill="#fff" font-family="Inter, Arial, Helvetica, sans-serif" font-size="${fontSize}" font-weight="800" letter-spacing="-1">Flux</text>
+      <rect x="${padding}" y="${markY}" width="${markSize}" height="${markSize}" rx="${markRadius}" fill="#0891b2"/>
+      <text x="${textX}" y="${baseline}" fill="#fff" font-family="Inter, Arial, Helvetica, sans-serif" font-size="${fontSize}" font-weight="900" letter-spacing="-1">Flux</text>
     </svg>`);
 
   return sharp(normalized.data)
