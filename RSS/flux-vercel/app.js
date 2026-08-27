@@ -493,23 +493,41 @@ const Renderer = {
       </div>
     </div>`;
   },
+  _flipTextStory(a, index, rows, total) {
+    const id = aid(a);
+    const row = index % rows;
+    const column = Math.floor(index / rows);
+    const itemsInColumn = Math.min(rows, total - column * rows);
+    const side = row % 2 ? 'right' : 'left';
+    const tone = parseInt(id.slice(1), 36) % 6;
+    return `<div class="flip-story flip-story-text square-${side}${row === itemsInColumn - 1 ? ' is-column-last' : ''}" data-id="${id}">
+      <span class="flip-text-square tone-${tone}" aria-hidden="true"></span>
+      <div class="flip-text-title">${e(a.title)}</div>
+    </div>`;
+  },
   _flipPage(page, index, total) {
+    const isTextPage = page.template === 'text';
     const roles = page.template === 'cover'
       ? ['lead', 'tile', 'tile']
       : page.template === 'feature'
         ? ['feature']
         : page.items.map(() => 'brief');
-    const stories = page.items.map((a, i) => this._flipStory(a, roles[i], index < 2)).join('');
-    const heading = page.template === 'briefs'
-      ? `<div class="flip-briefs-heading"><span>${e(page.heading || 'Hírek')}</span><span>${String(index + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}</span></div>`
+    const stories = isTextPage
+      ? page.items.map((a, i) => this._flipTextStory(a, i, page.rows, page.items.length)).join('')
+      : page.items.map((a, i) => this._flipStory(a, roles[i], index < 2)).join('');
+    const heading = page.template === 'briefs' || isTextPage
+      ? `<div class="flip-briefs-heading"><span>${e(page.heading || (isTextPage ? 'Röviden' : 'Hírek'))}</span><span>${String(index + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}</span></div>`
       : '';
-    return `<section class="flip-page template-${page.template}" data-flip-anchor="${e(aid(page.items[0]))}">
+    const textClass = isTextPage ? ` text-columns-${page.columns}` : '';
+    const textStyle = isTextPage ? ` style="--flip-text-rows:${page.rows};--flip-text-columns:${page.columns}"` : '';
+    return `<section class="flip-page template-${page.template}${textClass}" data-flip-anchor="${e(aid(page.items[0]))}"${textStyle}>
       <div class="flip-page-stage">${heading}<div class="flip-page-grid">${stories}</div></div>
     </section>`;
   },
   _flip(articles) {
     const pages = [];
-    const pool = [...articles];
+    const pool = articles.filter(a => a.image);
+    const textArticles = articles.filter(a => !a.image);
     const pattern = [
       { template: 'cover', count: 3 },
       { template: 'feature', count: 1 },
@@ -545,6 +563,18 @@ const Renderer = {
         sources.add(item.feedUrl);
       }
       pages.push({ type: 'stories', template: spec.template, heading, items });
+    }
+    const textSpec = flipTextPageSpec();
+    flipTextLayoutMode = textSpec.mode;
+    for (let i = 0; i < textArticles.length; i += textSpec.count) {
+      pages.push({
+        type: 'stories',
+        template: 'text',
+        heading: 'Röviden',
+        items: textArticles.slice(i, i + textSpec.count),
+        rows: textSpec.rows,
+        columns: textSpec.columns
+      });
     }
     if (S.showYoutube && S.ytChannels.length) pages.splice(Math.min(1, pages.length), 0, { type: 'youtube' });
     const total = pages.length;
@@ -636,6 +666,7 @@ const Renderer = {
 };
 let flipResizeTimer = 0;
 let flipYtCompact = null;
+let flipTextLayoutMode = '';
 let flipOverlay = null;
 let flipOverlayKey = '';
 let flipPageIndex = 0;
@@ -654,6 +685,11 @@ const FLIP_CAST_SHADOW_MAX = .5;
 const FLIP_CAST_SHADOW_SIZE = 72;
 const FLIP_WHEEL_THRESHOLD = 48;
 const FLIP_WHEEL_GESTURE_GAP = 180;
+function flipTextPageSpec() {
+  if (window.innerWidth > 900) return { mode: 'desktop', count: 8, rows: 4, columns: 2 };
+  if (window.innerHeight <= 700) return { mode: 'compact', count: 5, rows: 5, columns: 1 };
+  return { mode: 'mobile', count: 6, rows: 6, columns: 1 };
+}
 function currentFlipAnchor() {
   if (S.layout !== 'flip') return null;
   const content = $('content');
@@ -981,11 +1017,16 @@ function handleFlipResize() {
   flipWheelDelta = 0;
   flipWheelGestureActive = false;
   requestAnimationFrame(() => setFlipPage(flipPageIndex));
+  const textLayoutChanged = flipTextLayoutMode && flipTextLayoutMode !== flipTextPageSpec().mode;
   const compact = window.matchMedia('(max-width: 600px)').matches;
-  if (flipYtCompact === compact) return;
+  const ytLayoutChanged = flipYtCompact !== compact;
+  if (!textLayoutChanged && !ytLayoutChanged) return;
   flipYtCompact = compact;
   clearTimeout(flipResizeTimer);
-  flipResizeTimer = setTimeout(injectYtSidebar, 100);
+  flipResizeTimer = setTimeout(() => {
+    if (textLayoutChanged) renderArticles();
+    else injectYtSidebar();
+  }, 100);
 }
 function setupFlipView() {
   const content = $('content');
