@@ -669,6 +669,8 @@ let flipYtCompact = null;
 let flipTextLayoutMode = '';
 let flipOverlay = null;
 let flipOverlayKey = '';
+let flipPreparedPair = null;
+const flipGhosts = new Set();
 let flipPageIndex = 0;
 let flipGesture = null;
 let flipAnimating = false;
@@ -685,6 +687,8 @@ const FLIP_CAST_SHADOW_MAX = .5;
 const FLIP_CAST_SHADOW_SIZE = 72;
 const FLIP_WHEEL_THRESHOLD = 48;
 const FLIP_WHEEL_GESTURE_GAP = 180;
+const FLIP_REWIND_MAX_TURNS = 10;
+const FLIP_REWIND_BUDGET = 1800;
 function flipTextPageSpec() {
   if (window.innerWidth > 900) return { mode: 'desktop', count: 8, rows: 4, columns: 2 };
   if (window.innerHeight <= 700) return { mode: 'compact', count: 5, rows: 5, columns: 1 };
@@ -742,13 +746,43 @@ function flipStageClone(page) {
   wrapper.appendChild(clone);
   return wrapper;
 }
+function flipPairKey(currentPage, nextPage, index) {
+  return `${index}:${currentPage.dataset.flipAnchor}:${nextPage.dataset.flipAnchor}`;
+}
+function decodeFlipImages(root) {
+  return Promise.all([...root.querySelectorAll('img')].map(img => {
+    if (img.decode) return img.decode().catch(() => {});
+    if (img.complete) return Promise.resolve();
+    return new Promise(resolve => {
+      img.addEventListener('load', resolve, { once: true });
+      img.addEventListener('error', resolve, { once: true });
+    });
+  }));
+}
+function prebuildFlipPair(index) {
+  const content = $('content');
+  const pages = content ? [...content.querySelectorAll('.flip-page')] : [];
+  if (index < 0 || index >= pages.length - 1) return;
+  const currentPage = pages[index];
+  const nextPage = pages[index + 1];
+  const key = flipPairKey(currentPage, nextPage, index);
+  if (flipPreparedPair?.key === key || flipOverlayKey === key) return;
+  const front = flipStageClone(currentPage);
+  const back = flipStageClone(nextPage);
+  const holder = document.createElement('div');
+  holder.append(front, back);
+  flipPreparedPair = { key, front, back };
+  decodeFlipImages(holder);
+}
 function prepareFlipOverlay(currentPage, nextPage, index) {
   const overlay = ensureFlipOverlay();
-  const key = `${index}:${currentPage.dataset.flipAnchor}:${nextPage.dataset.flipAnchor}`;
+  const key = flipPairKey(currentPage, nextPage, index);
   if (flipOverlayKey === key) return;
   flipOverlayKey = key;
-  overlay.querySelector('.flip-turn-front').replaceChildren(flipStageClone(currentPage));
-  overlay.querySelector('.flip-turn-back').replaceChildren(flipStageClone(nextPage));
+  const prepared = flipPreparedPair?.key === key ? flipPreparedPair : null;
+  overlay.querySelector('.flip-turn-front').replaceChildren(prepared?.front || flipStageClone(currentPage));
+  overlay.querySelector('.flip-turn-back').replaceChildren(prepared?.back || flipStageClone(nextPage));
+  if (prepared) flipPreparedPair = null;
 }
 function setFlipTurnPages(currentPage, nextPage) {
   const pages = currentPage.closest('.flip-layout')?.querySelectorAll('.flip-page') || [];
@@ -774,17 +808,22 @@ function positionFlipOverlay(page) {
   flipHalfHeight = rect.height / 2;
   flipPerspective = parseFloat(getComputedStyle(flipOverlay.querySelector('.flip-turn-scene')).perspective) || 0;
 }
-function setFlipAngle(flap, angle) {
+function applyFlipAngle(overlay, flap, angle, syncContent = false) {
   const depth = flipHalfHeight * Math.sin(angle * Math.PI / 180);
   const scale = flipPerspective ? 1 - depth / flipPerspective : 1;
-  flipOverlay.querySelector('.flip-turn-compensator').style.transform = `scaleY(${scale})`;
+  overlay.querySelector('.flip-turn-compensator').style.transform = `scaleY(${scale})`;
   flap.style.transform = `rotateX(${angle}deg)`;
-  flipOverlay.classList.toggle('is-edge-on', Math.abs(angle - 90) < .5);
-  const content = $('content');
-  content?.classList.toggle('flip-front-visible', angle <= 90);
-  content?.classList.toggle('flip-back-visible', angle > 90);
+  overlay.classList.toggle('is-edge-on', Math.abs(angle - 90) < .5);
+  if (syncContent) {
+    const content = $('content');
+    content?.classList.toggle('flip-front-visible', angle <= 90);
+    content?.classList.toggle('flip-back-visible', angle > 90);
+  }
 }
-function setFlipCastShadow(angle, direction) {
+function setFlipAngle(flap, angle) {
+  applyFlipAngle(flipOverlay, flap, angle, true);
+}
+function applyFlipCastShadow(overlay, angle, direction) {
   const radians = angle * Math.PI / 180;
   const depth = flipHalfHeight * Math.sin(radians);
   const scale = flipPerspective ? 1 - depth / flipPerspective : 1;
@@ -793,10 +832,43 @@ function setFlipCastShadow(angle, direction) {
   const edgeY = flipHalfHeight + flipHalfHeight * Math.cos(radians) * scale;
   const above = angle > 90;
   const alpha = strength * .72;
-  flipOverlay.style.backgroundImage = above
+  overlay.style.backgroundImage = above
     ? `linear-gradient(to bottom, transparent, rgba(0,0,0,${alpha}) 88%, transparent)`
     : `linear-gradient(to bottom, transparent, rgba(0,0,0,${alpha}) 12%, transparent)`;
-  flipOverlay.style.backgroundPosition = `0 ${above ? edgeY - FLIP_CAST_SHADOW_SIZE : edgeY}px`;
+  overlay.style.backgroundPosition = `0 ${above ? edgeY - FLIP_CAST_SHADOW_SIZE : edgeY}px`;
+}
+function setFlipCastShadow(angle, direction) {
+  applyFlipCastShadow(flipOverlay, angle, direction);
+}
+function clearFlipGhosts() {
+  flipGhosts.forEach(entry => {
+    cancelAnimationFrame(entry.frame);
+    entry.overlay.remove();
+  });
+  flipGhosts.clear();
+}
+function trailFlipOverlay(startAngle, targetAngle, direction, duration) {
+  const overlay = flipOverlay.cloneNode(true);
+  overlay.classList.add('is-ready', 'is-active', 'flip-turn-ghost');
+  overlay.style.zIndex = '89';
+  document.body.appendChild(overlay);
+  const flap = overlay.querySelector('.flip-turn-flap');
+  const entry = { overlay, frame: 0 };
+  flipGhosts.add(entry);
+  const started = performance.now();
+  const animate = now => {
+    const progress = Math.min(1, (now - started) / Math.max(40, duration));
+    const eased = 1 - Math.pow(1 - progress, 2);
+    const angle = startAngle + (targetAngle - startAngle) * eased;
+    applyFlipAngle(overlay, flap, angle);
+    applyFlipCastShadow(overlay, angle, direction);
+    if (progress < 1) entry.frame = requestAnimationFrame(animate);
+    else {
+      overlay.remove();
+      flipGhosts.delete(entry);
+    }
+  };
+  entry.frame = requestAnimationFrame(animate);
 }
 function hideFlipOverlay() {
   cancelAnimationFrame(flipAnimationTimer);
@@ -820,14 +892,7 @@ async function primeFlipOverlay() {
   setFlipAngle(flap, angle);
   flipOverlay.style.backgroundImage = 'none';
   flipOverlay.classList.add('is-ready');
-  await Promise.all([...flipOverlay.querySelectorAll('img')].map(img => {
-    if (img.decode) return img.decode().catch(() => {});
-    if (img.complete) return Promise.resolve();
-    return new Promise(resolve => {
-      img.addEventListener('load', resolve, { once: true });
-      img.addEventListener('error', resolve, { once: true });
-    });
-  }));
+  await decodeFlipImages(flipOverlay);
   if (token !== flipPrimeToken || S.layout !== 'flip') return;
   flipOverlay.getBoundingClientRect();
   flap.getBoundingClientRect();
@@ -860,7 +925,7 @@ function beginFlipGesture(direction, startY = 0) {
   setFlipCastShadow(angle, direction);
   flipOverlay.classList.add('is-ready');
   flipOverlay.classList.add('is-active');
-  flipGesture = { axis: 'y', direction, pairIndex, startY, progress: 0, angle };
+  flipGesture = { axis: 'y', direction, pairIndex, startY, progress: 0, angle, lastY: startY, lastTime: 0, velocity: 0 };
   return true;
 }
 function handleFlipTouchStart(event) {
@@ -885,9 +950,20 @@ function handleFlipTouchMove(event) {
       return;
     }
     flipGesture.startX = startX;
+    flipGesture.lastY = touch.clientY;
+    flipGesture.lastTime = event.timeStamp || performance.now();
   }
   if (flipGesture.axis !== 'y') return;
   event.preventDefault();
+  const now = event.timeStamp || performance.now();
+  if (flipGesture.lastTime && now > flipGesture.lastTime) {
+    const segmentVelocity = Math.abs(touch.clientY - flipGesture.lastY) / (now - flipGesture.lastTime);
+    flipGesture.velocity = flipGesture.velocity
+      ? flipGesture.velocity * .65 + segmentVelocity * .35
+      : segmentVelocity;
+  }
+  flipGesture.lastY = touch.clientY;
+  flipGesture.lastTime = now;
   const distance = Math.abs(touch.clientY - flipGesture.startY);
   const travel = Math.min(280, Math.max(160, window.innerHeight * .36));
   const progress = Math.min(1, distance / travel);
@@ -940,12 +1016,20 @@ function finishFlipGesture(complete, options = {}) {
   const flap = flipOverlay.querySelector('.flip-turn-flap');
   const targetAngle = complete ? (gesture.direction > 0 ? 180 : 0) : (gesture.direction > 0 ? 0 : 180);
   const startAngle = gesture.angle;
-  const duration = options.duration ?? 560;
+  const distanceRatio = Math.abs(targetAngle - startAngle) / 180;
+  const velocityFactor = 1 - Math.min(.32, (gesture.velocity || 0) * .18);
+  const naturalDuration = (complete ? 110 + 330 * distanceRatio : 100 + 260 * distanceRatio) * velocityFactor;
+  const duration = options.duration ?? Math.round(Math.max(110, Math.min(complete ? 360 : 300, naturalDuration)));
+  const overlapAt = complete ? (options.overlapAt ?? .62) : 1;
   const startTime = performance.now();
   flipAnimating = true;
+  if (complete) {
+    const followingPair = gesture.direction > 0 ? gesture.pairIndex + 1 : gesture.pairIndex - 1;
+    prebuildFlipPair(followingPair);
+  }
   flap.style.transition = 'none';
   cancelAnimationFrame(flipAnimationTimer);
-  const finish = () => {
+  const finish = (trailed = false) => {
     setFlipAngle(flap, targetAngle);
     setFlipCastShadow(targetAngle, gesture.direction);
     const targetPage = complete
@@ -956,10 +1040,11 @@ function finishFlipGesture(complete, options = {}) {
       hideFlipOverlay();
       flipGesture = null;
       flipAnimating = false;
+      if (!flipRewinding) flipWheelGestureActive = false;
       if (options.prime !== false) primeFlipOverlay();
       options.done?.();
     };
-    if (options.chain) settle();
+    if (options.chain || trailed) settle();
     else requestAnimationFrame(() => requestAnimationFrame(settle));
   };
   const animate = now => {
@@ -969,7 +1054,11 @@ function finishFlipGesture(complete, options = {}) {
     gesture.angle = angle;
     setFlipAngle(flap, angle);
     setFlipCastShadow(angle, gesture.direction);
-    if (progress < 1) flipAnimationTimer = requestAnimationFrame(animate);
+    if (progress < overlapAt) flipAnimationTimer = requestAnimationFrame(animate);
+    else if (overlapAt < 1 && progress < 1) {
+      trailFlipOverlay(angle, targetAngle, gesture.direction, duration * (1 - progress));
+      finish(true);
+    }
     else finish();
   };
   flipAnimationTimer = requestAnimationFrame(animate);
@@ -984,21 +1073,36 @@ async function rewindFlipToStart() {
   }
   flipRewinding = true;
   const startIndex = flipPageIndex;
-  while (flipPageIndex > 0) {
+  const turnCount = Math.min(startIndex, FLIP_REWIND_MAX_TURNS);
+  const sources = Array.from({ length: turnCount }, (_, index) => {
+    if (turnCount === 1) return 1;
+    return Math.round(startIndex - (startIndex - 1) * index / (turnCount - 1));
+  });
+  const rewindStarted = performance.now();
+  for (let index = 0; index < sources.length; index++) {
     if (S.layout !== 'flip') break;
+    if (performance.now() - rewindStarted >= FLIP_REWIND_BUDGET) {
+      setFlipPage(0);
+      break;
+    }
+    if (flipPageIndex !== sources[index]) setFlipPage(sources[index]);
     if (!beginFlipGesture(-1)) {
       const previousIndex = flipPageIndex;
       setFlipPage(previousIndex - 1);
       if (flipPageIndex === previousIndex) break;
       continue;
     }
-    const lastPage = flipPageIndex === 1;
-    const rewindProgress = startIndex === 1 ? 1 : (startIndex - flipPageIndex) / (startIndex - 1);
-    const stepDuration = Math.round(72 + 228 * rewindProgress * rewindProgress);
+    const lastPage = index === sources.length - 1;
+    const rewindProgress = turnCount === 1 ? 1 : index / (turnCount - 1);
+    const plannedDuration = Math.round(110 + 260 * rewindProgress * rewindProgress);
+    const timeLeft = FLIP_REWIND_BUDGET - (performance.now() - rewindStarted);
+    const minimumFutureTime = Math.max(0, sources.length - index - 1) * 40;
+    const stepDuration = Math.max(40, Math.min(plannedDuration, timeLeft - minimumFutureTime));
     const completed = await new Promise(resolve => {
       const started = finishFlipGesture(true, {
         duration: stepDuration,
         linear: !lastPage,
+        overlapAt: lastPage ? 1 : .6,
         prime: lastPage,
         chain: !lastPage,
         done: () => resolve(true)
@@ -1008,10 +1112,16 @@ async function rewindFlipToStart() {
     if (!completed) break;
   }
   flipRewinding = false;
+  if (S.layout === 'flip' && flipPageIndex !== 0) {
+    setFlipPage(0);
+    primeFlipOverlay();
+  }
 }
 function handleFlipResize() {
   if (S.layout !== 'flip') return;
   hideFlipOverlay();
+  clearFlipGhosts();
+  flipPreparedPair = null;
   flipGesture = null;
   flipAnimating = false;
   flipWheelDelta = 0;
@@ -1034,6 +1144,8 @@ function setupFlipView() {
   flipOverlayKey = '';
   flipPrimeToken++;
   hideFlipOverlay();
+  clearFlipGhosts();
+  flipPreparedPair = null;
   flipGesture = null;
   flipAnimating = false;
   const pages = [...content.querySelectorAll('.flip-page')];
