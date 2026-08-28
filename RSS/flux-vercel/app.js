@@ -140,6 +140,48 @@ const Store = {
   get(key, fallback) { try { return JSON.parse(localStorage.getItem(key) || 'null') ?? fallback; } catch(e) { return fallback; } },
   set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch(e) {} }
 };
+const YT_CHANNELS_KEY = 'flux_yt';
+const YT_CHANNELS_BACKUP_KEY = 'flux_yt_backup';
+const YT_CHANNELS_META_KEY = 'flux_yt_meta';
+function normalizeYtChannels(value) {
+  if (!Array.isArray(value)) return null;
+  const seen = new Set();
+  return value.filter(channel => {
+    if (!channel || typeof channel.id !== 'string' || !channel.id.trim()) return false;
+    const key = `${channel.idType || 'id'}:${channel.id}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+function ytChannelsSignature(channels) {
+  return JSON.stringify(channels.map(channel => `${channel.idType || 'id'}:${channel.id}`));
+}
+function cachedYtChannels() {
+  const cache = Store.get('flux_yt_cache', null);
+  if (!Array.isArray(cache?.videos) || !cache.videos.length) return [];
+  const types = new Map();
+  try {
+    const entries = JSON.parse(String(cache.sig || '').replace(/^yt-cache-v2:/, ''));
+    if (Array.isArray(entries)) entries.forEach(entry => {
+      const splitAt = String(entry).indexOf(':');
+      if (splitAt > 0) types.set(String(entry).slice(splitAt + 1), String(entry).slice(0, splitAt));
+    });
+  } catch(e) {}
+  const channels = [];
+  const seen = new Set();
+  cache.videos.forEach(video => {
+    const id = typeof video?.channelId === 'string' ? video.channelId.trim() : '';
+    if (!id || seen.has(id)) return;
+    seen.add(id);
+    channels.push({
+      id,
+      name: typeof video.channelName === 'string' && video.channelName.trim() ? video.channelName.trim() : id,
+      idType: types.get(id) || (/^UC[A-Za-z0-9_-]{22}$/.test(id) ? 'id' : /^https?:\/\//.test(id) ? 'url' : 'handle')
+    });
+  });
+  return channels;
+}
 function clampInt(value, min, max, fallback) {
   const n = Number.parseInt(value, 10);
   return Number.isFinite(n) ? Math.max(min, Math.min(max, n)) : fallback;
@@ -163,7 +205,39 @@ function saveSettings() {
   Store.set('flux_s', Object.fromEntries(SETTINGS_KEYS.map(k => [k, S[k]])));
 }
 function saveFeeds()      { Store.set('flux_f', S.feeds); }
-function saveYtChannels() { Store.set('flux_yt', S.ytChannels); }
+function saveYtChannels({ allowEmpty = false } = {}) {
+  const channels = normalizeYtChannels(S.ytChannels) || [];
+  const stored = normalizeYtChannels(Store.get(YT_CHANNELS_KEY, null));
+  if (!channels.length && stored?.length && !allowEmpty) {
+    S.ytChannels = stored;
+    return false;
+  }
+  if (channels.length) {
+    Store.set(YT_CHANNELS_BACKUP_KEY, { version: 1, savedAt: new Date().toISOString(), channels });
+  }
+  Store.set(YT_CHANNELS_KEY, channels);
+  Store.set(YT_CHANNELS_META_KEY, {
+    version: 1,
+    count: channels.length,
+    signature: ytChannelsSignature(channels),
+    emptyIsIntentional: !channels.length && allowEmpty
+  });
+  S.ytChannels = channels;
+  return true;
+}
+function loadYtChannelsFromStorage() {
+  const stored = normalizeYtChannels(Store.get(YT_CHANNELS_KEY, null));
+  const meta = Store.get(YT_CHANNELS_META_KEY, null);
+  const backup = normalizeYtChannels(Store.get(YT_CHANNELS_BACKUP_KEY, null)?.channels) || [];
+  const primaryDiffersFromMeta = stored && meta?.signature
+    && ytChannelsSignature(stored) !== meta.signature
+    && ytChannelsSignature(backup) === meta.signature;
+  const primaryLooksLost = !meta?.emptyIsIntentional
+    && (stored === null || (!stored.length && meta?.count > 0) || primaryDiffersFromMeta);
+  S.ytChannels = primaryLooksLost && backup.length ? backup : (stored || []);
+  if (!S.ytChannels.length && !meta?.emptyIsIntentional) S.ytChannels = cachedYtChannels();
+  if (S.ytChannels.length) saveYtChannels();
+}
 function saveArticles()   { Store.set('flux_art', S.articles); }
 function saveReadLater()  { Store.set('flux_read_later', S.readLater); }
 function isArticleCacheFresh() {
@@ -201,8 +275,7 @@ function loadStorage() {
   const f = Store.get('flux_f', null);
   S.feeds = (f && f.length) ? f : [...DEFAULT_FEEDS];
   if (!localStorage.getItem('flux_f')) saveFeeds();
-  const yt = Store.get('flux_yt', []);
-  S.ytChannels = Array.isArray(yt) ? yt : [];
+  loadYtChannelsFromStorage();
   const arts = Store.get('flux_art', []);
   S.articles = Array.isArray(arts) ? arts.map(a => ({ ...a, date: new Date(a.date) })) : [];
   const readLater = Store.get('flux_read_later', []);
@@ -4172,7 +4245,7 @@ function deleteYtChannel(id) {
   const ch = S.ytChannels.find(c => c.id === id);
   confirmDialog(`"${ch?.name || id}" csatorna törlése visszavonhatatlan.`, () => {
     S.ytChannels = S.ytChannels.filter(c => c.id !== id);
-    saveYtChannels();
+    saveYtChannels({ allowEmpty: true });
     ytVideos = ytVideos.filter(v => v.channelId !== id);
     try { localStorage.removeItem('flux_yt_cache'); } catch(e) {}
     renderSYtChannels();
@@ -4629,7 +4702,7 @@ const Config = {
       try {
         const text = await input.files[0].text();
         this._apply(JSON.parse(text));
-        saveSettings(); saveFeeds(); saveYtChannels(); saveReadLater();
+        saveSettings(); saveFeeds(); saveYtChannels({ allowEmpty: true }); saveReadLater();
         Theme.apply(); renderSidebar(); renderSFeeds(); renderSYtChannels(); renderArticles();
         refreshAll();
         toast('Config betöltve');
