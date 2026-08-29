@@ -1,35 +1,35 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "24",
-      "FeelsLikeF": "75",
-      "cloudcover": "100",
-      "humidity": "31",
-      "observation_time": "12:07 PM",
+      "FeelsLikeC": "23",
+      "FeelsLikeF": "73",
+      "cloudcover": "0",
+      "humidity": "29",
+      "observation_time": "04:37 PM",
       "precipInches": "0.0",
       "precipMM": "0.0",
       "pressure": "1015",
       "pressureInches": "30",
-      "temp_C": "28",
-      "temp_F": "82",
-      "uvIndex": "4",
+      "temp_C": "27",
+      "temp_F": "80",
+      "uvIndex": "0",
       "visibility": "10",
       "visibilityMiles": "6",
-      "weatherCode": "122",
+      "weatherCode": "113",
       "weatherDesc": [
         {
-          "value": "Overcast "
+          "value": "Sunny"
         }
       ],
       "weatherIconUrl": [
         {
-          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0004_black_low_cloud.png"
+          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0001_sunny.png"
         }
       ],
       "winddir16Point": "NW",
-      "winddirDegree": "309",
-      "windspeedKmph": "19",
-      "windspeedMiles": "12"
+      "winddirDegree": "316",
+      "windspeedKmph": "17",
+      "windspeedMiles": "10"
     }
   ],
   "nearest_area": [
@@ -726,8 +726,8 @@
           "HeatIndexF": "81",
           "WindChillC": "28",
           "WindChillF": "83",
-          "WindGustKmph": "16",
-          "WindGustMiles": "10",
+          "WindGustKmph": "23",
+          "WindGustMiles": "14",
           "chanceoffog": "0",
           "chanceoffrost": "0",
           "chanceofhightemp": "81",
@@ -777,8 +777,8 @@
           "HeatIndexF": "83",
           "WindChillC": "31",
           "WindChillF": "87",
-          "WindGustKmph": "24",
-          "WindGustMiles": "15",
+          "WindGustKmph": "17",
+          "WindGustMiles": "11",
           "chanceoffog": "0",
           "chanceoffrost": "0",
           "chanceofhightemp": "89",
@@ -828,8 +828,8 @@
           "HeatIndexF": "83",
           "WindChillC": "30",
           "WindChillF": "87",
-          "WindGustKmph": "21",
-          "WindGustMiles": "13",
+          "WindGustKmph": "14",
+          "WindGustMiles": "9",
           "chanceoffog": "0",
           "chanceoffrost": "0",
           "chanceofhightemp": "90",
@@ -1005,8 +1005,8 @@
           "HeatIndexF": "77",
           "WindChillC": "25",
           "WindChillF": "77",
-          "WindGustKmph": "16",
-          "WindGustMiles": "10",
+          "WindGustKmph": "23",
+          "WindGustMiles": "14",
           "chanceoffog": "0",
           "chanceoffrost": "0",
           "chanceofhightemp": "51",
