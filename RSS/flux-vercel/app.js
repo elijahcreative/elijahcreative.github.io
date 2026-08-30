@@ -860,30 +860,94 @@ function flipYoutubePatterns(spec) {
     { id:'feature', ...spec, tiles:[{ column:1, row:1, size:4 }, ...block(5,1,2,4,2), { column:1, row:5, size:4 }, ...block(5,5,2,4,2)] }
   ];
 }
+const flipYoutubeExactPatternCache = new Map();
+function flipYoutubeTileSizes(spec) {
+  const fixedSizes = flipYoutubePatterns(spec).flatMap(pattern => pattern.tiles.map(tile => tile.size));
+  if (spec.mode === 'portrait-mobile-medium' || spec.mode === 'portrait-mobile-short') fixedSizes.push(3);
+  return [...new Set(fixedSizes)].sort((a, b) => b - a);
+}
+function flipYoutubeExactPattern(spec, count) {
+  const fixed = flipYoutubePatterns(spec).find(pattern => pattern.tiles.length === count);
+  if (fixed) return fixed;
+  const cacheKey = `${spec.mode}:${spec.columns}x${spec.rows}:${count}`;
+  if (flipYoutubeExactPatternCache.has(cacheKey)) return flipYoutubeExactPatternCache.get(cacheKey);
+  const sizes = flipYoutubeTileSizes(spec);
+  const smallestSize = sizes[sizes.length - 1];
+  const fullMask = (1n << BigInt(spec.columns * spec.rows)) - 1n;
+  const minArea = smallestSize ** 2;
+  const maxArea = sizes[0] ** 2;
+  const failed = new Set();
+  const place = (mask, remaining, emptyArea) => {
+    if (!remaining) return mask === fullMask ? [] : null;
+    if (emptyArea < remaining * minArea || emptyArea > remaining * maxArea) return null;
+    const state = `${mask}:${remaining}`;
+    if (failed.has(state)) return null;
+    let index = 0;
+    while ((mask & (1n << BigInt(index))) !== 0n) index += 1;
+    const column = index % spec.columns;
+    const row = Math.floor(index / spec.columns);
+    for (const size of sizes) {
+      if (column + size > spec.columns || row + size > spec.rows) continue;
+      let tileMask = 0n;
+      let fits = true;
+      for (let y = row; y < row + size && fits; y += 1) {
+        for (let x = column; x < column + size; x += 1) {
+          const bit = 1n << BigInt(y * spec.columns + x);
+          if (mask & bit) { fits = false; break; }
+          tileMask |= bit;
+        }
+      }
+      if (!fits) continue;
+      const rest = place(mask | tileMask, remaining - 1, emptyArea - size ** 2);
+      if (rest) return [{ column:column + 1, row:row + 1, size }, ...rest];
+    }
+    failed.add(state);
+    return null;
+  };
+  const tiles = place(0n, count, spec.columns * spec.rows);
+  const pattern = tiles ? { id:`exact-${count}`, ...spec, tiles } : null;
+  flipYoutubeExactPatternCache.set(cacheKey, pattern);
+  return pattern;
+}
+function flipYoutubePlanQuality(plan, smallestSize) {
+  return {
+    smallOnlyPages: plan.filter(pattern => pattern.tiles.every(tile => tile.size === smallestSize)).length,
+    pages: plan.length,
+    variety: plan.reduce((sum, pattern) => sum + new Set(pattern.tiles.map(tile => tile.size)).size, 0),
+    emphasis: plan.reduce((sum, pattern) => sum + Math.max(...pattern.tiles.map(tile => tile.size)), 0)
+  };
+}
+function isBetterFlipYoutubePlan(candidate, current, smallestSize) {
+  if (!current) return true;
+  const next = flipYoutubePlanQuality(candidate, smallestSize);
+  const previous = flipYoutubePlanQuality(current, smallestSize);
+  if (next.smallOnlyPages !== previous.smallOnlyPages) return next.smallOnlyPages < previous.smallOnlyPages;
+  if (next.pages !== previous.pages) return next.pages < previous.pages;
+  if (next.variety !== previous.variety) return next.variety > previous.variety;
+  return next.emphasis > previous.emphasis;
+}
 function flipYoutubePatternPlan(count, spec) {
-  const patterns = flipYoutubePatterns(spec);
-  const limit = count + Math.max(...patterns.map(pattern => pattern.tiles.length)) - 1;
-  const plans = Array(limit + 1).fill(null);
+  const sizes = flipYoutubeTileSizes(spec);
+  const smallestSize = sizes[sizes.length - 1];
+  const maxTiles = Math.min(count, Math.floor(spec.columns * spec.rows / smallestSize ** 2));
+  const patterns = [];
+  for (let tileCount = 1; tileCount <= maxTiles; tileCount += 1) {
+    const pattern = flipYoutubeExactPattern(spec, tileCount);
+    if (pattern) patterns.push(pattern);
+  }
+  const plans = Array(count + 1).fill(null);
   plans[0] = [];
-  for (let total = 1; total <= limit; total++) {
+  for (let total = 1; total <= count; total += 1) {
     for (const pattern of patterns) {
       const previous = plans[total - pattern.tiles.length];
       if (!previous) continue;
       const candidate = [...previous, pattern];
-      if (!plans[total] || candidate.length < plans[total].length) plans[total] = candidate;
+      if (isBetterFlipYoutubePlan(candidate, plans[total], smallestSize)) plans[total] = candidate;
     }
   }
-  let best = null;
-  for (let total = count; total <= limit; total++) {
-    if (!plans[total]) continue;
-    const candidate = { plan:plans[total], repeats:total - count };
-    candidate.score = candidate.plan.length + candidate.repeats;
-    candidate.variety = new Set(candidate.plan.flatMap(pattern => pattern.tiles.map(tile => tile.size))).size;
-    if (!best || candidate.score < best.score ||
-      (candidate.score === best.score && candidate.variety > best.variety) ||
-      (candidate.score === best.score && candidate.variety === best.variety && candidate.repeats < best.repeats)) best = candidate;
-  }
-  return best ? [...best.plan].sort((a, b) => b.tiles.length - a.tiles.length) : [];
+  return plans[count]
+    ? [...plans[count]].sort((a, b) => Math.max(...b.tiles.map(tile => tile.size)) - Math.max(...a.tiles.map(tile => tile.size)))
+    : [];
 }
 function currentFlipAnchor() {
   if (S.layout !== 'flip') return null;
@@ -3774,7 +3838,15 @@ function buildYtSidebarHtml() {
   const pages = [];
   if (flipSpec) {
     let offset = 0;
-    flipYoutubePatternPlan(videos.length, flipSpec).forEach((sourcePattern, pageIndex) => {
+    let patternPlan = flipYoutubePatternPlan(videos.length, flipSpec);
+    if (!patternPlan.length) {
+      const fallback = flipYoutubePatterns(flipSpec)[0];
+      patternPlan = [];
+      for (let remaining = videos.length; remaining > 0; remaining -= fallback.tiles.length) {
+        patternPlan.push({ ...fallback, id:`${fallback.id}-partial`, tiles:fallback.tiles.slice(0, remaining) });
+      }
+    }
+    patternPlan.forEach((sourcePattern, pageIndex) => {
       const mirrored = pageIndex % 2 === 1;
       const pattern = {
         ...sourcePattern,
@@ -3784,9 +3856,6 @@ function buildYtSidebarHtml() {
       };
       const pageVideos = videos.slice(offset, offset + pattern.tiles.length);
       offset += pageVideos.length;
-      for (let fill = 0; pageVideos.length < pattern.tiles.length; fill++) {
-        pageVideos.push(videos[fill % videos.length]);
-      }
       pages.push({ videos:pageVideos, pattern });
     });
   } else {
