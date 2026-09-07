@@ -11,6 +11,9 @@ on:
 jobs:
   update-f1-data:
     runs-on: ubuntu-latest
+    concurrency:
+      group: f1-auto-update-main
+      cancel-in-progress: false
     
     steps:
       - name: Checkout repository
@@ -41,4 +44,11 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git add F1/2023/Data/standings.json F1/2023/Data/podiums.json
           git commit -m "🏁 Auto-update: F1 results after race"
-          git push
+          for attempt in 1 2 3; do
+            git pull --rebase origin main
+            if git push origin main; then
+              exit 0
+            fi
+            sleep 5
+          done
+          exit 1
