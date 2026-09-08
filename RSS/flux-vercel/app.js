@@ -667,6 +667,7 @@ const Renderer = {
     return `<div class="flip-layout">${pages.map((page, index) => page.type === 'youtube'
       ? `<section class="flip-page flip-page-youtube" data-flip-anchor="youtube">
           <div class="flip-page-stage" data-flip-youtube>
+            <div class="flip-briefs-heading is-section"><span>YOUTUBE</span></div>
             <span class="flip-page-number" aria-label="${index + 1}. oldal, összesen ${total}">${String(index + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}</span>
           </div>
         </section>`
@@ -753,7 +754,6 @@ const Renderer = {
   }
 };
 let flipResizeTimer = 0;
-let flipYtLayoutMode = '';
 let flipTextLayoutMode = '';
 let flipOverlay = null;
 let flipOverlayKey = '';
@@ -777,177 +777,53 @@ const FLIP_WHEEL_THRESHOLD = 48;
 const FLIP_WHEEL_GESTURE_GAP = 180;
 const FLIP_REWIND_MAX_TURNS = 10;
 const FLIP_REWIND_BUDGET = 1800;
-const FLIP_YT_MOBILE_PAGER_HEIGHT = 40;
 function flipTextPageSpec() {
   if (window.innerWidth > 900) return { mode: 'desktop', count: 8, rows: 4, columns: 2 };
   if (window.innerHeight <= 700) return { mode: 'compact', count: 5, rows: 5, columns: 1 };
   return { mode: 'mobile', count: 6, rows: 6, columns: 1 };
 }
-function flipYoutubeGridSpec() {
-  const landscape = window.innerWidth > window.innerHeight;
-  if (landscape) {
-    return window.innerHeight <= 600
-      ? { mode: 'compact-landscape', columns: 15, rows: 6 }
-      : { mode: 'landscape', columns: 12, rows: 9 };
-  }
-  if (window.innerWidth < 700) {
-    const availableHeight = window.innerHeight - 56 - FLIP_YT_MOBILE_PAGER_HEIGHT;
-    const fitsWithFlipMargin = rows => {
-      const unit = (availableHeight - (rows - 1)) / rows;
-      const width = unit * 6 + 5;
-      return (window.innerWidth - width) / 2 <= 14;
-    };
-    if (fitsWithFlipMargin(11)) return { mode:'portrait-mobile-tall', columns:6, rows:11 };
-    if (fitsWithFlipMargin(10)) return { mode:'portrait-mobile-medium', columns:6, rows:10 };
-    return { mode:'portrait-mobile-short', columns:6, rows:8 };
-  }
-  return { mode: 'portrait-tablet', columns: 9, rows: 12 };
-}
-function flipYoutubeGridMetrics(spec, reservePager = false) {
-  const pageWidth = window.innerWidth <= 600
-    ? window.innerWidth
-    : Math.min(980, window.innerWidth - 48);
-  const pagerHeight = reservePager && spec.mode.startsWith('portrait-mobile') ? FLIP_YT_MOBILE_PAGER_HEIGHT : 0;
-  const pageHeight = Math.max(1, window.innerHeight - 56 - pagerHeight);
-  const gap = 1;
-  const tileSize = Math.max(1, Math.min(
-    (pageWidth - gap * (spec.columns - 1)) / spec.columns,
-    (pageHeight - gap * (spec.rows - 1)) / spec.rows
-  ));
-  return {
-    ...spec,
-    tileSize,
-    gap,
-    width: tileSize * spec.columns + gap * (spec.columns - 1),
-    height: tileSize * spec.rows + gap * (spec.rows - 1)
-  };
-}
-function flipYoutubeLayoutKey() {
-  const spec = flipYoutubeGridSpec();
-  return `${spec.mode}:${flipYoutubeGridMetrics(spec).tileSize}`;
-}
-function flipYoutubeTileBlock(column, row, width, height, size) {
-  const tiles = [];
-  for (let y = row; y < row + height; y += size) {
-    for (let x = column; x < column + width; x += size) tiles.push({ column:x, row:y, size });
-  }
-  return tiles;
-}
-function flipYoutubePatterns(spec) {
-  const block = flipYoutubeTileBlock;
-  if (spec.mode === 'landscape') return [
-    { id:'feature', ...spec, tiles:[...block(1,1,6,6,6), ...block(7,1,6,6,3), ...block(1,7,12,3,3)] },
-    { id:'double', ...spec, tiles:[...block(1,1,12,6,6), ...block(1,7,12,3,3)] },
-    { id:'hero', ...spec, tiles:[...block(1,1,9,9,9), ...block(10,1,3,9,3)] }
-  ];
-  if (spec.mode === 'compact-landscape') return [
-    { id:'mixed', ...spec, tiles:[...block(1,1,6,6,2), ...block(7,1,6,6,6), ...block(13,1,3,6,3)] },
-    { id:'feature', ...spec, tiles:[...block(1,1,6,6,6), ...block(7,1,6,6,3), ...block(13,1,3,6,3)] },
-    { id:'uniform', ...spec, tiles:block(1,1,15,6,3) },
-    { id:'double', ...spec, tiles:[...block(1,1,12,6,6), ...block(13,1,3,6,3)] }
-  ];
-  if (spec.mode === 'portrait-tablet') return [
-    { id:'double', ...spec, tiles:[...block(1,1,6,12,6), ...block(7,1,3,12,3)] },
-    { id:'hero', ...spec, tiles:[...block(1,1,9,9,9), ...block(1,10,9,3,3)] }
-  ];
-  if (spec.mode === 'portrait-mobile-tall') return [
-    { id:'feature', ...spec, tiles:[...block(1,1,6,6,6), ...block(1,7,6,3,3), ...block(1,10,6,2,2)] }
-  ];
-  if (spec.mode === 'portrait-mobile-medium') return [
-    { id:'feature', ...spec, tiles:[{ column:1, row:1, size:4 }, ...block(5,1,2,4,2), { column:1, row:5, size:4 }, ...block(5,5,2,6,2), ...block(1,9,4,2,2)] }
-  ];
-  return [
-    { id:'feature', ...spec, tiles:[{ column:1, row:1, size:4 }, ...block(5,1,2,4,2), { column:1, row:5, size:4 }, ...block(5,5,2,4,2)] }
-  ];
-}
-const flipYoutubeExactPatternCache = new Map();
-function flipYoutubeTileSizes(spec) {
-  const fixedSizes = flipYoutubePatterns(spec).flatMap(pattern => pattern.tiles.map(tile => tile.size));
-  if (spec.mode === 'portrait-mobile-medium' || spec.mode === 'portrait-mobile-short') fixedSizes.push(3);
-  return [...new Set(fixedSizes)].sort((a, b) => b - a);
-}
-function flipYoutubeExactPattern(spec, count) {
-  const fixed = flipYoutubePatterns(spec).find(pattern => pattern.tiles.length === count);
-  if (fixed) return fixed;
-  const cacheKey = `${spec.mode}:${spec.columns}x${spec.rows}:${count}`;
-  if (flipYoutubeExactPatternCache.has(cacheKey)) return flipYoutubeExactPatternCache.get(cacheKey);
-  const sizes = flipYoutubeTileSizes(spec);
-  const smallestSize = sizes[sizes.length - 1];
-  const fullMask = (1n << BigInt(spec.columns * spec.rows)) - 1n;
-  const minArea = smallestSize ** 2;
-  const maxArea = sizes[0] ** 2;
-  const failed = new Set();
-  const place = (mask, remaining, emptyArea) => {
-    if (!remaining) return mask === fullMask ? [] : null;
-    if (emptyArea < remaining * minArea || emptyArea > remaining * maxArea) return null;
-    const state = `${mask}:${remaining}`;
-    if (failed.has(state)) return null;
-    let index = 0;
-    while ((mask & (1n << BigInt(index))) !== 0n) index += 1;
-    const column = index % spec.columns;
-    const row = Math.floor(index / spec.columns);
-    for (const size of sizes) {
-      if (column + size > spec.columns || row + size > spec.rows) continue;
-      let tileMask = 0n;
-      let fits = true;
-      for (let y = row; y < row + size && fits; y += 1) {
-        for (let x = column; x < column + size; x += 1) {
-          const bit = 1n << BigInt(y * spec.columns + x);
-          if (mask & bit) { fits = false; break; }
-          tileMask |= bit;
-        }
-      }
-      if (!fits) continue;
-      const rest = place(mask | tileMask, remaining - 1, emptyArea - size ** 2);
-      if (rest) return [{ column:column + 1, row:row + 1, size }, ...rest];
-    }
-    failed.add(state);
-    return null;
-  };
-  const tiles = place(0n, count, spec.columns * spec.rows);
-  const pattern = tiles ? { id:`exact-${count}`, ...spec, tiles } : null;
-  flipYoutubeExactPatternCache.set(cacheKey, pattern);
-  return pattern;
-}
-function flipYoutubePlanQuality(plan, smallestSize) {
-  return {
-    smallOnlyPages: plan.filter(pattern => pattern.tiles.every(tile => tile.size === smallestSize)).length,
-    pages: plan.length,
-    variety: plan.reduce((sum, pattern) => sum + new Set(pattern.tiles.map(tile => tile.size)).size, 0),
-    emphasis: plan.reduce((sum, pattern) => sum + Math.max(...pattern.tiles.map(tile => tile.size)), 0)
-  };
-}
-function isBetterFlipYoutubePlan(candidate, current, smallestSize) {
-  if (!current) return true;
-  const next = flipYoutubePlanQuality(candidate, smallestSize);
-  const previous = flipYoutubePlanQuality(current, smallestSize);
-  if (next.smallOnlyPages !== previous.smallOnlyPages) return next.smallOnlyPages < previous.smallOnlyPages;
-  if (next.pages !== previous.pages) return next.pages < previous.pages;
-  if (next.variety !== previous.variety) return next.variety > previous.variety;
-  return next.emphasis > previous.emphasis;
-}
-function flipYoutubePatternPlan(count, spec) {
-  const sizes = flipYoutubeTileSizes(spec);
-  const smallestSize = sizes[sizes.length - 1];
-  const maxTiles = Math.min(count, Math.floor(spec.columns * spec.rows / smallestSize ** 2));
-  const patterns = [];
-  for (let tileCount = 1; tileCount <= maxTiles; tileCount += 1) {
-    const pattern = flipYoutubeExactPattern(spec, tileCount);
-    if (pattern) patterns.push(pattern);
-  }
+// Each row is either one full-width video or a pair of small videos.
+// Only counts that cannot be composed from 3 and 5 use a filling exception.
+function flipYoutubePatternPlan(count) {
   const plans = Array(count + 1).fill(null);
-  plans[0] = [];
+  plans[0] = { counts: [], exceptions: 0 };
   for (let total = 1; total <= count; total += 1) {
-    for (const pattern of patterns) {
-      const previous = plans[total - pattern.tiles.length];
+    for (const size of [3, 5, 4, 2, 1]) {
+      const previous = plans[total - size];
       if (!previous) continue;
-      const candidate = [...previous, pattern];
-      if (isBetterFlipYoutubePlan(candidate, plans[total], smallestSize)) plans[total] = candidate;
+      const candidate = {
+        counts: [...previous.counts, size],
+        exceptions: previous.exceptions + (size === 3 || size === 5 ? 0 : 1)
+      };
+      const current = plans[total];
+      if (!current || candidate.exceptions < current.exceptions ||
+          (candidate.exceptions === current.exceptions && candidate.counts.length < current.counts.length)) {
+        plans[total] = candidate;
+      }
     }
   }
-  return plans[count]
-    ? [...plans[count]].sort((a, b) => Math.max(...b.tiles.map(tile => tile.size)) - Math.max(...a.tiles.map(tile => tile.size)))
-    : [];
+  const variants = {
+    1: [[1]],
+    2: [[1, 1]],
+    3: [[1, 2], [2, 1]],
+    4: [[1, 2, 1]],
+    5: [[1, 2, 2], [2, 1, 2], [2, 2, 1]]
+  };
+  const used = {};
+  // Keep the exceptional page last; preserve video order within the plan.
+  return plans[count].counts.sort((a, b) => Number(![3, 5].includes(a)) - Number(![3, 5].includes(b))).map(size => {
+    const index = used[size] || 0;
+    used[size] = index + 1;
+    const rows = variants[size][index % variants[size].length];
+    return {
+      id: rows.join('-'),
+      rowTracks: rows.map(columns => `minmax(0, ${columns === 1 && size !== 4 ? 'var(--yt-feature-weight, 1.9fr)' : '1fr'})`).join(' '),
+      tiles: rows.flatMap((columns, row) => Array.from({ length: columns }, (_, column) => ({
+        column: column + 1, row: row + 1, span: columns === 1 ? 2 : 1,
+        size: columns === 1 ? 'large' : 'small'
+      })))
+    };
+  });
 }
 function currentFlipAnchor() {
   if (S.layout !== 'flip') return null;
@@ -1002,6 +878,20 @@ function flipStageClone(page) {
   return wrapper;
 }
 function syncFlipCloneState(sourcePage, targetCopy) {
+  const indicator = sourcePage.querySelector('[data-yt-indicator]');
+  const indicatorCopy = targetCopy?.querySelector('[data-yt-indicator]');
+  if (indicator && indicatorCopy) {
+    const clone = indicator.cloneNode(true);
+    clone.classList.add('is-initial');
+    clone.querySelector('.yt-indicator-pill').style.transform = getComputedStyle(indicator.querySelector('.yt-indicator-pill')).transform;
+    const stops = indicator.querySelectorAll('.yt-indicator-stop');
+    clone.querySelectorAll('.yt-indicator-stop').forEach((stop, index) => {
+      const source = stops[index];
+      stop.style.flexBasis = getComputedStyle(source).flexBasis;
+      stop.style.width = getComputedStyle(source).width;
+    });
+    indicatorCopy.replaceWith(clone);
+  }
   const sources = sourcePage.querySelectorAll('[data-flip-scroll-sync]');
   const targets = targetCopy?.querySelectorAll('[data-flip-scroll-sync]') || [];
   sources.forEach((source, index) => {
@@ -1407,14 +1297,10 @@ function handleFlipResize() {
   flipWheelGestureActive = false;
   requestAnimationFrame(() => setFlipPage(flipPageIndex));
   const textLayoutChanged = flipTextLayoutMode && flipTextLayoutMode !== flipTextPageSpec().mode;
-  const ytLayoutMode = flipYoutubeLayoutKey();
-  const ytLayoutChanged = flipYtLayoutMode && flipYtLayoutMode !== ytLayoutMode;
-  flipYtLayoutMode = ytLayoutMode;
-  if (!textLayoutChanged && !ytLayoutChanged) return;
+  if (!textLayoutChanged) return;
   clearTimeout(flipResizeTimer);
   flipResizeTimer = setTimeout(() => {
-    if (textLayoutChanged) renderArticles();
-    else injectYtSidebar();
+    renderArticles();
   }, 100);
 }
 function setupFlipView() {
@@ -1433,7 +1319,6 @@ function setupFlipView() {
     setFlipPage(flipPageIndex);
     requestAnimationFrame(primeFlipOverlay);
   }
-  flipYtLayoutMode = flipYoutubeLayoutKey();
   if (!content._flipViewBound) {
     content._flipViewBound = true;
     content.addEventListener('touchstart', handleFlipTouchStart, { passive: true });
@@ -3832,38 +3717,23 @@ function buildYtSidebarHtml() {
     </div>
     <a class="yt-player-external" href="${e(watchUrl)}" target="flux-youtube">Megnyitás YouTube-on</a>`;
   }
-  const flipSpec = S.layout === 'flip' ? flipYoutubeGridSpec() : null;
-  const cols = flipSpec?.columns || clampInt(S.ytColumns, 1, 4, 3);
-  const rows = flipSpec?.rows || clampInt(S.ytRows, 1, 4, 1);
+  const isFlip = S.layout === 'flip';
+  const cols = clampInt(S.ytColumns, 1, 4, 3);
+  const rows = clampInt(S.ytRows, 1, 4, 1);
   const pages = [];
-  if (flipSpec) {
+  if (isFlip) {
     let offset = 0;
-    let patternPlan = flipYoutubePatternPlan(videos.length, flipSpec);
-    if (!patternPlan.length) {
-      const fallback = flipYoutubePatterns(flipSpec)[0];
-      patternPlan = [];
-      for (let remaining = videos.length; remaining > 0; remaining -= fallback.tiles.length) {
-        patternPlan.push({ ...fallback, id:`${fallback.id}-partial`, tiles:fallback.tiles.slice(0, remaining) });
-      }
-    }
-    patternPlan.forEach((sourcePattern, pageIndex) => {
-      const mirrored = pageIndex % 2 === 1;
-      const pattern = {
-        ...sourcePattern,
-        tiles: sourcePattern.tiles.map(tile => mirrored
-          ? { ...tile, column:sourcePattern.columns - tile.column - tile.size + 2 }
-          : tile)
-      };
+    flipYoutubePatternPlan(videos.length).forEach(pattern => {
       const pageVideos = videos.slice(offset, offset + pattern.tiles.length);
       offset += pageVideos.length;
-      pages.push({ videos:pageVideos, pattern });
+      pages.push({ videos: pageVideos, pattern });
     });
   } else {
     const pageSize = cols * rows;
     for (let i = 0; i < videos.length; i += pageSize) pages.push({ videos:videos.slice(i, i + pageSize) });
   }
   const cardHtml = (v, tile, size = '') => `
-      <button class="yt-vcard" type="button" data-yt-video-id="${e(v.videoId)}"${size ? ` data-yt-tile-size="${size}" style="grid-column:${tile.column} / span ${tile.size};grid-row:${tile.row} / span ${tile.size}"` : ''}>
+      <button class="yt-vcard" type="button" data-yt-video-id="${e(v.videoId)}"${size ? ` data-yt-tile-size="${size}" style="grid-column:${tile.column} / span ${tile.span};grid-row:${tile.row}"` : ''}>
         <div class="yt-vcard-thumb-wrap"><img class="yt-vcard-thumb" src="${e(v.thumb)}" alt="" loading="lazy" onerror="this.parentNode.style.display='none'"></div>
         <div class="yt-vcard-body">
           <div class="yt-vcard-title">${e(v.title)}</div>
@@ -3872,17 +3742,11 @@ function buildYtSidebarHtml() {
       </button>`;
   const html = pages.map(page => {
     if (page.pattern) {
-      const grid = flipYoutubeGridMetrics(page.pattern, pages.length > 1);
-      const maxSize = Math.min(page.pattern.columns, page.pattern.rows);
       const cards = page.videos.map((video, index) => {
         const tile = page.pattern.tiles[index];
-        const ratio = tile.size / maxSize;
-        const size = page.pattern.mode.startsWith('portrait-mobile')
-          ? (tile.size >= 4 ? 'large' : tile.size === 3 ? 'medium' : 'small')
-          : ratio >= .75 ? 'large' : ratio >= .45 ? 'medium' : 'small';
-        return cardHtml(video, tile, size);
+        return cardHtml(video, tile, tile.size);
       }).join('');
-      return `<div class="yt-page yt-cols-${page.pattern.columns}" style="--yt-cols:${page.pattern.columns};--yt-rows:${page.pattern.rows}"><div class="yt-flip-grid" data-yt-pattern="${page.pattern.id}" style="--yt-unit-size:${grid.tileSize}px;--yt-grid-gap:${grid.gap}px;--yt-grid-width:${grid.width}px;--yt-grid-height:${grid.height}px">${cards}</div></div>`;
+      return `<div class="yt-page"><div class="yt-flip-grid" data-yt-pattern="${page.pattern.id}" style="grid-template-rows:${page.pattern.rowTracks}">${cards}</div></div>`;
     }
     const cards = page.videos.map(video => cardHtml(video)).join('');
     return `<div class="yt-page yt-cols-${cols}" style="--yt-cols:${cols};--yt-rows:${rows}">${cards}</div>`;
@@ -4128,6 +3992,7 @@ function removeYtSidebar() {
     wrap.remove();
   });
   content.querySelectorAll('.yt-sidebar').forEach(sidebar => {
+    sidebar._ytIndicatorObserver?.disconnect();
     sidebar.remove();
   });
   mergeSplitLayouts(content);
@@ -4147,9 +4012,50 @@ function placeYtSidebar(content, sidebar) {
   }
   content.appendChild(sidebar);
 }
+function initFlipYoutubeIndicator(sidebar, pages, goToPage) {
+  const heading = sidebar.closest('.flip-page-youtube')?.querySelector('.flip-briefs-heading');
+  if (!heading) return () => {};
+  heading.innerHTML = `<div class="yt-page-indicator" role="navigation" aria-label="YouTube-oldalak" data-yt-indicator>
+    ${pages.map((_, index) => `<button class="yt-indicator-stop" type="button" aria-label="${index + 1}. YouTube-oldal, összesen ${pages.length}" data-yt-page="${index}"></button>`).join('')}
+    <span class="yt-indicator-pill" aria-hidden="true">YOUTUBE</span>
+  </div>`;
+  const indicator = heading.firstElementChild;
+  const pill = indicator.querySelector('.yt-indicator-pill');
+  const stops = [...indicator.querySelectorAll('.yt-indicator-stop')];
+  let active = -1;
+  const measure = () => {
+    if (!pill.offsetWidth) return;
+    const available = heading.clientWidth - parseFloat(getComputedStyle(heading).paddingRight);
+    const step = Math.min(16, Math.max(0, (available - pill.offsetWidth) / Math.max(1, pages.length - 1)));
+    indicator.style.setProperty('--yt-pill-width', `${pill.offsetWidth}px`);
+    indicator.style.setProperty('--yt-indicator-step', `${step}px`);
+  };
+  sidebar._ytIndicatorObserver = new ResizeObserver(measure);
+  sidebar._ytIndicatorObserver.observe(heading);
+  sidebar._ytIndicatorObserver.observe(pill);
+  measure();
+  stops.forEach((stop, index) => { stop.onclick = () => goToPage(index); });
+  return index => {
+    if (active === index) return;
+    const initial = active < 0;
+    active = index;
+    indicator.classList.toggle('is-initial', initial);
+    indicator.style.setProperty('--yt-active-page', index);
+    stops.forEach((stop, i) => {
+      stop.classList.toggle('is-active', i === index);
+      if (i === index) stop.setAttribute('aria-current', 'page');
+      else stop.removeAttribute('aria-current');
+    });
+    if (initial) requestAnimationFrame(() => indicator.classList.remove('is-initial'));
+  };
+}
 function initYtPager(sidebar) {
+  sidebar._ytIndicatorObserver?.disconnect();
   const row = sidebar.querySelector('.yt-scroll-row');
-  if (!row) return;
+  if (!row) {
+    sidebar.closest('.flip-page-youtube')?.querySelectorAll('.yt-indicator-stop').forEach(stop => { stop.disabled = true; });
+    return;
+  }
   const pages = [...row.querySelectorAll('.yt-page')];
   sidebar.classList.toggle('yt-has-pager', pages.length > 1);
   const pageLeft = index => pages[index] ? pages[index].offsetLeft - row.offsetLeft : 0;
@@ -4159,8 +4065,14 @@ function initYtPager(sidebar) {
       Math.abs(pageLeft(i) - row.scrollLeft) < Math.abs(pageLeft(best) - row.scrollLeft) ? i : best
     ), 0);
   };
+  const goToPage = index => row.scrollTo({
+    left: pageLeft(index),
+    behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'
+  });
+  const syncIndicator = initFlipYoutubeIndicator(sidebar, pages, goToPage);
   const syncEdges = () => {
     const index = currentPage();
+    syncIndicator(index);
     sidebar.classList.toggle('has-left', index > 0);
     sidebar.classList.toggle('has-right', index < pages.length - 1);
   };
@@ -4170,7 +4082,7 @@ function initYtPager(sidebar) {
     btn.onclick = () => {
       const dir = Number(btn.dataset.dir) || 0;
       const next = Math.max(0, Math.min(pages.length - 1, currentPage() + dir));
-      row.scrollTo({ left: pageLeft(next), behavior: 'smooth' });
+      goToPage(next);
       requestAnimationFrame(syncEdges);
     };
   });
