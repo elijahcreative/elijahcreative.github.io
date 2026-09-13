@@ -1,8 +1,8 @@
 {
   "Podiums": [
     {
-      "Country": "🇮🇹 Italy",
-      "City": "Monza",
+      "Country": "🇪🇸 Spain",
+      "City": "Madrid",
       "Message": "Race ?"
     },
     {
@@ -10,21 +10,21 @@
       "Name": "Antonelli",
       "Team": "Mercedes",
       "Points": "+25",
-      "Total": "267"
+      "Total": "292"
     },
     {
       "Place": "2",
-      "Name": "Russell",
-      "Team": "Mercedes",
+      "Name": "Verstappen",
+      "Team": "Red Bull",
       "Points": "+18",
-      "Total": "201"
+      "Total": "145"
     },
     {
       "Place": "3",
-      "Name": "Verstappen",
-      "Team": "Red Bull",
+      "Name": "Norris",
+      "Team": "McLaren",
       "Points": "+15",
-      "Total": "127"
+      "Total": "186"
     }
   ]
 }

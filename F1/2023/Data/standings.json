@@ -1,19 +1,19 @@
 {
   "Standings": [
     {
-      "After": "After Italy"
+      "After": "After Spain"
     },
     {
       "Place": "1",
       "Name": "Antonelli",
       "Team": "Mercedes",
-      "Points": "267"
+      "Points": "292"
     },
     {
       "Place": "2",
       "Name": "Russell",
       "Team": "Mercedes",
-      "Points": "201"
+      "Points": "211"
     },
     {
       "Place": "3",
@@ -25,19 +25,19 @@
       "Place": "4",
       "Name": "Norris",
       "Team": "McLaren",
-      "Points": "171"
+      "Points": "186"
     },
     {
       "Place": "5",
       "Name": "Leclerc",
       "Team": "Ferrari",
-      "Points": "155"
+      "Points": "167"
     },
     {
       "Place": "6",
       "Name": "Verstappen",
       "Team": "Red Bull",
-      "Points": "127"
+      "Points": "145"
     }
   ]
 }
