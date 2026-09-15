@@ -1,0 +1,2218 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QRAFT — QR Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Roboto:wght@300;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #eaecf3;
+  --panel: #ffffff;
+  --border: #dde3ed;
+  --accent: #4f46e5;
+  --accent-h: #4338ca;
+  --accent-l: #eef2ff;
+  --text: #1e293b;
+  --muted: #64748b;
+  --inp: #f5f8fa;
+  --track: #ccd8e2;
+  --sh: 0 6px 28px rgba(0,0,0,0.10);
+  --tab-bg: #e4eaf2;
+  --tab-on: #ffffff;
+  --card: #ffffff;
+  --placeholder: #c2cdd6;
+}
+
+/* ── DARK THEME ── */
+[data-theme="dark"] {
+  --bg: #050d14;
+  --panel: #081420;
+  --border: #0e2235;
+  --accent: #22d3ee;
+  --accent-h: #06b6d4;
+  --accent-l: #051e2e;
+  --text: #cce6f4;
+  --muted: #6a8fa8;
+  --inp: #060f1a;
+  --track: #0a2035;
+  --sh: 0 6px 28px rgba(0,0,0,0.55);
+  --tab-bg: #060f1a;
+  --tab-on: #0c1e30;
+  --card: #091624;
+  --placeholder: rgba(34,211,238,0.28);
+}
+::placeholder { color: var(--placeholder); opacity: 1; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg); color: var(--text); font-size: 13.5px;
+}
+
+/* ══════════════════════════════
+   TOPBAR
+══════════════════════════════ */
+#topbar {
+  height: 44px; display: flex; align-items: center;
+  padding: 0 18px; gap: 10px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 4px rgba(0,0,0,.05);
+  flex-shrink: 0;
+}
+#topbar h1 {
+  display: flex; align-items: center; gap: 9px;
+}
+#app-name {
+  font-size: 1.48rem; font-weight: 800; letter-spacing: 0.07em;
+  text-transform: uppercase; color: var(--text); line-height: 1;
+}
+#app-tag {
+  font-size: 0.62rem; font-weight: 300; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--muted); align-self: flex-end; padding-bottom: 1px;
+  font-family: 'Roboto', sans-serif;
+}
+#topbar-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+
+#theme-btn {
+  height: 34px; padding: 0 9px; border-radius: 10px;
+  border: 1.5px solid transparent; background: transparent;
+  cursor: pointer; display: flex; align-items: center; gap: 6px;
+  color: var(--muted); transition: all .18s; font-family: inherit;
+  font-size: 0.75rem; font-weight: 500;
+}
+#theme-btn:hover { background: var(--accent-l); color: var(--accent); }
+#theme-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+.topbar-sep { width: 1px; height: 20px; background: var(--border); flex-shrink: 0; }
+.tb-flat {
+  height: 34px; padding: 0 9px; border-radius: 10px;
+  border: 1.5px solid transparent; background: transparent;
+  cursor: pointer; display: flex; align-items: center; gap: 5px;
+  color: var(--muted); transition: all .18s; font-family: inherit;
+  font-size: 0.75rem; font-weight: 500;
+}
+.tb-flat:hover { background: var(--accent-l); color: var(--accent); }
+.tb-flat:disabled { opacity: 0.3; cursor: default; pointer-events: none; }
+.tb-flat svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+/* ══════════════════════════════
+   MAIN SHELL (below topbar)
+══════════════════════════════ */
+#shell {
+  display: flex;
+  height: calc(100vh - 44px - 34px);
+  padding: 16px 0 16px 16px;
+  background: var(--bg);
+}
+
+/* ══════════════════════════════
+   EDITOR PANEL (resizable, floating card)
+══════════════════════════════ */
+#editor-panel {
+  display: flex;
+  width: 960px;
+  min-width: 600px;
+  flex-shrink: 0;
+  background: var(--panel);
+  gap: 0;
+  overflow: hidden;
+  border-radius: 14px;
+  box-shadow: 0 8px 28px rgba(0,0,0,.13), 0 2px 6px rgba(0,0,0,.07);
+}
+[data-theme="dark"] #editor-panel {
+  box-shadow: 0 20px 60px rgba(0,0,0,.8), 0 4px 12px rgba(0,0,0,.6);
+}
+
+/* ── RESIZE HANDLE ── */
+#rh {
+  width: 14px; flex-shrink: 0;
+  background: transparent;
+  cursor: col-resize;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .15s;
+  user-select: none;
+}
+#rh::after {
+  content: '';
+  display: block; width: 4px; height: 40px;
+  background: var(--border);
+  border-radius: 2px;
+  transition: all .18s;
+}
+#rh:hover::after, #rh.dragging::after {
+  background: var(--accent);
+  height: 56px;
+}
+
+/* ══════════════════════════════
+   COLUMNS
+══════════════════════════════ */
+.col {
+  flex: 1; min-width: 160px;
+  background: var(--panel);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+
+.col-head {
+  padding: 14px 16px 12px;
+  border-bottom: none;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  background: var(--panel);
+}
+.col-num { display: none; }
+.col-head h2 {
+  font-size: 0.60rem; font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  font-family: 'Roboto', sans-serif;
+}
+
+.col-body {
+  flex: 1; overflow-y: auto; padding: 10px 10px 20px;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  display: flex; flex-direction: column; gap: 0;
+}
+.col:not(:last-child) .col-body {
+  border-right: 2px solid var(--border);
+}
+
+/* ══════════════════════════════
+   SECTION DIVIDER (inside cols)
+══════════════════════════════ */
+.sdiv {
+  display: flex; align-items: center; justify-content: space-between;
+  margin: 40px 0 6px; padding: 7px 11px;
+  font-size: 0.60rem; font-weight: 800; color: var(--accent);
+  letter-spacing: .18em; text-transform: uppercase;
+  cursor: pointer; user-select: none; flex-shrink: 0;
+  background: var(--accent-l);
+  border: 1px solid var(--border); border-radius: 10px;
+}
+.sdiv:first-child { margin-top: 0; }
+.sdiv::before { display: none; }
+.sdiv::after {
+  content: ''; flex: none;
+  width: 5px; height: 5px;
+  border-right: 1.5px solid var(--accent); border-bottom: 1.5px solid var(--accent);
+  transform: rotate(45deg) translateY(-1px);
+  transition: transform .2s; opacity: 0.7;
+}
+.sdiv.closed::after { transform: rotate(-45deg) translateY(1px); }
+.sdc {
+  display: flex; flex-direction: column; gap: 10px;
+  padding: 8px 2px 4px;
+  background: transparent; border: none;
+}
+.sdc.hide { display: none; }
+
+/* ══════════════════════════════
+   PREVIEW AREA
+══════════════════════════════ */
+#mv {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 24px; gap: 16px; overflow: hidden;
+  background: transparent;   /* shell bg shows through */
+}
+
+/* ══════════════════════════════
+   FORM ELEMENTS
+══════════════════════════════ */
+.fg { display: flex; flex-direction: column; gap: 3px; }
+.fg > label {
+  font-size: 0.67rem; font-weight: 400; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .07em;
+}
+.fr { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+
+input[type=text], input[type=url], input[type=email],
+input[type=tel], input[type=number], select, textarea {
+  width: 100%; padding: 6px 9px;
+  border: 1.5px solid var(--border); border-radius: 10px;
+  background: var(--inp); color: var(--text); font-size: 0.82rem;
+  font-family: inherit; transition: border-color .15s;
+}
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
+
+select {
+  -webkit-appearance: none; appearance: none; cursor: pointer;
+  padding-right: 30px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 14px;
+}
+[data-theme="dark"] select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236a8fa8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+}
+textarea { min-height: 68px; resize: vertical; }
+
+input[type=color] {
+  -webkit-appearance: none; appearance: none;
+  width: 24px; height: 24px; padding: 0;
+  border: none; border-radius: 6px; cursor: pointer; background: transparent;
+  flex-shrink: 0;
+}
+input[type=color]::-webkit-color-swatch-wrapper { padding: 0; border-radius: 6px; }
+input[type=color]::-webkit-color-swatch { border: none; border-radius: 6px; }
+input[type=color]::-moz-color-swatch { border: none; border-radius: 6px; }
+
+.cr {
+  display: flex; align-items: center;
+  border: 1px solid var(--border); border-radius: 10px;
+  background: var(--inp); overflow: hidden; padding: 3px; gap: 0;
+}
+.cr input[type=color] { margin: 0; }
+.cr-div { width: 1px; background: var(--border); align-self: stretch; margin: 0 3px; flex-shrink: 0; }
+.cr input[type=text] {
+  flex: 1; border: none !important; background: transparent !important;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.79rem; font-weight: 400; padding: 4px 6px;
+  color: var(--text); border-radius: 0 !important;
+}
+.cr input[type=text]:focus { outline: none; }
+
+/* ══════════════════════════════
+   TYPE TABS
+══════════════════════════════ */
+.ttabs {
+  display: grid; grid-template-columns: repeat(2,1fr);
+  gap: 4px; border: 1px solid var(--border); border-radius: 12px;
+  padding: 7px; background: var(--inp);
+}
+.ttab {
+  aspect-ratio: 1; padding: 8px 4px; border: 1px solid transparent; border-radius: 9px;
+  cursor: pointer; text-align: center;
+  color: var(--muted); background: transparent;
+  transition: all .15s; font-family: inherit;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+}
+.ttab:hover { color: var(--accent); background: var(--accent-l); }
+.ttab.on { border-color: var(--accent); background: var(--accent-l); color: var(--accent); }
+.ttab svg { display: block; flex-shrink: 0; margin-bottom: 5px; }
+.ttab .ti { display: none; }
+.ttab-label {
+  font-size: 0.62rem; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; line-height: 1;
+}
+.ttab-desc {
+  font-size: 0.54rem; font-weight: 300; line-height: 1.3;
+  text-transform: none; letter-spacing: 0; opacity: 0.75;
+}
+
+/* ══════════════════════════════
+   STYLE BUTTON GRIDS
+══════════════════════════════ */
+.sg {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 4px;
+  border: 1px solid var(--border); border-radius: 12px;
+  padding: 7px; background: var(--inp);
+}
+.sb {
+  padding: 7px 2px; border: 1px solid transparent; border-radius: 9px;
+  cursor: pointer; text-align: center; font-size: 0.66rem; color: var(--muted);
+  background: transparent; transition: all .15s; line-height: 1.35;
+}
+.sb:hover { color: var(--accent); background: var(--accent-l); }
+.sb.on { border-color: var(--accent); background: var(--accent-l); color: var(--accent); }
+.sb svg { display: block; margin: 0 auto 2px; }
+
+/* ══════════════════════════════
+   TOGGLE
+══════════════════════════════ */
+.tog { display: flex; align-items: center; gap: 7px; cursor: pointer; }
+.tog input { display: none; }
+.tt {
+  width: 36px; height: 20px; background: var(--border);
+  border-radius: 10px; position: relative; transition: background .2s; flex-shrink: 0;
+}
+.tog input:checked + .tt { background: var(--accent); }
+.tt::after {
+  content: ''; position: absolute; top: 2px; left: 2px;
+  width: 16px; height: 16px; background: white; border-radius: 50%;
+  transition: transform .2s; box-shadow: 0 1px 3px rgba(0,0,0,.2);
+}
+.tog input:checked + .tt::after { transform: translateX(16px); }
+.tl { font-size: 0.83rem; }
+
+/* ══════════════════════════════
+   SLIDER
+══════════════════════════════ */
+input[type=range] {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; cursor: pointer; background: transparent;
+}
+input[type=range]::-webkit-slider-runnable-track {
+  height: 4px; border-radius: 4px; border: none; background: var(--track);
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 15px; height: 15px; border-radius: 50%;
+  background: var(--accent); cursor: pointer;
+  margin-top: -5.5px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.25);
+}
+input[type=range]::-moz-range-track {
+  height: 4px; border-radius: 4px; border: none; background: var(--track);
+}
+input[type=range]::-moz-range-thumb {
+  width: 15px; height: 15px; border-radius: 50%;
+  background: var(--accent); border: none; cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,.25);
+}
+.sr { display: flex; align-items: center; gap: 7px; }
+.row-disabled { opacity: 0.32; pointer-events: none; }
+.sr input[type=range] { flex: 1; }
+.sv { font-size: 0.72rem; font-weight: 300; color: var(--muted); min-width: 30px; text-align: right; }
+.tl { font-weight: 300; }
+
+/* ══════════════════════════════
+   ICON GRID
+══════════════════════════════ */
+.ig {
+  display: grid; grid-template-columns: repeat(6,1fr); gap: 3px;
+  max-height: 160px; overflow-y: auto; scrollbar-width: thin;
+  border: 1px solid var(--border); border-radius: 12px;
+  padding: 7px; background: var(--inp);
+}
+.ib {
+  height: 32px; width: 100%; border: 1px solid transparent;
+  border-radius: 8px; cursor: pointer; background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--muted); transition: all .15s;
+}
+.ib svg { width: 15px; height: 15px; flex-shrink: 0; }
+.ib:hover { background: var(--accent-l); color: var(--accent); }
+.ib.on { border-color: var(--accent); background: var(--accent-l); color: var(--accent); }
+
+/* ══════════════════════════════
+   FILE UPLOAD
+══════════════════════════════ */
+.fu {
+  border: 2px dashed var(--border); border-radius: 12px;
+  padding: 12px 8px; text-align: center; cursor: pointer;
+  color: var(--muted); transition: all .15s;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+}
+.fu:hover { border-color: var(--accent); color: var(--accent); }
+.fu input { display: none; }
+#logo-lbl { display:flex; flex-direction:column; align-items:center; gap:3px; }
+
+/* ══════════════════════════════
+   PREVIEW CANVAS
+══════════════════════════════ */
+#pv-wrap {
+  background: var(--card); border-radius: 14px; box-shadow: var(--sh);
+  overflow: hidden; display: inline-flex; position: relative;
+  max-width: 100%; max-height: calc(100vh - 160px);
+}
+canvas { display: block; max-width: 100%; max-height: calc(100vh - 160px); }
+
+/* ══════════════════════════════
+   BUTTONS
+══════════════════════════════ */
+.dl { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.btn {
+  padding: 9px 18px; border-radius: 11px; cursor: pointer;
+  font-weight: 600; font-size: 0.80rem; font-family: inherit;
+  display: flex; align-items: center; gap: 7px; transition: all .18s;
+  border: 1px solid var(--border); backdrop-filter: blur(6px);
+}
+.p {
+  background: var(--accent-l); color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+}
+.p:hover { background: var(--accent); color: white; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(79,70,229,.35); }
+.q { background: var(--inp); color: var(--text); }
+.q:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+
+#st { font-size: 0.76rem; color: var(--muted); height: 16px; }
+
+/* ══════════════════════════════
+   PRESET SYSTEM
+══════════════════════════════ */
+#preset-wrap { position: relative; display: flex; gap: 6px; }
+.preset-btn {
+  height: 34px; padding: 0 12px; border-radius: 10px;
+  border: 1.5px solid var(--border); background: transparent;
+  cursor: pointer; display: flex; align-items: center; gap: 6px;
+  color: var(--muted); transition: all .18s; font-family: inherit;
+  font-size: 0.75rem; font-weight: 500;
+}
+.preset-btn:hover { background: var(--accent-l); border-color: var(--accent); color: var(--accent); }
+.preset-btn.p:hover { background: var(--accent); color: white; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(79,70,229,.35); }
+.preset-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+#preset-panel {
+  display: none; position: absolute; top: calc(100% + 10px); right: 0;
+  background: var(--panel); border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 14px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.2), 0 3px 10px rgba(0,0,0,.1);
+  z-index: 200; width: 290px; max-height: 72vh; overflow-y: auto;
+}
+[data-theme="dark"] #preset-panel {
+  box-shadow: 0 16px 60px rgba(0,0,0,.7), 0 4px 14px rgba(0,0,0,.5);
+}
+.preset-divlabel {
+  font-size: 0.56rem; font-weight: 700; letter-spacing: 0.22em;
+  color: var(--muted); text-transform: uppercase;
+  padding: 4px 2px 8px; margin-top: 4px;
+  font-family: 'Roboto', sans-serif;
+}
+.preset-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+  margin-bottom: 4px;
+}
+.preset-card {
+  position: relative; border-radius: 10px; padding: 6px 4px 5px;
+  cursor: pointer; text-align: center;
+  border: 1.5px solid transparent; background: var(--inp);
+  transition: all .15s;
+}
+.preset-card:hover { border-color: var(--accent); }
+.preset-card canvas { border-radius: 6px; display: block; margin: 0 auto 5px; width: 72px; height: 72px; }
+.preset-card-name { font-size: 0.60rem; font-weight: 600; color: var(--muted); line-height: 1.2; }
+.preset-card-del {
+  display: none; position: absolute; top: 3px; right: 4px;
+  width: 15px; height: 15px; background: var(--border); border-radius: 50%;
+  font-size: 10px; line-height: 15px; text-align: center;
+  color: var(--text); cursor: pointer; font-weight: 700;
+}
+.preset-card:hover .preset-card-del { display: block; }
+.preset-card-del:hover { background: #ef4444; color: white; }
+.preset-io {
+  border-top: 1.5px solid var(--border); margin-top: 10px; padding-top: 8px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.preset-io button {
+  width: 100%; padding: 7px 10px; border-radius: 8px;
+  border: 1.5px solid transparent; background: transparent;
+  color: var(--muted); font-size: 0.68rem; font-weight: 600;
+  font-family: inherit; cursor: pointer; text-align: left;
+  display: flex; align-items: center; gap: 6px; transition: all .15s;
+}
+.preset-io button:hover { background: var(--accent-l); color: var(--accent); }
+.preset-io button svg { width: 12px; height: 12px; flex-shrink: 0; }
+
+/* Save modal */
+#preset-modal-bg {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.45); z-index: 500;
+  align-items: center; justify-content: center;
+}
+#preset-modal {
+  background: var(--panel); border: 1.5px solid var(--border);
+  border-radius: 16px; padding: 28px 24px; width: 300px;
+  box-shadow: 0 16px 50px rgba(0,0,0,.35);
+}
+#preset-modal h3 {
+  font-size: 0.85rem; font-weight: 700; color: var(--text);
+  margin-bottom: 16px; letter-spacing: .01em;
+}
+#preset-modal input {
+  width: 100%; margin-bottom: 14px;
+}
+.modal-btns { display: flex; gap: 8px; justify-content: flex-end; }
+.modal-btns button { padding: 8px 16px; border-radius: 9px; font-family: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; border: 1.5px solid var(--border); transition: all .15s; }
+.modal-ok { background: var(--accent-l); color: var(--accent); border-color: color-mix(in srgb, var(--accent) 40%, transparent) !important; }
+.modal-ok:hover { background: var(--accent); color: white; }
+.modal-cancel { background: transparent; color: var(--muted); }
+.modal-cancel:hover { border-color: var(--accent); color: var(--accent); }
+.overwrite-item {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 9px; border-radius: 8px; margin-bottom: 3px;
+  font-size: 0.76rem; font-weight: 500; color: var(--muted);
+  cursor: pointer; border: 1.5px solid transparent;
+  background: var(--inp); transition: all .13s;
+}
+.overwrite-item:hover { border-color: var(--border); color: var(--text); }
+.overwrite-item.sel { border-color: var(--accent); background: var(--accent-l); color: var(--accent); }
+
+/* ══════════════════════════════
+   FOOTER
+══════════════════════════════ */
+#footer {
+  height: 34px; display: flex; align-items: center;
+  padding: 0 20px; gap: 12px;
+  background: var(--panel);
+  border-top: 1px solid var(--border);
+  font-size: 0.67rem; color: var(--muted);
+  flex-shrink: 0;
+}
+#footer-name {
+  font-size: 0.63rem; font-weight: 800;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--text);
+}
+#footer-sep { opacity: 0.35; }
+#footer-right { margin-left: auto; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     TOPBAR
+══════════════════════════════════════ -->
+<header id="topbar">
+  <h1>
+    <svg width="20" height="20" viewBox="0 0 20 20">
+      <!-- TL finder -->
+      <rect x="0" y="0" width="8" height="8" rx="2" fill="var(--accent)"/>
+      <rect x="1.2" y="1.2" width="5.6" height="5.6" rx="1.2" fill="var(--panel)"/>
+      <rect x="2.5" y="2.5" width="3" height="3" rx="0.7" fill="var(--accent)"/>
+      <!-- TR finder -->
+      <rect x="12" y="0" width="8" height="8" rx="2" fill="var(--accent)"/>
+      <rect x="13.2" y="1.2" width="5.6" height="5.6" rx="1.2" fill="var(--panel)"/>
+      <rect x="14.5" y="2.5" width="3" height="3" rx="0.7" fill="var(--accent)"/>
+      <!-- BL finder -->
+      <rect x="0" y="12" width="8" height="8" rx="2" fill="var(--accent)"/>
+      <rect x="1.2" y="13.2" width="5.6" height="5.6" rx="1.2" fill="var(--panel)"/>
+      <rect x="2.5" y="14.5" width="3" height="3" rx="0.7" fill="var(--accent)"/>
+      <!-- data dots -->
+      <rect x="12.2" y="12.2" width="2" height="2" rx="0.5" fill="var(--accent)"/>
+      <rect x="15.5" y="12.2" width="2" height="2" rx="0.5" fill="var(--accent)"/>
+      <rect x="12.2" y="15.5" width="2" height="2" rx="0.5" fill="var(--accent)"/>
+      <rect x="15.5" y="15.5" width="2" height="2" rx="0.5" fill="var(--accent)"/>
+      <rect x="17.8" y="17.8" width="2.2" height="2.2" rx="0.6" fill="var(--accent)"/>
+    </svg>
+    <span id="app-name">QRAFT</span>
+    <span id="app-tag">THE QR STUDIO</span>
+  </h1>
+  <div id="topbar-right">
+    <!-- PRESET BUTTONS -->
+    <div id="preset-wrap">
+      <button class="preset-btn p" onclick="togglePresetPanel(event)" title="Sablon betöltése">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Betöltés
+      </button>
+      <button class="preset-btn" onclick="savePreset()" title="Jelenlegi sablon mentése">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Mentés
+      </button>
+      <!-- Dropdown preset panel -->
+      <div id="preset-panel" onclick="event.stopPropagation()"></div>
+    </div>
+    <div class="topbar-sep"></div>
+    <button class="tb-flat" id="undo-btn" onclick="undo()" title="Visszavonás" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M3 13C5 7 11 3 18 5a9 9 0 0 1 3 14"/></svg>
+    </button>
+    <button class="tb-flat" id="redo-btn" onclick="redo()" title="Újra" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7v6h-6"/><path d="M21 13C19 7 13 3 6 5a9 9 0 0 0-3 14"/></svg>
+    </button>
+    <div class="topbar-sep"></div>
+    <button id="theme-btn" onclick="toggleTheme()" title="Nappali / Éjszakai mód">
+      <!-- moon = shown in light mode, sun = shown in dark mode -->
+      <svg id="ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg id="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════
+     3 COLUMNS + PREVIEW
+══════════════════════════════════════ -->
+<div id="shell">
+<div id="editor-panel">
+
+  <!-- ─── COL 1 : TARTALOM ─── -->
+  <div class="col" id="col1">
+    <div class="col-head">
+      <div class="col-num">01</div>
+      <h2>Tartalom</h2>
+    </div>
+    <div class="col-body">
+
+      <div class="ttabs">
+        <button class="ttab on" onclick="setType('url',this)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span class="ttab-label">Web Link</span>
+          <span class="ttab-desc">Weboldal, hivatkozás</span>
+        </button>
+        <button class="ttab" onclick="setType('vcard',this)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span class="ttab-label">vCard</span>
+          <span class="ttab-desc">Névjegy, kontakt</span>
+        </button>
+        <button class="ttab" onclick="setType('wifi',this)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="currentColor" stroke="none"/></svg>
+          <span class="ttab-label">WiFi</span>
+          <span class="ttab-desc">Hálózat, jelszó</span>
+        </button>
+        <button class="ttab" onclick="setType('text',this)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg>
+          <span class="ttab-label">Szöveg</span>
+          <span class="ttab-desc">Szabad szöveges tartalom</span>
+        </button>
+      </div>
+
+      <!-- URL -->
+      <div id="f-url" style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
+        <div class="fg"><label>URL cím</label>
+          <input type="url" id="in-url" placeholder="https://example.com" oninput="go()">
+        </div>
+      </div>
+
+      <!-- vCARD -->
+      <div id="f-vcard" style="display:none;margin-top:10px;flex-direction:column;gap:7px">
+        <div class="fr">
+          <div class="fg"><label>Keresztnév</label><input type="text" id="vc-fn" placeholder="János" oninput="go()"></div>
+          <div class="fg"><label>Vezetéknév</label><input type="text" id="vc-ln" placeholder="Kovács" oninput="go()"></div>
+        </div>
+        <div class="fg"><label>Cég</label><input type="text" id="vc-org" placeholder="Cég neve" oninput="go()"></div>
+        <div class="fg"><label>Beosztás</label><input type="text" id="vc-ti" placeholder="Igazgató" oninput="go()"></div>
+        <div class="fg"><label>Telefon</label><input type="tel" id="vc-ph" placeholder="+36 1 234 5678" oninput="go()"></div>
+        <div class="fg"><label>Email</label><input type="email" id="vc-em" placeholder="janos@pelda.hu" oninput="go()"></div>
+        <div class="fg"><label>Weboldal</label><input type="url" id="vc-wb" placeholder="https://pelda.hu" oninput="go()"></div>
+        <div class="fg"><label>Cím</label><input type="text" id="vc-ad" placeholder="Budapest, Fő u. 1." oninput="go()"></div>
+      </div>
+
+      <!-- WiFi -->
+      <div id="f-wifi" style="display:none;margin-top:10px;flex-direction:column;gap:7px">
+        <div class="fg"><label>Hálózat (SSID)</label><input type="text" id="wi-ss" placeholder="OtthoniHalozat" oninput="go()"></div>
+        <div class="fg"><label>Jelszó</label><input type="text" id="wi-pw" placeholder="jelszó123" oninput="go()"></div>
+        <div class="fg"><label>Titkosítás</label>
+          <select id="wi-en" onchange="go()">
+            <option value="WPA">WPA/WPA2</option>
+            <option value="WEP">WEP</option>
+            <option value="nopass">Nincs jelszó</option>
+          </select>
+        </div>
+        <label class="tog"><input type="checkbox" id="wi-hd" onchange="go()"><span class="tt"></span><span class="tl">Rejtett hálózat</span></label>
+      </div>
+
+      <!-- TEXT -->
+      <div id="f-text" style="display:none;margin-top:10px;flex-direction:column;gap:7px">
+        <div class="fg"><label>Szöveg</label>
+          <textarea id="in-tx" placeholder="Ide írja be a szöveget..." oninput="go()"></textarea>
+        </div>
+      </div>
+
+    </div><!-- /col-body -->
+  </div><!-- /col1 -->
+
+
+  <!-- ─── COL 2 : QR STÍLUS + KERET ─── -->
+  <div class="col" id="col2">
+    <div class="col-head">
+      <div class="col-num">02</div>
+      <h2>Stílus</h2>
+    </div>
+    <div class="col-body">
+
+      <!-- ·· QR Kód stílus ·· -->
+      <div class="sdiv" onclick="toggleSd(this)">QR Kód stílus</div>
+      <div class="sdc">
+        <div class="fg"><label>Pont stílus</label>
+          <div class="sg" id="dg">
+            <button class="sb on" onclick="pick('dg',this,'dot','square')">
+              <svg width="26" height="26" viewBox="0 0 28 28"><rect x="2" y="2" width="10" height="10" fill="currentColor"/><rect x="16" y="2" width="10" height="10" fill="currentColor"/><rect x="2" y="16" width="10" height="10" fill="currentColor"/><rect x="16" y="16" width="10" height="10" fill="currentColor"/></svg>Négyzet</button>
+            <button class="sb" onclick="pick('dg',this,'dot','rounded')">
+              <svg width="26" height="26" viewBox="0 0 28 28"><rect x="2" y="2" width="10" height="10" rx="3" fill="currentColor"/><rect x="16" y="2" width="10" height="10" rx="3" fill="currentColor"/><rect x="2" y="16" width="10" height="10" rx="3" fill="currentColor"/><rect x="16" y="16" width="10" height="10" rx="3" fill="currentColor"/></svg>Kerekített</button>
+            <button class="sb" onclick="pick('dg',this,'dot','xround')">
+              <svg width="26" height="26" viewBox="0 0 28 28"><rect x="2" y="2" width="10" height="10" rx="3.5" fill="currentColor"/><rect x="16" y="2" width="10" height="10" rx="3.5" fill="currentColor"/><rect x="2" y="16" width="10" height="10" rx="3.5" fill="currentColor"/><rect x="16" y="16" width="10" height="10" rx="3.5" fill="currentColor"/></svg>Extra kerek</button>
+            <button class="sb" onclick="pick('dg',this,'dot','dots')">
+              <svg width="26" height="26" viewBox="0 0 28 28"><circle cx="7" cy="7" r="5" fill="currentColor"/><circle cx="21" cy="7" r="5" fill="currentColor"/><circle cx="7" cy="21" r="5" fill="currentColor"/><circle cx="21" cy="21" r="5" fill="currentColor"/></svg>Kör</button>
+            <button class="sb" onclick="pick('dg',this,'dot','diamond')">
+              <svg width="26" height="26" viewBox="0 0 28 28"><polygon points="7,2 12,7 7,12 2,7" fill="currentColor"/><polygon points="21,2 26,7 21,12 16,7" fill="currentColor"/><polygon points="7,16 12,21 7,26 2,21" fill="currentColor"/><polygon points="21,16 26,21 21,26 16,21" fill="currentColor"/></svg>Gyémánt</button>
+            <button class="sb" onclick="pick('dg',this,'dot','classy')">
+              <svg width="26" height="26" viewBox="0 0 28 28"><path d="M2,2 L8,2 A4,4 0 0,1 12,6 L12,12 L6,12 A4,4 0 0,1 2,8 Z" fill="currentColor"/><path d="M16,2 L22,2 A4,4 0 0,1 26,6 L26,12 L20,12 A4,4 0 0,1 16,8 Z" fill="currentColor"/><path d="M2,16 L8,16 A4,4 0 0,1 12,20 L12,26 L6,26 A4,4 0 0,1 2,22 Z" fill="currentColor"/><path d="M16,16 L22,16 A4,4 0 0,1 26,20 L26,26 L20,26 A4,4 0 0,1 16,22 Z" fill="currentColor"/></svg>Elegáns</button>
+          </div>
+        </div>
+
+        <div class="fg"><label>Sarokstílus</label>
+          <div class="sg" id="cg">
+            <button class="sb on" onclick="pick('cg',this,'corner','square')">
+              <svg width="26" height="26" viewBox="0 0 28 28"><rect x="2" y="2" width="24" height="24" rx="0" fill="none" stroke="currentColor" stroke-width="3"/><rect x="8" y="8" width="12" height="12" fill="currentColor"/></svg>Négyzet</button>
+            <button class="sb" onclick="pick('cg',this,'corner','xround')">
+              <svg width="26" height="26" viewBox="0 0 28 28"><rect x="2" y="2" width="24" height="24" rx="8" fill="none" stroke="currentColor" stroke-width="3"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>Kerekített</button>
+            <button class="sb" onclick="pick('cg',this,'corner','dot')">
+              <svg width="26" height="26" viewBox="0 0 28 28"><circle cx="14" cy="14" r="12" fill="currentColor"/><circle cx="14" cy="14" r="8" fill="var(--bg)"/><circle cx="14" cy="14" r="4.5" fill="currentColor"/></svg>Kör</button>
+          </div>
+        </div>
+
+        <div class="fr">
+          <div class="fg"><label>QR szín</label>
+            <div class="cr">
+              <input type="color" id="fc" value="#000000" oninput="syncC('f')">
+              <div class="cr-div"></div>
+              <input type="text" id="ft" value="#000000" oninput="syncT('f')" maxlength="7">
+            </div>
+          </div>
+          <div class="fg"><label>Háttérszín</label>
+            <div class="cr">
+              <input type="color" id="bc" value="#ffffff" oninput="syncC('b')">
+              <div class="cr-div"></div>
+              <input type="text" id="bt" value="#ffffff" oninput="syncT('b')" maxlength="7">
+            </div>
+          </div>
+        </div>
+
+        <div class="fg"><label>Méret</label>
+          <div class="sr">
+            <input type="range" id="qs" min="150" max="500" value="300" oninput="sl('qs','qsv');go()">
+            <span class="sv" id="qsv">300px</span>
+          </div>
+        </div>
+
+        <div class="fg"><label>Hibajavítás szintje</label>
+          <select id="el" onchange="go()">
+            <option value="L">L – Alacsony (7%)</option>
+            <option value="M" selected>M – Közepes (15%)</option>
+            <option value="Q">Q – Negyedes (25%)</option>
+            <option value="H">H – Magas (30%)</option>
+          </select>
+        </div>
+      </div><!-- /sdc QR stílus -->
+
+
+      <!-- ·· Keret ·· -->
+      <div class="sdiv" onclick="toggleSd(this)">Keret</div>
+      <div class="sdc">
+        <div class="fg"><label>Keret stílus</label>
+          <div class="sg" id="fg-frame">
+            <button class="sb on" onclick="pick('fg-frame',this,'frame','none')">
+              <svg width="26" height="26" viewBox="0 0 28 28"><line x1="3" y1="25" x2="25" y2="3" stroke="currentColor" stroke-width="2"/></svg>Nincs</button>
+            <button class="sb" onclick="pick('fg-frame',this,'frame','simple')">
+              <svg width="26" height="26" viewBox="0 0 28 28"><rect x="2" y="2" width="24" height="24" fill="none" stroke="currentColor" stroke-width="3"/></svg>Négyzet</button>
+            <button class="sb" onclick="pick('fg-frame',this,'frame','rounded')">
+              <svg width="26" height="26" viewBox="0 0 28 28"><rect x="2" y="2" width="24" height="24" rx="6" fill="none" stroke="currentColor" stroke-width="3"/></svg>Lekerekített</button>
+            <button class="sb" onclick="pick('fg-frame',this,'frame','shadow')">
+              <svg width="26" height="26" viewBox="0 0 28 28"><rect x="5" y="5" width="20" height="20" fill="rgba(0,0,0,.18)"/><rect x="2" y="2" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"/></svg>Árnyék</button>
+            <button class="sb" onclick="pick('fg-frame',this,'frame','double')">
+              <svg width="26" height="26" viewBox="0 0 28 28"><rect x="1" y="1" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="5" y="5" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>Dupla</button>
+          </div>
+        </div>
+
+        <div class="fr">
+          <div class="fg"><label>Keret szín</label>
+            <div class="cr">
+              <input type="color" id="frc" value="#000000" oninput="go()">
+              <div class="cr-div"></div>
+              <input type="text" id="frt" value="#000000" oninput="syncFrColor()" maxlength="7">
+            </div>
+          </div>
+          <div class="fg"><label>Vastagság</label>
+            <div class="sr">
+              <input type="range" id="frw" min="2" max="30" value="10" oninput="sl('frw','frwv');go()">
+              <span class="sv" id="frwv">10</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="fg" id="frr-row"><label>Lekerekítés</label>
+          <div class="sr">
+            <input type="range" id="frr" min="0" max="50" value="12" oninput="sl('frr','frrv');go()">
+            <span class="sv" id="frrv">12</span>
+          </div>
+        </div>
+      </div><!-- /sdc keret -->
+
+    </div><!-- /col-body -->
+  </div><!-- /col2 -->
+
+
+  <!-- ─── COL 3 : FELIRAT + IKON + LOGÓ ─── -->
+  <div class="col" id="col3">
+    <div class="col-head">
+      <div class="col-num">03</div>
+      <h2>Dekoráció</h2>
+    </div>
+    <div class="col-body">
+
+      <!-- ·· Felirat ·· -->
+      <div class="sdiv" onclick="toggleSd(this)">Felirat</div>
+      <div class="sdc">
+        <label class="tog"><input type="checkbox" id="cap-on" onchange="tog('cap-on','cap-opts');go()"><span class="tt"></span><span class="tl">Felirat megjelenítése</span></label>
+        <div id="cap-opts" style="display:none;flex-direction:column;gap:8px">
+          <div class="fg"><label>Szöveg</label><input type="text" id="cap-tx" placeholder="Szkennelj be!" oninput="go()"></div>
+          <div class="fg"><label>Pozíció</label>
+            <select id="cap-po" onchange="go()">
+              <option value="bottom">Alul (kívül)</option>
+              <option value="top">Felül (kívül)</option>
+              <option value="bottom-in">Alul (QR-en belül)</option>
+              <option value="top-in">Felül (QR-en belül)</option>
+            </select>
+          </div>
+          <div class="fg"><label>Betűméret</label>
+            <div class="sr"><input type="range" id="cap-fs" min="8" max="48" value="16" oninput="sl('cap-fs','cap-fsv');go()"><span class="sv" id="cap-fsv">16</span></div>
+          </div>
+          <div class="fr">
+            <div class="fg" style="flex:2"><label>Betűtípus</label>
+              <select id="cap-ff" onchange="go()">
+                <option>Arial</option><option>Georgia</option>
+                <option>Courier New</option><option>Impact</option>
+                <option>Verdana</option><option>Trebuchet MS</option>
+              </select>
+            </div>
+          </div>
+          <div class="fr">
+            <div class="fg"><label>Betűszín</label>
+              <div class="cr">
+                <input type="color" id="cap-fc" value="#ffffff" oninput="syncC2('cap-fc','cap-fct');go()">
+                <div class="cr-div"></div>
+                <input type="text" id="cap-fct" value="#ffffff" oninput="syncT2('cap-fc','cap-fct');go()" maxlength="7">
+              </div>
+            </div>
+            <div class="fg"><label>Sáv háttér</label>
+              <div class="cr">
+                <input type="color" id="cap-bc" value="#000000" oninput="syncC2('cap-bc','cap-bct');go()">
+                <div class="cr-div"></div>
+                <input type="text" id="cap-bct" value="#000000" oninput="syncT2('cap-bc','cap-bct');go()" maxlength="7">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /sdc felirat -->
+
+
+      <!-- ·· Ikon ·· -->
+      <div class="sdiv closed" onclick="toggleSd(this)">Ikon</div>
+      <div class="sdc hide">
+        <label class="tog"><input type="checkbox" id="ico-on" onchange="tog('ico-on','ico-opts');go()"><span class="tt"></span><span class="tl">Ikon megjelenítése</span></label>
+        <div id="ico-opts" style="display:none;flex-direction:column;gap:8px">
+          <div class="fg"><label>Válassz ikont</label><div class="ig" id="icon-g"></div></div>
+          <div class="fg"><label>Pozíció</label>
+            <select id="ico-po" onchange="go()">
+              <option value="center">Középen (QR-en belül)</option>
+              <option value="br">Jobb alsó sarok</option>
+            </select>
+          </div>
+          <div class="fg"><label>Méret</label>
+            <div class="sr">
+              <input type="range" id="ico-sz" min="16" max="80" value="40" oninput="sl('ico-sz','ico-szv');go()">
+              <span class="sv" id="ico-szv">40</span>
+            </div>
+          </div>
+          <div class="fg"><label>Háttér (ikon mögött)</label>
+            <div class="cr">
+              <input type="color" id="ico-bg" value="#ffffff" oninput="syncC2('ico-bg','ico-bgt');go()">
+              <div class="cr-div"></div>
+              <input type="text" id="ico-bgt" value="#ffffff" oninput="syncT2('ico-bg','ico-bgt');go()" maxlength="7">
+            </div>
+          </div>
+          <div class="fr">
+            <div class="fg"><label>Körvonal szín</label>
+              <div class="cr">
+                <input type="color" id="ico-sc" value="#000000" oninput="syncC2('ico-sc','ico-sct');go()">
+                <div class="cr-div"></div>
+                <input type="text" id="ico-sct" value="#000000" oninput="syncT2('ico-sc','ico-sct');go()" maxlength="7">
+              </div>
+            </div>
+            <div class="fg"><label>Vastagság</label>
+              <div class="sr"><input type="range" id="ico-sw" min="0" max="12" value="0" oninput="sl('ico-sw','ico-swv');go()"><span class="sv" id="ico-swv">0</span></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /sdc ikon -->
+
+
+      <!-- ·· Logó ·· -->
+      <div class="sdiv closed" onclick="toggleSd(this)">Logó</div>
+      <div class="sdc hide">
+        <label class="tog"><input type="checkbox" id="logo-on" onchange="tog('logo-on','logo-opts');go()"><span class="tt"></span><span class="tl">Logó megjelenítése</span></label>
+        <div id="logo-opts" style="display:none;flex-direction:column;gap:8px">
+          <div class="fg"><label>Feltöltés</label>
+            <label class="fu">
+              <input type="file" id="logo-f" accept="image/*" onchange="loadLogo(this)">
+              <div id="logo-lbl"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span class="ttab-label">Kattints a feltöltéshez</span><span class="ttab-desc">PNG, JPG, SVG, WebP</span></div>
+            </label>
+          </div>
+          <div class="fg"><label>Pozíció</label>
+            <select id="logo-po" onchange="go()">
+              <option value="center">Középen (QR-en belül)</option>
+              <option value="br">Jobb alsó sarok</option>
+            </select>
+          </div>
+          <div class="fg"><label>Méret</label>
+            <div class="sr">
+              <input type="range" id="logo-sz" min="20" max="150" value="60" oninput="sl('logo-sz','logo-szv');go()">
+              <span class="sv" id="logo-szv">60</span>
+            </div>
+          </div>
+          <div class="fg"><label>Lekerekítés</label>
+            <div class="sr">
+              <input type="range" id="logo-r" min="0" max="50" value="0" oninput="sl('logo-r','logo-rv');go()">
+              <span class="sv" id="logo-rv">0</span>
+            </div>
+          </div>
+          <div class="fr">
+            <div class="fg"><label>Körvonal szín</label>
+              <div class="cr">
+                <input type="color" id="logo-sc" value="#000000" oninput="syncC2('logo-sc','logo-sct');go()">
+                <div class="cr-div"></div>
+                <input type="text" id="logo-sct" value="#000000" oninput="syncT2('logo-sc','logo-sct');go()" maxlength="7">
+              </div>
+            </div>
+            <div class="fg"><label>Vastagság</label>
+              <div class="sr"><input type="range" id="logo-sw" min="0" max="12" value="0" oninput="sl('logo-sw','logo-swv');go()"><span class="sv" id="logo-swv">0</span></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /sdc logo -->
+
+    </div><!-- /col-body -->
+  </div><!-- /col3 -->
+
+</div><!-- /editor-panel -->
+<div id="rh" title="Húzd a panel méretezéséhez"></div>
+
+  <!-- ─── PREVIEW ─── -->
+  <main id="mv">
+    <div id="pv-wrap"><canvas id="qc"></canvas></div>
+    <div class="dl">
+      <button class="btn q" id="copy-btn" onclick="copyQR(this)">
+        <svg id="copy-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <span id="copy-lbl">Másolás</span>
+      </button>
+      <button class="btn p" onclick="dlJPG()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        JPG
+      </button>
+      <button class="btn q" onclick="dlSVG()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        SVG
+      </button>
+    </div>
+    <div id="st"></div>
+  </main>
+
+</div><!-- /shell -->
+
+<footer id="footer">
+  <span id="footer-name">QRAFT</span>
+  <span id="footer-sep">·</span>
+  <span>QR Studio</span>
+  <span id="footer-sep">·</span>
+  <span>v1.0</span>
+  <span id="footer-right">THE QR STUDIO</span>
+</footer>
+
+<!-- qrcode-generator: reliable, exposes window.qrcode() -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<script>
+'use strict';
+
+// ════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════
+const S = {
+  type: 'url',
+  dot: 'square',
+  corner: 'square',
+  frame: 'none',
+  fg: '#000000',
+  bg: '#ffffff',
+  ico:  { on: false, icon: 'globe', pos: 'center', sz: 40, bg: '#ffffff', sw: 0, sc: '#000000' },
+  logo: { on: false, url: null,  pos: 'center', sz: 60, r: 0,           sw: 0, sc: '#000000', thumb: null }
+};
+
+// ════════════════════════════════════════
+//  QR DATA BUILDER
+// ════════════════════════════════════════
+function buildData() {
+  const g = id => document.getElementById(id);
+  switch (S.type) {
+    case 'url':
+      return g('in-url').value.trim() || 'https://example.com';
+    case 'vcard': {
+      const fn=g('vc-fn').value, ln=g('vc-ln').value,
+            org=g('vc-org').value, ti=g('vc-ti').value,
+            ph=g('vc-ph').value, em=g('vc-em').value,
+            wb=g('vc-wb').value, ad=g('vc-ad').value;
+      let v=`BEGIN:VCARD\nVERSION:3.0\nN:${ln};${fn};;;\nFN:${fn} ${ln}`;
+      if(org) v+=`\nORG:${org}`; if(ti) v+=`\nTITLE:${ti}`;
+      if(ph)  v+=`\nTEL:${ph}`;  if(em) v+=`\nEMAIL:${em}`;
+      if(wb)  v+=`\nURL:${wb}`;  if(ad) v+=`\nADR:;;${ad};;;;`;
+      return v+'\nEND:VCARD';
+    }
+    case 'wifi': {
+      const ss=g('wi-ss').value, pw=g('wi-pw').value,
+            en=g('wi-en').value, hd=g('wi-hd').checked;
+      return `WIFI:T:${en};S:${ss};P:${pw};H:${hd?'true':'false'};;`;
+    }
+    case 'text':
+      return g('in-tx').value.trim() || 'Szöveg';
+  }
+}
+
+// ════════════════════════════════════════
+//  QR MATRIX GENERATION
+// ════════════════════════════════════════
+function makeQR(data, lvl) {
+  for (let v = 0; v <= 40; v++) {
+    try {
+      const q = qrcode(v, lvl);
+      q.addData(data);
+      q.make();
+      return q;
+    } catch(e) { if (v === 40) return null; }
+  }
+}
+
+// ════════════════════════════════════════
+//  UNDO / REDO
+// ════════════════════════════════════════
+const _hist = [];
+let _hIdx = -1;
+let _isUndoRedo = false;
+
+function _captureState() {
+  const gv = id => { const el = document.getElementById(id); if (!el) return ''; return el.type === 'checkbox' ? el.checked : el.value; };
+  return {
+    S: JSON.parse(JSON.stringify(S)),
+    f: {
+      fc:gv('fc'), bc:gv('bc'), frc:gv('frc'), frw:gv('frw'), frr:gv('frr'),
+      qs:gv('qs'), el:gv('el'),
+      'cap-on':gv('cap-on'), 'cap-tx':gv('cap-tx'), 'cap-po':gv('cap-po'),
+      'cap-fs':gv('cap-fs'), 'cap-ff':gv('cap-ff'),
+      'cap-fc':gv('cap-fc'), 'cap-bc':gv('cap-bc'),
+      'in-url':gv('in-url'), 'in-tx':gv('in-tx'),
+      'vc-fn':gv('vc-fn'), 'vc-ln':gv('vc-ln'), 'vc-org':gv('vc-org'),
+      'wi-ss':gv('wi-ss'), 'wi-pw':gv('wi-pw'),
+    }
+  };
+}
+
+function _restoreState(snap) {
+  const g = id => document.getElementById(id);
+  Object.assign(S, JSON.parse(JSON.stringify(snap.S)));
+  S.ico = {...snap.S.ico}; S.logo = {...snap.S.logo};
+  const f = snap.f;
+  g('fc').value=f.fc; g('ft').value=f.fc;
+  g('bc').value=f.bc; g('bt').value=f.bc;
+  g('frc').value=f.frc; if(g('frt')) g('frt').value=f.frc;
+  g('frw').value=f.frw; g('frwv').textContent=f.frw;
+  g('frr').value=f.frr; g('frrv').textContent=f.frr;
+  g('qs').value=f.qs;   g('qsv').textContent=f.qs+'px';
+  g('el').value=f.el;
+  g('cap-on').checked=f['cap-on']; tog('cap-on','cap-opts');
+  g('cap-tx').value=f['cap-tx']; g('cap-po').value=f['cap-po'];
+  g('cap-fs').value=f['cap-fs']; if(g('cap-fsv')) g('cap-fsv').textContent=f['cap-fs'];
+  g('cap-ff').value=f['cap-ff'];
+  g('cap-fc').value=f['cap-fc']; g('cap-fct').value=f['cap-fc'];
+  g('cap-bc').value=f['cap-bc']; g('cap-bct').value=f['cap-bc'];
+  if(f['in-url']!==undefined) g('in-url').value=f['in-url'];
+  if(f['in-tx']!==undefined)  g('in-tx').value=f['in-tx'];
+  if(f['vc-fn']!==undefined)  g('vc-fn').value=f['vc-fn'];
+  if(f['vc-ln']!==undefined)  g('vc-ln').value=f['vc-ln'];
+  if(f['wi-ss']!==undefined)  g('wi-ss').value=f['wi-ss'];
+  if(f['wi-pw']!==undefined)  g('wi-pw').value=f['wi-pw'];
+  g('ico-on').checked=S.ico.on; tog('ico-on','ico-opts');
+  g('ico-po').value=S.ico.pos;
+  g('ico-sz').value=S.ico.sz; g('ico-szv').textContent=S.ico.sz;
+  g('ico-bg').value=S.ico.bg; g('ico-bgt').value=S.ico.bg;
+  g('ico-sw').value=S.ico.sw; g('ico-swv').textContent=S.ico.sw;
+  g('ico-sc').value=S.ico.sc; g('ico-sct').value=S.ico.sc;
+  document.querySelectorAll('.ib').forEach(b => {
+    const m = b.getAttribute('onclick') && b.getAttribute('onclick').match(/pickIcon\('(\w+)'/);
+    if (m) b.classList.toggle('on', m[1] === (S.ico.icon||'globe'));
+  });
+  g('logo-on').checked=S.logo.on; tog('logo-on','logo-opts');
+  g('logo-po').value=S.logo.pos;
+  g('logo-sz').value=S.logo.sz; g('logo-szv').textContent=S.logo.sz;
+  g('logo-r').value=S.logo.r;   g('logo-rv').textContent=S.logo.r;
+  g('logo-sw').value=S.logo.sw; g('logo-swv').textContent=S.logo.sw;
+  g('logo-sc').value=S.logo.sc; g('logo-sct').value=S.logo.sc;
+  ['#dg .sb','#cg .sb','#fg-frame .sb'].forEach(sel => {
+    const prop = sel.includes('dg') ? 'dot' : sel.includes('cg') ? 'corner' : 'frame';
+    document.querySelectorAll(sel).forEach(b => {
+      const m = b.getAttribute('onclick').match(new RegExp(`'${prop}','(\\w+)'`));
+      if (m) b.classList.toggle('on', m[1] === S[prop]);
+    });
+  });
+  updateFrrState();
+}
+
+function _pushHist(snap) {
+  _hist.splice(_hIdx + 1);
+  _hist.push(snap);
+  if (_hist.length > 60) _hist.shift(); else _hIdx++;
+  _updateUR();
+}
+
+function _updateUR() {
+  const u = document.getElementById('undo-btn');
+  const r = document.getElementById('redo-btn');
+  if (u) u.disabled = _hIdx <= 0;
+  if (r) r.disabled = _hIdx >= _hist.length - 1;
+}
+
+function undo() {
+  if (_hIdx <= 0) return;
+  _hIdx--; _isUndoRedo = true;
+  _restoreState(_hist[_hIdx]);
+  render(); _updateUR();
+}
+function redo() {
+  if (_hIdx >= _hist.length - 1) return;
+  _hIdx++; _isUndoRedo = true;
+  _restoreState(_hist[_hIdx]);
+  render(); _updateUR();
+}
+
+// ════════════════════════════════════════
+//  RENDER ENGINE
+// ════════════════════════════════════════
+let renderTimer = null;
+function go() {
+  clearTimeout(renderTimer);
+  renderTimer = setTimeout(render, 60);
+}
+
+async function render() {
+  const g = id => document.getElementById(id);
+
+  // History snapshot (skipped during undo/redo)
+  if (!_isUndoRedo) { _pushHist(_captureState()); }
+  _isUndoRedo = false;
+
+  S.fg = g('fc').value;
+  S.bg = g('bc').value;
+  const qrSz   = parseInt(g('qs').value) || 300;
+  let   errLvl = g('el').value;
+
+  const hasCenterImg = (S.ico.on && S.ico.pos === 'center') ||
+                       (S.logo.on && S.logo.url && S.logo.pos === 'center');
+  if (hasCenterImg) errLvl = 'H';
+
+  const data = buildData();
+  const qr   = makeQR(data, errLvl);
+  if (!qr) { setst('⚠ Túl sok adat a QR kódhoz'); return; }
+
+  const n  = qr.getModuleCount();
+  const ms = qrSz / n;
+
+  const frStyle = S.frame;
+  const frColor = g('frc').value;
+  const frW     = parseInt(g('frw').value) || 10;
+  const frR     = parseInt(g('frr').value) || 12;
+  const pad     = frStyle !== 'none' ? frW + 16 : 16;
+
+  const capOn  = g('cap-on').checked;
+  const capTxt = g('cap-tx').value || 'Szkennelj be!';
+  const capPos = g('cap-po').value;
+  const capFs  = parseInt(g('cap-fs').value) || 16;
+  const capFf  = g('cap-ff').value;
+  const capFc  = g('cap-fc').value;
+  const capBc  = g('cap-bc').value;
+  const capH   = capOn ? Math.max(36, capFs + 18) : 0;
+
+  const capTop    = capOn && capPos === 'top'    ? capH : 0;
+  const capBottom = capOn && capPos === 'bottom' ? capH : 0;
+  const badgeH    = frStyle === 'badge' ? (capOn ? Math.max(42, capFs + 18) : 42) : 0;
+
+  const W  = qrSz + pad * 2;
+  const H  = qrSz + pad * 2 + capTop + capBottom + badgeH;
+  const qX = pad;
+  const qY = pad + capTop;
+
+  const canvas = g('qc');
+  canvas.width  = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, W, H);
+
+  const clipR = (frStyle === 'rounded' || frStyle === 'shadow') ? frR + frW / 2 : 0;
+  if (clipR > 0) {
+    ctx.save();
+    ctx.beginPath(); rr(ctx, 0, 0, W, H, clipR); ctx.clip();
+  }
+  ctx.fillStyle = S.bg;
+  ctx.fillRect(0, 0, W, H);
+
+  drawFrame(ctx, W, H, frStyle, frColor, frW, frR, badgeH);
+
+  if (capOn && capPos === 'top')
+    drawCaption(ctx, 0, 0, W, capTop, capTxt, capFf, capFs, capFc, capBc);
+
+  drawQR(ctx, qr, n, qX, qY, qrSz, ms);
+
+  if (capOn && capPos === 'top-in')
+    drawCaption(ctx, qX, qY, qrSz, capH, capTxt, capFf, capFs, capFc, capBc);
+  if (capOn && capPos === 'bottom-in')
+    drawCaption(ctx, qX, qY + qrSz - capH, qrSz, capH, capTxt, capFf, capFs, capFc, capBc);
+  if (capOn && capPos === 'bottom')
+    drawCaption(ctx, 0, H - capBottom - badgeH, W, capBottom, capTxt, capFf, capFs, capFc, capBc);
+
+  if (frStyle === 'badge') {
+    ctx.fillStyle = frColor;
+    ctx.fillRect(0, H - badgeH, W, badgeH);
+    if (capOn) {
+      ctx.fillStyle = capFc;
+      ctx.font = `bold ${capFs}px ${capFf}`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(capTxt, W / 2, H - badgeH / 2 + 1);
+    }
+  }
+
+  if (S.ico.on) {
+    const { icon: icoId, pos, sz, bg: ibg, sw: iSW, sc: iSC } = S.ico;
+    const ico = getIcon(icoId);
+    const strokeC = iSC || frColor;
+    if (pos === 'center') {
+      drawCenterIcon(ctx, ico, qX, qY, qrSz, sz, ibg, iSC);
+      if (iSW > 0) {
+        const cx = qX+qrSz/2, cy = qY+qrSz/2;
+        ctx.strokeStyle = strokeC; ctx.lineWidth = iSW;
+        ctx.beginPath(); rr(ctx, cx-sz/2-5, cy-sz/2-5, sz+10, sz+10, sz*.3); ctx.stroke();
+      }
+    } else {
+      const [cx, cy] = finderCenter(pos, qX, qY, n, ms);
+      ctx.fillStyle = ibg;
+      ctx.beginPath(); ctx.arc(cx, cy, sz/2+4, 0, Math.PI*2); ctx.fill();
+      if (iSW > 0) {
+        ctx.strokeStyle = strokeC; ctx.lineWidth = iSW;
+        ctx.beginPath(); ctx.arc(cx, cy, sz/2+4, 0, Math.PI*2); ctx.stroke();
+      }
+      drawIconOnCanvas(ctx, ico.path, cx, cy, sz * 0.68, iSC);
+    }
+  }
+
+  if (S.logo.on && S.logo.url) {
+    const { pos, sz, r: lr, sw: lSW, sc: lSC } = S.logo;
+    const strokeC = lSC || frColor;
+    try {
+      const img = await loadImg(S.logo.url);
+      if (pos === 'center') {
+        drawCenterImg(ctx, img, qX, qY, qrSz, sz, lr);
+        if (lSW > 0) {
+          const cx = qX+qrSz/2, cy = qY+qrSz/2, lx = cx-sz/2, ly = cy-sz/2;
+          ctx.strokeStyle = strokeC; ctx.lineWidth = lSW;
+          if (lr > 0) { ctx.beginPath(); rr(ctx, lx, ly, sz, sz, lr); ctx.stroke(); }
+          else { ctx.strokeRect(lx, ly, sz, sz); }
+        }
+      } else {
+        const [fcx, fcy] = finderCenter(pos, qX, qY, n, ms);
+        const [lx, ly] = [fcx - sz/2, fcy - sz/2];
+        ctx.save();
+        if (lr > 0) { ctx.beginPath(); rr(ctx, lx, ly, sz, sz, lr); ctx.clip(); }
+        else { ctx.beginPath(); ctx.rect(lx, ly, sz, sz); ctx.clip(); }
+        ctx.drawImage(img, lx, ly, sz, sz);
+        ctx.restore();
+        if (lSW > 0) {
+          ctx.strokeStyle = strokeC; ctx.lineWidth = lSW;
+          if (lr > 0) { ctx.beginPath(); rr(ctx, lx, ly, sz, sz, lr); ctx.stroke(); }
+          else { ctx.strokeRect(lx, ly, sz, sz); }
+        }
+      }
+    } catch(e) {}
+  }
+
+  if (clipR > 0) ctx.restore(); // close rounded clip
+
+  setst('Kész ✓');
+
+  // Sync #pv-wrap border-radius to match the drawn frame's visual corner radius
+  {
+    const rect = canvas.getBoundingClientRect();
+    const pvWrap = g('pv-wrap');
+    const scale = rect.width / canvas.width;
+    let r = 14;
+    if (frStyle === 'rounded' || frStyle === 'shadow' || frStyle === 'double') r = Math.round((frR + frW / 2) * scale);
+    else if (frStyle === 'simple') r = 0;
+    pvWrap.style.borderRadius = r + 'px';
+  }
+}
+
+// ─────────────────────────────────────────
+//  DRAW QR MODULES
+// ─────────────────────────────────────────
+function drawQR(ctx, qr, n, x, y, size, ms) {
+  ctx.fillStyle = S.fg;
+  for (const [r0, c0] of [[0,0],[0,n-7],[n-7,0]])
+    drawFinder(ctx, x + c0*ms, y + r0*ms, ms);
+  for (let r = 0; r < n; r++)
+    for (let c = 0; c < n; c++) {
+      if (inFinder(r, c, n)) continue;
+      if (!qr.isDark(r, c)) continue;
+      ctx.fillStyle = S.fg;
+      dot(ctx, x + c*ms, y + r*ms, ms, S.dot);
+    }
+}
+
+function inFinder(r, c, n) {
+  return (r < 8 && c < 8) || (r < 8 && c >= n-8) || (r >= n-8 && c < 8);
+}
+
+function drawFinder(ctx, ox, oy, ms) {
+  const fg = S.fg, bg = S.bg;
+  ctx.fillStyle = fg;
+  if (S.corner === 'square') {
+    ctx.fillRect(ox,      oy,      7*ms, ms);
+    ctx.fillRect(ox,      oy+6*ms, 7*ms, ms);
+    ctx.fillRect(ox,      oy+ms,   ms,   5*ms);
+    ctx.fillRect(ox+6*ms, oy+ms,   ms,   5*ms);
+    ctx.fillRect(ox+2*ms, oy+2*ms, 3*ms, 3*ms);
+  } else if (S.corner === 'xround') {
+    const ro = ms*1.6, ri = ms*0.9;
+    ctx.beginPath(); rr(ctx, ox, oy, 7*ms, 7*ms, ro); ctx.fill();
+    ctx.fillStyle = bg;
+    ctx.beginPath(); rr(ctx, ox+ms, oy+ms, 5*ms, 5*ms, ri); ctx.fill();
+    ctx.fillStyle = fg;
+    ctx.beginPath(); rr(ctx, ox+2*ms, oy+2*ms, 3*ms, 3*ms, ms*0.7); ctx.fill();
+  } else if (S.corner === 'dot') {
+    const cx = ox+3.5*ms, cy = oy+3.5*ms;
+    ctx.beginPath(); ctx.arc(cx, cy, 3.5*ms, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = bg;
+    ctx.beginPath(); ctx.arc(cx, cy, 2.5*ms, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = fg;
+    ctx.beginPath(); ctx.arc(cx, cy, 1.5*ms, 0, Math.PI*2); ctx.fill();
+  }
+}
+
+function dot(ctx, dx, dy, ms, style) {
+  const g = ms*.08, s = ms-g*2, ox = dx+g, oy = dy+g;
+  ctx.beginPath();
+  switch (style) {
+    case 'square':   ctx.rect(ox, oy, s, s); break;
+    case 'rounded':  rr(ctx, ox, oy, s, s, s*.28); break;
+    case 'dots':     ctx.arc(dx+ms/2, dy+ms/2, s/2, 0, Math.PI*2); break;
+    case 'xround':   rr(ctx, ox, oy, s, s, s*.38); break;
+    case 'diamond': {
+      const cx=dx+ms/2, cy=dy+ms/2, r=s*.5;
+      ctx.moveTo(cx,cy-r); ctx.lineTo(cx+r,cy);
+      ctx.lineTo(cx,cy+r); ctx.lineTo(cx-r,cy); ctx.closePath(); break;
+    }
+    case 'classy': {
+      const cr=s*.42;
+      ctx.moveTo(ox,oy); ctx.lineTo(ox+s-cr,oy);
+      ctx.arcTo(ox+s,oy, ox+s,oy+cr, cr);
+      ctx.lineTo(ox+s,oy+s); ctx.lineTo(ox+cr,oy+s);
+      ctx.arcTo(ox,oy+s, ox,oy+s-cr, cr); ctx.closePath(); break;
+    }
+    default: ctx.rect(ox, oy, s, s);
+  }
+  ctx.fill();
+}
+
+// ─────────────────────────────────────────
+//  DRAW HELPERS
+// ─────────────────────────────────────────
+function drawFrame(ctx, W, H, style, color, fw, fr, badgeH) {
+  if (style === 'none' || style === 'badge') return;
+  ctx.save();
+  ctx.strokeStyle = color; ctx.lineWidth = fw;
+  const h = fw/2;
+  if (style === 'simple') {
+    ctx.strokeRect(h, h, W-fw, H-fw);
+  } else if (style === 'rounded') {
+    ctx.beginPath(); rr(ctx, h, h, W-fw, H-fw, fr); ctx.stroke();
+  } else if (style === 'shadow') {
+    ctx.shadowColor='rgba(0,0,0,.22)'; ctx.shadowBlur=18;
+    ctx.shadowOffsetX=5; ctx.shadowOffsetY=5;
+    ctx.beginPath(); rr(ctx, h, h, W-fw, H-fw, Math.max(fr,4)); ctx.stroke();
+  } else if (style === 'double') {
+    if (fr > 0) { ctx.beginPath(); rr(ctx, h, h, W-fw, H-fw, fr); ctx.stroke(); }
+    else { ctx.strokeRect(h, h, W-fw, H-fw); }
+    const d = fw+6;
+    ctx.lineWidth = Math.max(1, fw*.55);
+    const fr2 = Math.max(0, fr - fw/2 - 6);
+    if (fr2 > 0) { ctx.beginPath(); rr(ctx, d, d, W-d*2, H-d*2, fr2); ctx.stroke(); }
+    else { ctx.strokeRect(d, d, W-d*2, H-d*2); }
+  }
+  ctx.restore();
+}
+
+function drawCaption(ctx, x, y, w, h, txt, ff, fs, fc, bc) {
+  ctx.fillStyle = bc; ctx.fillRect(x, y, w, h);
+  ctx.fillStyle = fc;
+  ctx.font = `bold ${fs}px ${ff}`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(txt, x + w/2, y + h/2);
+}
+
+function drawIconOnCanvas(ctx, path, cx, cy, size, color) {
+  const sc = size / 24;
+  ctx.save();
+  ctx.translate(cx - size/2, cy - size/2);
+  ctx.scale(sc, sc);
+  ctx.strokeStyle = color; ctx.lineWidth = 2.5 / sc;
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  ctx.stroke(new Path2D(path));
+  ctx.restore();
+}
+function drawCenterIcon(ctx, icon, qx, qy, qsz, sz, bg, iconColor) {
+  const cx = qx+qsz/2, cy = qy+qsz/2;
+  ctx.fillStyle = bg;
+  ctx.beginPath(); rr(ctx, cx-sz/2-5, cy-sz/2-5, sz+10, sz+10, sz*.3); ctx.fill();
+  drawIconOnCanvas(ctx, icon.path, cx, cy, sz * 0.68, iconColor);
+}
+
+function drawCenterImg(ctx, img, qx, qy, qsz, sz, lr) {
+  const cx=qx+qsz/2, cy=qy+qsz/2, lx=cx-sz/2, ly=cy-sz/2;
+  ctx.save();
+  ctx.fillStyle = 'white';
+  if (lr > 0) {
+    ctx.beginPath(); rr(ctx, lx-5, ly-5, sz+10, sz+10, lr+3); ctx.fill();
+    ctx.beginPath(); rr(ctx, lx, ly, sz, sz, lr); ctx.clip();
+  } else {
+    ctx.fillRect(lx-5, ly-5, sz+10, sz+10);
+  }
+  ctx.drawImage(img, lx, ly, sz, sz);
+  ctx.restore();
+}
+
+// Center of the finder pattern dot for the given corner position.
+// Finder pattern is 7×7 modules, center at module 3.5 from each edge.
+function finderCenter(pos, qx, qy, n, ms) {
+  const h = 3.5 * ms;
+  const R = {
+    tl: [qx + h,       qy + h      ],
+    tr: [qx + n*ms - h, qy + h     ],
+    bl: [qx + h,       qy + n*ms - h],
+    br: [qx + n*ms - h, qy + n*ms - h],
+    center: [qx + n*ms/2, qy + n*ms/2]
+  };
+  return R[pos] || R.center;
+}
+// Kept for SVG export (used without n/ms — falls back to QR boundary)
+function cornerXY(pos, qx, qy, qsz) {
+  const R={tl:[qx,qy], tr:[qx+qsz,qy], bl:[qx,qy+qsz], br:[qx+qsz,qy+qsz], center:[qx+qsz/2,qy+qsz/2]};
+  return R[pos]||R.center;
+}
+function cornerXYtl(pos, qx, qy, qsz, sz) {
+  const R={tl:[qx-sz/2,qy-sz/2], tr:[qx+qsz-sz/2,qy-sz/2],
+           bl:[qx-sz/2,qy+qsz-sz/2], br:[qx+qsz-sz/2,qy+qsz-sz/2],
+           center:[qx+qsz/2-sz/2,qy+qsz/2-sz/2]};
+  return R[pos]||R.center;
+}
+
+function rr(ctx, x, y, w, h, r) {
+  r = Math.min(r, w/2, h/2);
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.arcTo(x+w,y,x+w,y+r,r);
+  ctx.lineTo(x+w,y+h-r); ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+  ctx.lineTo(x+r,y+h); ctx.arcTo(x,y+h,x,y+h-r,r);
+  ctx.lineTo(x,y+r); ctx.arcTo(x,y,x+r,y,r); ctx.closePath();
+}
+
+function loadImg(src) {
+  return new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=src; });
+}
+function setst(msg) { document.getElementById('st').textContent=msg; }
+
+// ════════════════════════════════════════
+//  SVG EXPORT
+// ════════════════════════════════════════
+async function dlSVG() {
+  setst('SVG generálás...');
+  const g = id => document.getElementById(id);
+  S.fg=g('fc').value; S.bg=g('bc').value;
+  const qrSz=parseInt(g('qs').value)||300;
+  const frStyle=S.frame, frColor=g('frc').value;
+  const frW=parseInt(g('frw').value)||10, frR=parseInt(g('frr').value)||12;
+  const pad=frStyle!=='none'?frW+16:16;
+  const capOn=g('cap-on').checked, capTxt=g('cap-tx').value||'Szkennelj be!';
+  const capPos=g('cap-po').value, capFs=parseInt(g('cap-fs').value)||16;
+  const capFf=g('cap-ff').value, capFc=g('cap-fc').value, capBc=g('cap-bc').value;
+  const capH=capOn?Math.max(36,capFs+18):0;
+  const capTop=capOn&&capPos==='top'?capH:0;
+  const capBot=capOn&&capPos==='bottom'?capH:0;
+  const badgeH=frStyle==='badge'?42:0;
+
+  let errLvl=g('el').value;
+  const hasCenterImg=(S.ico.on&&S.ico.pos==='center')||(S.logo.on&&S.logo.url&&S.logo.pos==='center');
+  if(hasCenterImg) errLvl='H';
+
+  const data=buildData(), qr=makeQR(data,errLvl);
+  if(!qr){setst('⚠ Hiba');return;}
+  const n=qr.getModuleCount(), ms=qrSz/n;
+  const W=qrSz+pad*2, H=qrSz+pad*2+capTop+capBot+badgeH;
+  const qX=pad, qY=pad+capTop;
+
+  const ps=[];
+  ps.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`);
+  ps.push(`<rect width="${W}" height="${H}" fill="${S.bg}"/>`);
+
+  const h=frW/2;
+  if(frStyle==='simple') ps.push(`<rect x="${h}" y="${h}" width="${W-frW}" height="${H-frW}" fill="none" stroke="${frColor}" stroke-width="${frW}"/>`);
+  else if(frStyle==='rounded') ps.push(`<rect x="${h}" y="${h}" width="${W-frW}" height="${H-frW}" rx="${frR}" fill="none" stroke="${frColor}" stroke-width="${frW}"/>`);
+  else if(frStyle==='shadow') ps.push(`<filter id="sh"><feDropShadow dx="5" dy="5" stdDeviation="7" flood-opacity=".2"/></filter><rect x="${h}" y="${h}" width="${W-frW}" height="${H-frW}" rx="${Math.max(frR,4)}" fill="none" stroke="${frColor}" stroke-width="${frW}" filter="url(#sh)"/>`);
+  else if(frStyle==='double'){const d=frW+6,fr2=Math.max(0,frR-frW/2-6);ps.push(`<rect x="${h}" y="${h}" width="${W-frW}" height="${H-frW}" rx="${frR}" fill="none" stroke="${frColor}" stroke-width="${frW}"/><rect x="${d}" y="${d}" width="${W-d*2}" height="${H-d*2}" rx="${fr2}" fill="none" stroke="${frColor}" stroke-width="${Math.max(1,frW*.55)}"/>`);}
+  else if(frStyle==='badge'){ps.push(`<rect x="0" y="${H-badgeH}" width="${W}" height="${badgeH}" fill="${frColor}"/>`);if(capOn)ps.push(`<text x="${W/2}" y="${H-badgeH/2}" dominant-baseline="middle" text-anchor="middle" fill="${capFc}" font-family="${capFf}" font-size="${Math.min(capFs,20)}" font-weight="bold">${xe(capTxt)}</text>`);}
+
+  if(capOn&&capPos==='top') ps.push(svgCap(0,0,W,capTop,capTxt,capFf,capFs,capFc,capBc));
+
+  // QR data modules
+  for(let r=0;r<n;r++) for(let c=0;c<n;c++) {
+    if(!qr.isDark(r,c)||inFinder(r,c,n)) continue;
+    ps.push(svgDot(qX+c*ms, qY+r*ms, ms, S.dot, S.fg));
+  }
+  // Finder patterns
+  for(const[r0,c0]of[[0,0],[0,n-7],[n-7,0]])
+    ps.push(svgFinder(qX+c0*ms, qY+r0*ms, ms, S.corner, S.fg, S.bg));
+
+  if(capOn&&capPos==='top-in')    ps.push(svgCap(qX,qY,qrSz,capH,capTxt,capFf,capFs,capFc,capBc));
+  if(capOn&&capPos==='bottom-in') ps.push(svgCap(qX,qY+qrSz-capH,qrSz,capH,capTxt,capFf,capFs,capFc,capBc));
+  if(capOn&&capPos==='bottom')    ps.push(svgCap(0,H-capBot-badgeH,W,capBot,capTxt,capFf,capFs,capFc,capBc));
+
+  if(S.ico.on){
+    const{icon:icoId,pos,sz,bg:ibg,sc:iSC}=S.ico;
+    const ico=getIcon(icoId);
+    const iSz=sz*0.68, iSc=iSz/24;
+    const iAttr=`fill="none" stroke="${iSC}" stroke-width="${(2.5/iSc).toFixed(2)}" stroke-linecap="round" stroke-linejoin="round"`;
+    if(pos==='center'){
+      const cx=qX+qrSz/2,cy=qY+qrSz/2;
+      ps.push(`<rect x="${cx-sz/2-5}" y="${cy-sz/2-5}" width="${sz+10}" height="${sz+10}" rx="${sz*.3}" fill="${ibg}"/>`);
+      ps.push(`<g transform="translate(${(cx-iSz/2).toFixed(2)},${(cy-iSz/2).toFixed(2)}) scale(${iSc.toFixed(4)})"><path d="${ico.path}" ${iAttr}/></g>`);
+    } else {
+      const[cx,cy]=cornerXY(pos,qX,qY,qrSz);
+      ps.push(`<circle cx="${cx}" cy="${cy}" r="${sz/2+4}" fill="${ibg}"/>`);
+      ps.push(`<g transform="translate(${(cx-iSz/2).toFixed(2)},${(cy-iSz/2).toFixed(2)}) scale(${iSc.toFixed(4)})"><path d="${ico.path}" ${iAttr}/></g>`);
+    }
+  }
+
+  if(S.logo.on&&S.logo.url){
+    const{pos,sz,r:lr}=S.logo;
+    if(pos==='center'){const cx=qX+qrSz/2,cy=qY+qrSz/2,lx=cx-sz/2,ly=cy-sz/2;if(lr>0){ps.push(`<clipPath id="lc"><rect x="${lx}" y="${ly}" width="${sz}" height="${sz}" rx="${lr}"/></clipPath><rect x="${lx-5}" y="${ly-5}" width="${sz+10}" height="${sz+10}" rx="${lr+3}" fill="white"/><image href="${S.logo.url}" x="${lx}" y="${ly}" width="${sz}" height="${sz}" clip-path="url(#lc)"/>`);}else{ps.push(`<rect x="${lx-5}" y="${ly-5}" width="${sz+10}" height="${sz+10}" fill="white"/><image href="${S.logo.url}" x="${lx}" y="${ly}" width="${sz}" height="${sz}"/>`);}}
+    else{const[lx,ly]=cornerXYtl(pos,qX,qY,qrSz,sz),lr2=S.logo.r;if(lr2>0){ps.push(`<clipPath id="lc2"><rect x="${lx}" y="${ly}" width="${sz}" height="${sz}" rx="${lr2}"/></clipPath><rect x="${lx-3}" y="${ly-3}" width="${sz+6}" height="${sz+6}" rx="${lr2+2}" fill="white"/><image href="${S.logo.url}" x="${lx}" y="${ly}" width="${sz}" height="${sz}" clip-path="url(#lc2)"/>`);}else{ps.push(`<rect x="${lx-3}" y="${ly-3}" width="${sz+6}" height="${sz+6}" fill="white"/><image href="${S.logo.url}" x="${lx}" y="${ly}" width="${sz}" height="${sz}"/>`);}}
+  }
+
+  ps.push('</svg>');
+  const blob=new Blob([ps.join('\n')],{type:'image/svg+xml'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.download='qr-kod.svg'; a.href=url; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),2000);
+  setst('SVG letöltve ✓');
+}
+
+function svgCap(x,y,w,h,txt,ff,fs,fc,bc) {
+  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${bc}"/><text x="${x+w/2}" y="${y+h/2}" dominant-baseline="middle" text-anchor="middle" fill="${fc}" font-family="${ff}" font-size="${fs}" font-weight="bold">${xe(txt)}</text>`;
+}
+function svgDot(dx,dy,ms,style,fg) {
+  const g=ms*.08,s=ms-g*2,ox=dx+g,oy=dy+g;
+  switch(style){
+    case 'square':  return `<rect x="${ox}" y="${oy}" width="${s}" height="${s}" fill="${fg}"/>`;
+    case 'rounded': return `<rect x="${ox}" y="${oy}" width="${s}" height="${s}" rx="${s*.28}" fill="${fg}"/>`;
+    case 'dots':    return `<circle cx="${dx+ms/2}" cy="${dy+ms/2}" r="${s/2}" fill="${fg}"/>`;
+    case 'xround':  return `<rect x="${ox}" y="${oy}" width="${s}" height="${s}" rx="${s*.38}" fill="${fg}"/>`;
+    case 'diamond':{const cx=dx+ms/2,cy=dy+ms/2,r=s*.5;return `<polygon points="${cx},${cy-r} ${cx+r},${cy} ${cx},${cy+r} ${cx-r},${cy}" fill="${fg}"/>`;}
+    case 'classy': {const cr=s*.42;return `<path d="M${ox},${oy} L${ox+s-cr},${oy} A${cr},${cr} 0 0,1 ${ox+s},${oy+cr} L${ox+s},${oy+s} L${ox+cr},${oy+s} A${cr},${cr} 0 0,1 ${ox},${oy+s-cr} Z" fill="${fg}"/>"`;}
+    default: return `<rect x="${ox}" y="${oy}" width="${s}" height="${s}" fill="${fg}"/>`;
+  }
+}
+function svgFinder(ox,oy,ms,style,fg,bg) {
+  const p=[];
+  if(style==='square'){
+    p.push(`<rect x="${ox}" y="${oy}" width="${7*ms}" height="${ms}" fill="${fg}"/>`);
+    p.push(`<rect x="${ox}" y="${oy+6*ms}" width="${7*ms}" height="${ms}" fill="${fg}"/>`);
+    p.push(`<rect x="${ox}" y="${oy+ms}" width="${ms}" height="${5*ms}" fill="${fg}"/>`);
+    p.push(`<rect x="${ox+6*ms}" y="${oy+ms}" width="${ms}" height="${5*ms}" fill="${fg}"/>`);
+    p.push(`<rect x="${ox+2*ms}" y="${oy+2*ms}" width="${3*ms}" height="${3*ms}" fill="${fg}"/>`);
+  }else if(style==='xround'){
+    p.push(`<rect x="${ox}" y="${oy}" width="${7*ms}" height="${7*ms}" rx="${ms*1.6}" fill="${fg}"/>`);
+    p.push(`<rect x="${ox+ms}" y="${oy+ms}" width="${5*ms}" height="${5*ms}" rx="${ms*.9}" fill="${bg}"/>`);
+    p.push(`<rect x="${ox+2*ms}" y="${oy+2*ms}" width="${3*ms}" height="${3*ms}" rx="${ms*.7}" fill="${fg}"/>`);
+  }else if(style==='dot'){
+    const cx=ox+3.5*ms,cy=oy+3.5*ms;
+    p.push(`<circle cx="${cx}" cy="${cy}" r="${3.5*ms}" fill="${fg}"/>`);
+    p.push(`<circle cx="${cx}" cy="${cy}" r="${2.5*ms}" fill="${bg}"/>`);
+    p.push(`<circle cx="${cx}" cy="${cy}" r="${1.5*ms}" fill="${fg}"/>`);
+  }
+  return p.join('');
+}
+function xe(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ════════════════════════════════════════
+//  DOWNLOAD JPG
+// ════════════════════════════════════════
+function dlJPG() {
+  const canvas=document.getElementById('qc');
+  const a=document.createElement('a');
+  a.download='qr-kod.jpg';
+  a.href=canvas.toDataURL('image/jpeg',0.95);
+  a.click();
+}
+
+// ════════════════════════════════════════
+//  COPY TO CLIPBOARD
+// ════════════════════════════════════════
+async function copyQR(btn) {
+  const canvas = document.getElementById('qc');
+  const icon = document.getElementById('copy-icon');
+  const lbl  = document.getElementById('copy-lbl');
+  try {
+    const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+    await navigator.clipboard.write([new ClipboardItem({'image/png': blob})]);
+    // Siker visszajelzés
+    icon.innerHTML = '<polyline points="20 6 9 17 4 12" stroke-width="2.5"/>';
+    lbl.textContent = 'Másolva!';
+    btn.style.borderColor = 'var(--accent)';
+    btn.style.color = 'var(--accent)';
+    setTimeout(() => {
+      icon.innerHTML = '<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>';
+      lbl.textContent = 'Másolás';
+      btn.style.borderColor = '';
+      btn.style.color = '';
+    }, 2000);
+  } catch(e) {
+    setst('⚠ Másolás sikertelen – HTTPS szükséges');
+  }
+}
+
+// ════════════════════════════════════════
+//  PRESET SYSTEM
+// ════════════════════════════════════════
+const PRESETS_BUILTIN = [
+  { name:'Alap',       dot:'square',  corner:'square',  frame:'none',    fg:'#000000', bg:'#ffffff', frc:'#000000', frw:10, frr:12, capOn:false },
+  { name:'Kerekített', dot:'rounded', corner:'xround',  frame:'rounded', fg:'#1e293b', bg:'#ffffff', frc:'#1e293b', frw:8,  frr:22, capOn:false },
+  { name:'Pöttyök',   dot:'dots',    corner:'dot',     frame:'none',    fg:'#0f172a', bg:'#ffffff', frc:'#000000', frw:10, frr:12, capOn:false },
+  { name:'Retro',      dot:'xround',  corner:'xround',  frame:'rounded', fg:'#F28A0F', bg:'#FFE7BD', frc:'#3F8A8C', frw:8,  frr:20, capOn:false },
+  { name:'Neon',       dot:'dots',    corner:'dot',     frame:'none',    fg:'#22d3ee', bg:'#050d14', frc:'#22d3ee', frw:10, frr:12, capOn:false },
+  { name:'Kártya',     dot:'rounded', corner:'xround',  frame:'rounded', fg:'#4ecebd', bg:'#d6fff6', frc:'#2374ab', frw:9,  frr:22, capOn:true,  capTxt:'SZKENNELJ BE!', capPo:'bottom', capFs:19, capFf:'Courier New', capFc:'#ffffff', capBc:'#ff8585' },
+];
+
+function getUserPresets() {
+  try { return JSON.parse(localStorage.getItem('qraft-presets') || '[]'); } catch(e) { return []; }
+}
+function setUserPresets(arr) { localStorage.setItem('qraft-presets', JSON.stringify(arr)); }
+
+function togglePresetPanel(e) {
+  e.stopPropagation();
+  const panel = document.getElementById('preset-panel');
+  if (panel.style.display === 'block') { closePresetPanel(); return; }
+  renderPresetPanel();
+  panel.style.display = 'block';
+  setTimeout(() => document.addEventListener('click', _presetOutside), 0);
+}
+function _presetOutside(e) {
+  if (!document.getElementById('preset-wrap').contains(e.target)) closePresetPanel();
+}
+function closePresetPanel() {
+  document.getElementById('preset-panel').style.display = 'none';
+  document.removeEventListener('click', _presetOutside);
+}
+
+function renderPresetPanel() {
+  const panel = document.getElementById('preset-panel');
+  const user = getUserPresets();
+  let html = `<div class="preset-divlabel">Beépített</div><div class="preset-grid">`;
+  PRESETS_BUILTIN.forEach((p, i) =>
+    html += `<div class="preset-card" onclick="applyPreset(PRESETS_BUILTIN[${i}])"><canvas id="pmb${i}" width="72" height="72"></canvas><div class="preset-card-name">${p.name}</div></div>`
+  );
+  html += `</div>`;
+  if (user.length) {
+    html += `<div class="preset-divlabel" style="margin-top:10px">Saját</div><div class="preset-grid">`;
+    user.forEach((p, i) =>
+      html += `<div class="preset-card" onclick="applyUserPreset(${i})"><canvas id="pmu${i}" width="72" height="72"></canvas><div class="preset-card-name">${p.name}</div><div class="preset-card-del" onclick="event.stopPropagation();deleteUserPreset(${i})">×</div></div>`
+    );
+    html += `</div>`;
+  }
+  html += `<div class="preset-io">
+    <button onclick="importPresets()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Saját stílusok importálása</button>
+    <button onclick="exportPresets()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Saját stílusok exportálása</button>
+  </div>`;
+  panel.innerHTML = html;
+  requestAnimationFrame(() => {
+    PRESETS_BUILTIN.forEach((p, i) => { const c=document.getElementById(`pmb${i}`); if(c) drawMiniQR(c,p); });
+    user.forEach((p, i) => { const c=document.getElementById(`pmu${i}`); if(c) drawMiniQR(c,p); });
+  });
+}
+
+function drawMiniQR(canvas, preset) {
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const qr = makeQR('QRAFT', 'M');
+  if (!qr) return;
+  const n = qr.getModuleCount();
+  const frStyle = preset.frame || 'none';
+  const frW = (parseInt(preset.frw) || 10) * (W / 300);
+  const badgeH = frStyle === 'badge' ? H * 0.15 : 0;
+  const pad = frStyle !== 'none' && frStyle !== 'badge' ? frW + 3 : 3;
+  // Background
+  ctx.fillStyle = preset.bg || '#ffffff';
+  ctx.fillRect(0, 0, W, H);
+  // QR dots (simplified squares)
+  const cell = (W - pad * 2) / n;
+  ctx.fillStyle = preset.fg || '#000000';
+  for (let r = 0; r < n; r++) {
+    for (let c = 0; c < n; c++) {
+      if (qr.isDark(r, c)) ctx.fillRect(pad + c*cell, pad + r*cell, cell-0.4, cell-0.4);
+    }
+  }
+  // Caption strip (mini preview)
+  if (preset.capOn) {
+    const capH = Math.round(H * 0.22);
+    const capBc = preset.capBc || '#000000';
+    const capFc = preset.capFc || '#ffffff';
+    const capTxt = preset.capTxt || '';
+    const capPo = preset.capPo || 'bottom';
+    const fp = frStyle !== 'none' ? Math.round(frW * 0.5) : 0;
+    const capY = capPo === 'top' ? fp : H - fp - capH;
+    ctx.fillStyle = capBc;
+    ctx.fillRect(fp, capY, W - fp * 2, capH);
+    if (capTxt) {
+      ctx.fillStyle = capFc;
+      ctx.font = `bold ${Math.round(capH * 0.48)}px sans-serif`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(capTxt, W / 2, capY + capH / 2, W - fp * 2 - 4);
+    }
+  }
+  // Badge strip
+  if (frStyle === 'badge') {
+    ctx.fillStyle = preset.frc || '#000000';
+    ctx.fillRect(0, H - badgeH, W, badgeH);
+  }
+  // Frame stroke
+  if (frStyle !== 'none' && frStyle !== 'badge') {
+    ctx.strokeStyle = preset.frc || '#000000';
+    ctx.lineWidth = frW;
+    if (frStyle === 'rounded' || frStyle === 'shadow') {
+      const r = ((parseInt(preset.frr)||12) + frW/2) * (W/300);
+      ctx.beginPath(); rr(ctx, frW/2, frW/2, W-frW, H-frW, r); ctx.stroke();
+    } else {
+      ctx.strokeRect(frW/2, frW/2, W-frW, H-frW);
+      if (frStyle === 'double') {
+        ctx.lineWidth = frW * 0.55;
+        const d = frW * 1.6;
+        ctx.strokeRect(d, d, W-d*2, H-d*2);
+      }
+    }
+  }
+}
+
+function applyPreset(p) {
+  const g = id => document.getElementById(id);
+  S.dot = p.dot; S.corner = p.corner; S.frame = p.frame; S.fg = p.fg; S.bg = p.bg;
+  // Button active states
+  document.querySelectorAll('#dg .sb').forEach(b => {
+    const m = b.getAttribute('onclick').match(/'dot','(\w+)'/); if(m) b.classList.toggle('on', m[1]===p.dot);
+  });
+  document.querySelectorAll('#cg .sb').forEach(b => {
+    const m = b.getAttribute('onclick').match(/'corner','(\w+)'/); if(m) b.classList.toggle('on', m[1]===p.corner);
+  });
+  document.querySelectorAll('#fg-frame .sb').forEach(b => {
+    const m = b.getAttribute('onclick').match(/'frame','(\w+)'/); if(m) b.classList.toggle('on', m[1]===p.frame);
+  });
+  // Color inputs
+  g('fc').value = p.fg; g('ft').value = p.fg;
+  g('bc').value = p.bg; g('bt').value = p.bg;
+  // Frame inputs
+  g('frc').value = p.frc || '#000000';
+  g('frw').value = p.frw || 10; g('frwv').textContent = p.frw || 10;
+  g('frr').value = p.frr || 12; g('frrv').textContent = p.frr || 12;
+  // Caption
+  g('cap-on').checked = !!p.capOn; tog('cap-on','cap-opts');
+  if (p.capOn) {
+    g('cap-tx').value = p.capTxt||''; g('cap-po').value = p.capPo||'bottom';
+    g('cap-fs').value = p.capFs||16; g('cap-fsv').textContent = p.capFs||16; g('cap-ff').value = p.capFf||'sans-serif';
+    g('cap-fc').value = p.capFc||'#ffffff'; g('cap-fct').value = p.capFc||'#ffffff';
+    g('cap-bc').value = p.capBc||'#000000'; g('cap-bct').value = p.capBc||'#000000';
+  }
+  // Icon
+  if (p.icoIcon !== undefined) {
+    // User preset: restore all icon settings from saved data
+    const icoSW = p.icoSW||0, icoSC = p.icoSC||'#000000';
+    const icoId = p.icoIcon || 'globe';
+    S.ico = { on:!!p.icoOn, icon:icoId, pos:p.icoPos||'center', sz:p.icoSz||40, bg:p.icoBg||'#ffffff', sw:icoSW, sc:icoSC };
+    g('ico-on').checked = !!p.icoOn; tog('ico-on','ico-opts');
+    if (p.icoOn) {
+      g('ico-po').value = p.icoPos||'center';
+      g('ico-sz').value = p.icoSz||40; g('ico-szv').textContent = p.icoSz||40;
+      g('ico-bg').value = p.icoBg||'#ffffff'; g('ico-bgt').value = p.icoBg||'#ffffff';
+    }
+    document.querySelectorAll('.ib').forEach(b => {
+      const m = b.getAttribute('onclick') && b.getAttribute('onclick').match(/pickIcon\('(\w+)'/);
+      if (m) b.classList.toggle('on', m[1] === icoId);
+    });
+    g('ico-sw').value = icoSW; g('ico-swv').textContent = icoSW;
+    g('ico-sc').value = icoSC; g('ico-sct').value = icoSC;
+  } else {
+    // Built-in preset: keep icon on/off and style as-is, but sync colors to the new palette
+    const newBg = p.bg;
+    const newSc = p.frc || p.fg;
+    S.ico.bg = newBg; S.ico.sc = newSc;
+    g('ico-bg').value = newBg; g('ico-bgt').value = newBg;
+    g('ico-sc').value = newSc; g('ico-sct').value = newSc;
+  }
+  const logoSW = p.logoSW||0, logoSC = p.logoSC||'#000000';
+  g('logo-sw').value = logoSW; g('logo-swv').textContent = logoSW;
+  g('logo-sc').value = logoSC; g('logo-sct').value = logoSC;
+  // Logo — restore from thumbnail if saved, otherwise clear
+  if (p.logoThumb) {
+    S.logo = { on:true, url:p.logoThumb, thumb:p.logoThumb, pos:p.logoPos||'center', sz:p.logoSz||60, r:p.logoR||0, sw:logoSW, sc:logoSC };
+    g('logo-on').checked = true; tog('logo-on','logo-opts');
+    g('logo-po').value = p.logoPos||'center';
+    g('logo-sz').value = p.logoSz||60; g('logo-szv').textContent = p.logoSz||60;
+    g('logo-r').value = p.logoR||0; g('logo-rv').textContent = p.logoR||0;
+    g('logo-lbl').innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><rect x="3" y="3" width="18" height="12" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span class="ttab-label">Mentett logó</span>';
+  } else {
+    S.logo = { on:false, url:null, thumb:null, pos:'center', sz:60, r:0, sw:0, sc:'#000000' };
+    g('logo-on').checked = false; tog('logo-on','logo-opts');
+    g('logo-lbl').innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span class="ttab-label">Kattints a feltöltéshez</span><span class="ttab-desc">PNG, JPG, SVG, WebP</span>';
+  }
+  // Content type & fields (only for user presets that saved content)
+  if (p.type) {
+    S.type = p.type;
+    document.querySelectorAll('.ttab').forEach(b => {
+      const m = b.getAttribute('onclick') && b.getAttribute('onclick').match(/setType\('(\w+)'/);
+      if (m) b.classList.toggle('on', m[1] === p.type);
+    });
+    ['url','vcard','wifi','text'].forEach(x => {
+      const el = document.getElementById('f-'+x);
+      if (el) el.style.display = x === p.type ? 'flex' : 'none';
+    });
+    if (p.url  !== undefined) g('in-url').value  = p.url;
+    if (p.tx   !== undefined) g('in-tx').value   = p.tx;
+    if (p.vcFn !== undefined) g('vc-fn').value   = p.vcFn;
+    if (p.vcLn !== undefined) g('vc-ln').value   = p.vcLn;
+    if (p.vcOrg!== undefined) g('vc-org').value  = p.vcOrg;
+    if (p.vcTi !== undefined) g('vc-ti').value   = p.vcTi;
+    if (p.vcPh !== undefined) g('vc-ph').value   = p.vcPh;
+    if (p.vcEm !== undefined) g('vc-em').value   = p.vcEm;
+    if (p.vcWb !== undefined) g('vc-wb').value   = p.vcWb;
+    if (p.vcAd !== undefined) g('vc-ad').value   = p.vcAd;
+    if (p.wiSs !== undefined) g('wi-ss').value   = p.wiSs;
+    if (p.wiPw !== undefined) g('wi-pw').value   = p.wiPw;
+    if (p.wiEn !== undefined) g('wi-en').value   = p.wiEn;
+    if (p.wiHd !== undefined) g('wi-hd').checked = p.wiHd;
+  }
+  closePresetPanel();
+  go();
+}
+function applyUserPreset(i) { applyPreset(getUserPresets()[i]); }
+
+function deleteUserPreset(i) {
+  const arr = getUserPresets();
+  if (!confirm(`Törlöd a(z) „${arr[i].name}" stílust?`)) return;
+  arr.splice(i, 1); setUserPresets(arr);
+  renderPresetPanel();
+}
+
+function exportPresets() {
+  const user = getUserPresets();
+  if (!user.length) { setst('⚠ Nincs mentett saját stílus'); return; }
+  const blob = new Blob([JSON.stringify(user, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'qraft-presetek.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  setst('Stílusok exportálva ✓');
+}
+
+function importPresets() {
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = '.json,application/json';
+  input.onchange = e => {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const imported = JSON.parse(ev.target.result);
+        if (!Array.isArray(imported)) throw new Error('Nem tömb');
+        const existing = getUserPresets();
+        const existingNames = existing.map(p => p.name);
+        const newOnes = imported.filter(p => p.name && !existingNames.includes(p.name));
+        setUserPresets([...existing, ...newOnes]);
+        renderPresetPanel();
+        setst(newOnes.length ? `${newOnes.length} új stílus importálva ✓` : 'Minden stílus már létezik');
+      } catch(e) { setst('⚠ Érvénytelen fájl'); }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+// Track which user preset to overwrite (-1 = new)
+let _saveTargetIdx = -1;
+function savePreset() {
+  _saveTargetIdx = -1;
+  const modal = document.getElementById('preset-modal-bg');
+  modal.style.display = 'flex';
+  _renderSaveModalPresets();
+  setTimeout(() => document.getElementById('preset-save-name').focus(), 50);
+}
+function _renderSaveModalPresets() {
+  const user = getUserPresets();
+  const wrap = document.getElementById('preset-overwrite-list');
+  if (!user.length) { wrap.style.display='none'; return; }
+  wrap.style.display = 'block';
+  wrap.innerHTML = '<div style="font-size:0.62rem;font-weight:700;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;margin-bottom:7px;font-family:Roboto,sans-serif">Meglévő felülírása</div>' +
+    user.map((p,i)=>`<div class="overwrite-item" id="owi${i}" onclick="_selectOverwrite(${i},'${p.name.replace(/'/g,"\\'")}')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg>${p.name}</div>`).join('');
+}
+function _selectOverwrite(i, name) {
+  _saveTargetIdx = i;
+  document.getElementById('preset-save-name').value = name;
+  document.querySelectorAll('.overwrite-item').forEach((el,j)=>el.classList.toggle('sel', j===i));
+}
+function closeSaveModal() {
+  document.getElementById('preset-modal-bg').style.display = 'none';
+  _saveTargetIdx = -1;
+}
+function confirmSavePreset() {
+  const name = document.getElementById('preset-save-name').value.trim();
+  if (!name) { document.getElementById('preset-save-name').focus(); return; }
+  const g = id => document.getElementById(id);
+  const p = {
+    name, dot:S.dot, corner:S.corner, frame:S.frame, fg:S.fg, bg:S.bg,
+    frc:g('frc').value, frw:parseInt(g('frw').value)||10, frr:parseInt(g('frr').value)||12,
+    capOn:g('cap-on').checked, capTxt:g('cap-tx').value, capPo:g('cap-po').value,
+    capFs:parseInt(g('cap-fs').value)||16, capFf:g('cap-ff').value,
+    capFc:g('cap-fc').value, capBc:g('cap-bc').value,
+    // Icon settings
+    icoOn:S.ico.on, icoIcon:S.ico.icon, icoPos:S.ico.pos, icoSz:S.ico.sz, icoBg:S.ico.bg,
+    icoSW:S.ico.sw, icoSC:S.ico.sc,
+    logoThumb:S.logo.on && S.logo.thumb ? S.logo.thumb : null,
+    logoPos:S.logo.pos, logoSz:S.logo.sz, logoR:S.logo.r,
+    logoSW:S.logo.sw, logoSC:S.logo.sc,
+    // Content
+    type:S.type,
+    url:g('in-url').value,
+    tx:g('in-tx').value,
+    vcFn:g('vc-fn').value, vcLn:g('vc-ln').value, vcOrg:g('vc-org').value,
+    vcTi:g('vc-ti').value, vcPh:g('vc-ph').value, vcEm:g('vc-em').value,
+    vcWb:g('vc-wb').value, vcAd:g('vc-ad').value,
+    wiSs:g('wi-ss').value, wiPw:g('wi-pw').value,
+    wiEn:g('wi-en').value, wiHd:g('wi-hd').checked,
+  };
+  const arr = getUserPresets();
+  if (_saveTargetIdx >= 0 && _saveTargetIdx < arr.length) {
+    arr[_saveTargetIdx] = p; // overwrite (#1)
+  } else {
+    arr.push(p); // new
+  }
+  setUserPresets(arr);
+  closeSaveModal(); setst(_saveTargetIdx>=0 ? 'Sablon frissítve ✓' : 'Sablon elmentve ✓');
+}
+
+// ════════════════════════════════════════
+//  UI HELPERS
+// ════════════════════════════════════════
+function setType(t, btn) {
+  S.type=t;
+  document.querySelectorAll('.ttab').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  ['url','vcard','wifi','text'].forEach(x=>{
+    const el=document.getElementById('f-'+x);
+    el.style.display=x===t?'flex':'none';
+  });
+  go();
+}
+
+function updateFrrState() {
+  const row = document.getElementById('frr-row');
+  const frr = document.getElementById('frr');
+  const noRound = S.frame === 'none' || S.frame === 'simple';
+  row.classList.toggle('row-disabled', noRound);
+  const maxVal = S.frame === 'double' ? 40 : 50;
+  frr.max = maxVal;
+  if (parseInt(frr.value) > maxVal) { frr.value = maxVal; document.getElementById('frrv').textContent = maxVal; }
+}
+
+function pick(gridId, btn, prop, val) {
+  document.querySelectorAll(`#${gridId} .sb`).forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  S[prop]=val;
+  if (prop === 'frame') updateFrrState();
+  go();
+}
+
+function syncC(w) {
+  const val=document.getElementById(w+'c').value;
+  document.getElementById(w+'t').value=val;
+  w==='f'?(S.fg=val):(S.bg=val);
+  go();
+}
+function syncT(w) {
+  const val=document.getElementById(w+'t').value;
+  if(/^#[0-9A-Fa-f]{6}$/.test(val)){
+    document.getElementById(w+'c').value=val;
+    w==='f'?(S.fg=val):(S.bg=val);
+    go();
+  }
+}
+function syncFrColor() {
+  const val=document.getElementById('frt').value;
+  if(/^#[0-9A-Fa-f]{6}$/.test(val)){document.getElementById('frc').value=val;go();}
+}
+function syncC2(colorId, textId) {
+  document.getElementById(textId).value = document.getElementById(colorId).value;
+}
+function syncT2(colorId, textId) {
+  const val = document.getElementById(textId).value;
+  if (/^#[0-9A-Fa-f]{6}$/.test(val)) document.getElementById(colorId).value = val;
+}
+
+function sl(inId, outId) {
+  const suffix=inId==='qs'?'px':'';
+  document.getElementById(outId).textContent=document.getElementById(inId).value+suffix;
+}
+
+function tog(checkId, optsId) {
+  const on=document.getElementById(checkId).checked;
+  document.getElementById(optsId).style.display=on?'flex':'none';
+}
+
+// ════════════════════════════════════════
+//  PANEL RESIZE
+// ════════════════════════════════════════
+(function() {
+  const rh=document.getElementById('rh');
+  const ep=document.getElementById('editor-panel');
+  let dragging=false, startX=0, startW=0;
+
+  rh.addEventListener('mousedown', e => {
+    dragging=true; startX=e.clientX; startW=ep.offsetWidth;
+    rh.classList.add('dragging');
+    document.body.style.cursor='col-resize';
+    document.body.style.userSelect='none';
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', e => {
+    if(!dragging) return;
+    const maxW=Math.floor(window.innerWidth*0.75);
+    const minW=480;
+    const newW=Math.min(Math.max(startW+(e.clientX-startX), minW), maxW);
+    ep.style.width=newW+'px';
+  });
+  document.addEventListener('mouseup', () => {
+    if(!dragging) return;
+    dragging=false;
+    rh.classList.remove('dragging');
+    document.body.style.cursor='';
+    document.body.style.userSelect='';
+  });
+}());
+
+function toggleSd(divEl) {
+  const sdc = divEl.nextElementSibling;
+  if (sdc && sdc.classList.contains('sdc')) {
+    sdc.classList.toggle('hide');
+    divEl.classList.toggle('closed');
+  }
+}
+
+function loadLogo(input) {
+  const file=input.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    S.logo.url=e.target.result;
+    // Create 200px thumbnail for preset saving
+    const img=new Image();
+    img.onload=()=>{
+      const maxSz=200, sc=Math.min(1,maxSz/Math.max(img.width,img.height));
+      const tc=document.createElement('canvas');
+      tc.width=Math.round(img.width*sc); tc.height=Math.round(img.height*sc);
+      tc.getContext('2d').drawImage(img,0,0,tc.width,tc.height);
+      S.logo.thumb=tc.toDataURL('image/png');
+    };
+    img.src=e.target.result;
+    document.getElementById('logo-lbl').innerHTML=`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><rect x="3" y="3" width="18" height="12" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span class="ttab-label">Mentett logó</span><span class="ttab-desc">${file.name}</span>`;
+    go();
+  };
+  reader.readAsDataURL(file);
+}
+
+// ════════════════════════════════════════
+//  ICON GRID
+// ════════════════════════════════════════
+const ICONS = [
+  { id:'globe',      label:'Web',        path:'M2 12a10 10 0 1 0 20 0a10 10 0 1 0-20 0 M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20 M2 12h20' },
+  { id:'phone',      label:'Telefon',    path:'M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384' },
+  { id:'mail',       label:'Email',      path:'M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z M22 7l-8.991 5.727a2 2 0 0 1-2.009 0L2 7' },
+  { id:'wifi',       label:'WiFi',       path:'M12 20h.01 M2 8.82a15 15 0 0 1 20 0 M5 12.859a10 10 0 0 1 14 0 M8.5 16.429a5 5 0 0 1 7 0' },
+  { id:'mappin',     label:'Helyszín',   path:'M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0' },
+  { id:'user',       label:'Személy',    path:'M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2 M8 7a4 4 0 1 0 8 0a4 4 0 1 0-8 0' },
+  { id:'instagram',  label:'Instagram',  path:'M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5z M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z M17.5 6.5h.01' },
+  { id:'facebook',   label:'Facebook',   path:'M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z' },
+  { id:'twitter',    label:'X / Twitter',path:'M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z' },
+  { id:'linkedin',   label:'LinkedIn',   path:'M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z M2 9h4v12H2z M2 4a2 2 0 1 0 4 0a2 2 0 1 0-4 0' },
+  { id:'youtube',    label:'YouTube',    path:'M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17z M10 15l5-3-5-3z' },
+  { id:'store',      label:'Bolt',       path:'M3.4 5.467a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.667a2 2 0 0 0-.4-1.2l-2-2.667A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z M3.103 6.034h17.794 M16 10a4 4 0 0 1-8 0' },
+  { id:'utensils',   label:'Étterem',    path:'M3 2v7c0 1.1 .9 2 2 2h4a2 2 0 0 0 2-2V2 M7 2v20 M21 15V2a5 5 0 0 0-5 5v6c0 1.1 .9 2 2 2h3Zm0 0v7' },
+  { id:'coffee',     label:'Kávé',       path:'M10 2v2 M14 2v2 M6 2v2 M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1' },
+  { id:'calendar',   label:'Naptár',     path:'M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z M8 2v4 M16 2v4 M3 10h18' },
+  { id:'star',       label:'Csillag',    path:'M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z' },
+  { id:'heart',      label:'Szív',       path:'M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5' },
+  { id:'music',      label:'Zene',       path:'M9 18V5l12-2v13 M3 18a3 3 0 1 0 6 0a3 3 0 1 0-6 0 M15 16a3 3 0 1 0 6 0a3 3 0 1 0-6 0' },
+  { id:'camera',     label:'Kamera',     path:'M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z M9 13a3 3 0 1 0 6 0a3 3 0 1 0-6 0' },
+  { id:'home',       label:'Otthon',     path:'M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8 M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z' },
+  { id:'briefcase',  label:'Munkahely',  path:'M4 6h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16' },
+  { id:'link',       label:'Link',       path:'M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71 M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71' },
+  { id:'plane',      label:'Repülő',     path:'M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z' },
+  { id:'car',        label:'Autó',       path:'M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2 M9 17h6 M7 15C8.1 15 9 15.9 9 17C9 18.1 8.1 19 7 19C5.9 19 5 18.1 5 17C5 15.9 5.9 15 7 15Z M17 15C18.1 15 19 15.9 19 17C19 18.1 18.1 19 17 19C15.9 19 15 18.1 15 17C15 15.9 15.9 15 17 15Z' },
+];
+function getIcon(id) { return ICONS.find(ic => ic.id === id) || ICONS[0]; }
+
+function initIcons() {
+  const svgAttr = 'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"';
+  document.getElementById('icon-g').innerHTML = ICONS.map((ic, i) =>
+    `<button class="ib${i===0?' on':''}" onclick="pickIcon('${ic.id}',this)" title="${ic.label}"><svg ${svgAttr}><path d="${ic.path}"/></svg></button>`
+  ).join('');
+}
+function pickIcon(id, btn) {
+  document.querySelectorAll('.ib').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on'); S.ico.icon = id; go();
+}
+
+// ════════════════════════════════════════
+//  DARK MODE
+// ════════════════════════════════════════
+function toggleTheme() {
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+  document.getElementById('ic-moon').style.display = dark ? '' : 'none';
+  document.getElementById('ic-sun').style.display  = dark ? 'none' : '';
+  localStorage.setItem('qr-theme', dark ? 'light' : 'dark');
+}
+
+function applyTheme() {
+  const saved = localStorage.getItem('qr-theme') || 'light';
+  document.documentElement.setAttribute('data-theme', saved);
+  if (saved === 'dark') {
+    document.getElementById('ic-moon').style.display = 'none';
+    document.getElementById('ic-sun').style.display  = '';
+  }
+}
+
+// ════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════
+function init() {
+  initIcons();
+  document.getElementById('ico-on').addEventListener('change',   ()=>{S.ico.on=document.getElementById('ico-on').checked;});
+  document.getElementById('logo-on').addEventListener('change',  ()=>{S.logo.on=document.getElementById('logo-on').checked;});
+  document.getElementById('ico-po').addEventListener('change',   ()=>{S.ico.pos=document.getElementById('ico-po').value;});
+  document.getElementById('logo-po').addEventListener('change',  ()=>{S.logo.pos=document.getElementById('logo-po').value;});
+  document.getElementById('ico-sz').addEventListener('input',    ()=>{S.ico.sz=parseInt(document.getElementById('ico-sz').value);});
+  document.getElementById('logo-sz').addEventListener('input',   ()=>{S.logo.sz=parseInt(document.getElementById('logo-sz').value);});
+  document.getElementById('logo-r').addEventListener('input',    ()=>{S.logo.r=parseInt(document.getElementById('logo-r').value);});
+  document.getElementById('ico-bg').addEventListener('input',    ()=>{S.ico.bg=document.getElementById('ico-bg').value;});
+  document.getElementById('ico-sw').addEventListener('input',    ()=>{S.ico.sw=parseInt(document.getElementById('ico-sw').value)||0;});
+  document.getElementById('ico-sc').addEventListener('input',    ()=>{S.ico.sc=document.getElementById('ico-sc').value;});
+  document.getElementById('ico-sct').addEventListener('input',   ()=>{S.ico.sc=document.getElementById('ico-sct').value;});
+  document.getElementById('logo-sw').addEventListener('input',   ()=>{S.logo.sw=parseInt(document.getElementById('logo-sw').value)||0;});
+  document.getElementById('logo-sc').addEventListener('input',   ()=>{S.logo.sc=document.getElementById('logo-sc').value;});
+  document.getElementById('logo-sct').addEventListener('input',  ()=>{S.logo.sc=document.getElementById('logo-sct').value;});
+  applyTheme();
+  go();
+  // Fallback: ensure canvas renders after all resources (CDN, fonts) are fully loaded
+  window.addEventListener('load', () => {
+    const c = document.getElementById('qc');
+    if (!c || c.width === 0) go();
+  });
+}
+init();
+</script>
+
+<!-- ── SAVE PRESET MODAL ── -->
+<div id="preset-modal-bg" onclick="closeSaveModal()">
+  <div id="preset-modal" onclick="event.stopPropagation()">
+    <h3>Sablon mentése</h3>
+    <input type="text" id="preset-save-name" placeholder="Sablon neve..." maxlength="30"
+      onkeydown="if(event.key==='Enter')confirmSavePreset(); if(event.key==='Escape')closeSaveModal()">
+    <div id="preset-overwrite-list" style="display:none;margin-bottom:14px"></div>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeSaveModal()">Mégse</button>
+      <button class="modal-ok" onclick="confirmSavePreset()">Mentés</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
