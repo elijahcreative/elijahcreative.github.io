@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="hu">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CellSignal</title>
+    <link rel="stylesheet" href="src/taskpane.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="status-bar">
+        <div class="status" id="monitorStatus" aria-live="polite">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span id="monitorStatusText">Indítás…</span>
+        </div>
+      </header>
+
+      <section class="workbook-section">
+        <p class="section-kicker">Munkafüzet</p>
+        <h2 id="workbookName">Excel-munkafüzet</h2>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">Figyelési szabályok</p>
+            <h2>Mit figyeljen?</h2>
+          </div>
+          <button class="button button-secondary button-small" id="useSelectionButton" type="button">Cellák kijelölése</button>
+        </div>
+
+        <form class="rule-form" id="ruleForm">
+          <div class="form-row form-row-split">
+            <label>
+              <span>Munkalap</span>
+              <input id="sheetInput" name="sheet" required placeholder="Munkalap neve" />
+            </label>
+            <label>
+              <span>Cella vagy tartomány</span>
+              <input id="addressInput" name="address" required placeholder="B12 vagy B12:B20" />
+            </label>
+          </div>
+          <button class="button button-primary" type="submit">Figyelés hozzáadása</button>
+        </form>
+
+        <div class="rule-list" id="ruleList"></div>
+      </section>
+
+      <section class="section-block changes-section">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">Értesítési sor</p>
+            <h2>Változások</h2>
+          </div>
+          <span class="count-badge" id="pendingCount">0</span>
+        </div>
+        <div class="change-list" id="changeList">
+          <div class="empty-state" id="emptyState">
+            <span class="empty-icon" aria-hidden="true">↗</span>
+            <p>Még nincs küldésre váró változás.</p>
+            <small>Szerkessz egy figyelt cellát az Excelben.</small>
+          </div>
+        </div>
+        <div class="batch-actions" id="changeBatchActions" hidden>
+          <button class="button-link" type="button" data-batch-action="clear">Törlés</button>
+          <button class="button button-send" type="button" data-batch-action="mail">E-mail kiküldése</button>
+        </div>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">E-mail</p>
+            <h2>Alapértelmezett szöveg</h2>
+          </div>
+        </div>
+        <form class="rule-form" id="emailForm">
+          <label>
+            <span>Megszólítás</span>
+            <input id="salutationInput" name="salutation" value="Kedves Kollégák!" />
+          </label>
+          <label>
+            <span>Tárgy</span>
+            <input id="subjectInput" name="subject" value="Excel-változás: {sheet} {address}" />
+          </label>
+          <button class="button button-secondary" type="submit">E-mail-beállítások mentése</button>
+        </form>
+      </section>
+
+      <div class="notice" id="notice" role="status" aria-live="polite" hidden></div>
+    </main>
+
+    <div class="confirm-overlay" id="confirmDialog" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" hidden>
+      <div class="confirm-box">
+        <h2 id="confirmTitle">Megerősítés</h2>
+        <p id="confirmMessage"></p>
+        <div class="confirm-actions">
+          <button class="button-link" id="confirmCancelButton" type="button">Mégsem</button>
+          <button class="button button-send" id="confirmAllowButton" type="button">Engedélyezem</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+    <script src="src/taskpane.js"></script>
+  </body>
+</html>
