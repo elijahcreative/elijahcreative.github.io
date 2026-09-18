@@ -2,10 +2,14 @@ const RSS2JSON    = 'https://api.rss2json.com/v1/api.json?rss_url=';
 const ALLORIGINS  = 'https://api.allorigins.win/get?url=';
 const CORSPROXY   = 'https://corsproxy.io/?';
 const ARTICLE_API = '/api/article?url=';
+const TTS_API     = '/api/tts';
 const YOUTUBE_API = '/api/youtube?input=';
 const FEED_API    = '/api/feed?input=';
 const CACHE_TTL   = 5 * 60 * 1000; // 5 minutes
 const ARTICLE_CACHE_TTL = 10 * 60 * 1000;
+const TTS_CACHE_NAME = 'flux-tts-george-v1';
+const TTS_CHUNK_MAX = 420;
+const TTS_PLAYBACK_RATE = 1.1;
 const FEED_ARTICLE_LIMIT = 20;
 const PULL_REFRESH_THRESHOLD = 72;
 const ARTICLE_SWIPE_BACK_THRESHOLD = 78;
@@ -17,6 +21,7 @@ let pendingArticleScrollTop = 0;
 let lastClosedArticle = null;
 const articleScrollPositions = new Map();
 let currentArticleIds = [];
+let articleSpeech = freshArticleSpeech();
 function fetchT(url, opts = {}, ms = 8000) {
   const ctrl = new AbortController();
   const tid = setTimeout(() => ctrl.abort(), ms);
@@ -111,7 +116,8 @@ const S = {
   showWeather:   true,
   showF1:        false,
   showReadLater: true,
-  showShare:     true
+  showShare:     true,
+  showSpeech:    false
 };
 const articleMap = {};
 const extractedArticleCache = new Map();
@@ -186,7 +192,7 @@ function clampInt(value, min, max, fallback) {
   const n = Number.parseInt(value, 10);
   return Number.isFinite(n) ? Math.max(min, Math.min(max, n)) : fallback;
 }
-const SETTINGS_KEYS = ['layout','theme','preset','customAccent','fontSize','activeUrl','ytPerChannel','ytMaxChannels','ytColumns','ytRows','ytSortMode','ytMiniCorner','ytMiniSize','showYoutube','sectionView','readerMode','showArticleMore','articleMoreColumns','articleMoreRows','lastUpdated','showWeather','showF1','showReadLater','showShare'];
+const SETTINGS_KEYS = ['layout','theme','preset','customAccent','fontSize','activeUrl','ytPerChannel','ytMaxChannels','ytColumns','ytRows','ytSortMode','ytMiniCorner','ytMiniSize','showYoutube','sectionView','readerMode','showArticleMore','articleMoreColumns','articleMoreRows','lastUpdated','showWeather','showF1','showReadLater','showShare','showSpeech'];
 const SECTION_RULES = [
   { id: 'kozelet',  label: 'Közélet',  keys: ['belfold', 'kozelet', 'politika', 'valasztas', 'kormany', 'onkormanyzat'] },
   { id: 'kulfold',  label: 'Külföld',  keys: ['kulfold', 'vilag', 'europa', 'eu', 'usa', 'ukrajna', 'oroszorszag'] },
@@ -270,7 +276,8 @@ function loadStorage() {
     showWeather: s.showWeather !== false,
     showF1: s.showF1 === true,
     showReadLater: s.showReadLater !== false,
-    showShare: s.showShare !== false
+    showShare: s.showShare !== false,
+    showSpeech: s.showSpeech === true
   });
   const f = Store.get('flux_f', null);
   S.feeds = (f && f.length) ? f : [...DEFAULT_FEEDS];
@@ -332,6 +339,7 @@ const Theme = {
   _syncUI() {
     document.documentElement.dataset.readLaterEnabled = S.showReadLater ? 'true' : 'false';
     document.documentElement.dataset.shareEnabled = S.showShare ? 'true' : 'false';
+    document.documentElement.dataset.speechEnabled = S.showSpeech ? 'true' : 'false';
     document.querySelectorAll('.mode-btn[data-mode]').forEach(b => b.classList.toggle('active', b.dataset.mode === S.theme));
     document.querySelectorAll('.reader-mode-btn[data-reader-mode]').forEach(b => b.classList.toggle('active', b.dataset.readerMode === S.readerMode));
     document.querySelectorAll('[data-setting]').forEach(input => {
@@ -1332,6 +1340,7 @@ function setupFlipView() {
 async function openArticle(id) {
   const a = articleMap[id];
   if (!a) return;
+  if (articleSpeech.articleId && articleSpeech.articleId !== id) stopArticleSpeech();
   pendingArticleScrollTop = history.state?.flux === 'article' && history.state.articleId === id
     ? articleScrollTopFor(id)
     : 0;
@@ -1379,6 +1388,7 @@ async function openArticleUrl(url) {
     image: '',
     date: new Date()
   };
+  if (articleSpeech.articleId && articleSpeech.articleId !== aid(fallback)) stopArticleSpeech();
   pendingArticleScrollTop = history.state?.flux === 'article' && history.state.articleId === aid(fallback)
     ? articleScrollTopFor(aid(fallback))
     : 0;
@@ -1473,7 +1483,7 @@ function setupArticlePrefetch() {
 }
 function renderArticleLoading(a) {
   const restoreTop = pendingArticleScrollTop;
-  renderArticleShell(articleViewHtml(a, { body: '<div class="article-content"><p>Cikk betöltése...</p></div>' }), aid(a));
+  renderArticleShell(articleViewHtml(a, { body: '<div class="article-content"><p>Cikk betöltése...</p></div>', speech: false }), aid(a));
   pendingArticleScrollTop = restoreTop;
 }
 function renderArticleView(a) {
@@ -1492,6 +1502,7 @@ function articleViewHtml(a, opts = {}) {
     <h1 class="article-title">${e(a.title)}</h1>
     <div class="article-meta">${Renderer._metaHtml(a, 'article-source', { full: true })}</div>
     <div class="article-action-row">
+      ${opts.speech === false ? '' : `<button class="article-read-btn" type="button" data-read-id="${aid(a)}" title="Felolvasás George hangjával" aria-label="Cikk felolvasása George hangjával" aria-pressed="false">${speechIcon('play')}<span class="article-read-label">Felolvasás</span></button>`}
       <button class="article-save-btn${saved ? ' saved' : ''}" type="button" data-save-id="${aid(a)}" title="${saved ? 'Mentve' : 'Mentés későbbre'}" aria-label="${saved ? 'Mentve' : 'Mentés későbbre'}" aria-pressed="${saved ? 'true' : 'false'}">${bookmarkIcon(saved, 18)}</button>
       <button class="article-share-btn" type="button" data-share-id="${aid(a)}" title="Megosztás" aria-label="Megosztás">${shareIcon(18)}</button>
     </div>
@@ -1650,6 +1661,7 @@ function closeArticleView(fromHistory = false) {
   finishArticleClose();
 }
 function finishArticleClose() {
+  stopArticleSpeech();
   const mode = activeArticleMode;
   const closedScroller = mode === 'modal'
     ? $('articleModalLayer')?.querySelector('.article-scroll')
@@ -1804,6 +1816,173 @@ function bookmarkIcon(filled = false, size = 15) {
 }
 function shareIcon(size = 18) {
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V3"/><path d="m7 8 5-5 5 5"/><path d="M5 11v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8"/></svg>`;
+}
+function speechIcon(state = 'play', size = 18) {
+  if (state === 'pause') {
+    return `<svg class="article-read-icon" width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5h3v14H7zM14 5h3v14h-3z"/></svg>`;
+  }
+  if (state === 'loading') {
+    return `<svg class="article-read-icon article-read-spinner" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 12a8 8 0 1 1-5.5-7.6"/></svg>`;
+  }
+  return `<svg class="article-read-icon" width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m8 5 11 7-11 7z"/></svg>`;
+}
+function freshArticleSpeech() {
+  return { articleId: '', chunks: [], index: 0, audio: null, objectUrl: '', controllers: new Map(), pending: new Map() };
+}
+function articleSpeechText(articleId) {
+  const article = document.querySelector(`.article-view[data-article-id="${CSS.escape(articleId)}"]`);
+  if (!article) return '';
+  const title = normalizeText(article.querySelector('.article-title')?.textContent || '');
+  const content = article.querySelector('.article-content')?.cloneNode(true);
+  content?.querySelectorAll('figcaption, .article-image-meta, .hint_box, script, style').forEach(el => el.remove());
+  const blockSelector = 'p, h2, h3, h4, h5, h6, li, blockquote';
+  const blocks = content
+    ? [...content.querySelectorAll(blockSelector)]
+        .filter(el => ![...el.children].some(child => child.matches(blockSelector)))
+        .map(el => normalizeText(el.textContent || ''))
+        .filter(Boolean)
+    : [];
+  if (!blocks.length && content?.textContent) blocks.push(normalizeText(content.textContent));
+  return [title, ...blocks].filter(Boolean).map(finishSpeechBlock).join('\n\n');
+}
+function finishSpeechBlock(text) {
+  const clean = normalizeText(text);
+  return /[.!?…][”’"')\]]*$/.test(clean) ? clean : `${clean}.`;
+}
+function splitSpeechText(text, maxLength = TTS_CHUNK_MAX) {
+  return String(text || '').split(/\n{2,}/).map(normalizeText).filter(Boolean).flatMap(paragraph => {
+    let sentences;
+    try {
+      sentences = [...new Intl.Segmenter('hu', { granularity: 'sentence' }).segment(paragraph)].map(item => item.segment.trim());
+    } catch(e) {
+      sentences = paragraph.match(/[^.!?]+(?:[.!?]+|$)/g)?.map(s => s.trim()) || [paragraph];
+    }
+    const pieces = [];
+    sentences.filter(Boolean).forEach(sentence => {
+      if (sentence.length <= maxLength) return pieces.push(sentence);
+      let piece = '';
+      sentence.split(/\s+/).forEach(word => {
+        const next = piece ? `${piece} ${word}` : word;
+        if (next.length <= maxLength) piece = next;
+        else {
+          if (piece) pieces.push(piece);
+          piece = word;
+        }
+      });
+      if (piece) pieces.push(piece);
+    });
+    return pieces.reduce((chunks, sentence) => {
+      const previous = chunks.at(-1);
+      if (previous && `${previous} ${sentence}`.length <= maxLength) chunks[chunks.length - 1] = `${previous} ${sentence}`;
+      else chunks.push(sentence);
+      return chunks;
+    }, []);
+  });
+}
+async function speechCacheKey(text) {
+  const data = new TextEncoder().encode(`george|eleven_flash_v2_5|hu|${text}`);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return [...new Uint8Array(hash)].map(byte => byte.toString(16).padStart(2, '0')).join('');
+}
+async function loadSpeechChunk(text, signal) {
+  const key = await speechCacheKey(text);
+  const request = new Request(`/__flux_tts_cache/${key}.mp3`);
+  let cache = null;
+  try {
+    cache = 'caches' in window ? await caches.open(TTS_CACHE_NAME) : null;
+    const hit = cache ? await cache.match(request) : null;
+    if (hit) return hit.blob();
+  } catch(e) {}
+  const response = await fetch(TTS_API, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ text }),
+    signal
+  });
+  if (!response.ok) throw new Error('tts_failed');
+  try { if (cache) await cache.put(request, response.clone()); } catch(e) {}
+  return response.blob();
+}
+function speechChunk(index) {
+  if (index < 0 || index >= articleSpeech.chunks.length) return null;
+  if (!articleSpeech.pending.has(index)) {
+    const controller = new AbortController();
+    articleSpeech.controllers.set(index, controller);
+    const pending = loadSpeechChunk(articleSpeech.chunks[index], controller.signal).catch(err => {
+      articleSpeech.pending.delete(index);
+      articleSpeech.controllers.delete(index);
+      throw err;
+    });
+    articleSpeech.pending.set(index, pending);
+  }
+  return articleSpeech.pending.get(index);
+}
+function setArticleSpeechUi(state, label) {
+  if (!articleSpeech.articleId) return;
+  document.querySelectorAll(`.article-read-btn[data-read-id="${CSS.escape(articleSpeech.articleId)}"]`).forEach(btn => {
+    btn.dataset.state = state;
+    btn.setAttribute('aria-pressed', state === 'playing' ? 'true' : 'false');
+    btn.innerHTML = `${speechIcon(state === 'playing' ? 'pause' : state === 'loading' ? 'loading' : 'play')}<span class="article-read-label">${e(label)}</span>`;
+  });
+}
+async function playArticleSpeechChunk(index) {
+  if (index >= articleSpeech.chunks.length) {
+    setArticleSpeechUi('idle', 'Újra');
+    articleSpeech.index = 0;
+    return;
+  }
+  articleSpeech.index = index;
+  setArticleSpeechUi('loading', 'Betöltés');
+  try {
+    const blob = await speechChunk(index);
+    if (!articleSpeech.articleId || articleSpeech.index !== index) return;
+    if (articleSpeech.objectUrl) URL.revokeObjectURL(articleSpeech.objectUrl);
+    articleSpeech.objectUrl = URL.createObjectURL(blob);
+    const audio = new Audio(articleSpeech.objectUrl);
+    audio.playbackRate = TTS_PLAYBACK_RATE;
+    audio.preservesPitch = true;
+    if ('webkitPreservesPitch' in audio) audio.webkitPreservesPitch = true;
+    articleSpeech.audio = audio;
+    let prefetched = false;
+    audio.addEventListener('playing', () => setArticleSpeechUi('playing', 'Szünet'));
+    audio.addEventListener('pause', () => {
+      if (!audio.ended) setArticleSpeechUi('paused', 'Folytatás');
+    });
+    audio.addEventListener('timeupdate', () => {
+      if (!prefetched && audio.duration && audio.currentTime / audio.duration >= .65) {
+        prefetched = true;
+        speechChunk(index + 1)?.catch(() => {});
+      }
+    });
+    audio.addEventListener('ended', () => playArticleSpeechChunk(index + 1));
+    audio.addEventListener('error', () => {
+      setArticleSpeechUi('idle', 'Felolvasás');
+      toast('A felolvasás megszakadt.');
+    });
+    await audio.play();
+  } catch(e) {
+    if (e?.name === 'AbortError') return;
+    setArticleSpeechUi('idle', 'Felolvasás');
+    toast('A felolvasás most nem érhető el.');
+  }
+}
+function toggleArticleSpeech(articleId) {
+  if (articleSpeech.articleId === articleId && articleSpeech.audio && !articleSpeech.audio.ended) {
+    if (articleSpeech.audio.paused) articleSpeech.audio.play().catch(() => {});
+    else articleSpeech.audio.pause();
+    return;
+  }
+  stopArticleSpeech();
+  const chunks = splitSpeechText(articleSpeechText(articleId));
+  if (!chunks.length) return toast('Nincs felolvasható szöveg.');
+  articleSpeech = { ...freshArticleSpeech(), articleId, chunks };
+  playArticleSpeechChunk(0);
+}
+function stopArticleSpeech() {
+  articleSpeech.controllers.forEach(controller => controller.abort());
+  articleSpeech.audio?.pause();
+  if (articleSpeech.objectUrl) URL.revokeObjectURL(articleSpeech.objectUrl);
+  articleSpeech = freshArticleSpeech();
 }
 async function shareArticle(a) {
   if (!a || !S.showShare) return;
@@ -2881,6 +3060,13 @@ function bindEvents() {
       shareArticle(articleMap[shareBtn.dataset.shareId]);
       return;
     }
+    const readBtn = ev.target.closest('.article-read-btn[data-read-id]');
+    if (readBtn) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      toggleArticleSpeech(readBtn.dataset.readId);
+      return;
+    }
     if (ev.target.closest('.ix-footer-brand')) return scrollHome();
     if (ev.target.closest('.article-back')) closeArticleView();
   });
@@ -3030,6 +3216,7 @@ function bindEvents() {
       renderSidebar();
       renderArticles();
     }
+    if (input.dataset.setting === 'showSpeech' && !S.showSpeech) stopArticleSpeech();
     syncWidgets();
   });
   $('overlay').onclick = () => { closeAddModal(); closeAddYtModal(); };

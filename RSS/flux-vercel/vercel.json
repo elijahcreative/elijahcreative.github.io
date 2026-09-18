@@ -14,6 +14,9 @@
     },
     "api/share-image.js": {
       "maxDuration": 10
+    },
+    "api/tts.js": {
+      "maxDuration": 15
     }
   },
   "rewrites": [
