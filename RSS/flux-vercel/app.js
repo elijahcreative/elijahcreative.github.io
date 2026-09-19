@@ -1925,10 +1925,69 @@ function setArticleSpeechUi(state, label) {
     btn.innerHTML = `${speechIcon(state === 'playing' ? 'pause' : state === 'loading' ? 'loading' : 'play')}<span class="article-read-label">${e(label)}</span>`;
   });
 }
+const MEDIA_SESSION_ACTIONS = ['play', 'pause', 'seekbackward', 'seekforward', 'seekto', 'stop'];
+function setArticleMediaSession(articleId) {
+  if (!('mediaSession' in navigator) || typeof MediaMetadata !== 'function') return;
+  const article = articleMap[articleId] || {};
+  const articleNode = document.querySelector(`.article-view[data-article-id="${CSS.escape(articleId)}"]`);
+  const title = normalizeText(article.title || articleNode?.querySelector('.article-title')?.textContent || 'Cikk');
+  const source = normalizeText(article.feedName || Renderer._feedName(article.feedUrl) || 'Flux');
+  let artwork = new URL('/icons/pwa-512.png', location.href).href;
+  try {
+    if (article.image) artwork = new URL(article.image, location.href).href;
+  } catch(e) {}
+  try {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title,
+      artist: source,
+      album: 'Flux',
+      artwork: [{ src: artwork }]
+    });
+  } catch(e) {}
+  const handlers = {
+    play: () => {
+      const audio = articleSpeech.audio;
+      if (audio && !audio.ended) audio.play().catch(() => {});
+      else playArticleSpeechChunk(articleSpeech.index || 0);
+    },
+    pause: () => articleSpeech.audio?.pause(),
+    seekbackward: details => seekArticleSpeech(-(details.seekOffset || 10)),
+    seekforward: details => seekArticleSpeech(details.seekOffset || 10),
+    seekto: details => seekArticleSpeechTo(details.seekTime),
+    stop: () => stopArticleSpeech()
+  };
+  MEDIA_SESSION_ACTIONS.forEach(action => {
+    try { navigator.mediaSession.setActionHandler(action, handlers[action]); } catch(e) {}
+  });
+  setArticleMediaPlaybackState('paused');
+}
+function setArticleMediaPlaybackState(state) {
+  if (!('mediaSession' in navigator)) return;
+  try { navigator.mediaSession.playbackState = state; } catch(e) {}
+}
+function seekArticleSpeech(offset) {
+  const audio = articleSpeech.audio;
+  if (!audio || !Number.isFinite(audio.duration)) return;
+  audio.currentTime = Math.max(0, Math.min(audio.duration, audio.currentTime + offset));
+}
+function seekArticleSpeechTo(time) {
+  const audio = articleSpeech.audio;
+  if (!audio || !Number.isFinite(audio.duration) || !Number.isFinite(time)) return;
+  audio.currentTime = Math.max(0, Math.min(audio.duration, time));
+}
+function clearArticleMediaSession() {
+  if (!('mediaSession' in navigator)) return;
+  MEDIA_SESSION_ACTIONS.forEach(action => {
+    try { navigator.mediaSession.setActionHandler(action, null); } catch(e) {}
+  });
+  try { navigator.mediaSession.metadata = null; } catch(e) {}
+  setArticleMediaPlaybackState('none');
+}
 async function playArticleSpeechChunk(index) {
   if (index >= articleSpeech.chunks.length) {
     setArticleSpeechUi('idle', 'Újra');
     articleSpeech.index = 0;
+    setArticleMediaPlaybackState('none');
     return;
   }
   articleSpeech.index = index;
@@ -1944,9 +2003,15 @@ async function playArticleSpeechChunk(index) {
     if ('webkitPreservesPitch' in audio) audio.webkitPreservesPitch = true;
     articleSpeech.audio = audio;
     let prefetched = false;
-    audio.addEventListener('playing', () => setArticleSpeechUi('playing', 'Szünet'));
+    audio.addEventListener('playing', () => {
+      setArticleSpeechUi('playing', 'Szünet');
+      setArticleMediaPlaybackState('playing');
+    });
     audio.addEventListener('pause', () => {
-      if (!audio.ended) setArticleSpeechUi('paused', 'Folytatás');
+      if (!audio.ended) {
+        setArticleSpeechUi('paused', 'Folytatás');
+        setArticleMediaPlaybackState('paused');
+      }
     });
     audio.addEventListener('timeupdate', () => {
       if (!prefetched && audio.duration && audio.currentTime / audio.duration >= .65) {
@@ -1957,12 +2022,14 @@ async function playArticleSpeechChunk(index) {
     audio.addEventListener('ended', () => playArticleSpeechChunk(index + 1));
     audio.addEventListener('error', () => {
       setArticleSpeechUi('idle', 'Felolvasás');
+      setArticleMediaPlaybackState('none');
       toast('A felolvasás megszakadt.');
     });
     await audio.play();
   } catch(e) {
     if (e?.name === 'AbortError') return;
     setArticleSpeechUi('idle', 'Felolvasás');
+    setArticleMediaPlaybackState('none');
     toast('A felolvasás most nem érhető el.');
   }
 }
@@ -1976,13 +2043,16 @@ function toggleArticleSpeech(articleId) {
   const chunks = splitSpeechText(articleSpeechText(articleId));
   if (!chunks.length) return toast('Nincs felolvasható szöveg.');
   articleSpeech = { ...freshArticleSpeech(), articleId, chunks };
+  setArticleMediaSession(articleId);
   playArticleSpeechChunk(0);
 }
 function stopArticleSpeech() {
+  if (articleSpeech.articleId) setArticleSpeechUi('idle', 'Felolvasás');
   articleSpeech.controllers.forEach(controller => controller.abort());
   articleSpeech.audio?.pause();
   if (articleSpeech.objectUrl) URL.revokeObjectURL(articleSpeech.objectUrl);
   articleSpeech = freshArticleSpeech();
+  clearArticleMediaSession();
 }
 async function shareArticle(a) {
   if (!a || !S.showShare) return;
