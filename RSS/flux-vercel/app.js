@@ -1827,7 +1827,7 @@ function speechIcon(state = 'play', size = 18) {
   return `<svg class="article-read-icon" width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m8 5 11 7-11 7z"/></svg>`;
 }
 function freshArticleSpeech() {
-  return { articleId: '', chunks: [], index: 0, audio: null, objectUrl: '', controllers: new Map(), pending: new Map() };
+  return { articleId: '', chunks: [], index: 0, audio: null, objectUrl: '', loading: false, prefetchedIndex: -1, controllers: new Map(), pending: new Map() };
 }
 function articleSpeechText(articleId) {
   const article = document.querySelector(`.article-view[data-article-id="${CSS.escape(articleId)}"]`);
@@ -1947,7 +1947,8 @@ function setArticleMediaSession(articleId) {
   const handlers = {
     play: () => {
       const audio = articleSpeech.audio;
-      if (audio && !audio.ended) audio.play().catch(() => {});
+      if (articleSpeech.loading) return;
+      if (audio?.src && !audio.ended) audio.play().catch(() => {});
       else playArticleSpeechChunk(articleSpeech.index || 0);
     },
     pause: () => articleSpeech.audio?.pause(),
@@ -1983,7 +1984,42 @@ function clearArticleMediaSession() {
   try { navigator.mediaSession.metadata = null; } catch(e) {}
   setArticleMediaPlaybackState('none');
 }
+function createArticleSpeechAudio() {
+  const audio = new Audio();
+  audio.playbackRate = TTS_PLAYBACK_RATE;
+  audio.preservesPitch = true;
+  if ('webkitPreservesPitch' in audio) audio.webkitPreservesPitch = true;
+  audio.addEventListener('playing', () => {
+    if (articleSpeech.audio !== audio) return;
+    setArticleSpeechUi('playing', 'Szünet');
+    setArticleMediaPlaybackState('playing');
+  });
+  audio.addEventListener('pause', () => {
+    if (articleSpeech.audio !== audio || audio.ended) return;
+    setArticleSpeechUi('paused', 'Folytatás');
+    setArticleMediaPlaybackState('paused');
+  });
+  audio.addEventListener('timeupdate', () => {
+    if (articleSpeech.audio !== audio || !audio.duration || audio.currentTime / audio.duration < .65) return;
+    const index = articleSpeech.index;
+    if (articleSpeech.prefetchedIndex === index) return;
+    articleSpeech.prefetchedIndex = index;
+    speechChunk(index + 1)?.catch(() => {});
+  });
+  audio.addEventListener('ended', () => {
+    if (articleSpeech.audio === audio) playArticleSpeechChunk(articleSpeech.index + 1);
+  });
+  audio.addEventListener('error', () => {
+    if (articleSpeech.audio !== audio) return;
+    articleSpeech.loading = false;
+    setArticleSpeechUi('idle', 'Felolvasás');
+    setArticleMediaPlaybackState('none');
+    toast('A felolvasás megszakadt.');
+  });
+  return audio;
+}
 async function playArticleSpeechChunk(index) {
+  if (articleSpeech.loading && articleSpeech.index === index) return;
   if (index >= articleSpeech.chunks.length) {
     setArticleSpeechUi('idle', 'Újra');
     articleSpeech.index = 0;
@@ -1991,43 +2027,24 @@ async function playArticleSpeechChunk(index) {
     return;
   }
   articleSpeech.index = index;
+  articleSpeech.loading = true;
   setArticleSpeechUi('loading', 'Betöltés');
   try {
+    const articleId = articleSpeech.articleId;
     const blob = await speechChunk(index);
-    if (!articleSpeech.articleId || articleSpeech.index !== index) return;
+    if (!articleId || articleSpeech.articleId !== articleId || articleSpeech.index !== index) return;
     if (articleSpeech.objectUrl) URL.revokeObjectURL(articleSpeech.objectUrl);
     articleSpeech.objectUrl = URL.createObjectURL(blob);
-    const audio = new Audio(articleSpeech.objectUrl);
+    const audio = articleSpeech.audio;
+    if (!audio) return;
+    audio.src = articleSpeech.objectUrl;
     audio.playbackRate = TTS_PLAYBACK_RATE;
-    audio.preservesPitch = true;
-    if ('webkitPreservesPitch' in audio) audio.webkitPreservesPitch = true;
-    articleSpeech.audio = audio;
-    let prefetched = false;
-    audio.addEventListener('playing', () => {
-      setArticleSpeechUi('playing', 'Szünet');
-      setArticleMediaPlaybackState('playing');
-    });
-    audio.addEventListener('pause', () => {
-      if (!audio.ended) {
-        setArticleSpeechUi('paused', 'Folytatás');
-        setArticleMediaPlaybackState('paused');
-      }
-    });
-    audio.addEventListener('timeupdate', () => {
-      if (!prefetched && audio.duration && audio.currentTime / audio.duration >= .65) {
-        prefetched = true;
-        speechChunk(index + 1)?.catch(() => {});
-      }
-    });
-    audio.addEventListener('ended', () => playArticleSpeechChunk(index + 1));
-    audio.addEventListener('error', () => {
-      setArticleSpeechUi('idle', 'Felolvasás');
-      setArticleMediaPlaybackState('none');
-      toast('A felolvasás megszakadt.');
-    });
+    audio.load();
+    articleSpeech.loading = false;
     await audio.play();
   } catch(e) {
     if (e?.name === 'AbortError') return;
+    articleSpeech.loading = false;
     setArticleSpeechUi('idle', 'Felolvasás');
     setArticleMediaPlaybackState('none');
     toast('A felolvasás most nem érhető el.');
@@ -2043,13 +2060,19 @@ function toggleArticleSpeech(articleId) {
   const chunks = splitSpeechText(articleSpeechText(articleId));
   if (!chunks.length) return toast('Nincs felolvasható szöveg.');
   articleSpeech = { ...freshArticleSpeech(), articleId, chunks };
+  articleSpeech.audio = createArticleSpeechAudio();
   setArticleMediaSession(articleId);
   playArticleSpeechChunk(0);
 }
 function stopArticleSpeech() {
   if (articleSpeech.articleId) setArticleSpeechUi('idle', 'Felolvasás');
   articleSpeech.controllers.forEach(controller => controller.abort());
-  articleSpeech.audio?.pause();
+  const audio = articleSpeech.audio;
+  audio?.pause();
+  if (audio) {
+    audio.removeAttribute('src');
+    audio.load();
+  }
   if (articleSpeech.objectUrl) URL.revokeObjectURL(articleSpeech.objectUrl);
   articleSpeech = freshArticleSpeech();
   clearArticleMediaSession();
