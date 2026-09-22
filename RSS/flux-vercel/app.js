@@ -1488,9 +1488,11 @@ function renderArticleLoading(a) {
 }
 function renderArticleView(a) {
   articleMap[aid(a)] = a;
+  const articleContent = sanitizeArticleHtml(a.content || a.desc || '');
+  const hasEmbeddedVideo = articleContent.includes('class="article-video"');
   renderArticleShell(articleViewHtml(a, {
-    body: `${a.image ? `<img class="article-hero-img" src="${e(a.image)}" alt="">` : ''}
-      <div class="article-content">${sanitizeArticleHtml(a.content || a.desc || '')}</div>
+    body: `${a.image && !hasEmbeddedVideo ? `<img class="article-hero-img" src="${e(a.image)}" alt="">` : ''}
+      <div class="article-content">${articleContent}</div>
       <a class="reader-ext" href="${e(a.url)}" target="_self" rel="noopener">Eredeti cikk megnyitása</a>
       ${articleMoreHtml(a)}`
   }), aid(a));
@@ -1771,6 +1773,23 @@ function sanitizeArticleHtml(html) {
       if (name.startsWith('on') || name === 'style') el.removeAttribute(attr.name);
       if ((name === 'href' || name === 'src') && /^\s*javascript:/i.test(value)) el.removeAttribute(attr.name);
     });
+  });
+  d.querySelectorAll('[data-flux-youtube]').forEach(placeholder => {
+    const videoId = placeholder.getAttribute('data-flux-youtube') || '';
+    if (!/^[A-Za-z0-9_-]{6,15}$/.test(videoId)) {
+      placeholder.remove();
+      return;
+    }
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}`;
+    iframe.title = 'Beágyazott YouTube-videó';
+    iframe.loading = 'lazy';
+    iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+    iframe.allowFullscreen = true;
+    placeholder.className = 'article-video';
+    placeholder.removeAttribute('data-flux-youtube');
+    placeholder.replaceChildren(iframe);
   });
   return d.innerHTML;
 }

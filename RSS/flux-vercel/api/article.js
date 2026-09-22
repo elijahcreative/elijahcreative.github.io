@@ -43,7 +43,7 @@ const SOURCE_CONFIG = [
     host: 'telex.hu',
     image: [['property', 'og:image']],
     date: [['name', 'article:published_time']],
-    content: (html, url) => cleanupArticleContent(extractElementsByClass(html, 'article-html-content').join('\n'), url)
+    content: (html, url) => extractTelexContent(html, url)
   },
   {
     source: '444',
@@ -152,6 +152,15 @@ function extractArticleForHost(articleUrl, html) {
     author: metaFirst(html, [['name', 'author'], ['property', 'article:author'], ['name', 'dc.creator']]),
     content: cfg.content(html, articleUrl.href, { image })
   };
+}
+function extractTelexContent(html, sourceUrl) {
+  const content = cleanupArticleContent(extractElementsByClass(html, 'article-html-content').join('\n'), sourceUrl);
+  let videoId = '';
+  try {
+    if (new URL(sourceUrl).pathname.startsWith('/video/')) videoId = youtubeVideoIdFromHtml(html);
+  } catch {}
+  if (!videoId || content.includes(`data-flux-youtube="${videoId}"`)) return content;
+  return `${youtubePlaceholder(videoId)}\n${content}`.trim();
 }
 function extractIndexLiveblogEntry(html, sourceUrl) {
   const normalizedUrl = sourceUrl.replace(/\/+$/, '');
@@ -306,11 +315,50 @@ function elementSpanFromMatch(html, match) {
 }
 function cleanupArticleContent(content, sourceUrl) {
   const base = new URL(sourceUrl);
-  let out = removeElements(removeElements(content, REMOVE_IDS, id => ({ id })), REMOVE_CLASSES, className => ({ className }));
+  let out = preserveYoutubeIframes(content);
+  out = removeElements(removeElements(out, REMOVE_IDS, id => ({ id })), REMOVE_CLASSES, className => ({ className }));
   STRIP_PATTERNS.forEach(re => { out = out.replace(re, ''); });
   out = out.replace(/\s(?:href|src)=["']\/\/([^"']*)["']/gi, (m, p1) => m.replace('//' + p1, 'https://' + p1));
   out = out.replace(/\s(?:href|src)=["']\/([^"']*)["']/gi, (m, p1) => m.replace('/' + p1, new URL('/' + p1, base).href));
   return out.trim();
+}
+function preserveYoutubeIframes(html) {
+  return String(html || '').replace(/<iframe\b[\s\S]*?<\/iframe\s*>/gi, frame => {
+    const videoId = youtubeVideoId(tagAttribute(frame, 'src'));
+    return videoId ? youtubePlaceholder(videoId) : frame;
+  });
+}
+function youtubeVideoIdFromHtml(html) {
+  const normalized = String(html || '').replace(/\\u002f/gi, '/').replace(/\\\//g, '/');
+  const urls = normalized.match(/https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?[^"'\\\s<>]+|youtu\.be\/[A-Za-z0-9_-]{6,15})/gi) || [];
+  for (const url of urls) {
+    const videoId = youtubeVideoId(url);
+    if (videoId) return videoId;
+  }
+  return '';
+}
+function youtubeVideoId(value) {
+  if (!value) return '';
+  try {
+    const url = new URL(decodeHtml(value));
+    const host = url.hostname.toLowerCase().replace(/^www\./, '');
+    let id = '';
+    if (host === 'youtu.be') id = url.pathname.split('/').filter(Boolean)[0] || '';
+    else if (host === 'youtube.com' || host === 'm.youtube.com' || host === 'youtube-nocookie.com') {
+      if (url.pathname === '/watch') id = url.searchParams.get('v') || '';
+      else if (/^\/(?:embed|shorts|live)\//.test(url.pathname)) id = url.pathname.split('/')[2] || '';
+    }
+    return /^[A-Za-z0-9_-]{6,15}$/.test(id) ? id : '';
+  } catch {
+    return '';
+  }
+}
+function youtubePlaceholder(videoId) {
+  return `<div class="article-video-embed-marker" data-flux-youtube="${escapeAttr(videoId)}"></div>`;
+}
+function tagAttribute(tag, name) {
+  const match = new RegExp(`\\b${escapeRe(name)}\\s*=\\s*["']([^"']*)["']`, 'i').exec(String(tag || ''));
+  return match ? match[1] : '';
 }
 function removeElements(html, values, toSelector) {
   let out = html;
