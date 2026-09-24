@@ -1,42 +1,42 @@
 {
   "current_condition": [
     {
-      "FeelsLikeC": "11",
-      "FeelsLikeF": "53",
-      "cloudcover": "100",
-      "humidity": "45",
-      "observation_time": "01:12 PM",
+      "FeelsLikeC": "10",
+      "FeelsLikeF": "49",
+      "cloudcover": "4",
+      "humidity": "82",
+      "observation_time": "05:42 PM",
       "precipInches": "0.0",
-      "precipMM": "0.4",
-      "pressure": "1019",
+      "precipMM": "0.0",
+      "pressure": "1020",
       "pressureInches": "30",
-      "temp_C": "17",
-      "temp_F": "63",
+      "temp_C": "12",
+      "temp_F": "54",
       "uvIndex": "0",
-      "visibility": "2",
-      "visibilityMiles": "1",
-      "weatherCode": "266",
+      "visibility": "10",
+      "visibilityMiles": "6",
+      "weatherCode": "113",
       "weatherDesc": [
         {
-          "value": "Light drizzle"
+          "value": "Clear "
         }
       ],
       "weatherIconUrl": [
         {
-          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0017_cloudy_with_light_rain.png"
+          "value": "https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0008_clear_sky_night.png"
         }
       ],
       "winddir16Point": "WNW",
-      "winddirDegree": "282",
-      "windspeedKmph": "23",
-      "windspeedMiles": "15"
+      "winddirDegree": "293",
+      "windspeedKmph": "15",
+      "windspeedMiles": "9"
     }
   ],
   "nearest_area": [
     {
       "areaName": [
         {
-          "value": "Gellert"
+          "value": "Buda"
         }
       ],
       "country": [
@@ -44,8 +44,8 @@
           "value": "Hungary"
         }
       ],
-      "latitude": "47.483",
-      "longitude": "19.050",
+      "latitude": "47.500",
+      "longitude": "19.033",
       "population": "0",
       "region": [
         {
@@ -54,7 +54,7 @@
       ],
       "weatherUrl": [
         {
-          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.483,19.05"
+          "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=47.5,19.033"
         }
       ]
     }
