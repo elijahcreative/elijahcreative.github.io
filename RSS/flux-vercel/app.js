@@ -314,9 +314,7 @@ const Theme = {
     root.style.setProperty('--ac2', ac2);
     root.style.setProperty('--acl', acl);
     root.style.setProperty('--font-size-base', S.fontSize + 'px');
-    const _hex = c.bg.replace('#','');
-    const _r = parseInt(_hex.slice(0,2),16), _g = parseInt(_hex.slice(2,4),16), _b = parseInt(_hex.slice(4,6),16);
-    root.style.setProperty('--bg-nav', `rgba(${_r},${_g},${_b},0.82)`);
+    root.style.setProperty('--bg-nav', c.bg);
     document.documentElement.style.backgroundColor = c.bg;
     document.body.style.backgroundColor = c.bg;
     const oldTc = document.getElementById('themeColorMeta');
