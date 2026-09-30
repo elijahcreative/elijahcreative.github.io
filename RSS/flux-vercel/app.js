@@ -4788,6 +4788,12 @@ function f1CountdownTo(date, nowMs) {
   const h = Math.floor((diff % 86400000) / 3600000);
   return d > 0 ? `${d} nap` : h > 0 ? `${h} ó` : 'Ma';
 }
+function f1StatusDaysTo(date, nowMs) {
+  const now = new Date(nowMs);
+  const dayNumber = d => Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000;
+  const days = Math.max(0, dayNumber(date) - dayNumber(now));
+  return days === 0 ? 'Ma' : days === 1 ? 'Holnap' : `${days} nap`;
+}
 function f1EventSpecs(race) {
   const sprint = Boolean(race.Sprint || race.Sprintqual);
   const raw = sprint
@@ -4859,7 +4865,7 @@ function buildF1Model(races, standingsRaw) {
   const currentIndex = liveIndex >= 0 ? liveIndex : nextIndex;
   if (currentIndex >= 0) events[currentIndex].isCurrent = true;
   if (liveIndex >= 0) events[liveIndex].statusLabel = 'Élő';
-  else if (nextIndex >= 0) events[nextIndex].statusLabel = 'Következő';
+  else if (nextIndex >= 0) events[nextIndex].statusLabel = f1StatusDaysTo(events[nextIndex].start, nowMs);
   const standingsTop5 = standingsRaw
     .filter(s => s.Name && s.Points)
     .slice(0, 5)
@@ -4868,7 +4874,7 @@ function buildF1Model(races, standingsRaw) {
     .slice(selectedIndex + 1, selectedIndex + 5)
     .map(r => ({ city: r.City || stripF1Country(r.Country), dateLabel: f1ShortDate(parseF1Date(r.Race)) }));
   return {
-    version: 8,
+    version: 9,
     city,
     countryRaw,
     countryEn,
@@ -4931,7 +4937,7 @@ async function loadF1() {
   if (!S.showF1) { clearWidget('navF1'); return; }
   try {
     const cached = JSON.parse(localStorage.getItem('flux_f1') || 'null');
-    if (cached?.version === 8 && Date.now() - cached.ts < F1_TTL) { renderF1(cached); return; }
+    if (cached?.version === 9 && Date.now() - cached.ts < F1_TTL) { renderF1(cached); return; }
   } catch(e) {}
   try {
     const [racesJ, standingsJ] = await Promise.all([
