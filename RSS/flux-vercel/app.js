@@ -4036,14 +4036,22 @@ function buildYtSidebarHtml() {
     const pageSize = cols * rows;
     for (let i = 0; i < videos.length; i += pageSize) pages.push({ videos:videos.slice(i, i + pageSize) });
   }
-  const cardHtml = (v, tile, size = '') => `
+  const cardHtml = (v, tile, size = '') => {
+    const upgrade = /^[A-Za-z0-9_-]{11}$/.test(v.videoId || '');
+    const large = size === 'large';
+    const thumb = upgrade ? `https://i.ytimg.com/vi/${v.videoId}/${large ? 'maxresdefault' : 'sddefault'}.jpg` : v.thumb;
+    const imageHandlers = upgrade
+      ? ` data-yt-thumb-fallback="${e(v.thumb)}"${large ? '' : ` data-yt-thumb-secondary="https://i.ytimg.com/vi/${e(v.videoId)}/hqdefault.jpg"`} onload="if(this.naturalWidth<=120)ytThumbnailFallback(this)" onerror="ytThumbnailFallback(this)"`
+      : ` onerror="this.parentNode.style.display='none'"`;
+    return `
       <button class="yt-vcard" type="button" data-yt-video-id="${e(v.videoId)}"${size ? ` data-yt-tile-size="${size}" style="grid-column:${tile.column} / span ${tile.span};grid-row:${tile.row}"` : ''}>
-        <div class="yt-vcard-thumb-wrap"><img class="yt-vcard-thumb" src="${e(v.thumb)}" alt="" loading="lazy" onerror="this.parentNode.style.display='none'"></div>
+        <div class="yt-vcard-thumb-wrap"><img class="yt-vcard-thumb" src="${e(thumb)}" alt="" loading="lazy"${imageHandlers}></div>
         <div class="yt-vcard-body">
           <div class="yt-vcard-title">${e(v.title)}</div>
           <div class="yt-vcard-meta"><span class="yt-vcard-channel">${e(v.displayChannelName || v.channelName || '')}</span> · ${ytAge(v.date)}</div>
         </div>
       </button>`;
+  };
   const html = pages.map(page => {
     if (page.pattern) {
       const cards = page.videos.map((video, index) => {
@@ -4078,6 +4086,20 @@ function buildYtSidebarHtml() {
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h11l-3-3"/><path d="M17 17H6l3 3"/></svg>
     </button>
   </div><div class="yt-scroll-row" data-flip-scroll-sync>${html}</div>${pager}`;
+}
+function ytThumbnailFallback(img) {
+  const secondary = img.getAttribute('data-yt-thumb-secondary');
+  if (secondary) {
+    img.removeAttribute('data-yt-thumb-secondary');
+    img.src = secondary;
+    return;
+  }
+  const fallback = img.getAttribute('data-yt-thumb-fallback');
+  img.onload = null;
+  img.onerror = () => { img.parentNode.style.display = 'none'; };
+  img.removeAttribute('data-yt-thumb-fallback');
+  if (fallback) img.src = fallback;
+  else img.parentNode.style.display = 'none';
 }
 function animateYtOpen(card, video) {
   const img = card.querySelector('.yt-vcard-thumb');
