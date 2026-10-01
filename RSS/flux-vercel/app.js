@@ -4789,18 +4789,18 @@ function f1ShortDate(date) {
   return `${date.getMonth() + 1}.${date.getDate()}`;
 }
 function f1CountdownTo(date, nowMs) {
-  const diff = date ? date.getTime() - nowMs : 0;
-  if (diff <= 0) return 'Ma';
-  const d = Math.floor(diff / 86400000);
-  const h = Math.floor((diff % 86400000) / 3600000);
-  return d > 0 ? `${d} nap` : h > 0 ? `${h} ó` : 'Ma';
+  const days = f1DaysUntilLocalDay(date, nowMs);
+  return days <= 0 ? 'Ma' : days === 1 ? 'Holnap' : `${days} nap`;
 }
-function f1StatusDaysTo(date, nowMs) {
+function f1DaysUntilLocalDay(date, nowMs) {
   const today = new Date(nowMs);
   const target = new Date(date);
   today.setHours(0, 0, 0, 0);
   target.setHours(0, 0, 0, 0);
-  const days = Math.round((target.getTime() - today.getTime()) / 86400000);
+  return Math.round((target.getTime() - today.getTime()) / 86400000);
+}
+function f1StatusDaysTo(date, nowMs) {
+  const days = f1DaysUntilLocalDay(date, nowMs);
   return days <= 1 ? 'KÖVETKEZŐ' : `${days} NAP`;
 }
 function f1EventSpecs(race) {
@@ -4883,7 +4883,7 @@ function buildF1Model(races, standingsRaw) {
     .slice(selectedIndex + 1, selectedIndex + 5)
     .map(r => ({ city: r.City || stripF1Country(r.Country), dateLabel: f1ShortDate(parseF1Date(r.Race)) }));
   return {
-    version: 10,
+    version: 11,
     city,
     countryRaw,
     countryEn,
@@ -4921,7 +4921,7 @@ function renderF1(f1) {
   const progressHtml = [1, 2, 3, 4].map(i => `<span class="f1-track-seg f1-track-seg-${i}${i <= progress ? ' active' : ''}"></span>`).join('');
   const flag = f1.flagUrl ? `<span class="f1-flag"><img src="${e(f1.flagUrl)}" alt=""></span>` : '<span class="f1-flag is-empty"></span>';
   const titleFlag = f1FlagEmoji(f1.countryRaw);
-  const titleCountry = `${titleFlag ? `${titleFlag} ` : ''}${f1.countryHu || f1.countryEn}`;
+  const titleCountry = f1.countryHu || f1.countryEn;
   el.innerHTML = `
     <span class="f1-badge">
       ${flag}
@@ -4932,7 +4932,7 @@ function renderF1(f1) {
     <div class="f1-popup nav-widget-popup" id="f1Popup">
       <div class="f1-card">
         <div class="f1-ticker">${ticker}</div>
-        <div class="f1-title f1-title-combined"><span>${e(f1.city)}</span><strong>${e(titleCountry)}</strong></div>
+        <div class="f1-title f1-title-combined"><span>${e(f1.city)}</span>${titleFlag ? `<span class="f1-title-flag">${e(titleFlag)}</span>` : ''}<strong>${e(titleCountry)}</strong></div>
         <div class="f1-track">
           <div class="f1-trackline">${progressHtml}</div>
           <div class="f1-events">${eventHtml}</div>
@@ -4946,7 +4946,7 @@ async function loadF1() {
   if (!S.showF1) { clearWidget('navF1'); return; }
   try {
     const cached = JSON.parse(localStorage.getItem('flux_f1') || 'null');
-    if (cached?.version === 10 && Date.now() - cached.ts < F1_TTL) { renderF1(cached); return; }
+    if (cached?.version === 11 && Date.now() - cached.ts < F1_TTL) renderF1(cached);
   } catch(e) {}
   try {
     const [racesJ, standingsJ] = await Promise.all([

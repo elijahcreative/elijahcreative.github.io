@@ -1006,7 +1006,7 @@ to   { opacity: 1; transform: translateY(0); }
 .f1-badge { font-family: var(--font-sans); font-size: .95rem; font-weight: 500; color: var(--text); line-height: 1; cursor: default; user-select: none; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
 .f1-badge-city { font-weight: 700; }
 .f1-badge-event { display: none; }
-.f1-badge-countdown { font-weight: 500; }
+.f1-badge-countdown { font-family: "Avenir Next Condensed", "Arial Narrow", var(--font-sans); font-weight: 400; font-style: normal; text-transform: uppercase; letter-spacing: -.02em; }
 .f1-badge-sep { opacity: .35; font-weight: 300; }
 .f1-flag { display: inline-flex; align-items: center; justify-content: center; width: 1em; height: 1em; padding: 0; border: 1px solid #000; border-radius: 50%; flex: 0 0 auto; overflow: hidden; vertical-align: -.08em; }
 .f1-flag img { display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
@@ -1025,15 +1025,16 @@ to   { opacity: 1; transform: translateY(0); }
 .f1-ticker span,
 .f1-upcoming span { min-width: max-content; overflow: visible; text-overflow: clip; white-space: nowrap; }
 .f1-title { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; column-gap: .36em; margin: 11px 0 8px; text-align: center; font-style: italic; text-transform: uppercase; letter-spacing: .095em; font-size: clamp(1.16rem, 2.9vw, 1.48rem); line-height: .95; white-space: nowrap; overflow: visible; text-overflow: clip; }
-.f1-title-combined { display: block; }
+.f1-title-combined { display: flex; justify-content: center; align-items: center; gap: .28em; }
+.f1-title-combined .f1-title-flag { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; font-style: normal; letter-spacing: 0; line-height: 1; transform: translateX(-.06em); }
 .f1-title strong { font-weight: 900; letter-spacing: .02em; }
 .f1-title span { font-weight: 400; color: color-mix(in srgb, var(--text) 72%, transparent); }
 .f1-title-city { justify-self: end; min-width: 0; overflow: visible; text-overflow: clip; }
 .f1-title-country { justify-self: start; min-width: 0; overflow: visible; text-overflow: clip; }
 .f1-title .f1-flag { color: var(--text); }
 .f1-track { position: relative; padding-top: 5px; }
-.f1-trackline { position: absolute; left: 7.5%; right: 7.5%; top: 31px; height: 3px; border-radius: 999px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); overflow: hidden; }
-.f1-track-seg { display: block; min-width: 0; height: 100%; background: color-mix(in srgb, var(--text) 22%, transparent); transition: background .25s ease; }
+.f1-trackline { position: absolute; left: 10%; right: 10%; top: 31px; height: 3px; border-radius: 999px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); overflow: hidden; }
+.f1-track-seg { display: block; min-width: 0; height: 100%; background: color-mix(in srgb, var(--text) 22%, transparent); -webkit-mask-image: linear-gradient(to right, transparent 9px, #000 9px, #000 calc(100% - 9px), transparent calc(100% - 9px)); mask-image: linear-gradient(to right, transparent 9px, #000 9px, #000 calc(100% - 9px), transparent calc(100% - 9px)); transition: background .25s ease; }
 .f1-track-seg:first-child { border-radius: 999px 0 0 999px; }
 .f1-track-seg:last-child { border-radius: 0 999px 999px 0; }
 .f1-track-seg.active { background: var(--f1-teal); }
@@ -1041,7 +1042,7 @@ to   { opacity: 1; transform: translateY(0); }
 .f1-track-seg-4.active { background: var(--f1-red); }
 .f1-events { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: start; gap: 0; }
 .f1-event { display: grid; grid-template-rows: 14px 26px 30px 20px 17px; justify-items: center; min-width: 0; text-align: center; }
-.f1-event-status { height: 16px; font-size: clamp(.64rem, 1.18vw, .75rem); font-style: italic; font-weight: 650; line-height: 1; text-transform: uppercase; color: var(--text); justify-self: center; margin-left: 0; }
+.f1-event-status { height: 16px; font-size: clamp(.64rem, 1.18vw, .75rem); font-style: italic; font-weight: 400; line-height: 1; text-transform: uppercase; color: var(--text); justify-self: center; margin-left: 0; }
 .f1-event-dot { width: 20px; height: 20px; border-radius: 50%; background: var(--bg); border: 3px solid color-mix(in srgb, var(--text) 24%, transparent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--bg) 70%, transparent); position: relative; z-index: 2; align-self: center; }
 .f1-event.done .f1-event-dot,
 .f1-event.live .f1-event-dot,
@@ -1058,6 +1059,11 @@ to   { opacity: 1; transform: translateY(0); }
 .f1-event.race.live .f1-event-dot { background: var(--f1-red); box-shadow: 0 0 0 4px color-mix(in srgb, var(--f1-red) 24%, transparent); }
 .f1-event.qual.next .f1-event-dot::after,
 .f1-event.race.next .f1-event-dot::after { background: var(--f1-red); }
+.f1-event:not(.current) .f1-event-dot { width: 6.5px; height: 6.5px; border: 0; background: color-mix(in srgb, var(--text) 24%, transparent); box-shadow: none; }
+.f1-event.done:not(.current) .f1-event-dot { background: var(--f1-teal); }
+.f1-event.qual.done:not(.current) .f1-event-dot,
+.f1-event.race.done:not(.current) .f1-event-dot { background: var(--f1-red); }
+.f1-event:not(.current) .f1-event-dot::after { content: none; }
 .f1-event-label { min-width: 0; color: var(--f1-teal); font-size: clamp(.7rem, 1.55vw, .84rem); font-weight: 900; font-style: italic; line-height: 1; text-transform: uppercase; white-space: nowrap; align-self: center; }
 .f1-event.qual .f1-event-label,
 .f1-event.race .f1-event-label { color: var(--f1-red); }
@@ -1078,7 +1084,7 @@ to   { opacity: 1; transform: translateY(0); }
 .f1-ticker { justify-content: center; font-size: .7rem; }
 .f1-title { font-size: clamp(1rem, 5.2vw, 1.42rem); letter-spacing: .075em; margin: 9px 0 6px; }
 .f1-track { padding-top: 5px; }
-.f1-trackline { top: 32px; left: 9%; right: 9%; height: 3px; }
+.f1-trackline { top: 32px; left: 10%; right: 10%; height: 3px; }
 .f1-event { grid-template-rows: 15px 26px 28px 19px 18px; }
 .f1-event-dot { width: 20px; height: 20px; border-width: 3px; }
 .f1-event-status { font-size: .7rem; margin-left: 0; justify-self: center; }
