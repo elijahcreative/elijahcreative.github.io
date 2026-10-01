@@ -3506,7 +3506,14 @@ function wxFluxIcon(name, size) {
   if (weather === 'storm') {
     body += `<path d="M33 47l-8 13h8l-3 9 11-16h-8l4-6z" fill="${bolt}"/><path d="M47 50l-3 7" stroke="${rain}" stroke-width="5" stroke-linecap="round"/>`;
   }
-  return `<svg width="${size}" height="${size}" viewBox="0 0 64 64" fill="none" style="display:block;flex-shrink:0;overflow:visible" aria-hidden="true">${body}</svg>`;
+  // Center the visible weather glyph, including precipitation, in a shared frame.
+  const offsetY = name === 'sunset' ? 6
+    : name.includes('partly-cloudy') ? 8
+    : weather === 'storm' ? -8
+    : weather === 'rain' || weather === 'snow' || weather === 'fog' ? -3
+    : hasCloud ? 3 : 0;
+  const viewBox = isRaindrop || name === 'wind' || name === 'uv-index' ? '0 0 64 64' : '-4 -4 72 72';
+  return `<svg width="${size}" height="${size}" viewBox="${viewBox}" fill="none" style="display:block;flex-shrink:0" aria-hidden="true"><g transform="translate(0 ${offsetY})">${body}</g></svg>`;
 }
 function wxIconName(code, isDay) {
   const pair = WX_ICONS[code] || ['not-available','not-available'];
