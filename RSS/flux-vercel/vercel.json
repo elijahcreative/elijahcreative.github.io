@@ -1,7 +1,8 @@
 {
   "functions": {
     "api/article.js": {
-      "maxDuration": 10
+      "maxDuration": 10,
+      "regions": ["fra1"]
     },
     "api/youtube.js": {
       "maxDuration": 10

@@ -121,10 +121,36 @@ async function handleArticle(req, res) {
     sendJson(res, 400, { error: 'unsupported_source' });
     return;
   }
-  const upstream = await fetch(articleUrl.href, {
+  const relayUrl = process.env.TELEX_RELAY_URL;
+  const relaySecret = process.env.TELEX_RELAY_SECRET;
+  const useRelay = ['telex.hu', 'www.telex.hu'].includes(articleUrl.hostname) && relayUrl && relaySecret;
+  let fetchUrl = articleUrl.href;
+  const relayHeaders = {};
+  if (useRelay) {
+    const relayArticleUrl = new URL(articleUrl.href);
+    relayArticleUrl.hostname = 'telex.hu';
+    relayArticleUrl.search = '';
+    relayArticleUrl.hash = '';
+    const endpoint = new URL(relayUrl);
+    if (endpoint.protocol !== 'https:' || endpoint.hostname !== 'flux-telex-reader.balazskemenesi.workers.dev'
+      || endpoint.username || endpoint.password || endpoint.port || endpoint.pathname !== '/article') {
+      throw new Error('Invalid Telex relay configuration');
+    }
+    endpoint.search = '';
+    endpoint.hash = '';
+    endpoint.searchParams.set('url', relayArticleUrl.href);
+    fetchUrl = endpoint.href;
+    const timestamp = String(Date.now());
+    relayHeaders['X-Flux-Time'] = timestamp;
+    relayHeaders['X-Flux-Signature'] = require('node:crypto').createHmac('sha256', relaySecret)
+      .update(`${timestamp}\n${relayArticleUrl.href}`).digest('hex');
+  }
+  const upstream = await fetch(fetchUrl, {
+    ...(useRelay ? { signal: AbortSignal.timeout(8000) } : {}),
     headers: {
       'accept': 'text/html,application/xhtml+xml',
-      'user-agent': 'Mozilla/5.0 FluxReader/1.0'
+      'user-agent': 'Mozilla/5.0 FluxReader/1.0',
+      ...relayHeaders
     }
   });
   if (!upstream.ok) {
