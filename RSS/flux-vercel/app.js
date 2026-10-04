@@ -1489,18 +1489,23 @@ function renderArticleView(a) {
   const articleContent = sanitizeArticleHtml(a.content || a.desc || '');
   const hasEmbeddedVideo = articleContent.includes('class="article-video"');
   renderArticleShell(articleViewHtml(a, {
-    body: `${a.image && !hasEmbeddedVideo ? `<img class="article-hero-img" src="${e(a.image)}" alt="">` : ''}
-      <div class="article-content">${articleContent}</div>
+    hero: !hasEmbeddedVideo,
+    body: `<div class="article-content">${articleContent}</div>
       <a class="reader-ext" href="${e(a.url)}" target="_self" rel="noopener">Eredeti cikk megnyitása</a>
       ${articleMoreHtml(a)}`
   }), aid(a));
 }
 function articleViewHtml(a, opts = {}) {
   const saved = isReadLaterArticle(a);
-  return `<article class="article-view" data-article-id="${e(aid(a))}">
-    <button class="article-back" type="button">← Vissza</button>
-    <h1 class="article-title">${e(a.title)}</h1>
-    <div class="article-meta">${Renderer._metaHtml(a, 'article-source', { full: true })}</div>
+  const hasHero = Boolean(a.image) && opts.hero !== false;
+  const title = `<h1 class="article-title">${e(a.title)}</h1>`;
+  const meta = `<div class="article-meta">${Renderer._metaHtml(a, 'article-source', { full: true })}</div>`;
+  const back = '<button class="article-back" type="button">← Vissza</button>';
+  return `<article class="article-view${hasHero ? ' article-view-with-hero' : ''}" data-article-id="${e(aid(a))}">
+    ${hasHero ? `<div class="article-back-float">${back}</div><header class="article-hero">
+      <img class="article-hero-img" src="${e(a.image)}" alt="" onerror="this.parentNode.classList.add('article-hero-unavailable');this.remove()">
+      <div class="article-hero-caption">${title}${meta}</div>
+    </header>` : back + title + meta}
     <div class="article-action-row">
       ${opts.speech === false ? '' : `<button class="article-read-btn" type="button" data-read-id="${aid(a)}" title="Felolvasás George hangjával" aria-label="Cikk felolvasása George hangjával" aria-pressed="false">${speechIcon('play')}<span class="article-read-label">Felolvasás</span></button>`}
       <button class="article-save-btn${saved ? ' saved' : ''}" type="button" data-save-id="${aid(a)}" title="${saved ? 'Mentve' : 'Mentés későbbre'}" aria-label="${saved ? 'Mentve' : 'Mentés későbbre'}" aria-pressed="${saved ? 'true' : 'false'}">${bookmarkIcon(saved, 18)}</button>
