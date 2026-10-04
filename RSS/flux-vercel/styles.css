@@ -1335,3 +1335,11 @@ body.article-swipe-underlay-close > .app-shell { transition: transform .35s cubi
 .article-page-scroll:has(> .article-view-with-hero) { padding-top: 0; }
 .article-view-with-hero { padding-top: 0; }
 .article-scroll:has(> .article-view-with-hero) { padding-top: 0; }
+
+[data-theme="light"] .article-back-float .article-back-over-hero { color: #f4f2ee; }
+.article-back-float .article-back { transition: color 140ms ease, background var(--t), border-color var(--t); }
+[data-theme="dark"] .article-hero::after { background: linear-gradient(to bottom, transparent 25%, color-mix(in srgb, var(--article-hero-end, var(--bg)) 12%, transparent) 44%, color-mix(in srgb, var(--article-hero-end, var(--bg)) 65%, transparent) 72%, var(--article-hero-end, var(--bg)) 100%); }
+.article-sheet .article-view { --article-hero-end: var(--bg-card); }
+@media (prefers-reduced-motion: reduce) {
+  .article-back-float .article-back { transition: none; }
+}

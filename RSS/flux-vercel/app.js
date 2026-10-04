@@ -1563,6 +1563,21 @@ function relatedArticleScore(base, candidate, baseWords, baseCategories, order) 
   if (Number.isFinite(deltaHours)) score += Math.max(0, 14 - deltaHours / 6);
   return score;
 }
+function setupArticleHeroBack(scroll) {
+  if (scroll._heroBackScroll) scroll.removeEventListener('scroll', scroll._heroBackScroll);
+  const hero = scroll.querySelector('.article-hero');
+  const back = scroll.querySelector('.article-back-float .article-back');
+  if (!hero || !back) return;
+  const update = () => {
+    const imageVisible = !hero.classList.contains('article-hero-unavailable')
+      && hero.getBoundingClientRect().bottom > back.getBoundingClientRect().top + back.offsetHeight / 2;
+    back.classList.toggle('article-back-over-hero', imageVisible);
+  };
+  scroll._heroBackScroll = update;
+  scroll.addEventListener('scroll', update, { passive: true });
+  hero.querySelector('img')?.addEventListener('error', update, { once: true });
+  requestAnimationFrame(update);
+}
 function renderArticleShell(html, articleId = '') {
   const stateTop = history.state?.flux === 'article' && history.state.articleId === articleId
     ? articleScrollTopFor(articleId)
@@ -1583,6 +1598,7 @@ function renderArticleShell(html, articleId = '') {
     const scroll = layer.querySelector('.article-scroll');
     scroll.innerHTML = html;
     setScrollTopInstant(scroll, restoreTop);
+    setupArticleHeroBack(scroll);
     pendingArticleScrollTop = 0;
     document.body.classList.add('article-modal-open');
     requestAnimationFrame(() => {
@@ -1599,6 +1615,7 @@ function renderArticleShell(html, articleId = '') {
   const scroll = layer.querySelector('.article-page-scroll');
   scroll.addEventListener('scroll', saveArticleHistoryScroll, { passive: true });
   setScrollTopInstant(scroll, restoreTop);
+  setupArticleHeroBack(scroll);
   pendingArticleScrollTop = 0;
   requestAnimationFrame(() => {
     if (!activeArticleMode) return;
