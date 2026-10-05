@@ -1,13 +1,13 @@
 {
   "Standings": [
     {
-      "After": "After Azerbaijan"
+      "After": "After Bahrain"
     },
     {
       "Place": "1",
       "Name": "Antonelli",
       "Team": "Mercedes",
-      "Points": "302"
+      "Points": "320"
     },
     {
       "Place": "2",
@@ -19,25 +19,25 @@
       "Place": "3",
       "Name": "Hamilton",
       "Team": "Ferrari",
-      "Points": "199"
+      "Points": "214"
     },
     {
       "Place": "4",
-      "Name": "Norris",
-      "Team": "McLaren",
-      "Points": "186"
+      "Name": "Leclerc",
+      "Team": "Ferrari",
+      "Points": "191"
     },
     {
       "Place": "5",
-      "Name": "Leclerc",
-      "Team": "Ferrari",
-      "Points": "179"
+      "Name": "Norris",
+      "Team": "McLaren",
+      "Points": "188"
     },
     {
       "Place": "6",
       "Name": "Verstappen",
       "Team": "Red Bull",
-      "Points": "163"
+      "Points": "188"
     }
   ]
 }

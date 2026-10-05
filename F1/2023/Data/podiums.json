@@ -1,30 +1,30 @@
 {
   "Podiums": [
     {
-      "Country": "🇦🇿 Azerbaijan",
-      "City": "Baku",
+      "Country": "🇧🇭 Bahrain",
+      "City": "Sepang",
       "Message": "Race ?"
     },
     {
       "Place": "1",
-      "Name": "Russell",
-      "Team": "Mercedes",
+      "Name": "Verstappen",
+      "Team": "Red Bull",
       "Points": "+25",
-      "Total": "236"
+      "Total": "188"
     },
     {
       "Place": "2",
-      "Name": "Verstappen",
-      "Team": "Red Bull",
+      "Name": "Antonelli",
+      "Team": "Mercedes",
       "Points": "+18",
-      "Total": "163"
+      "Total": "320"
     },
     {
       "Place": "3",
-      "Name": "Hadjar",
-      "Team": "Red Bull",
+      "Name": "Hamilton",
+      "Team": "Ferrari",
       "Points": "+15",
-      "Total": "86"
+      "Total": "214"
     }
   ]
 }
