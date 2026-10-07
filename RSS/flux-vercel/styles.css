@@ -1343,3 +1343,16 @@ body.article-swipe-underlay-close > .app-shell { transition: transform .35s cubi
 @media (prefers-reduced-motion: reduce) {
   .article-back-float .article-back { transition: none; }
 }
+
+/* Active YouTube player stays outside feed layouts, including during rotation. */
+body > .yt-sidebar.yt-player-fullscreen { position: fixed; inset: 0; z-index: 600; width: 100%; max-width: none; height: 100vh; height: 100dvh; margin: 0; padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); border: 0; border-radius: 0; background: #000; display: flex; flex-direction: column; gap: 12px; }
+body > .yt-player-fullscreen .yt-player-head { margin: 0; flex: 0 0 auto; }
+body > .yt-player-fullscreen .yt-player-stage { flex: 1 1 auto; min-height: 0; aspect-ratio: auto; }
+body > .yt-player-fullscreen .yt-player-frame-wrap { border-radius: 0; box-shadow: none; }
+body > .yt-player-fullscreen .yt-mini-tools { display: none; }
+body > .yt-player-fullscreen .yt-player-external { flex: 0 0 auto; margin: 0; }
+@media (orientation: landscape) and (max-height: 600px) {
+  body > .yt-player-fullscreen .yt-player-copy,
+  body > .yt-player-fullscreen .yt-player-external { display: none; }
+  body > .yt-player-fullscreen .yt-player-head { position: absolute; top: max(8px, env(safe-area-inset-top)); right: max(8px, env(safe-area-inset-right)); z-index: 5; }
+}
