@@ -1,9 +1,9 @@
 {
-    "updated": "2026-10-06T09:29:28.999Z",
+    "updated": "2026-10-07T09:25:28.365Z",
     "nextHoliday": {
-        "date": "Október 6.",
-        "name": "Az aradi vértanúk emléknapja",
-        "workday": "Munkanap",
-        "daysLeft": 0
+        "date": "Október 23.",
+        "name": "Az 1956-os forradalom ünnepe",
+        "workday": "Munkaszüneti nap",
+        "daysLeft": 16
     }
 }
