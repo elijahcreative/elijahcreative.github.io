@@ -1564,18 +1564,37 @@ function relatedArticleScore(base, candidate, baseWords, baseCategories, order) 
   return score;
 }
 function setupArticleHeroBack(scroll) {
-  if (scroll._heroBackScroll) scroll.removeEventListener('scroll', scroll._heroBackScroll);
-  const hero = scroll.querySelector('.article-hero');
-  const back = scroll.querySelector('.article-back-float .article-back');
-  if (!hero || !back) return;
+  if (scroll._heroBackScroll) {
+    scroll.removeEventListener('scroll', scroll._heroBackScroll);
+    scroll.removeEventListener('load', scroll._heroBackScroll, true);
+    scroll.removeEventListener('error', scroll._heroBackScroll, true);
+  }
+  const back = scroll.querySelector('.article-back');
+  if (!back) return;
+  const images = [...scroll.querySelectorAll('.article-hero-img, .article-content img')];
   const update = () => {
-    const imageVisible = !hero.classList.contains('article-hero-unavailable')
-      && hero.getBoundingClientRect().bottom > back.getBoundingClientRect().top + back.offsetHeight / 2;
-    back.classList.toggle('article-back-over-hero', imageVisible);
+    const button = back.getBoundingClientRect();
+    const centerX = button.left + button.width / 2;
+    const centerY = button.top + button.height / 2;
+    const overImage = images.some(image => {
+      if (!image.isConnected || !image.complete || !image.naturalWidth) return false;
+      const rect = image.getBoundingClientRect();
+      return centerX >= rect.left && centerX <= rect.right
+        && centerY >= rect.top && centerY <= rect.bottom;
+    });
+    back.classList.toggle('article-back-over-image', overImage);
   };
   scroll._heroBackScroll = update;
   scroll.addEventListener('scroll', update, { passive: true });
-  hero.querySelector('img')?.addEventListener('error', update, { once: true });
+  scroll.addEventListener('load', update, true);
+  scroll.addEventListener('error', update, true);
+  if (!setupArticleHeroBack.resizeBound) {
+    window.addEventListener('resize', () => {
+      document.querySelectorAll('.article-page-layer.open .article-page-scroll, .article-modal-layer.open .article-scroll')
+        .forEach(scroller => scroller._heroBackScroll?.());
+    }, { passive: true });
+    setupArticleHeroBack.resizeBound = true;
+  }
   requestAnimationFrame(update);
 }
 function renderArticleShell(html, articleId = '') {

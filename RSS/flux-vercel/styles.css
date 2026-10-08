@@ -653,7 +653,7 @@ body { position: relative; display: block; height: 100vh; height: 100dvh; overfl
 .reader-ext { margin-top: 18px; }
 .reader-ext:hover,
 .article-back:hover { background: var(--bg-hover); border-color: var(--muted); color: var(--text); text-decoration: none; }
-.article-view { --article-hero-bleed: 0px; --article-inset: 20px; width: min(760px, 100%); margin: 0 auto; padding: 18px 0 40px; }
+.article-view { --article-hero-bleed: 20px; --article-inset: 20px; --article-hero-radius: var(--radius); --article-body-inset: 20px; width: min(760px, 100%); margin: 0 auto; padding: 18px var(--article-body-inset) 40px; }
 .article-back { appearance: none; -webkit-appearance: none; position: sticky; top: 10px; z-index: 2; min-height: 40px; margin-bottom: 18px; background: var(--bg-nav, var(--bg-card)); backdrop-filter: blur(18px) saturate(180%); -webkit-backdrop-filter: blur(18px) saturate(180%); box-shadow: 0 18px 46px rgba(0,0,0,.06); }
 .article-sheet .article-back { top: 0; }
 .article-title { font-size: 2rem; font-weight: 900; line-height: 1.15; color: var(--text); margin-bottom: 10px; }
@@ -676,7 +676,7 @@ html[data-read-later-enabled="false"] .article-save-btn,
 html[data-share-enabled="false"] .article-share-btn,
 html:not([data-speech-enabled="true"]) .article-read-btn { display: none; }
 html[data-read-later-enabled="false"][data-share-enabled="false"]:not([data-speech-enabled="true"]) .article-action-row { display: none; }
-.article-hero { position: relative; isolation: isolate; width: calc(100% + 2 * var(--article-hero-bleed)); aspect-ratio: 1 / 1; margin: 0 calc(-1 * var(--article-hero-bleed)) 18px; background: #252525; }
+.article-hero { position: relative; isolation: isolate; width: calc(100% + 2 * var(--article-hero-bleed)); aspect-ratio: 1 / 1; margin: 0 calc(-1 * var(--article-hero-bleed)) 18px; border-radius: var(--article-hero-radius); overflow: hidden; background: #252525; }
 .article-hero::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(to bottom, transparent 25%, rgba(0,0,0,.12) 44%, rgba(0,0,0,.65) 72%, rgba(0,0,0,.88) 100%); }
 .article-hero-img { position: absolute; inset: 0; z-index: -2; display: block; width: 100%; height: 100%; object-fit: cover; }
 .article-hero-caption { position: absolute; bottom: 0; left: 0; right: 0; padding: 24px var(--article-inset); color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.25); }
@@ -729,7 +729,7 @@ body.article-modal-open .content { overflow: hidden; }
 .article-sheet { width: min(900px, 100%); max-height: 100%; display: flex; flex-direction: column; overflow: hidden; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 18px 50px rgba(0,0,0,.18); padding: 0; opacity: 0; transform: translateY(18px) scale(.985); transition: opacity .24s ease, transform .28s cubic-bezier(.2,.8,.2,1); will-change: opacity, transform; }
 .article-scroll { flex: 1 1 auto; min-height: 0; overflow: auto; -webkit-overflow-scrolling: touch; padding: 28px clamp(20px, 4vw, 48px); touch-action: pan-y; }
 .article-modal-layer.open .article-sheet { opacity: 1; transform: translateY(0) scale(1); }
-.article-sheet .article-view { width: min(760px, 100%); padding: 0 0 16px; }
+.article-sheet .article-view { width: min(760px, 100%); padding: 0 var(--article-body-inset) 16px; }
 .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 340; display: none; backdrop-filter: blur(2px); }
 .overlay.open { display: block; }
 .confirm-bg { position: fixed; inset: 0; background: rgba(0,0,0,.45); backdrop-filter: blur(2px); z-index: 400; display: none; }
@@ -1328,20 +1328,20 @@ body.article-swipe-underlay-close > .app-shell { transition: transform .35s cubi
 /* Reader hero: share the outer inset with each existing reader container. */
 @media (max-width: 720px) {
   .article-page-scroll > .article-view,
-  .content > .article-view { --article-hero-bleed: 12px; --article-inset: 12px; }
-  .article-scroll > .article-view { --article-hero-bleed: 20px; --article-inset: 20px; }
+  .content > .article-view { --article-hero-bleed: 12px; --article-inset: 12px; --article-hero-radius: 0px; --article-body-inset: 0px; }
+  .article-scroll > .article-view { --article-hero-bleed: 20px; --article-inset: 20px; --article-hero-radius: 0px; --article-body-inset: 0px; }
 }
 
 .article-page-scroll:has(> .article-view-with-hero) { padding-top: 0; }
 .article-view-with-hero { padding-top: 0; }
 .article-scroll:has(> .article-view-with-hero) { padding-top: 0; }
 
-[data-theme="light"] .article-back-float .article-back-over-hero { color: #f4f2ee; }
-.article-back-float .article-back { transition: color 140ms ease, background var(--t), border-color var(--t); }
+[data-theme="light"] .article-back-over-image { color: #f4f2ee; }
+.article-view .article-back { transition: color 140ms ease, background var(--t), border-color var(--t); }
 [data-theme="dark"] .article-hero::after { background: linear-gradient(to bottom, transparent 25%, color-mix(in srgb, var(--article-hero-end, var(--bg)) 12%, transparent) 44%, color-mix(in srgb, var(--article-hero-end, var(--bg)) 65%, transparent) 72%, var(--article-hero-end, var(--bg)) 100%); }
 .article-sheet .article-view { --article-hero-end: var(--bg-card); }
 @media (prefers-reduced-motion: reduce) {
-  .article-back-float .article-back { transition: none; }
+  .article-view .article-back { transition: none; }
 }
 
 /* Active YouTube player stays outside feed layouts, including during rotation. */
