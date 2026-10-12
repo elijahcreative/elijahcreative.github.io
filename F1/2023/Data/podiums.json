@@ -1,8 +1,8 @@
 {
   "Podiums": [
     {
-      "Country": "🇧🇭 Bahrain",
-      "City": "Sepang",
+      "Country": "🇸🇬 Singapore",
+      "City": "Marina Bay",
       "Message": "Race ?"
     },
     {
@@ -10,21 +10,21 @@
       "Name": "Verstappen",
       "Team": "Red Bull",
       "Points": "+25",
-      "Total": "188"
+      "Total": "221"
     },
     {
       "Place": "2",
-      "Name": "Antonelli",
-      "Team": "Mercedes",
+      "Name": "Leclerc",
+      "Team": "Ferrari",
       "Points": "+18",
-      "Total": "320"
+      "Total": "215"
     },
     {
       "Place": "3",
-      "Name": "Hamilton",
-      "Team": "Ferrari",
+      "Name": "Antonelli",
+      "Team": "Mercedes",
       "Points": "+15",
-      "Total": "214"
+      "Total": "340"
     }
   ]
 }
