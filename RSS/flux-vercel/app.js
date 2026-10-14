@@ -204,8 +204,8 @@ const SECTION_RULES = [
   { id: 'velemeny', label: 'Vélemény', keys: ['velemeny', 'publicisztika', 'kommentar', 'elemzes', 'interju'] }
 ];
 const MAGAZINE_TOPIC_INSERTS = [
-  { id: 'gazdasag', label: 'Gazdaság', icon: 'chart', subtitle: 'piacok, cégek, pénz' },
-  { id: 'tech', label: 'Technológia', icon: 'chip', subtitle: 'digitális világ és tudomány' }
+  { id: 'gazdasag', label: 'Gazdaság', subtitle: 'piacok, cégek, pénz' },
+  { id: 'tech', label: 'Technológia', subtitle: 'digitális világ és tudomány' }
 ];
 function saveSettings() {
   Store.set('flux_s', Object.fromEntries(SETTINGS_KEYS.map(k => [k, S[k]])));
@@ -480,6 +480,7 @@ const Fetcher = {
 };
 const ChevronIcon = '<svg class="chevron" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>';
 const Renderer = {
+  _topicPools: new Map(),
   render(articles, layout = S.layout) {
     const el = $('content');
     const isFlip = layout === 'flip';
@@ -493,6 +494,7 @@ const Renderer = {
     }
     articles.forEach(a => { articleMap[aid(a)] = a; });
     el.innerHTML = (this['_' + layout] || this._magazine).call(this, articles);
+    setupMagazineTopics();
     if (isFlip) requestAnimationFrame(setupFlipView);
   },
   _feedName(url)  { return S.feeds.find(f => f.url === url)?.name || DEFAULT_FEEDS.find(f => f.url === url)?.name || ''; },
@@ -688,6 +690,7 @@ const Renderer = {
     return `<footer class="ix-footer"><button class="ix-footer-brand" type="button"><span class="ix-footer-mark"></span>Flux</button>${parts.map(p => `<span class="ix-footer-sep">·</span><span>${e(p)}</span>`).join('')}</footer>`;
   },
   _magazine(articles) {
+    this._topicPools.clear();
     const used = new Set();
     const pool = [...articles.filter(a => a.image), ...articles.filter(a => !a.image)];
     let idx = 0;
@@ -739,26 +742,259 @@ const Renderer = {
       .filter(a => !used.has(aid(a)) && primarySectionRule(a)?.id === topic.id)
       .sort((a, b) => b.date - a.date);
     if (items.length < 2) return '';
-    const photoItems = items.filter(a => a.image).slice(0, 4);
-    const photoIds = new Set(photoItems.map(aid));
-    const miniItems = items.filter(a => !photoIds.has(aid(a)) && a.image).slice(0, 4);
-    const miniIds = new Set(miniItems.map(aid));
-    const textItems = items.filter(a => !photoIds.has(aid(a)) && !miniIds.has(aid(a))).slice(0, 9);
-    [...photoItems, ...miniItems, ...textItems].forEach(a => used.add(aid(a)));
-    return `<section class="ix-topic-box ix-topic-box-${e(topic.id)}">
-      <div class="ix-topic-box-head">${topicIcon(topic.icon)}<span>${e(topic.label)}</span><em>— ${e(topic.subtitle || '')}</em></div>
-      ${photoItems.length ? `<div class="ix-topic-photo-row count-${photoItems.length}">${photoItems.map(a => this._topicPhotoItem(a)).join('')}</div>` : ''}
-      ${miniItems.length ? `<div class="ix-topic-mini-row">${miniItems.map(a => this._topicMiniItem(a)).join('')}</div>` : ''}
-      ${textItems.length ? `<div class="ix-topic-link-list">${textItems.map(a => `<div class="ix-topic-link" data-id="${aid(a)}"><div class="ix-topic-link-title">${e(a.title)}</div><div class="ix-topic-link-meta">${this._meta(a, 'ix-topic-link-source')}</div></div>`).join('')}</div>` : ''}
+    items.forEach(a => used.add(aid(a)));
+    this._topicPools.set(topic.id, { items, topic });
+    const columns = window.matchMedia('(max-width: 720px)').matches ? 1 : 2;
+    return `<section class="ix-topic-section ix-topic-section-${e(topic.id)}" data-topic="${e(topic.id)}" data-topic-columns="${columns}" style="--topic-columns:${columns}">
+      <div class="ix-topic-box">
+        <div class="ix-topic-box-inner">
+          <div class="ix-topic-heading">
+            <h2 class="ix-topic-heading-label">${e(topic.label)}</h2>
+            <p class="ix-topic-heading-subtitle">${e(topic.subtitle || '')}</p>
+          </div>
+          <div class="ix-topic-main">${this._topicBody(items, topic, columns)}</div>
+        </div>
+        ${this._topicTicker(items, topic, columns)}
+      </div>
     </section>`;
   },
+  _topicBody(items, topic, columns) {
+    const { photoItems, miniItems } = this._topicSelection(items, columns);
+    const photoRow = photoItems.length
+      ? columns === 1 && photoItems.length > 1
+        ? `<div class="ix-topic-photo-row ix-topic-photo-carousel" role="region" aria-label="${e(topic.label)} kiemelt cikkei"><div class="ix-topic-photo-track">${photoItems.map(a => this._topicPhotoItem(a)).join('')}</div></div><button class="ix-topic-photo-dots" type="button" data-topic-next aria-label="Következő kiemelt cikk, jelenleg 1 / ${photoItems.length}">${photoItems.map((_, i) => `<span class="ix-topic-photo-dot${i === 0 ? ' is-active' : ''}" aria-hidden="true"></span>`).join('')}</button>`
+        : `<div class="ix-topic-photo-row">${photoItems.map(a => this._topicPhotoItem(a)).join('')}</div>`
+      : '';
+    return `${photoItems.length ? `<div class="ix-topic-photo-area">${photoRow}</div>` : ''}${miniItems.length ? `<div class="ix-topic-mini-row">${miniItems.map(a => this._topicMiniItem(a)).join('')}</div>` : ''}`;
+  },
+  _topicSelection(items, columns) {
+    const photos = items.filter(a => a.image);
+    const photoCount = columns === 1 && photos.length < 6
+      ? 1
+      : columns === 3 ? (photos.length >= 6 ? 6 : 3) : 4;
+    const miniCount = columns === 3 ? 3 : 4;
+    return {
+      photoItems: photos.slice(0, photoCount),
+      miniItems: photos.slice(photoCount, photoCount + miniCount)
+    };
+  },
+  _topicTicker(items, topic, columns) {
+    const { photoItems, miniItems } = this._topicSelection(items, columns);
+    const imageIds = new Set([...photoItems, ...miniItems].map(aid));
+    const textItems = items.filter(a => !imageIds.has(aid(a)));
+    const tickerRepeats = textItems.length ? Math.max(1, Math.ceil(Math.max(2600, window.innerWidth) / (textItems.length * 180))) : 0;
+    const tickerItem = (a, clone) => `<${clone ? 'div' : 'button'} class="ix-topic-link" ${clone ? 'aria-hidden="true"' : 'type="button"'} data-id="${aid(a)}"><span class="ix-topic-link-title">${e(a.title)}</span><span class="ix-topic-link-meta">${this._meta(a, 'ix-topic-link-source')}</span></${clone ? 'div' : 'button'}>`;
+    const tickerItems = textItems.map(a => tickerItem(a, false)).join('');
+    const tickerCloneItems = textItems.map(a => tickerItem(a, true)).join('');
+    const tickerPrimaryCopies = tickerCloneItems.repeat(Math.max(0, tickerRepeats - 1));
+    const tickerLoopCopies = tickerCloneItems.repeat(tickerRepeats);
+    return textItems.length ? `<div class="ix-topic-ticker" role="region" aria-label="${e(topic.label)} további cikkei" tabindex="0"><div class="ix-topic-ticker-track"><div class="ix-topic-ticker-group">${tickerItems}${tickerPrimaryCopies}</div><div class="ix-topic-ticker-group" aria-hidden="true">${tickerLoopCopies}</div></div></div>` : '';
+  },
   _topicPhotoItem(a) {
-    return `<div class="ix-topic-photo-item" data-id="${aid(a)}">${this._ixImg(a, 'ix-topic-photo-img', 'ix-topic-photo-nobg')}<div class="ix-topic-photo-title">${e(a.title)}</div>${this._desc(a, 'ix-topic-photo-desc')}<div class="ix-topic-photo-meta">${this._meta(a, 'ix-topic-photo-source')}</div></div>`;
+    return `<div class="ix-topic-photo-item" data-id="${aid(a)}">${this._ixImg(a, 'ix-topic-photo-img', 'ix-topic-photo-nobg')}<div class="ix-topic-photo-title">${e(a.title)}</div><div class="ix-topic-photo-meta">${this._meta(a, 'ix-topic-photo-source')}</div></div>`;
   },
   _topicMiniItem(a) {
     return `<div class="ix-topic-mini-item" data-id="${aid(a)}">${this._rawImg(a, 'ix-topic-mini-img', 'ix-topic-mini-nobg')}<div class="ix-topic-mini-body"><div class="ix-topic-mini-title">${e(a.title)}</div><div class="ix-topic-mini-meta">${this._meta(a, 'ix-topic-mini-source')}</div></div></div>`;
   }
 };
+let magazineTopicResizeObserver = null;
+const magazineTickerStates = new Map();
+const magazineTickerReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+let magazineTickerFrame = 0;
+let magazineTickerLastTime = 0;
+const magazineTickerObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    const state = magazineTickerStates.get(entry.target);
+    if (state) state.visible = entry.isIntersecting;
+  });
+  resumeMagazineTickers();
+});
+function paintMagazineTicker(state) {
+  if (!state.width) return;
+  state.position = ((state.position % state.width) + state.width) % state.width;
+  state.track.style.transform = `translate3d(${-state.position}px, 0, 0)`;
+}
+function resumeMagazineTickers() {
+  if (magazineTickerFrame || document.hidden || activeArticleMode || magazineTickerReducedMotion.matches) return;
+  if (![...magazineTickerStates.values()].some(state => state.visible && state.ticker.isConnected)) return;
+  magazineTickerLastTime = 0;
+  magazineTickerFrame = requestAnimationFrame(advanceMagazineTickers);
+}
+function advanceMagazineTickers(now) {
+  magazineTickerFrame = 0;
+  if (document.hidden || activeArticleMode || magazineTickerReducedMotion.matches) return;
+  const elapsed = magazineTickerLastTime ? Math.min(.05, (now - magazineTickerLastTime) / 1000) : 0;
+  magazineTickerLastTime = now;
+  let moving = false;
+  magazineTickerStates.forEach((state, ticker) => {
+    if (!ticker.isConnected) {
+      magazineTickerObserver.unobserve(ticker);
+      magazineTickerStates.delete(ticker);
+      return;
+    }
+    if (!state.visible) return;
+    moving = true;
+    if (state.pointer?.dragging) return;
+    state.position += (40 + state.boost) * elapsed;
+    state.boost *= Math.exp(-elapsed / .65);
+    if (Math.abs(state.boost) < .5) state.boost = 0;
+    paintMagazineTicker(state);
+  });
+  if (moving) magazineTickerFrame = requestAnimationFrame(advanceMagazineTickers);
+}
+function setupMagazineTickers(content) {
+  magazineTickerStates.forEach((state, ticker) => {
+    if (!ticker.isConnected) {
+      magazineTickerObserver.unobserve(ticker);
+      magazineTickerStates.delete(ticker);
+    }
+  });
+  content.querySelectorAll('.ix-topic-ticker').forEach(ticker => {
+    const existing = magazineTickerStates.get(ticker);
+    if (existing) {
+      existing.width = existing.track.firstElementChild.getBoundingClientRect().width;
+      paintMagazineTicker(existing);
+      return;
+    }
+    const track = ticker.querySelector('.ix-topic-ticker-track');
+    const state = { ticker, track, width: track.firstElementChild.getBoundingClientRect().width, position: 0, boost: 0, visible: false, pointer: null, suppressClickUntil: 0 };
+    magazineTickerStates.set(ticker, state);
+    magazineTickerObserver.observe(ticker);
+    ticker.addEventListener('pointerdown', ev => {
+      if (magazineTickerReducedMotion.matches || !ev.isPrimary || (ev.pointerType === 'mouse' && ev.button !== 0)) return;
+      state.pointer = { id: ev.pointerId, x: ev.clientX, y: ev.clientY, lastX: ev.clientX, time: ev.timeStamp, velocity: 0, dragging: false };
+      state.boost = 0;
+    });
+    ticker.addEventListener('pointermove', ev => {
+      const pointer = state.pointer;
+      if (!pointer || pointer.id !== ev.pointerId) return;
+      const dx = ev.clientX - pointer.x;
+      const dy = ev.clientY - pointer.y;
+      if (!pointer.dragging) {
+        if (Math.abs(dy) > 6 && Math.abs(dy) > Math.abs(dx)) { state.pointer = null; return; }
+        if (Math.abs(dx) < 6 || Math.abs(dx) <= Math.abs(dy)) return;
+        pointer.dragging = true;
+        ticker.setPointerCapture(ev.pointerId);
+        ticker.classList.add('is-dragging');
+      }
+      const delta = pointer.lastX - ev.clientX;
+      const elapsed = Math.max(8, ev.timeStamp - pointer.time);
+      pointer.velocity = pointer.velocity * .35 + Math.max(-1400, Math.min(1400, delta * 1000 / elapsed)) * .65;
+      state.position += delta;
+      pointer.lastX = ev.clientX;
+      pointer.time = ev.timeStamp;
+      ev.preventDefault();
+      paintMagazineTicker(state);
+    });
+    const release = ev => {
+      const pointer = state.pointer;
+      if (!pointer || pointer.id !== ev.pointerId) return;
+      if (pointer.dragging) {
+        state.suppressClickUntil = performance.now() + 400;
+        state.boost = ev.type === 'pointercancel' || ev.timeStamp - pointer.time > 120 ? 0 : Math.max(-360, Math.min(360, pointer.velocity - 40));
+        if (ticker.hasPointerCapture(ev.pointerId)) ticker.releasePointerCapture(ev.pointerId);
+      }
+      state.pointer = null;
+      ticker.classList.remove('is-dragging');
+      resumeMagazineTickers();
+    };
+    ticker.addEventListener('pointerup', release);
+    ticker.addEventListener('pointercancel', release);
+    ticker.addEventListener('lostpointercapture', ev => {
+      // Touch implicitly captures the pressed title. Its release bubbles when
+      // capture moves to the ticker; only losing the ticker's own capture ends a drag.
+      if (ev.target === ticker) release(ev);
+    });
+    ticker.addEventListener('click', ev => {
+      if (performance.now() < state.suppressClickUntil) { ev.preventDefault(); ev.stopPropagation(); }
+    }, true);
+    ticker.addEventListener('wheel', ev => {
+      if (magazineTickerReducedMotion.matches) return;
+      const delta = ev.deltaX || (ev.shiftKey ? ev.deltaY : 0);
+      if (!delta || (!ev.shiftKey && Math.abs(ev.deltaY) > Math.abs(ev.deltaX))) return;
+      ev.preventDefault();
+      const pixels = delta * (ev.deltaMode === 1 ? 16 : ev.deltaMode === 2 ? ticker.clientWidth : 1);
+      state.position += pixels;
+      state.boost = Math.max(-360, Math.min(360, pixels * 10));
+      paintMagazineTicker(state);
+      resumeMagazineTickers();
+    }, { passive: false });
+    ticker.addEventListener('scroll', () => {
+      // Focus restoration must not add native scrolling to the translated loop.
+      if (!magazineTickerReducedMotion.matches && ticker.scrollLeft) ticker.scrollLeft = 0;
+    }, { passive: true });
+  });
+  resumeMagazineTickers();
+}
+document.addEventListener('visibilitychange', resumeMagazineTickers);
+window.addEventListener('pageshow', resumeMagazineTickers);
+magazineTickerReducedMotion.addEventListener('change', () => {
+  magazineTickerStates.forEach(state => {
+    state.boost = 0;
+    state.track.style.transform = magazineTickerReducedMotion.matches ? '' : `translate3d(${-state.position}px, 0, 0)`;
+  });
+  resumeMagazineTickers();
+});
+function fitMagazineTopicHeading(section) {
+  const heading = section.querySelector('.ix-topic-heading');
+  const label = heading?.querySelector('.ix-topic-heading-label');
+  const subtitle = heading?.querySelector('.ix-topic-heading-subtitle');
+  if (!heading || !label || !subtitle) return;
+  const style = getComputedStyle(heading);
+  const verticalSpace = heading.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom)
+    - subtitle.getBoundingClientRect().height - parseFloat(style.rowGap || style.gap);
+  const horizontalSpace = heading.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+  if (verticalSpace < 30 || horizontalSpace < 30) return;
+  const mobile = window.matchMedia('(max-width: 720px)').matches;
+  let low = 18;
+  let high = mobile ? 68 : 100;
+  for (let i = 0; i < 8; i++) {
+    const size = (low + high) / 2;
+    label.style.fontSize = `${size}px`;
+    const bounds = label.getBoundingClientRect();
+    if (bounds.height <= verticalSpace - 6 && bounds.width <= horizontalSpace - 4) low = size;
+    else high = size;
+  }
+  label.style.fontSize = `${low}px`;
+}
+function setupMagazineTopics() {
+  magazineTopicResizeObserver?.disconnect();
+  const content = $('content');
+  if (!content?.querySelector('.ix-topic-section[data-topic]')) return;
+  let frame = 0;
+  const update = () => {
+    if (frame) return;
+    frame = requestAnimationFrame(() => {
+      frame = 0;
+      content.querySelectorAll('.ix-topic-section[data-topic]').forEach(section => {
+        const pool = Renderer._topicPools.get(section.dataset.topic);
+        const photoArea = section.querySelector('.ix-topic-photo-area');
+        const main = section.querySelector('.ix-topic-main');
+        if (!pool || !photoArea || !main) return;
+        const available = photoArea.clientWidth;
+        const minimum = parseFloat(getComputedStyle(section).getPropertyValue('--topic-tile-min')) || 180;
+        const maxColumns = window.matchMedia('(max-width: 720px)').matches ? 1 : 3;
+        let columns = Math.max(1, Math.min(maxColumns, Math.floor((available + 14) / (minimum + 14))));
+        if (columns === 3 && pool.items.filter(item => item.image).length < 3) columns = 2;
+        if (columns !== Number(section.dataset.topicColumns)) {
+          section.dataset.topicColumns = String(columns);
+          section.style.setProperty('--topic-columns', columns);
+          main.innerHTML = Renderer._topicBody(pool.items, pool.topic, columns);
+          const ticker = section.querySelector('.ix-topic-ticker');
+          const tickerHtml = Renderer._topicTicker(pool.items, pool.topic, columns);
+          if (ticker) ticker.outerHTML = tickerHtml;
+          else section.querySelector('.ix-topic-box')?.insertAdjacentHTML('beforeend', tickerHtml);
+        }
+        fitMagazineTopicHeading(section);
+      });
+      setupMagazineTickers(content);
+    });
+  };
+  update();
+  document.fonts?.ready.then(update);
+  magazineTopicResizeObserver = new ResizeObserver(update);
+  magazineTopicResizeObserver.observe(content);
+}
 let flipResizeTimer = 0;
 let flipTextLayoutMode = '';
 let flipOverlay = null;
@@ -1461,11 +1697,75 @@ function setupArticlePrefetch() {
   if (!content || content._fluxPrefetchBound) return;
   content._fluxPrefetchBound = true;
   let timer = null;
+  const activeTopicPhotoIndex = track => {
+    const origin = track.firstElementChild?.offsetLeft || 0;
+    return Array.from(track.children).reduce((best, item, index) =>
+      Math.abs(item.offsetLeft - origin - track.scrollLeft) < best.distance
+        ? { index, distance: Math.abs(item.offsetLeft - origin - track.scrollLeft) }
+        : best, { index: 0, distance: Infinity }).index;
+  };
+  const scrollToTopicPhoto = (track, index) => {
+    const item = track.children[index];
+    if (!item) return;
+    track.scrollTo({ left: track.scrollLeft + item.getBoundingClientRect().left - track.getBoundingClientRect().left, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  };
+  content.addEventListener('scroll', ev => {
+    const track = ev.target;
+    if (!track.classList?.contains('ix-topic-photo-track')) return;
+    const dots = track.closest('.ix-topic-photo-area')?.querySelectorAll('.ix-topic-photo-dot');
+    if (!dots?.length || !track.clientWidth) return;
+    const active = activeTopicPhotoIndex(track);
+    if (track.dataset.activeTopicIndex === String(active)) return;
+    track.dataset.activeTopicIndex = String(active);
+    dots.forEach((dot, index) => {
+      dot.classList.toggle('is-active', index === active);
+    });
+    dots[0].parentElement.setAttribute('aria-label', `Következő kiemelt cikk, jelenleg ${active + 1} / ${dots.length}`);
+  }, true);
   content.addEventListener('click', ev => {
+    const dot = ev.target.closest('[data-topic-next]');
+    if (dot && content.contains(dot)) {
+      const track = dot.closest('.ix-topic-photo-area')?.querySelector('.ix-topic-photo-track');
+      if (track) scrollToTopicPhoto(track, (activeTopicPhotoIndex(track) + 1) % track.children.length);
+      return;
+    }
     const video = ev.target.closest('[data-video-id]');
     if (video && content.contains(video)) return openYtVideo(video.dataset.videoId);
     const item = ev.target.closest('[data-id]');
+    if (item?.classList.contains('ix-topic-photo-item')) {
+      const track = item.closest('.ix-topic-photo-track');
+      if (track) {
+        const index = Array.prototype.indexOf.call(track.children, item);
+        if (index !== activeTopicPhotoIndex(track)) {
+          scrollToTopicPhoto(track, index);
+          return;
+        }
+      }
+    }
     if (item && content.contains(item)) openArticle(item.dataset.id);
+  });
+  content.addEventListener('focusin', ev => {
+    const item = ev.target.closest('.ix-topic-link[data-id]');
+    const ticker = item?.closest('.ix-topic-ticker');
+    if (!ticker || item.getAttribute('aria-hidden') === 'true') return;
+    requestAnimationFrame(() => {
+      if (!ticker.contains(document.activeElement)) return;
+      if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+        item.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'auto' });
+        return;
+      }
+      const view = ticker.getBoundingClientRect();
+      const rect = item.getBoundingClientRect();
+      const inset = 10;
+      const shift = rect.left < view.left + inset
+        ? view.left + inset - rect.left
+        : rect.right > view.right - inset ? view.right - inset - rect.right : 0;
+      if (!shift) return;
+      const state = magazineTickerStates.get(ticker);
+      if (!state) return;
+      state.position -= shift;
+      paintMagazineTicker(state);
+    });
   });
   content.addEventListener('pointerover', ev => {
     const item = ev.target.closest('[data-id]');
@@ -1725,6 +2025,7 @@ function finishArticleClose() {
   document.body.style.removeProperty('--article-underlay-x');
   $('articleModalLayer')?.classList.remove('article-swipe-underlay');
   activeArticleMode = null;
+  resumeMagazineTickers();
   restoreReturnScroll(true);
   clearReturnScroll();
 }
@@ -2342,13 +2643,6 @@ function isUsableSectionToken(token) {
 function sectionTokenMatches(token, key) {
   return token === key || (key.length >= 5 && token.includes(key)) || (token.length >= 5 && key.includes(token));
 }
-function topicIcon(type) {
-  const icons = {
-    chart: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-8"/></svg>',
-    chip: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M9 3v4M15 3v4M9 17v4M15 17v4M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>'
-  };
-  return `<span class="ix-topic-icon">${icons[type] || icons.chart}</span>`;
-}
 function openMobileFeedPanel() {
   renderMobileFeedPanel();
   const panel = $('mobileFeedPanel');
@@ -2837,7 +3131,7 @@ function setupArticleSwipeBack() {
       return;
     }
     const point = ev.touches[0];
-    if (!activeArticleMode && lastClosedArticle && history.state?.flux !== 'article' && point.clientX >= window.innerWidth - cfg.nativeEdgeWidth) {
+    if (!activeArticleMode && lastClosedArticle && history.state?.flux !== 'article' && point.clientX >= window.innerWidth - cfg.nativeEdgeWidth && !ev.target.closest('.ix-topic-photo-carousel, .ix-topic-ticker')) {
       // Keep Safari's native forward card from running beside the Flux card.
       ev.preventDefault();
       gesture = {
