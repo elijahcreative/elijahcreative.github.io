@@ -1,14 +1,5 @@
 # Telex Reader relay
 
-The relay is on standby. Flux currently fetches Telex articles directly from
-the Frankfurt Vercel function. The Worker, shared secret and relay URL are kept
-in place for reactivation; no automatic relay fallback is used.
-
-To reactivate, set the Vercel server environment variable
-`TELEX_RELAY_ENABLED=1` and redeploy. An absent variable or `0` keeps the relay
-inactive even when its URL and secret are configured. To return to direct
-fetching, remove this variable or set it to `0`, then redeploy.
-
 This separate Worker does not bind to Pixaluma resources. Only signed GET
 requests to `/article` are accepted, for HTTPS Telex article paths. The shared
 secret belongs in Cloudflare and Vercel server environment variables, never in
@@ -30,14 +21,13 @@ Requests rejected by authentication still consume Worker invocations; this does
 not guarantee isolation from the account-wide free quota under deliberate
 flooding. The public Flux article API remains public as before.
 
-With relay activation or configuration absent, Flux uses direct fetching.
+With configuration absent, Flux retains its existing direct-fetch behavior.
 Non-Telex extraction, article parsing and saved user settings are unchanged.
 
-The Reader and Widgy Telex RSS functions run in `fra1`. The standby Worker uses
-the `aws:eu-central-1` placement hint. On 2026-10-15, direct Frankfurt fetching
-succeeded for five Telex articles, including a video article. Exact content,
-title and image comparisons for a long article and the video article matched
-the relay route. This does not guarantee that Telex will never change its
-access rules.
+The Reader Vercel function alone runs in `fra1`; other functions keep their
+existing region. The Worker uses the `aws:eu-central-1` placement hint. End-to-end
+testing found Telex returning 403 on the US Vercel-to-Worker path, while the
+European Reader path succeeded for both test articles. This does not guarantee
+that Telex will never change its access rules.
 
 Validation: `node --test worker.test.mjs`.
