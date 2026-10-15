@@ -4,6 +4,10 @@
       "maxDuration": 10,
       "regions": ["fra1"]
     },
+    "api/rss-telex.js": {
+      "maxDuration": 10,
+      "regions": ["fra1"]
+    },
     "api/youtube.js": {
       "maxDuration": 10
     },
