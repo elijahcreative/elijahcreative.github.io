@@ -40,6 +40,7 @@ test('auth, source restrictions, rate limit, cache, size cap and Reader integrat
   const require = createRequire(import.meta.url);
   const handler = require('../../api/article.js');
   process.env.TELEX_RELAY_URL=origin; process.env.TELEX_RELAY_SECRET=secret;
+  process.env.TELEX_RELAY_ENABLED='1';
   const remoteFetch = async () => new Response(html,{headers:{'content-type':'text/html'}});
   globalThis.fetch = async (endpoint, options) => {
     assert.equal(new URL(endpoint).hostname,new URL(origin).hostname);
@@ -56,6 +57,21 @@ test('auth, source restrictions, rate limit, cache, size cap and Reader integrat
   assert.equal(output.title,'Tesztcikk');
   await handler({method:'GET',query:{url:url+'?utm_source=test#section'}},res);
   assert.equal(status || res.statusCode,200);
+  // Retained relay credentials must not activate the standby relay by themselves.
+  globalThis.fetch = async (endpoint,options) => {
+    assert.equal(endpoint,url);
+    assert.equal(options.headers['X-Flux-Signature'],undefined);
+    assert.equal(options.headers['X-Flux-Time'],undefined);
+    return new Response(html,{headers:{'content-type':'text/html'}});
+  };
+  for (const enabled of [undefined,'0']) {
+    if (enabled === undefined) delete process.env.TELEX_RELAY_ENABLED;
+    else process.env.TELEX_RELAY_ENABLED=enabled;
+    await handler({method:'GET',query:{url}},res);
+    assert.equal(status || res.statusCode,200);
+    assert.equal(output.title,'Tesztcikk');
+  }
+  process.env.TELEX_RELAY_ENABLED='1';
   // Other sources retain direct fetching and never receive relay credentials.
   const other = 'https://444.hu/2026/10/02/test';
   globalThis.fetch = async (endpoint,options) => {
@@ -66,6 +82,7 @@ test('auth, source restrictions, rate limit, cache, size cap and Reader integrat
   await handler({method:'GET',query:{url:other}},res);
   delete process.env.TELEX_RELAY_URL;
   delete process.env.TELEX_RELAY_SECRET;
+  delete process.env.TELEX_RELAY_ENABLED;
   globalThis.fetch = async (endpoint,options) => {
     assert.equal(endpoint,url);
     assert.equal(options.headers['X-Flux-Signature'],undefined);

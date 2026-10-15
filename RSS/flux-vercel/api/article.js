@@ -123,7 +123,8 @@ async function handleArticle(req, res) {
   }
   const relayUrl = process.env.TELEX_RELAY_URL;
   const relaySecret = process.env.TELEX_RELAY_SECRET;
-  const useRelay = ['telex.hu', 'www.telex.hu'].includes(articleUrl.hostname) && relayUrl && relaySecret;
+  const useRelay = process.env.TELEX_RELAY_ENABLED === '1'
+    && ['telex.hu', 'www.telex.hu'].includes(articleUrl.hostname) && relayUrl && relaySecret;
   let fetchUrl = articleUrl.href;
   const relayHeaders = {};
   if (useRelay) {
