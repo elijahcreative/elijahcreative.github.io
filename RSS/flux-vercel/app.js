@@ -995,6 +995,131 @@ function setupMagazineTopics() {
   magazineTopicResizeObserver = new ResizeObserver(update);
   magazineTopicResizeObserver.observe(content);
 }
+// Only the visible photo counter requests a small, CDN-cached analysis image.
+const flipContrastImages = new Map();
+function flipContrastImage(url) {
+  if (flipContrastImages.has(url)) return flipContrastImages.get(url);
+  const promise = new Promise(resolve => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => resolve(null);
+    image.src = '/api/contrast-image?image=' + encodeURIComponent(url);
+  });
+  flipContrastImages.set(url, promise);
+  if (flipContrastImages.size > 80) flipContrastImages.delete(flipContrastImages.keys().next().value);
+  return promise;
+}
+    function analyzeFlipNumberPixels(data, offset) {
+      let total = 0;
+      let totalSquared = 0;
+      let bright = 0;
+      const histogram = new Uint16Array(32);
+      const pixelCount = 64 * 24;
+      for (let index = offset; index < offset + pixelCount * 4; index += 4) {
+        const luminance = data[index] * 0.2126 + data[index + 1] * 0.7152 + data[index + 2] * 0.0722;
+        total += luminance;
+        totalSquared += luminance * luminance;
+        if (luminance >= 200) bright += 1;
+        histogram[Math.min(31, Math.floor(luminance / 8))] += 1;
+      }
+      const mean = total / pixelCount;
+      let accumulated = 0;
+      let upperBrightness = 0;
+      for (let bin = 0; bin < histogram.length; bin += 1) {
+        accumulated += histogram[bin];
+        if (accumulated >= pixelCount * 0.8) {
+          upperBrightness = Math.min(255, bin * 8 + 4);
+          break;
+        }
+      }
+      return {
+        mean,
+        upperBrightness,
+        deviation: Math.sqrt(Math.max(0, totalSquared / pixelCount - mean * mean)),
+        brightRatio: bright / pixelCount
+      };
+    }
+
+    function flipNumberContrastStyle({ mean, upperBrightness, deviation, brightRatio }) {
+      if (mean >= 205 && deviation <= 28 && brightRatio >= 0.7) {
+        return {
+          ink: "#111111",
+          outlineWidth: "0.45px",
+          outlineColor: "rgba(255, 255, 255, 0.5)",
+          shadowColor: "rgba(255, 255, 255, 0.16)"
+        };
+      }
+      // A bright patch behind a digit must not disappear into a darker average.
+      const brightness = Math.max(mean, upperBrightness * 0.9);
+      const level = Math.max(0, Math.min(1, (brightness - 75) / 140));
+      const lightSupport = level * level * (3 - 2 * level);
+      const texture = Math.max(0, Math.min(1, (deviation - 24) / 80));
+      const edgeStrength = Math.min(0.75, 0.15 + 0.5 * lightSupport + 0.1 * texture);
+      const shadowStrength = Math.min(0.62, 0.06 + 0.49 * lightSupport + 0.07 * texture);
+      return {
+        ink: "#ffffff",
+        outlineWidth: `${(0.35 + 0.55 * lightSupport + 0.15 * texture).toFixed(2)}px`,
+        outlineColor: `rgba(0, 0, 0, ${edgeStrength.toFixed(2)})`,
+        shadowColor: `rgba(0, 0, 0, ${shadowStrength.toFixed(2)})`
+      };
+    }
+
+    function setFlipNumberContrast(label, analysis) {
+      if (!label?.style?.setProperty) return;
+      const style = flipNumberContrastStyle(analysis);
+      label.style.setProperty("--flip-number-ink", style.ink);
+      label.style.setProperty("--flip-number-outline-width", style.outlineWidth);
+      label.style.setProperty("--flip-number-outline-color", style.outlineColor);
+      label.style.setProperty("--flip-number-shadow-color", style.shadowColor);
+    }
+
+
+async function updateFlipNumberContrast(page) {
+  if (!page?.isConnected) return;
+  const label = page.querySelector('.flip-page-number');
+  if (!label) return;
+  const onPhoto = page.classList.contains('template-cover') ||
+    (page.classList.contains('template-feature') && matchMedia('(max-width: 600px)').matches);
+  if (!onPhoto) { label.removeAttribute('style'); return; }
+  const range = document.createRange();
+  range.selectNodeContents(label);
+  const textRect = range.getBoundingClientRect();
+  if (!textRect.width) return;
+  const x = textRect.left + textRect.width / 2;
+  const y = textRect.top + textRect.height / 2;
+  const photo = [...page.querySelectorAll('.flip-story-media img')].find(image => {
+    const r = image.getBoundingClientRect();
+    return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+  });
+  if (!photo) return;
+  const source = photo.currentSrc || photo.src;
+  const analysisImage = await flipContrastImage(source);
+  if (!analysisImage || !page.isConnected || !page.classList.contains('is-current') || (photo.currentSrc || photo.src) !== source) return;
+  const imageRect = photo.getBoundingClientRect();
+  if (range.getBoundingClientRect().left !== textRect.left || !imageRect.width || !imageRect.height) {
+    requestAnimationFrame(() => updateFlipNumberContrast(page));
+    return;
+  }
+  const scale = Math.max(imageRect.width / analysisImage.naturalWidth, imageRect.height / analysisImage.naturalHeight);
+  const cropX = (analysisImage.naturalWidth - imageRect.width / scale) / 2;
+  const cropY = (analysisImage.naturalHeight - imageRect.height / scale) / 2;
+  const left = Math.max(imageRect.left, textRect.left - 4);
+  const top = Math.max(imageRect.top, textRect.top - 4);
+  const width = Math.min(imageRect.right, textRect.right + 4) - left;
+  const height = Math.min(imageRect.bottom, textRect.bottom + 4) - top;
+  if (width <= 0 || height <= 0) return;
+  try {
+    const canvas = document.createElement('canvas'); canvas.width = 64; canvas.height = 24;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    if (!ctx) return;
+    ctx.drawImage(analysisImage, cropX + (left - imageRect.left) / scale,
+      cropY + (top - imageRect.top) / scale, width / scale, height / scale, 0, 0, 64, 24);
+    setFlipNumberContrast(label, analyzeFlipNumberPixels(ctx.getImageData(0, 0, 64, 24).data, 0));
+    // Prepared turn copies must use the same treatment as the original page.
+    flipOverlayKey = ''; flipPreparedPair = null;
+  } catch { /* The static CSS treatment remains readable if sampling fails. */ }
+}
+
 let flipResizeTimer = 0;
 let flipTextLayoutMode = '';
 let flipOverlay = null;
@@ -1120,6 +1245,9 @@ function flipStageClone(page) {
   return wrapper;
 }
 function syncFlipCloneState(sourcePage, targetCopy) {
+  const number = sourcePage.querySelector('.flip-page-number');
+  const numberCopy = targetCopy?.querySelector('.flip-page-number');
+  if (number && numberCopy) numberCopy.style.cssText = number.style.cssText;
   const indicator = sourcePage.querySelector('[data-yt-indicator]');
   const indicatorCopy = targetCopy?.querySelector('[data-yt-indicator]');
   if (indicator && indicatorCopy) {
@@ -1314,6 +1442,7 @@ function setFlipPage(index) {
   pages.forEach((page, pageIndex) => page.classList.toggle('is-current', pageIndex === flipPageIndex));
   clearFlipTurnPages();
   content.scrollTop = 0;
+  requestAnimationFrame(() => updateFlipNumberContrast(pages[flipPageIndex]));
 }
 function beginFlipGesture(direction, startY = 0) {
   if (flipAnimating || S.layout !== 'flip') return false;

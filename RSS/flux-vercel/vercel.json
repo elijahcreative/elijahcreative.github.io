@@ -2,11 +2,15 @@
   "functions": {
     "api/article.js": {
       "maxDuration": 10,
-      "regions": ["fra1"]
+      "regions": [
+        "fra1"
+      ]
     },
     "api/rss-telex.js": {
       "maxDuration": 10,
-      "regions": ["fra1"]
+      "regions": [
+        "fra1"
+      ]
     },
     "api/youtube.js": {
       "maxDuration": 10
@@ -22,6 +26,12 @@
     },
     "api/tts.js": {
       "maxDuration": 15
+    },
+    "api/contrast-image.js": {
+      "maxDuration": 10,
+      "regions": [
+        "fra1"
+      ]
     }
   },
   "rewrites": [
