@@ -1364,8 +1364,8 @@ body.article-swipe-underlay-close > .app-shell { transition: transform .35s cubi
 .article-view-with-hero { padding-top: 0; }
 .article-scroll:has(> .article-view-with-hero) { padding-top: 0; }
 
-[data-theme="light"] .article-back-over-image { color: #f4f2ee; }
-.article-view .article-back { transition: color 140ms ease, background var(--t), border-color var(--t); }
+
+.article-view .article-back { color: var(--article-back-ink, var(--text2)); transition: color 140ms ease, background var(--t), border-color var(--t); }
 [data-theme="dark"] .article-hero::after { background: linear-gradient(to bottom, transparent 25%, color-mix(in srgb, var(--article-hero-end, var(--bg)) 12%, transparent) 44%, color-mix(in srgb, var(--article-hero-end, var(--bg)) 65%, transparent) 72%, var(--article-hero-end, var(--bg)) 100%); }
 .article-sheet .article-view { --article-hero-end: var(--bg-card); }
 @media (prefers-reduced-motion: reduce) {

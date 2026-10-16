@@ -995,7 +995,7 @@ function setupMagazineTopics() {
   magazineTopicResizeObserver = new ResizeObserver(update);
   magazineTopicResizeObserver.observe(content);
 }
-// Only the visible photo counter requests a small, CDN-cached analysis image.
+// Shared small, CDN-cached analysis images for visible counters and Reader controls.
 const flipContrastImages = new Map();
 function flipContrastImage(url) {
   if (flipContrastImages.has(url)) return flipContrastImages.get(url);
@@ -1997,34 +1997,92 @@ function setupArticleHeroBack(scroll) {
     scroll.removeEventListener('scroll', scroll._heroBackScroll);
     scroll.removeEventListener('load', scroll._heroBackScroll, true);
     scroll.removeEventListener('error', scroll._heroBackScroll, true);
+    scroll.removeEventListener('transitionend', scroll._heroBackScroll, true);
   }
   const back = scroll.querySelector('.article-back');
   if (!back) return;
-  const images = [...scroll.querySelectorAll('.article-hero-img, .article-content img')];
-  const update = () => {
+  let frame = 0;
+  let generation = 0;
+  let white = null;
+  const canvas = document.createElement('canvas');
+  canvas.width = 64; canvas.height = 24;
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  const sample = async () => {
+    const token = ++generation;
+    if (!ctx || !back.isConnected) return;
     const button = back.getBoundingClientRect();
-    const centerX = button.left + button.width / 2;
-    const centerY = button.top + button.height / 2;
-    const overImage = images.some(image => {
-      if (!image.isConnected || !image.complete || !image.naturalWidth) return false;
-      const rect = image.getBoundingClientRect();
-      return centerX >= rect.left && centerX <= rect.right
-        && centerY >= rect.top && centerY <= rect.bottom;
-    });
-    back.classList.toggle('article-back-over-image', overImage);
+    if (!button.width) return;
+    const x = button.left + button.width / 2;
+    const y = button.top + button.height / 2;
+    const hits = document.elementsFromPoint(x, y);
+    // WebKit may list a parent twice for its pseudo-element. Keep its background behind its children.
+    const layers = hits.filter((el, index) => hits.lastIndexOf(el) === index &&
+      !el.closest('.article-back-float, .article-back') && !back.contains(el));
+    const photo = layers.find(el => el.matches('.article-hero-img, .article-content img') && el.complete && el.naturalWidth);
+    const source = photo && (photo.currentSrc || photo.src);
+    const image = source ? await flipContrastImage(source) : null;
+    if (token !== generation || !back.isConnected) return;
+    ctx.clearRect(0, 0, 64, 24);
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#fff';
+    ctx.fillRect(0, 0, 64, 24);
+    // Compose solid surfaces behind the glass, from the page up to the article.
+    for (const layer of layers.slice().reverse()) {
+      const color = getComputedStyle(layer).backgroundColor;
+      if (color && color !== 'rgba(0, 0, 0, 0)') {
+        ctx.fillStyle = color; ctx.fillRect(0, 0, 64, 24);
+      }
+      if (layer === photo && image) {
+        const r = photo.getBoundingClientRect();
+        const fit = getComputedStyle(photo).objectFit;
+        const scale = (fit === 'contain' ? Math.min : Math.max)(r.width / image.naturalWidth, r.height / image.naturalHeight);
+        const w = image.naturalWidth * scale, h = image.naturalHeight * scale;
+        const left = r.left + (r.width - w) / 2, top = r.top + (r.height - h) / 2;
+        ctx.drawImage(image, (left - button.left) / button.width * 64,
+          (top - button.top) / button.height * 24, w / button.width * 64, h / button.height * 24);
+        const hero = photo.closest('.article-hero');
+        if (hero) {
+          const hr = hero.getBoundingClientRect();
+          const gradient = ctx.createLinearGradient(0, (hr.top - button.top) / button.height * 24,
+            0, (hr.bottom - button.top) / button.height * 24);
+          const dark = document.documentElement.dataset.theme === 'dark';
+          const end = getComputedStyle(hero).getPropertyValue('--article-hero-end').trim() || getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+          for (const [stop, alpha] of [[.25,0],[.44,.12],[.72,.65],[1,dark ? 1 : .88]])
+            gradient.addColorStop(stop, dark ? `color-mix(in srgb, ${end} ${alpha * 100}%, transparent)` : `rgba(0,0,0,${alpha})`);
+          ctx.fillStyle = gradient; ctx.fillRect(0, 0, 64, 24);
+        }
+      }
+    }
+    // Include the existing translucent button surface, without changing its style.
+    ctx.fillStyle = getComputedStyle(back).backgroundColor;
+    ctx.fillRect(0, 0, 64, 24);
+    const pixels = ctx.getImageData(0, 0, 64, 24).data;
+    let luminance = 0;
+    const linear = value => { const c = value / 255; return c <= .04045 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4; };
+    for (let i = 0; i < pixels.length; i += 4)
+      luminance += .2126 * linear(pixels[i]) + .7152 * linear(pixels[i + 1]) + .0722 * linear(pixels[i + 2]);
+    luminance /= 64 * 24;
+    // Small hysteresis prevents flickering near the black/white contrast boundary.
+    white = white === null ? luminance < .179 : white ? luminance < .21 : luminance < .15;
+    back.style.setProperty('--article-back-ink', white ? '#f4f2ee' : '#111111');
+  };
+  const update = () => {
+    generation++;
+    if (frame) return;
+    frame = requestAnimationFrame(() => { frame = 0; sample().catch(() => {}); });
   };
   scroll._heroBackScroll = update;
   scroll.addEventListener('scroll', update, { passive: true });
   scroll.addEventListener('load', update, true);
   scroll.addEventListener('error', update, true);
+  scroll.addEventListener('transitionend', update, true);
   if (!setupArticleHeroBack.resizeBound) {
-    window.addEventListener('resize', () => {
-      document.querySelectorAll('.article-page-layer.open .article-page-scroll, .article-modal-layer.open .article-scroll')
-        .forEach(scroller => scroller._heroBackScroll?.());
-    }, { passive: true });
+    const updateOpen = () => document.querySelectorAll('.article-page-layer.open .article-page-scroll, .article-modal-layer.open .article-scroll')
+      .forEach(scroller => scroller._heroBackScroll?.());
+    window.addEventListener('resize', updateOpen, { passive: true });
+    new MutationObserver(updateOpen).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'data-preset', 'style'] });
     setupArticleHeroBack.resizeBound = true;
   }
-  requestAnimationFrame(update);
+  update();
 }
 function renderArticleShell(html, articleId = '') {
   const stateTop = history.state?.flux === 'article' && history.state.articleId === articleId
@@ -3089,7 +3147,8 @@ function setupPullToRefresh() {
     if (icon) icon.textContent = '↻';
     if (label) label.textContent = 'FRISSÍTÉS';
     try {
-      await Promise.all([refreshAll(true), loadYouTube(true)]);
+      // Use exactly the browser reload path, including a fresh app lifecycle.
+      window.location.reload();
     } finally {
       refreshing = false;
       setTimeout(reset, 450);
