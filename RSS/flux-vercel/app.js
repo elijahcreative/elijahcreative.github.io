@@ -2711,6 +2711,26 @@ function toggleReadLater(a) {
   toast(saved ? 'Mentve.' : 'Eltávolítva.');
   return saved;
 }
+let activeNavWidget = null;
+let navWidgetGlass = null;
+function syncNavWidgetGlass() {
+  const popup = activeNavWidget?.popup;
+  if (!popup?.isConnected || !navWidgetGlass) return;
+  const r = popup.getBoundingClientRect();
+  Object.assign(navWidgetGlass.style, { left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px` });
+}
+function showNavWidgetGlass(switching) {
+  if (!navWidgetGlass) {
+    navWidgetGlass = document.createElement('div');
+    navWidgetGlass.className = 'nav-widget-glass';
+    navWidgetGlass.setAttribute('aria-hidden', 'true');
+    document.querySelector('.app-shell').append(navWidgetGlass);
+    window.addEventListener('resize', syncNavWidgetGlass, { passive: true });
+  }
+  navWidgetGlass.classList.toggle('is-switching', switching);
+  syncNavWidgetGlass();
+  navWidgetGlass.classList.add('is-visible');
+}
 function setupHoverTapPopup(trigger, popup, openClass) {
   if (!trigger || !popup) return;
   if (trigger._fluxPopupCleanup) trigger._fluxPopupCleanup();
@@ -2727,15 +2747,31 @@ function setupHoverTapPopup(trigger, popup, openClass) {
     const toolbarBottom = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 56;
     popup.style.setProperty('--widget-popup-top-shift', `${toolbarBottom + 10 - naturalTop}px`);
   };
+  const close = (keepGlass = false) => {
+    clearTimeout(closeTimer);
+    popup.getAnimations().forEach(animation => animation.cancel());
+    popup.classList.remove(openClass);
+    if (activeNavWidget?.popup === popup) {
+      activeNavWidget = null;
+      if (!keepGlass) navWidgetGlass?.classList.remove('is-visible');
+    }
+  };
   const open = () => {
     clearTimeout(closeTimer);
-    if (!isOpen()) alignToToolbar();
+    if (isOpen()) return;
+    const switching = Boolean(activeNavWidget);
+    activeNavWidget?.close(true);
+    alignToToolbar();
     popup.classList.add(openClass);
+    activeNavWidget = { popup, close };
+    showNavWidgetGlass(switching);
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+      popup.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 120, easing: 'ease-out' });
   };
-  const close = () => {
-    clearTimeout(closeTimer);
-    popup.classList.remove(openClass);
-  };
+  const sizeObserver = new ResizeObserver(() => {
+    if (activeNavWidget?.popup === popup) syncNavWidgetGlass();
+  });
+  sizeObserver.observe(popup);
   const closeSoon = () => {
     closeTimer = setTimeout(close, 150);
   };
@@ -2744,6 +2780,7 @@ function setupHoverTapPopup(trigger, popup, openClass) {
     lastPointerType = ev.pointerType || '';
     if (!isOpen()) return;
     if (trigger.contains(ev.target) || popup.contains(ev.target)) return;
+    if (ev.target.closest?.('#navF1, #navWeather')) return;
     close();
   };
   const onClick = ev => {
@@ -2761,6 +2798,8 @@ function setupHoverTapPopup(trigger, popup, openClass) {
   popup.addEventListener('pointerleave', onLeave);
   document.addEventListener('pointerdown', onDocPointer);
   trigger._fluxPopupCleanup = () => {
+    close();
+    sizeObserver.disconnect();
     trigger.removeEventListener('click', onClick);
     trigger.removeEventListener('pointerenter', onEnter);
     trigger.removeEventListener('pointerleave', onLeave);
