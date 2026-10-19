@@ -284,7 +284,7 @@ function loadStorage() {
   if (!localStorage.getItem('flux_f')) saveFeeds();
   loadYtChannelsFromStorage();
   const arts = Store.get('flux_art', []);
-  S.articles = Array.isArray(arts) ? arts.map(a => ({ ...a, date: new Date(a.date) })) : [];
+  S.articles = Array.isArray(arts) ? arts.map(a => ({ ...a, date: new Date(a.date ?? NaN) })) : [];
   const readLater = Store.get('flux_read_later', []);
   S.readLater = Array.isArray(readLater) ? readLater.map(item => ({
     ...item,
@@ -439,12 +439,25 @@ const Fetcher = {
         content:    content,
         url:        link,
         image:      enc || media || this._img(content || desc),
-        date:       new Date(qs('pubDate') || qs('published') || qs('updated')),
+        date:       this._parseXMLDate(el),
         author:     normalizeText(author),
         categories: [...el.querySelectorAll('category')].map(c => c.textContent.trim()).filter(Boolean),
         feedUrl
       };
     });
+  },
+  _parseXMLDate(el) {
+    // A nonempty but invalid RSS date must not hide a valid Atom/DC alternative.
+    for (const name of ['pubDate', 'published', 'updated', 'date']) {
+      for (const node of [...el.children].filter(child => child.localName === name)) {
+        const raw = node.textContent.trim();
+        if (!raw) continue;
+        // Some feeds use a bare RFC timezone Z, which Safari does not parse.
+        const date = new Date(raw.replace(/\s+Z$/i, ' +0000'));
+        if (Number.isFinite(date.getTime())) return date;
+      }
+    }
+    return new Date(NaN);
   },
   _xmlText(el, names) {
     for (const name of names) {
@@ -3079,7 +3092,7 @@ function setLayout(layout) {
 }
 async function refreshAll(bust = false) {
   if (bust) S.feeds.forEach(f => Fetcher.bust(f.url));
-  const prevSig = S.articles.slice(0, 40).map(a => a.id).join('|');
+  const prevSig = S.articles.slice(0, 40).map(a => `${a.id}@${a.date?.getTime()}`).join('|');
   const hadArticles = S.articles.length > 0;
   let loadedAny = false;
   setLoading(true);
@@ -3093,7 +3106,7 @@ async function refreshAll(bust = false) {
   }));
   S.articles.sort((a, b) => b.date - a.date);
   setLoading(false);
-  const newSig = S.articles.slice(0, 40).map(a => a.id).join('|');
+  const newSig = S.articles.slice(0, 40).map(a => `${a.id}@${a.date?.getTime()}`).join('|');
   const changed = newSig !== prevSig;
   const hasVisibleArticles = Boolean($('content')?.querySelector('.ix-article, .ix-card, .ix-text-fill, .ix-hero, .grid-layout, .list-layout, .reader-layout, .magazine-layout, .flip-layout'));
   if (loadedAny) {
