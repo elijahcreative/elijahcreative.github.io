@@ -576,7 +576,7 @@ const Renderer = {
   _flipStory(a, role = 'support', eager = false) {
     const id = aid(a);
     const media = a.image
-      ? `<img src="${e(a.image)}" alt="" loading="${eager ? 'eager' : 'lazy'}" onerror="this.parentNode.classList.add('no-image');this.remove()">`
+      ? `<img src="${e(flipImageChoices.get(flipImageKey(a))?.src || a.image)}" data-flip-original="${e(a.image)}" alt="" loading="${eager ? 'eager' : 'lazy'}" onload="improveFlipImage(this).catch(() => {})" onerror="flipImageFallback(this)">`
       : '<span aria-hidden="true">FLUX</span>';
     return `<div class="flip-story flip-story-${role}" data-id="${id}">
       <div class="flip-story-media${a.image ? '' : ' no-image'}">${media}</div>
@@ -1133,6 +1133,117 @@ async function updateFlipNumberContrast(page) {
   } catch { /* The static CSS treatment remains readable if sampling fails. */ }
 }
 
+// Higher-resolution news images belong only to Flip; RSS/Reader data stays untouched.
+const flipImageChoices = new Map();
+const flipImageCandidates = new Map();
+const flipImageProbes = new Map();
+function flipImageKey(article) { return `${article.url}|${article.image}`; }
+function probeFlipImage(src) {
+  if (!src) return Promise.resolve(null);
+  if (!flipImageProbes.has(src)) {
+    const promise = new Promise(resolve => {
+      const image = new Image();
+      const timer = setTimeout(() => resolve(null), 7000);
+      image.onload = async () => {
+        try { await image.decode(); } catch { clearTimeout(timer); resolve(null); return; }
+        clearTimeout(timer);
+        resolve({ src, width: image.naturalWidth, height: image.naturalHeight });
+      };
+      image.onerror = () => { clearTimeout(timer); resolve(null); };
+      image.src = src;
+    });
+    flipImageProbes.set(src, promise);
+    if (flipImageProbes.size > 160) flipImageProbes.delete(flipImageProbes.keys().next().value);
+  }
+  return flipImageProbes.get(src);
+}
+async function findFlipImage(article) {
+  const key = flipImageKey(article);
+  if (!flipImageCandidates.has(key)) {
+    const promise = (async () => {
+      // This is HVG's observed full article-image profile, preserving the image ID.
+      const hvg = String(article.image || '').replace(/^(https:\/\/img\.hvg\.hu\/Img\/)64092e40-39ef-4e7c-88f1-4e482711b139\//i, (_, prefix) => `${prefix}8133bb77-3fc3-490f-b374-cb198a0455cc/`);
+      if (hvg !== article.image) {
+        const direct = await probeFlipImage(hvg);
+        if (direct) return direct;
+      }
+      const cached = extractedArticleCache.get(article.url)?.image;
+      const src = cached || await fetchT('/api/feed-image?url=' + encodeURIComponent(article.url), { cache: 'force-cache' }, 7500)
+        .then(r => r.ok ? r.json() : null).then(data => data?.image).catch(() => null);
+      return src && src !== article.image ? probeFlipImage(src) : null;
+    })();
+    flipImageCandidates.set(key, promise);
+    if (flipImageCandidates.size > 160) flipImageCandidates.delete(flipImageCandidates.keys().next().value);
+  }
+  return flipImageCandidates.get(key);
+}
+function flipImageFallback(image) {
+  const original = image.dataset.flipOriginal;
+  if (original && image.getAttribute('src') !== original) {
+    const article = articleMap[image.closest('[data-id]')?.dataset.id];
+    if (article) {
+      const key = flipImageKey(article);
+      flipImageChoices.delete(key);
+      flipImageCandidates.set(key, Promise.resolve(null));
+    }
+    image.dataset.flipUpgradeFailed = '1';
+    image.src = original;
+    return;
+  }
+  image.parentNode.classList.add('no-image');
+  image.remove();
+}
+function applyFlipImageChoice(image, candidate) {
+  const page = image.closest('.flip-page');
+  if (!page || !image.isConnected || !$('content')?.contains(image) || S.layout !== 'flip' ||
+      flipAnimating || flipGesture || flipGhosts.size ||
+      (page.classList.contains('is-current') && page.dataset.flipImagePresented)) return;
+  if (image.getAttribute('src') === candidate.src) return;
+  image.src = candidate.src;
+  // The next turn rebuilds its faces from the same decoded source as the real page.
+  flipOverlayKey = ''; flipPreparedPair = null;
+  if (page.classList.contains('is-current')) requestAnimationFrame(() => updateFlipNumberContrast(page));
+}
+function applyHiddenFlipImageChoices() {
+  $('content')?.querySelectorAll('.flip-page:not(.is-current) img[data-flip-original]').forEach(image => {
+    const article = articleMap[image.closest('[data-id]')?.dataset.id];
+    const candidate = article && flipImageChoices.get(flipImageKey(article));
+    if (candidate && !image.dataset.flipUpgradeFailed) applyFlipImageChoice(image, candidate);
+  });
+}
+async function improveFlipImage(image, measurement = image) {
+  const page = image.closest('.flip-page');
+  const content = $('content');
+  if (S.layout !== 'flip' || !page || !content.contains(image) ||
+      !measurement.complete || !measurement.naturalWidth || image.dataset.flipQualityBusy || image.dataset.flipUpgradeFailed) return;
+  const article = articleMap[image.closest('[data-id]')?.dataset.id];
+  if (!article?.url || !article.image) return;
+  // Turn copies provide layout sizes for the hidden neighbour, without 3D scaling.
+  const rect = { width: measurement.clientWidth, height: measurement.clientHeight };
+  if (!rect.width || !rect.height) return;
+  const coverage = Math.min(measurement.naturalWidth / rect.width, measurement.naturalHeight / rect.height);
+  if (coverage >= Math.min(window.devicePixelRatio || 1, 2)) return;
+  const key = flipImageKey(article);
+  if (flipImageChoices.get(key)?.src === image.getAttribute('src')) return;
+  image.dataset.flipQualityBusy = '1';
+  try {
+    const candidate = flipImageChoices.get(key) || await findFlipImage(article);
+    if (!candidate) return;
+    const newCoverage = Math.min(candidate.width / rect.width, candidate.height / rect.height);
+    if (newCoverage <= coverage * 1.1) return;
+    flipImageChoices.set(key, candidate);
+    if (flipImageChoices.size > 160) flipImageChoices.delete(flipImageChoices.keys().next().value);
+    applyFlipImageChoice(image, candidate);
+  } finally {
+    delete image.dataset.flipQualityBusy;
+  }
+}
+function improveFlipPageImages(page, copy = page) {
+  const measurements = copy?.querySelectorAll('.flip-story-media img[data-flip-original]') || [];
+  page?.querySelectorAll('.flip-story-media img[data-flip-original]').forEach((image, index) =>
+    improveFlipImage(image, measurements[index] || image).catch(() => {}));
+}
+
 let flipResizeTimer = 0;
 let flipTextLayoutMode = '';
 let flipOverlay = null;
@@ -1261,6 +1372,11 @@ function syncFlipCloneState(sourcePage, targetCopy) {
   const number = sourcePage.querySelector('.flip-page-number');
   const numberCopy = targetCopy?.querySelector('.flip-page-number');
   if (number && numberCopy) numberCopy.style.cssText = number.style.cssText;
+  const imageCopies = targetCopy?.querySelectorAll('img[data-flip-original]') || [];
+  sourcePage.querySelectorAll('img[data-flip-original]').forEach((image, index) => {
+    if (imageCopies[index] && imageCopies[index].getAttribute('src') !== image.getAttribute('src'))
+      imageCopies[index].src = image.getAttribute('src');
+  });
   const indicator = sourcePage.querySelector('[data-yt-indicator]');
   const indicatorCopy = targetCopy?.querySelector('[data-yt-indicator]');
   if (indicator && indicatorCopy) {
@@ -1415,6 +1531,7 @@ function trailFlipOverlay(startAngle, targetAngle, direction, duration) {
     else {
       overlay.remove();
       flipGhosts.delete(entry);
+      applyHiddenFlipImageChoices();
     }
   };
   entry.frame = requestAnimationFrame(animate);
@@ -1426,6 +1543,7 @@ function hideFlipOverlay() {
 }
 async function primeFlipOverlay() {
   if (S.layout !== 'flip' || flipAnimating) return;
+  applyHiddenFlipImageChoices();
   const content = $('content');
   const pages = [...content.querySelectorAll('.flip-page')];
   if (pages.length < 2) return;
@@ -1445,17 +1563,24 @@ async function primeFlipOverlay() {
   if (token !== flipPrimeToken || S.layout !== 'flip') return;
   flipOverlay.getBoundingClientRect();
   syncFlipOverlayState(currentPage, nextPage);
+  improveFlipPageImages(currentPage, flipOverlay.querySelector('.flip-turn-front'));
+  improveFlipPageImages(nextPage, flipOverlay.querySelector('.flip-turn-back'));
   flap.getBoundingClientRect();
 }
 function setFlipPage(index) {
   const content = $('content');
   const pages = [...content.querySelectorAll('.flip-page')];
   if (!pages.length) return;
-  flipPageIndex = Math.max(0, Math.min(pages.length - 1, index));
+  const nextIndex = Math.max(0, Math.min(pages.length - 1, index));
+  if (nextIndex !== flipPageIndex) pages[nextIndex].dataset.flipImagePresented = '1';
+  flipPageIndex = nextIndex;
   pages.forEach((page, pageIndex) => page.classList.toggle('is-current', pageIndex === flipPageIndex));
   clearFlipTurnPages();
   content.scrollTop = 0;
-  requestAnimationFrame(() => updateFlipNumberContrast(pages[flipPageIndex]));
+  requestAnimationFrame(() => {
+    updateFlipNumberContrast(pages[flipPageIndex]);
+    improveFlipPageImages(pages[flipPageIndex]);
+  });
 }
 function beginFlipGesture(direction, startY = 0) {
   if (flipAnimating || S.layout !== 'flip') return false;
@@ -1466,6 +1591,9 @@ function beginFlipGesture(direction, startY = 0) {
   const currentPage = pages[pairIndex];
   const nextPage = pages[pairIndex + 1];
   if (currentPage.querySelector('iframe') || nextPage.querySelector('iframe')) return false;
+  // Once either face is revealed, keep its image stable until it is hidden again.
+  currentPage.dataset.flipImagePresented = '1';
+  nextPage.dataset.flipImagePresented = '1';
   prepareFlipOverlay(currentPage, nextPage, pairIndex);
   positionFlipOverlay(pages[flipPageIndex]);
   setFlipTurnPages(currentPage, nextPage);
@@ -1593,6 +1721,7 @@ function finishFlipGesture(complete, options = {}) {
       hideFlipOverlay();
       flipGesture = null;
       flipAnimating = false;
+      improveFlipPageImages($('content')?.querySelector('.flip-page.is-current'));
       if (!flipRewinding) flipWheelGestureActive = false;
       if (options.prime !== false) primeFlipOverlay();
       options.done?.();

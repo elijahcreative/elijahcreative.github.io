@@ -123,4 +123,4 @@ function mappedIpv4(value) {
 }
 
 
-module.exports = { fetchImage };
+module.exports = { fetchImage, safeLookup };

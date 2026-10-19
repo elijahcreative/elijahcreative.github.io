@@ -32,6 +32,12 @@
       "regions": [
         "fra1"
       ]
+    },
+    "api/feed-image.js": {
+      "maxDuration": 10,
+      "regions": [
+        "fra1"
+      ]
     }
   },
   "rewrites": [
