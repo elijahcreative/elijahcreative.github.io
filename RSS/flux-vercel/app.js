@@ -1196,7 +1196,7 @@ function flipImageFallback(image) {
 function applyFlipImageChoice(image, candidate) {
   const page = image.closest('.flip-page');
   if (!page || !image.isConnected || !$('content')?.contains(image) || S.layout !== 'flip' ||
-      flipAnimating || flipGesture || flipGhosts.size ||
+      flipAnimating || flipGesture || flipRewinding || flipGhosts.size ||
       (page.classList.contains('is-current') && page.dataset.flipImagePresented)) return;
   if (image.getAttribute('src') === candidate.src) return;
   image.src = candidate.src;
@@ -1214,7 +1214,7 @@ function applyHiddenFlipImageChoices() {
 async function improveFlipImage(image, measurement = image) {
   const page = image.closest('.flip-page');
   const content = $('content');
-  if (S.layout !== 'flip' || !page || !content.contains(image) ||
+  if (S.layout !== 'flip' || flipRewinding || !page || !content.contains(image) ||
       !measurement.complete || !measurement.naturalWidth || image.dataset.flipQualityBusy || image.dataset.flipUpgradeFailed) return;
   const article = articleMap[image.closest('[data-id]')?.dataset.id];
   if (!article?.url || !article.image) return;
@@ -1258,6 +1258,8 @@ let flipWheelDelta = 0;
 let flipWheelLastTime = 0;
 let flipWheelGestureActive = false;
 let flipAnimationTimer = 0;
+let flipNativeTurn = null;
+let flipRewindPairs = null;
 let flipPrimeToken = 0;
 let flipHalfHeight = 0;
 let flipPerspective = 0;
@@ -1340,6 +1342,8 @@ function ensureFlipOverlay() {
   flipOverlay.className = 'flip-turn-overlay';
   flipOverlay.setAttribute('aria-hidden', 'true');
   flipOverlay.innerHTML = `
+    <div class="flip-turn-shadow flip-turn-shadow-above"></div>
+    <div class="flip-turn-shadow flip-turn-shadow-below"></div>
     <div class="flip-turn-compensator">
       <div class="flip-turn-scene">
         <div class="flip-turn-flap">
@@ -1420,6 +1424,7 @@ function decodeFlipImages(root) {
   }));
 }
 function prebuildFlipPair(index) {
+  if (flipRewinding) return;
   const content = $('content');
   const pages = content ? [...content.querySelectorAll('.flip-page')] : [];
   if (index < 0 || index >= pages.length - 1) return;
@@ -1441,7 +1446,7 @@ function prepareFlipOverlay(currentPage, nextPage, index) {
   const back = overlay.querySelector('.flip-turn-back');
   if (flipOverlayKey !== key) {
     flipOverlayKey = key;
-    const prepared = flipPreparedPair?.key === key ? flipPreparedPair : null;
+    const prepared = flipRewindPairs?.get(key) || (flipPreparedPair?.key === key ? flipPreparedPair : null);
     front.replaceChildren(prepared?.front || flipStageClone(currentPage));
     back.replaceChildren(prepared?.back || flipStageClone(nextPage));
     if (prepared) flipPreparedPair = null;
@@ -1508,6 +1513,7 @@ function setFlipCastShadow(angle, direction) {
 function clearFlipGhosts() {
   flipGhosts.forEach(entry => {
     cancelAnimationFrame(entry.frame);
+    entry.animations?.forEach(animation => animation.cancel());
     entry.overlay.remove();
   });
   flipGhosts.clear();
@@ -1537,12 +1543,21 @@ function trailFlipOverlay(startAngle, targetAngle, direction, duration) {
   entry.frame = requestAnimationFrame(animate);
 }
 function hideFlipOverlay() {
+  if (flipNativeTurn) {
+    const turn = flipNativeTurn;
+    flipNativeTurn = null;
+    clearTimeout(turn.seamTimer);
+    clearTimeout(turn.advanceTimer);
+    turn.animations.forEach(animation => animation.cancel());
+    flipOverlay.classList.remove('is-native-turn');
+    turn.done?.(false);
+  }
   cancelAnimationFrame(flipAnimationTimer);
   flipAnimationTimer = 0;
   flipOverlay?.classList.remove('is-active');
 }
 async function primeFlipOverlay() {
-  if (S.layout !== 'flip' || flipAnimating) return;
+  if (S.layout !== 'flip' || flipAnimating || flipRewinding) return;
   applyHiddenFlipImageChoices();
   const content = $('content');
   const pages = [...content.querySelectorAll('.flip-page')];
@@ -1578,6 +1593,7 @@ function setFlipPage(index) {
   clearFlipTurnPages();
   content.scrollTop = 0;
   requestAnimationFrame(() => {
+    if (flipRewinding) return;
     updateFlipNumberContrast(pages[flipPageIndex]);
     improveFlipPageImages(pages[flipPageIndex]);
   });
@@ -1704,15 +1720,17 @@ function finishFlipGesture(complete, options = {}) {
   const overlapAt = complete ? (options.overlapAt ?? .62) : 1;
   const startTime = performance.now();
   flipAnimating = true;
-  if (complete) {
+  if (complete && !flipRewinding) {
     const followingPair = gesture.direction > 0 ? gesture.pairIndex + 1 : gesture.pairIndex - 1;
     prebuildFlipPair(followingPair);
   }
   flap.style.transition = 'none';
   cancelAnimationFrame(flipAnimationTimer);
-  const finish = (trailed = false) => {
-    setFlipAngle(flap, targetAngle);
-    setFlipCastShadow(targetAngle, gesture.direction);
+  const finish = (trailed = false, keepNativeTrail = false) => {
+    if (!keepNativeTrail) {
+      setFlipAngle(flap, targetAngle);
+      setFlipCastShadow(targetAngle, gesture.direction);
+    }
     const targetPage = complete
       ? (gesture.direction > 0 ? gesture.pairIndex + 1 : gesture.pairIndex)
       : flipPageIndex;
@@ -1729,6 +1747,86 @@ function finishFlipGesture(complete, options = {}) {
     if (options.chain || trailed) settle();
     else requestAnimationFrame(() => requestAnimationFrame(settle));
   };
+  if (flipRewinding && typeof flap.animate === 'function') {
+    // Precomputed transforms keep the rewind off the per-frame JS/paint path.
+    const rotation = [], compensation = [], above = [], below = [];
+    for (let i = 0; i <= 48; i++) {
+      const offset = i / 48;
+      const progress = options.linear ? offset : 1 - Math.pow(1 - offset, 3);
+      const angle = startAngle + (targetAngle - startAngle) * progress;
+      const radians = angle * Math.PI / 180;
+      const scale = flipPerspective ? 1 - flipHalfHeight * Math.sin(radians) / flipPerspective : 1;
+      const edgeY = flipHalfHeight + flipHalfHeight * Math.cos(radians) * scale;
+      const strength = Math.abs(progress * 2 - 1);
+      rotation.push({ offset, transform: `rotateX(${angle}deg)` });
+      compensation.push({ offset, transform: `scaleY(${scale})` });
+      above.push({ offset, transform: `translateY(${edgeY - FLIP_CAST_SHADOW_SIZE}px)`, opacity: angle > 90 ? strength : 0 });
+      below.push({ offset, transform: `translateY(${edgeY}px)`, opacity: angle <= 90 ? strength : 0 });
+    }
+    const timing = { duration, fill: 'both', easing: 'linear' };
+    flipOverlay.style.backgroundImage = 'none';
+    flipOverlay.classList.add('is-native-turn');
+    const animations = [
+      flap.animate(rotation, timing),
+      flipOverlay.querySelector('.flip-turn-compensator').animate(compensation, timing),
+      flipOverlay.querySelector('.flip-turn-shadow-above').animate(above, timing),
+      flipOverlay.querySelector('.flip-turn-shadow-below').animate(below, timing)
+    ];
+    const turn = { animations, done: options.done };
+    const halfwayTime = options.linear ? .5 : 1 - Math.cbrt(.5);
+    turn.seamTimer = setTimeout(() => {
+      if (flipNativeTurn !== turn) return;
+      $('content')?.classList.toggle('flip-front-visible', targetAngle < startAngle);
+      $('content')?.classList.toggle('flip-back-visible', targetAngle > startAngle);
+    }, duration * halfwayTime);
+    flipNativeTurn = turn;
+    if (options.chain && overlapAt < 1) {
+      turn.advanceTimer = setTimeout(() => {
+        if (flipNativeTurn !== turn) return;
+        flipNativeTurn = null;
+        clearTimeout(turn.seamTimer);
+        // Keep the original animated plane running; no cloned trailing page or JS frame loop.
+        const overlay = flipOverlay;
+        overlay.classList.add('flip-turn-ghost');
+        overlay.style.zIndex = '89';
+        turn.trail = { overlay, animations, frame: 0 };
+        flipGhosts.add(turn.trail);
+        flipOverlay = null;
+        flipOverlayKey = '';
+        finish(true, true);
+      }, duration * overlapAt);
+    }
+    Promise.all(animations.map(animation => animation.finished)).then(() => {
+      if (turn.trail) {
+        turn.trail.overlay.remove();
+        flipGhosts.delete(turn.trail);
+        animations.forEach(animation => animation.cancel());
+        applyHiddenFlipImageChoices();
+        return;
+      }
+      if (flipNativeTurn !== turn) return;
+      flipNativeTurn = null;
+      clearTimeout(turn.seamTimer);
+      clearTimeout(turn.advanceTimer);
+      finish();
+      animations.forEach(animation => animation.cancel());
+      flipOverlay.classList.remove('is-native-turn');
+    }).catch(() => {
+      if (turn.trail) {
+        turn.trail.overlay.remove();
+        flipGhosts.delete(turn.trail);
+        return;
+      }
+      if (flipNativeTurn !== turn) return;
+      flipNativeTurn = null;
+      clearTimeout(turn.seamTimer);
+      clearTimeout(turn.advanceTimer);
+      animations.forEach(animation => animation.cancel());
+      flipOverlay.classList.remove('is-native-turn');
+      options.done?.(false);
+    });
+    return true;
+  }
   const animate = now => {
     const progress = Math.min(1, (now - startTime) / duration);
     const eased = options.linear ? progress : 1 - Math.pow(1 - progress, 3);
@@ -1761,6 +1859,18 @@ async function rewindFlipToStart() {
     return Math.round(startIndex - (startIndex - 1) * index / (turnCount - 1));
   });
   const rewindStarted = performance.now();
+  const pages = [...$('content').querySelectorAll('.flip-page')];
+  const holder = document.createElement('div');
+  flipRewindPairs = new Map();
+  for (const source of sources) {
+    const current = pages[source - 1], next = pages[source];
+    if (!current || !next || current.querySelector('iframe') || next.querySelector('iframe')) continue;
+    const front = flipStageClone(current), back = flipStageClone(next);
+    holder.append(front, back);
+    flipRewindPairs.set(flipPairKey(current, next, source - 1), { front, back });
+  }
+  // Reuse decoded faces throughout the sequence; never wait indefinitely for a feed image.
+  await Promise.race([decodeFlipImages(holder), new Promise(resolve => setTimeout(resolve, 32))]);
   for (let index = 0; index < sources.length; index++) {
     if (S.layout !== 'flip') break;
     if (performance.now() - rewindStarted >= FLIP_REWIND_BUDGET) {
@@ -1787,17 +1897,18 @@ async function rewindFlipToStart() {
         overlapAt: lastPage ? 1 : .6,
         prime: lastPage,
         chain: !lastPage,
-        done: () => resolve(true)
+        done: completed => resolve(completed !== false)
       });
       if (!started) resolve(false);
     });
     if (!completed) break;
   }
   flipRewinding = false;
+  flipRewindPairs = null;
   if (S.layout === 'flip' && flipPageIndex !== 0) {
     setFlipPage(0);
-    primeFlipOverlay();
   }
+  if (S.layout === 'flip') primeFlipOverlay();
 }
 function handleFlipResize() {
   if (S.layout !== 'flip') return;
@@ -2855,6 +2966,7 @@ function toggleReadLater(a) {
 }
 let activeNavWidget = null;
 let navWidgetGlass = null;
+let navMenuBackdrop = null;
 function syncNavWidgetGlass() {
   const popup = activeNavWidget?.popup;
   if (!popup?.isConnected || !navWidgetGlass) return;
@@ -2870,12 +2982,21 @@ function showNavWidgetGlass(switching) {
     window.addEventListener('resize', syncNavWidgetGlass, { passive: true });
   }
   navWidgetGlass.classList.toggle('is-switching', switching);
+  if (!navMenuBackdrop) {
+    navMenuBackdrop = document.createElement('div');
+    navMenuBackdrop.className = 'nav-menu-backdrop';
+    navMenuBackdrop.setAttribute('aria-hidden', 'true');
+    document.querySelector('.app-shell').append(navMenuBackdrop);
+  }
   syncNavWidgetGlass();
   navWidgetGlass.classList.add('is-visible');
+  navMenuBackdrop.classList.add('is-visible');
 }
-function setupHoverTapPopup(trigger, popup, openClass) {
+function setupHoverTapPopup(trigger, popup, openClass, options = {}) {
   if (!trigger || !popup) return;
   if (trigger._fluxPopupCleanup) trigger._fluxPopupCleanup();
+  // Panels must sit above the page scrim, outside the navbar's own blur context.
+  document.querySelector('.app-shell').append(popup);
   let closeTimer = null;
   const isOpen = () => popup.classList.contains(openClass);
   const isTouchMode = () => window.matchMedia && window.matchMedia('(hover: none), (pointer: coarse)').matches;
@@ -2895,17 +3016,21 @@ function setupHoverTapPopup(trigger, popup, openClass) {
     popup.classList.remove(openClass);
     if (activeNavWidget?.popup === popup) {
       activeNavWidget = null;
-      if (!keepGlass) navWidgetGlass?.classList.remove('is-visible');
+      if (!keepGlass) {
+        navWidgetGlass?.classList.remove('is-visible');
+        navMenuBackdrop?.classList.remove('is-visible');
+      }
     }
   };
   const open = () => {
     clearTimeout(closeTimer);
+    closeMobileFeedPanel();
     if (isOpen()) return;
     const switching = Boolean(activeNavWidget);
     activeNavWidget?.close(true);
     alignToToolbar();
     popup.classList.add(openClass);
-    activeNavWidget = { popup, close };
+    activeNavWidget = { popup, close, cancelClose: () => clearTimeout(closeTimer), scheduleClose: () => closeSoon() };
     showNavWidgetGlass(switching);
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches)
       popup.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 120, easing: 'ease-out' });
@@ -2920,25 +3045,39 @@ function setupHoverTapPopup(trigger, popup, openClass) {
   let lastPointerType = '';
   const onDocPointer = ev => {
     lastPointerType = ev.pointerType || '';
+  };
+  const onDocClick = ev => {
     if (!isOpen()) return;
     if (trigger.contains(ev.target) || popup.contains(ev.target)) return;
-    if (ev.target.closest?.('#navF1, #navWeather')) return;
+    if (ev.target.closest?.('#navF1, #navWeather, #viewBtn')) return;
+    // Empty space between toolbar controls is not an outside-page dismissal.
+    if (ev.target.closest?.('.nav-right') && !ev.target.closest?.('button,a,[role="button"]')) return;
     close();
   };
   const onClick = ev => {
-    if (lastPointerType === 'mouse' || !isTouchMode()) return;
+    if (!options.toggleOnClick && (lastPointerType === 'mouse' || !isTouchMode())) return;
     ev.preventDefault();
     ev.stopPropagation();
     isOpen() ? close() : open();
   };
-  const onEnter = ev => { if (ev.pointerType === 'mouse') open(); };
-  const onLeave = ev => { if (ev.pointerType === 'mouse') closeSoon(); };
+  const onEnter = ev => {
+    if (ev.pointerType !== 'mouse') return;
+    // Keep the shared surface alive while moving to a click-only menu.
+    activeNavWidget?.cancelClose();
+    if (!options.toggleOnClick) open();
+  };
+  const onLeave = ev => {
+    if (ev.pointerType !== 'mouse') return;
+    if (activeNavWidget?.popup === popup) closeSoon();
+    else activeNavWidget?.scheduleClose();
+  };
   trigger.addEventListener('click', onClick);
   trigger.addEventListener('pointerenter', onEnter);
   trigger.addEventListener('pointerleave', onLeave);
   popup.addEventListener('pointerenter', onEnter);
   popup.addEventListener('pointerleave', onLeave);
   document.addEventListener('pointerdown', onDocPointer);
+  document.addEventListener('click', onDocClick);
   trigger._fluxPopupCleanup = () => {
     close();
     sizeObserver.disconnect();
@@ -2948,7 +3087,9 @@ function setupHoverTapPopup(trigger, popup, openClass) {
     popup.removeEventListener('pointerenter', onEnter);
     popup.removeEventListener('pointerleave', onLeave);
     document.removeEventListener('pointerdown', onDocPointer);
+    document.removeEventListener('click', onDocClick);
     clearTimeout(closeTimer);
+    popup.remove();
   };
 }
 function toast(msg) {
@@ -3286,7 +3427,7 @@ function setupPullToRefresh() {
     document.querySelector('.modal.open, .overlay.open, .confirm-bg.open, .sp-page.open, .view-panel.open, .mobile-feed-panel.open, .article-modal-layer.open');
 
   document.addEventListener('touchstart', ev => {
-    if (refreshing || ev.touches.length !== 1 || blocked()) {
+    if (ev.target.closest?.('#settingsBtn') || refreshing || ev.touches.length !== 1 || blocked()) {
       tracking = false;
       return;
     }
@@ -3959,18 +4100,15 @@ function bindEvents() {
     _pC = undefined;
     setAccent(sw.dataset.color);
   });
-  let _vTimer;
   const _vBtn = $('viewBtn'), _vPanel = $('viewPanel');
-  const openView  = () => { clearTimeout(_vTimer); _vPanel.classList.add('open'); };
-  const closeView = () => { _vTimer = setTimeout(() => _vPanel.classList.remove('open'), 150); };
-  _vBtn.addEventListener('pointerenter', ev => { if (ev.pointerType === 'mouse') openView(); });
-  _vBtn.addEventListener('pointerleave', ev => { if (ev.pointerType === 'mouse') closeView(); });
-  _vPanel.addEventListener('pointerenter', ev => { if (ev.pointerType === 'mouse') clearTimeout(_vTimer); });
-  _vPanel.addEventListener('pointerleave', ev => { if (ev.pointerType === 'mouse') closeView(); });
-  _vBtn.addEventListener('click', () => _vPanel.classList.toggle('open'));
+  _vPanel.classList.add('nav-widget-popup');
+  setupHoverTapPopup(_vBtn, _vPanel, 'open', { toggleOnClick: true });
   _vPanel.addEventListener('click', ev => {
     const btn = ev.target.closest('.v-layout-btn[data-layout]');
-    if (btn) { setLayout(btn.dataset.layout); _vPanel.classList.remove('open'); }
+    if (btn) {
+      setLayout(btn.dataset.layout);
+      if (activeNavWidget?.popup === _vPanel) activeNavWidget.close();
+    }
   });
   _vPanel.addEventListener('change', ev => {
     const input = ev.target.closest('[data-setting]');
@@ -3992,6 +4130,8 @@ function bindEvents() {
   });
   const _spPage = $('settingsPage');
   const openSettingsPage = () => {
+    activeNavWidget?.close();
+    closeMobileFeedPanel();
     Theme._syncUI();
     renderSFeeds(); renderSYtChannels();
     const pv = $('ytPerVal'); if (pv) pv.textContent = S.ytPerChannel || 3;
@@ -4034,9 +4174,6 @@ function bindEvents() {
     syncWidgets();
   });
   $('overlay').onclick = () => { closeAddModal(); closeAddYtModal(); };
-  document.addEventListener('click', ev => {
-    if (!_vBtn.contains(ev.target) && !_vPanel.contains(ev.target)) _vPanel.classList.remove('open');
-  });
   $('suggestions').addEventListener('click', ev => {
     const chip = ev.target.closest('.chip[data-url]');
     if (!chip) return;
@@ -4144,16 +4281,15 @@ const WX_ICONS = {
   96:['thunderstorms-rain','thunderstorms-rain'],
   99:['thunderstorms-rain','thunderstorms-rain']
 };
+let WX_ICON_MASK_ID = 0;
 function wxFluxIcon(name, size) {
-  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
-  const bg = 'var(--bg)';
-  const cloud = dark ? '#cbd5e1' : '#475569';
+  const cloud = 'var(--wx-cloud)';
   const sun = '#f59e0b';
-  const moon = dark ? '#93c5fd' : '#2563eb';
-  const rain = dark ? '#7dd3fc' : '#0ea5e9';
-  const snow = dark ? '#bae6fd' : '#0284c7';
+  const moon = 'var(--wx-moon)';
+  const rain = 'var(--wx-rain)';
+  const snow = 'var(--wx-snow)';
   const bolt = '#facc15';
-  const mist = dark ? '#94a3b8' : '#64748b';
+  const mist = 'var(--wx-mist)';
   const isNight = name.includes('night');
   const hasCloud = name.includes('cloud') || name.includes('overcast') || name.includes('rain') || name.includes('drizzle') || name.includes('snow') || name.includes('thunderstorms') || name.includes('fog');
   const isRaindrop = name === 'raindrop';
@@ -4170,14 +4306,12 @@ function wxFluxIcon(name, size) {
     return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="${width}"/><path d="M${cx} ${cy - outer}v${outer - inner}M${cx} ${cy + inner}v${outer - inner}M${cx - outer} ${cy}h${outer - inner}M${cx + inner} ${cy}h${outer - inner}M${cx - d2} ${cy - d2}l${d2 - d1} ${d2 - d1}M${cx + d1} ${cy + d1}l${d2 - d1} ${d2 - d1}M${cx + d2} ${cy - d2}l-${d2 - d1} ${d2 - d1}M${cx - d1} ${cy + d1}l-${d2 - d1} ${d2 - d1}" stroke="${color}" stroke-width="${width}" stroke-linecap="round"/>`;
   };
   const sunIcon = (cx = 32, cy = 32, r = 9) => sunGlyph(cx, cy, r);
-  const sunHalo = (cx = 32, cy = 32, r = 9) => sunGlyph(cx, cy, r, bg, 10);
   const moonIcon = (cx = 32, cy = 32, r = 18) =>
     `<path d="M${cx + r * .64} ${cy + r * .44}A${r} ${r} 0 1 1 ${cx + r * .12} ${cy - r * .94}A${r * .78} ${r * .78} 0 1 0 ${cx + r * .64} ${cy + r * .44}z" fill="${moon}"/>`;
   const cloudPath = 'M19 44h26a11 11 0 0 0 1-22 16 16 0 0 0-30-3 12 12 0 0 0 3 25z';
   const compactCloudPath = 'M19 42h27a10 10 0 0 0 0-20 15 15 0 0 0-28-3 12 12 0 0 0 1 23z';
-  const drawCloud = (path, fillInside = true, halo = true) => `${halo ? `<path d="${path}" fill="none" stroke="${bg}" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>` : ''}<path d="${path}" fill="${fillInside ? bg : 'none'}" stroke="${cloud}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const drawCloud = path => `<path d="${path}" fill="none" stroke="${cloud}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`;
   const cloudIcon = drawCloud(cloudPath);
-  const compactCloud = drawCloud(compactCloudPath, false);
   let body = '';
   if (name === 'raindrop') {
     body = size <= 14
@@ -4192,7 +4326,10 @@ function wxFluxIcon(name, size) {
   } else if (name.includes('clear')) {
     body = isNight ? moonIcon() : sunIcon();
   } else if (name.includes('partly-cloudy')) {
-    body = `${drawCloud(compactCloudPath, true, false)}${isNight ? moonIcon(24, 20, 11) : `<circle cx="19" cy="17" r="21" fill="${bg}"/>${sunIcon(19, 17, 7.5)}`}`;
+    const maskId = `wx-cloud-mask-${++WX_ICON_MASK_ID}`;
+    const luminary = isNight ? moonIcon(24, 20, 11) : sunIcon(19, 17, 7.5);
+    const cloudMask = `<mask id="${maskId}" maskUnits="userSpaceOnUse" x="-4" y="-4" width="72" height="72"><rect x="-4" y="-4" width="72" height="72" fill="#fff"/><path d="${compactCloudPath}" fill="#000" stroke="#000" stroke-width="5" stroke-linejoin="round"/></mask>`;
+    body = `<defs>${cloudMask}</defs><g mask="url(#${maskId})">${luminary}</g>${drawCloud(compactCloudPath)}`;
   } else if (hasCloud) {
     body = cloudIcon;
   } else {
@@ -4217,7 +4354,7 @@ function wxFluxIcon(name, size) {
     : weather === 'rain' || weather === 'snow' || weather === 'fog' ? -3
     : hasCloud ? 3 : 0;
   const viewBox = isRaindrop || name === 'wind' || name === 'uv-index' ? '0 0 64 64' : '-4 -4 72 72';
-  return `<svg width="${size}" height="${size}" viewBox="${viewBox}" fill="none" style="display:block;flex-shrink:0" aria-hidden="true"><g transform="translate(0 ${offsetY})">${body}</g></svg>`;
+  return `<svg class="wx-icon" width="${size}" height="${size}" viewBox="${viewBox}" fill="none" style="display:block;flex-shrink:0" aria-hidden="true"><g transform="translate(0 ${offsetY})">${body}</g></svg>`;
 }
 function wxIconName(code, isDay) {
   const pair = WX_ICONS[code] || ['not-available','not-available'];
@@ -4306,7 +4443,7 @@ async function loadWeather() {
         }).join('')}</div>
       </div>`;
     el.title = '';
-    setupHoverTapPopup(el, document.getElementById('wxPopup'), 'wx-open');
+    setupHoverTapPopup(el, el.querySelector('#wxPopup'), 'wx-open');
   }
   try {
     const cached = JSON.parse(localStorage.getItem('flux_wx') || 'null');
@@ -5626,7 +5763,7 @@ function renderF1(f1) {
   const navStatus = f1.liveEvent ? 'Élő' : f1.nextEvent ? f1.countdown : 'Vége';
   const navEvent = f1.liveEvent?.label || f1.nextEvent?.label || f1.city;
   const progress = Math.min(Math.max(Number(f1.activeProgress ?? f1.progress) || 0, 0), 4);
-  const progressHtml = [1, 2, 3, 4].map(i => `<span class="f1-track-seg f1-track-seg-${i}${i <= progress ? ' active' : ''}"></span>`).join('');
+  const progressHtml = [1, 2, 3, 4].map(i => `<span class="f1-track-seg f1-track-seg-${i}${i <= progress ? ' active' : ''}" style="--f1-start-gap:${f1.events[i - 1]?.isCurrent ? 14 : 9}px;--f1-end-gap:${f1.events[i]?.isCurrent ? 14 : 9}px"></span>`).join('');
   const flag = f1.flagUrl ? `<span class="f1-flag"><img src="${e(f1.flagUrl)}" alt=""></span>` : '<span class="f1-flag is-empty"></span>';
   const titleFlag = f1FlagEmoji(f1.countryRaw);
   const titleCountry = f1.countryHu || f1.countryEn;
@@ -5648,7 +5785,7 @@ function renderF1(f1) {
         <div class="f1-upcoming">${upcoming}</div>
       </div>
     </div>`;
-  setupHoverTapPopup(el, document.getElementById('f1Popup'), 'f1-open');
+  setupHoverTapPopup(el, el.querySelector('#f1Popup'), 'f1-open');
 }
 async function loadF1() {
   if (!S.showF1) { clearWidget('navF1'); return; }
