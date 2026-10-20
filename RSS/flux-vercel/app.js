@@ -317,13 +317,16 @@ const Theme = {
     root.style.setProperty('--bg-nav', c.bg);
     document.documentElement.style.backgroundColor = c.bg;
     document.body.style.backgroundColor = c.bg;
-    const oldTc = document.getElementById('themeColorMeta');
-    if (oldTc) oldTc.remove();
-    const newTc = document.createElement('meta');
-    newTc.name = 'theme-color';
-    newTc.id = 'themeColorMeta';
-    newTc.setAttribute('content', c.bg);
-    document.head.appendChild(newTc);
+    root.style.colorScheme = dark ? 'dark' : 'light';
+    // Keep one persistent browser theme hint instead of removing it mid-switch.
+    let themeColor = document.getElementById('themeColorMeta');
+    if (!themeColor) {
+      themeColor = document.createElement('meta');
+      themeColor.name = 'theme-color';
+      themeColor.id = 'themeColorMeta';
+      document.head.appendChild(themeColor);
+    }
+    themeColor.content = c.bg;
     this._syncUI();
   },
   _shade(hex, amt) {

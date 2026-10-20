@@ -19,6 +19,9 @@
       var theme  = s.theme  || 'auto';
       var dark   = theme === 'dark' || (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
       var bg = (BG[preset] || BG.default)[dark ? 'dark' : 'light'];
+      document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+      document.documentElement.dataset.preset = preset;
+      document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
       document.getElementById('themeColorMeta').content = bg;
       document.documentElement.style.backgroundColor = bg;
     } catch(e) {}
@@ -40,7 +43,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&display=swap&subset=latin,latin-ext" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=toolbar-20261020">
+  <link rel="stylesheet" href="styles.css?v=safari-canvas-20261020">
 </head>
 <body>
 <div class="pull-refresh" id="pullRefresh" role="status" aria-live="polite" aria-hidden="true">
@@ -474,6 +477,6 @@
 <div class="toast" id="toast"></div>
 
 <script src="drag-order.min.js?v=1"></script>
-<script src="app.js?v=toolbar-20261020"></script>
+<script src="app.js?v=safari-canvas-20261020"></script>
 </body>
 </html>

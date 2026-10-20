@@ -18,7 +18,9 @@ a { color: var(--ac); }
 button { font-family: inherit; }
 .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
 body { position: relative; display: block; height: 100vh; height: 100dvh; overflow: hidden; }
-.app-shell { position: fixed; inset: 0; overflow: hidden; background: var(--bg); }
+/* Body already follows 100dvh. Avoid Safari caching a viewport-sized fixed tint;
+   isolation preserves the shell's existing overlay stacking context. */
+.app-shell { position: absolute; inset: 0; isolation: isolate; overflow: hidden; background: var(--bg); }
 .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: var(--bg); border-bottom: 1px solid transparent; white-space: nowrap; transition: background .25s, border-color .25s, backdrop-filter .25s; }
 .navbar.scrolled { background: var(--bg-nav, var(--bg)); backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%); border-bottom-color: var(--border); }
 .navbar-inner { width: min(80vw, 1600px); max-width: 1600px; margin: 0 auto; padding: 0 24px; height: 56px; display: flex; align-items: stretch; gap: 2px; }
