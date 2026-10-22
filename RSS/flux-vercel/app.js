@@ -2969,7 +2969,6 @@ function toggleReadLater(a) {
 }
 let activeNavWidget = null;
 let navWidgetGlass = null;
-let navMenuBackdrop = null;
 function syncNavWidgetGlass() {
   const popup = activeNavWidget?.popup;
   if (!popup?.isConnected || !navWidgetGlass) return;
@@ -2985,15 +2984,8 @@ function showNavWidgetGlass(switching) {
     window.addEventListener('resize', syncNavWidgetGlass, { passive: true });
   }
   navWidgetGlass.classList.toggle('is-switching', switching);
-  if (!navMenuBackdrop) {
-    navMenuBackdrop = document.createElement('div');
-    navMenuBackdrop.className = 'nav-menu-backdrop';
-    navMenuBackdrop.setAttribute('aria-hidden', 'true');
-    document.querySelector('.app-shell').append(navMenuBackdrop);
-  }
   syncNavWidgetGlass();
   navWidgetGlass.classList.add('is-visible');
-  navMenuBackdrop.classList.add('is-visible');
 }
 function setupHoverTapPopup(trigger, popup, openClass, options = {}) {
   if (!trigger || !popup) return;
@@ -3021,7 +3013,6 @@ function setupHoverTapPopup(trigger, popup, openClass, options = {}) {
       activeNavWidget = null;
       if (!keepGlass) {
         navWidgetGlass?.classList.remove('is-visible');
-        navMenuBackdrop?.classList.remove('is-visible');
       }
     }
   };

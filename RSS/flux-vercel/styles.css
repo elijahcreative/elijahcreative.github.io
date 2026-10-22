@@ -1469,24 +1469,14 @@ body > .yt-player-fullscreen .yt-player-external { flex: 0 0 auto; margin: 0; }
 .nav-widget-popup.view-panel.open { transform: translateX(-50%) !important; }
 @media (prefers-reduced-motion: reduce) { .nav-widget-glass.is-switching { transition: none; } }
 
-/* The three toolbar menus use one geometry and one non-interactive gap scrim. */
+/* The three toolbar menus use one geometry. */
 .nav-widget-popup.view-panel { max-height: calc(100dvh - var(--header-height, 56px) - 22px); background: transparent; }
 .nav-widget-popup.view-panel .settings-body { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: 24px; }
 .nav-widget-popup.view-panel .s-section { min-width: 0; margin-bottom: 0; }
 .nav-widget-popup.wx-popup,
 .nav-widget-popup.f1-popup { max-height: calc(100dvh - var(--header-height, 56px) - 22px); overflow-y: auto; overscroll-behavior: contain; }
-.nav-menu-backdrop {
-  position: fixed; z-index: 98; inset: var(--header-height, 56px) 0 auto; height: calc(10px + 6rem);
-  pointer-events: none; opacity: 0; visibility: hidden;
-  background: color-mix(in srgb, var(--bg) 75%, transparent);
-  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-  mask-image: linear-gradient(to bottom, #000 0%, #000 35%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 35%, transparent 100%);
-  transition: opacity 120ms ease, visibility 0s linear 120ms;
-}
-.nav-menu-backdrop.is-visible { visibility: visible; opacity: 1; transition-delay: 0s; }
 
-/* All toolbar panels share the glass/scrim stacking context, outside navbar blur. */
+/* All toolbar panels share the glass stacking context, outside navbar blur. */
 .nav-widget-popup.wx-popup,
 .nav-widget-popup.f1-popup,
 .nav-widget-popup.view-panel { z-index: 101; }
