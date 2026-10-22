@@ -1439,7 +1439,7 @@ body > .yt-player-fullscreen .yt-player-external { flex: 0 0 auto; margin: 0; }
 .nav-widget-popup.view-panel { width: min(420px, calc(100vw - 24px)) !important; }
 }
 
-/* One stable glass surface; effects stay inside the rounded panel. */
+/* One stable glass/shadow plane; only widget content fades during a switch. */
 .nav-widget-glass {
   position: fixed; z-index: 99; pointer-events: none; visibility: hidden;
   --nav-widget-radius: 24px;
@@ -1447,13 +1447,11 @@ body > .yt-player-fullscreen .yt-player-external { flex: 0 0 auto; margin: 0; }
   background: color-mix(in srgb, var(--bg) 88%, transparent);
   backdrop-filter: blur(40px) saturate(110%);
   -webkit-backdrop-filter: blur(40px) saturate(110%);
-  box-shadow: none;
-  overflow: hidden;
-  clip-path: inset(0 round var(--nav-widget-radius));
+  box-shadow: 0 24px 64px rgba(0,0,0,.22), 0 8px 24px rgba(0,0,0,.1);
 }
 .nav-widget-glass.is-visible { visibility: visible; }
 .nav-widget-glass.is-switching { transition: height 180ms ease; }
-
+[data-theme="dark"] .nav-widget-glass { box-shadow: 0 26px 68px rgba(0,0,0,.5), 0 8px 24px rgba(0,0,0,.28); }
 .nav-widget-popup.wx-popup,
 .nav-widget-popup.f1-popup,
 .nav-widget-popup.view-panel,
