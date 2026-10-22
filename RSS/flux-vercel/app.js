@@ -1687,6 +1687,7 @@ function handleFlipTouchCancel() {
   else flipGesture = null;
 }
 function handleFlipWheel(event) {
+  if (S.layout !== 'flip' || !event.currentTarget?.classList.contains('flip-view')) return;
   const multiplier = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? window.innerHeight : 1;
   const delta = event.deltaY * multiplier;
   if (!delta) return;
@@ -2972,6 +2973,17 @@ let navWidgetGlass = null;
 function syncNavWidgetGlass() {
   const popup = activeNavWidget?.popup;
   if (!popup?.isConnected || !navWidgetGlass) return;
+  const shell = document.querySelector('.app-shell');
+  const headerBottom = $('navbar').getBoundingClientRect().bottom;
+  shell.style.setProperty('--nav-toolbar-bottom', `${headerBottom}px`);
+  const gap = parseFloat(getComputedStyle(shell).getPropertyValue('--nav-panel-gap'));
+  if (popup.id === 'viewPanel') {
+    const layout = $('content')?.querySelector(':scope > :is(.magazine-layout,.flip-layout,.grid-layout,.list-layout,.reader-layout,.read-later-view,.state-box)');
+    const edge = layout?.getBoundingClientRect();
+    if (edge?.width) {
+      popup.style.setProperty('--view-content-right', `${window.innerWidth - edge.right + gap}px`);
+    }
+  }
   const r = popup.getBoundingClientRect();
   Object.assign(navWidgetGlass.style, { left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px` });
 }
@@ -2990,9 +3002,10 @@ function showNavWidgetGlass(switching) {
 function setupHoverTapPopup(trigger, popup, openClass, options = {}) {
   if (!trigger || !popup) return;
   if (trigger._fluxPopupCleanup) trigger._fluxPopupCleanup();
-  // Panels must sit above the page scrim, outside the navbar's own blur context.
+  // Panels share a stacking context outside the navbar's own blur.
   document.querySelector('.app-shell').append(popup);
   let closeTimer = null;
+  let pinnedByClick = false;
   const isOpen = () => popup.classList.contains(openClass);
   const isTouchMode = () => window.matchMedia && window.matchMedia('(hover: none), (pointer: coarse)').matches;
   const alignToToolbar = () => {
@@ -3007,6 +3020,7 @@ function setupHoverTapPopup(trigger, popup, openClass, options = {}) {
   };
   const close = (keepGlass = false) => {
     clearTimeout(closeTimer);
+    pinnedByClick = false;
     popup.getAnimations().forEach(animation => animation.cancel());
     popup.classList.remove(openClass);
     if (activeNavWidget?.popup === popup) {
@@ -3033,8 +3047,10 @@ function setupHoverTapPopup(trigger, popup, openClass, options = {}) {
     if (activeNavWidget?.popup === popup) syncNavWidgetGlass();
   });
   sizeObserver.observe(popup);
+  if (popup.id === 'viewPanel' && $('content')) sizeObserver.observe($('content'));
   const closeSoon = () => {
-    closeTimer = setTimeout(close, 150);
+    clearTimeout(closeTimer);
+    if (!pinnedByClick) closeTimer = setTimeout(close, options.hoverCloseDelay ?? 150);
   };
   let lastPointerType = '';
   const onDocPointer = ev => {
@@ -3052,13 +3068,22 @@ function setupHoverTapPopup(trigger, popup, openClass, options = {}) {
     if (!options.toggleOnClick && (lastPointerType === 'mouse' || !isTouchMode())) return;
     ev.preventDefault();
     ev.stopPropagation();
+    if (options.pinOnMouseClick && (lastPointerType === 'mouse' || (!lastPointerType && !isTouchMode()))) {
+      if (isOpen() && pinnedByClick) close();
+      else {
+        open();
+        pinnedByClick = true;
+        clearTimeout(closeTimer);
+      }
+      return;
+    }
     isOpen() ? close() : open();
   };
   const onEnter = ev => {
     if (ev.pointerType !== 'mouse') return;
     // Keep the shared surface alive while moving to a click-only menu.
     activeNavWidget?.cancelClose();
-    if (!options.toggleOnClick) open();
+    if (!options.toggleOnClick || options.hoverOpen) open();
   };
   const onLeave = ev => {
     if (ev.pointerType !== 'mouse') return;
@@ -4096,7 +4121,7 @@ function bindEvents() {
   });
   const _vBtn = $('viewBtn'), _vPanel = $('viewPanel');
   _vPanel.classList.add('nav-widget-popup');
-  setupHoverTapPopup(_vBtn, _vPanel, 'open', { toggleOnClick: true });
+  setupHoverTapPopup(_vBtn, _vPanel, 'open', { toggleOnClick: true, hoverOpen: true, pinOnMouseClick: true, hoverCloseDelay: 400 });
   _vPanel.addEventListener('click', ev => {
     const btn = ev.target.closest('.v-layout-btn[data-layout]');
     if (btn) {

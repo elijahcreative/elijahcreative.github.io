@@ -20,7 +20,7 @@ button { font-family: inherit; }
 body { position: relative; display: block; height: 100vh; height: 100dvh; overflow: hidden; }
 /* Body already follows 100dvh. Avoid Safari caching a viewport-sized fixed tint;
    isolation preserves the shell's existing overlay stacking context. */
-.app-shell { position: absolute; inset: 0; isolation: isolate; overflow: hidden; background: var(--bg); }
+.app-shell { --nav-panel-gap: 10px; position: absolute; inset: 0; isolation: isolate; overflow: hidden; background: var(--bg); }
 .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: var(--bg); border-bottom: 1px solid transparent; white-space: nowrap; transition: background .25s, border-color .25s, backdrop-filter .25s; }
 .navbar.scrolled { background: var(--bg-nav, var(--bg)); backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%); border-bottom-color: var(--border); }
 .navbar-inner { width: min(80vw, 1600px); max-width: 1600px; margin: 0 auto; padding: 0 24px; height: 56px; display: flex; align-items: stretch; gap: 2px; }
@@ -1410,7 +1410,7 @@ body > .yt-player-fullscreen .yt-player-external { flex: 0 0 auto; margin: 0; }
 .nav-widget-popup.f1-popup,
 .nav-widget-popup.view-panel {
   position: fixed !important;
-  top: calc(var(--header-height, 56px) + 10px) !important;
+  top: calc(var(--nav-toolbar-bottom, var(--header-height, 56px)) + var(--nav-panel-gap)) !important;
   left: 50% !important;
   right: auto !important;
   width: min(420px, calc(100vw - 24px)) !important;
@@ -1470,11 +1470,11 @@ body > .yt-player-fullscreen .yt-player-external { flex: 0 0 auto; margin: 0; }
 @media (prefers-reduced-motion: reduce) { .nav-widget-glass.is-switching { transition: none; } }
 
 /* The three toolbar menus use one geometry. */
-.nav-widget-popup.view-panel { max-height: calc(100dvh - var(--header-height, 56px) - 22px); background: transparent; }
+.nav-widget-popup.view-panel { max-height: calc(100dvh - var(--nav-toolbar-bottom, var(--header-height, 56px)) - var(--nav-panel-gap) - var(--nav-panel-gap)); background: transparent; }
 .nav-widget-popup.view-panel .settings-body { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: 24px; }
 .nav-widget-popup.view-panel .s-section { min-width: 0; margin-bottom: 0; }
 .nav-widget-popup.wx-popup,
-.nav-widget-popup.f1-popup { max-height: calc(100dvh - var(--header-height, 56px) - 22px); overflow-y: auto; overscroll-behavior: contain; }
+.nav-widget-popup.f1-popup { max-height: calc(100dvh - var(--nav-toolbar-bottom, var(--header-height, 56px)) - var(--nav-panel-gap) - var(--nav-panel-gap)); overflow-y: auto; overscroll-behavior: contain; }
 
 /* All toolbar panels share the glass stacking context, outside navbar blur. */
 .nav-widget-popup.wx-popup,
@@ -1492,3 +1492,16 @@ body > .yt-player-fullscreen .yt-player-external { flex: 0 0 auto; margin: 0; }
 
 /* Disable leftover menu scrims from older mobile page instances. */
 .nav-menu-backdrop { display: none !important; }
+
+/* Do not animate inherited visibility after the View panel has closed. */
+.view-panel .mode-btn { transition: color var(--t), background-color var(--t), box-shadow var(--t); }
+
+/* Match the desktop View panel to the actual content edge, including scrollbar space. */
+@media (min-width: 901px) and (hover: hover) and (pointer: fine) {
+  .nav-widget-popup.view-panel,
+  .nav-widget-popup.view-panel.open {
+    left: auto !important;
+    right: var(--view-content-right, calc((100vw - min(80vw, 1600px)) / 2)) !important;
+    transform: none !important;
+  }
+}
