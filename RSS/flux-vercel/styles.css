@@ -1489,3 +1489,6 @@ body > .yt-player-fullscreen .yt-player-external { flex: 0 0 auto; margin: 0; }
     content: ""; position: absolute; inset: 0 -2px;
   }
 }
+
+/* Disable leftover menu scrims from older mobile page instances. */
+.nav-menu-backdrop { display: none !important; }
