@@ -1,9 +1,9 @@
 {
-    "updated": "2026-10-23T07:59:28.400Z",
+    "updated": "2026-10-24T07:39:21.243Z",
     "nextHoliday": {
-        "date": "Október 23.",
-        "name": "Az 1956-os forradalom ünnepe",
+        "date": "Október 31.",
+        "name": "Halloween",
         "workday": "Munkaszüneti nap",
-        "daysLeft": 0
+        "daysLeft": 7
     }
 }
