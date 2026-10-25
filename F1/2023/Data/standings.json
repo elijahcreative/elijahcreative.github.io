@@ -1,43 +1,43 @@
 {
   "Standings": [
     {
-      "After": "After Singapore"
+      "After": "After USA"
     },
     {
       "Place": "1",
       "Name": "Antonelli",
       "Team": "Mercedes",
-      "Points": "340"
+      "Points": "365"
     },
     {
       "Place": "2",
       "Name": "Russell",
       "Team": "Mercedes",
-      "Points": "238"
+      "Points": "242"
     },
     {
       "Place": "3",
       "Name": "Hamilton",
       "Team": "Ferrari",
-      "Points": "229"
+      "Points": "241"
     },
     {
       "Place": "4",
       "Name": "Verstappen",
       "Team": "Red Bull",
-      "Points": "221"
+      "Points": "236"
     },
     {
       "Place": "5",
       "Name": "Leclerc",
       "Team": "Ferrari",
-      "Points": "215"
+      "Points": "233"
     },
     {
       "Place": "6",
       "Name": "Norris",
       "Team": "McLaren",
-      "Points": "201"
+      "Points": "211"
     }
   ]
 }
