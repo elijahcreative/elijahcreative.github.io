@@ -1981,7 +1981,7 @@ async function openArticle(id) {
     }
   }
   if (!hasReadableRssContent(a)) {
-    window.location.href = a.url;
+    openOriginalArticle(a.url);
     return;
   }
   renderArticleView(a);
@@ -2017,7 +2017,7 @@ async function openArticleUrl(url) {
       renderArticleView(fallback);
       return;
     }
-    window.location.href = articleUrl.href;
+    openOriginalArticle(articleUrl.href);
     return;
   }
   renderArticleLoading(fallback);
@@ -2030,7 +2030,7 @@ async function openArticleUrl(url) {
     renderArticleView(fallback);
     return;
   }
-  window.location.href = articleUrl.href;
+  openOriginalArticle(articleUrl.href);
 }
 function openUrlParam() {
   try {
@@ -2494,6 +2494,64 @@ function saveReturnScroll() {
     window._fluxReturnScrollTop = content ? content.scrollTop : 0;
   } catch(e) {}
 }
+// Keep this tab's exact feed snapshot when Reader falls back to another site.
+const EXTERNAL_RETURN_KEY = 'flux_external_return_v1';
+function openOriginalArticle(url) {
+  const snapshot = {
+    url: location.href,
+    articles: S.articles,
+    layout: S.layout,
+    activeUrl: S.activeUrl,
+    activeCategory: S.activeCategory,
+    activeSpecialView: S.activeSpecialView,
+    scrollTop: window._fluxReturnScrollTop ?? $('content')?.scrollTop ?? 0,
+    flipPageIndex,
+    flipAnchor: currentFlipAnchor(),
+    ytVideos
+  };
+  try { sessionStorage.setItem(EXTERNAL_RETURN_KEY, JSON.stringify(snapshot)); } catch(e) {}
+  // Loading Reader may have pushed a temporary history entry. Replace that
+  // entry so Back returns to the feed, rather than retrying the failed article.
+  if (history.state?.flux === 'article') location.replace(url);
+  else location.assign(url);
+}
+function takeExternalReturn() {
+  try {
+    const raw = sessionStorage.getItem(EXTERNAL_RETURN_KEY);
+    sessionStorage.removeItem(EXTERNAL_RETURN_KEY);
+    if (!raw) return null;
+    const snapshot = JSON.parse(raw);
+    if (snapshot.url !== location.href || !Array.isArray(snapshot.articles)) return null;
+    return snapshot;
+  } catch(e) { return null; }
+}
+function restoreExternalReturn(snapshot, cachedPage = false) {
+  if (cachedPage) {
+    window._fluxReturnScrollTop = snapshot.scrollTop;
+    finishArticleClose();
+  } else {
+    S.articles = snapshot.articles.map(a => ({ ...a, date: new Date(a.date ?? NaN) }));
+    S.layout = snapshot.layout;
+    S.activeUrl = snapshot.activeUrl;
+    S.activeCategory = snapshot.activeCategory;
+    S.activeSpecialView = snapshot.activeSpecialView;
+    ytVideos = (snapshot.ytVideos || []).map(v => ({ ...v, date: new Date(v.date) }));
+    ytVideos.forEach(v => { ytVideoMap[v.videoId] = v; });
+    flipPageIndex = snapshot.flipPageIndex || 0;
+    renderSidebar();
+    updateLayoutBtns();
+    renderArticles();
+  }
+  requestAnimationFrame(() => {
+    if (S.layout === 'flip') restoreFlipAnchor(snapshot.flipAnchor);
+    else setScrollTopInstant($('content'), snapshot.scrollTop || 0);
+  });
+}
+window.addEventListener('pageshow', event => {
+  if (!event.persisted) return;
+  const snapshot = takeExternalReturn();
+  if (snapshot) restoreExternalReturn(snapshot, true);
+});
 function articleScrollTopFor(articleId) {
   const stateTop = history.state?.flux === 'article' && history.state.articleId === articleId
     ? Math.max(0, Number(history.state.articleScrollTop) || 0)
@@ -5881,7 +5939,11 @@ const Config = {
   updateLayoutBtns();
   syncWidgets();
   const navigation = performance.getEntriesByType?.('navigation')?.[0];
-  loadYouTube(navigation?.type === 'reload');
+  const externalReturn = navigation?.type === 'back_forward' ? takeExternalReturn() : null;
+  if (!externalReturn) {
+    try { sessionStorage.removeItem(EXTERNAL_RETURN_KEY); } catch(e) {}
+    loadYouTube(navigation?.type === 'reload');
+  }
   const contentEl = document.getElementById('content');
   const navbar = document.getElementById('navbar');
   contentEl.addEventListener('scroll', () => {
@@ -5889,6 +5951,10 @@ const Config = {
     syncYtMiniPlayer();
   }, { passive: true });
   window.addEventListener('resize', syncYtMiniPlayer, { passive: true });
+  if (externalReturn) {
+    restoreExternalReturn(externalReturn);
+    return;
+  }
   const initialOpenUrl = openUrlParam();
   if (initialOpenUrl) {
     openArticleUrl(initialOpenUrl);
