@@ -1,33 +1,46 @@
-# Telex Reader relay
+# Telex Reader relay — preview revision
 
-This separate Worker does not bind to Pixaluma resources. Only signed GET
-requests to `/article` are accepted, for HTTPS Telex article paths. The shared
-secret belongs in Cloudflare and Vercel server environment variables, never in
-the client bundle or Git. Requests expire after one minute; redirects are not
+This dedicated Worker binds only to its own ReaderBudget SQLite Durable Object.
+It does not use Pixaluma resources. Changes require preview review before release.
+
+Only authenticated GET requests to `/article` with HTTPS Telex article paths are
+accepted. The shared `TELEX_RELAY_SECRET` belongs only in Cloudflare and Vercel
+server environment variables. Requests expire after one minute; the HMAC binds
+the URL, optional Web Bot Auth headers and daily client digest. Redirects are not
 followed. HTML is bounded to 2 MiB with a 6-second upstream timeout.
 
-Required configuration:
+## Traffic protection
 
-- Cloudflare secret: `TELEX_RELAY_SECRET`.
-- Vercel server variables: the same `TELEX_RELAY_SECRET` and
-  `TELEX_RELAY_URL=https://flux-telex-reader.balazskemenesi.workers.dev/article`.
-- Worker binding `RATE_LIMITER`: 20 requests per 60 seconds, namespace
-  `2026100201`, as specified in wrangler.jsonc.
+After authentication, valid successful edge-cache entries are served before quota
+admission. Successful HTML stays in edge cache for one hour. A single SQLite
+Durable Object coordinates 12 requests per client per minute, 20 globally per
+minute and 500 globally per UTC day. Counters survive Worker restarts; these are
+upstream-request limits, not per-Cloudflare-location counters. `wrangler.jsonc`
+contains the binding and initial SQLite migration. No raw client IP is stored;
+the backend sends an authenticated daily HMAC digest.
 
-Successful HTML is cached for one hour per Cloudflare location. Authentication
-and rate limiting happen before cache access. Failed responses are not cached.
-The native rate limit is approximate and per location, not a global daily cap.
-Requests rejected by authentication still consume Worker invocations; this does
-not guarantee isolation from the account-wide free quota under deliberate
-flooding. The public Flux article API remains public as before.
+Short typed negative records cover blocks, challenges, timeouts, upstream errors
+and provider rate limits. Provider `Retry-After` is honored up to 24 hours. A fresh
+unsigned transient failure can permit one direct retry only after atomically
+reserving a second client/global slot. Cached failures never grant permission.
+Challenges, 403, 429, unavailable guards, and signed Web Bot Auth requests do not
+grant a direct retry. Missing relay configuration fails closed for Telex.
 
-With configuration absent, Flux retains its existing direct-fetch behavior.
-Non-Telex extraction, article parsing and saved user settings are unchanged.
+Both article text and Flip image metadata use this relay and budget. The public
+Vercel API also applies bounded per-instance caches, coalescing and a local abuse
+brake. These local controls alone are not a global quota. Authentication failures
+and deliberately flooded public endpoints still consume platform invocations;
+this mechanism cannot guarantee isolation from shared account-wide free quotas.
 
-The Reader Vercel function alone runs in `fra1`; other functions keep their
-existing region. The Worker uses the `aws:eu-central-1` placement hint. End-to-end
-testing found Telex returning 403 on the US Vercel-to-Worker path, while the
-European Reader path succeeded for both test articles. This does not guarantee
-that Telex will never change its access rules.
+## Configuration and validation
 
-Validation: `node --test worker.test.mjs`.
+Use the same server-only `TELEX_RELAY_SECRET` in the Worker and Vercel. The
+production URL is `https://flux-telex-reader.balazskemenesi.workers.dev/article`.
+Preview uses a separate `flux-telex-reader-preview` Worker, secret and DO namespace.
+Web Bot Auth remains separately disabled until approved and configured.
+
+Run `node --test worker.test.mjs`. Local Wrangler tests also exercise the real
+SQLite implementation and persisted daily counters across a runtime restart.
+These checks do not prove that Telex will allow the fetcher; current deployment
+access must be tested independently. Parser behavior and saved settings are
+outside the relay and remain unchanged.

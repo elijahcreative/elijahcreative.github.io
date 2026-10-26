@@ -8,6 +8,8 @@
     "deploy:prod": "vercel --prod"
   },
   "dependencies": {
-    "sharp": "^0.35.4"
+    "http-message-sig": "0.3.0",
+    "sharp": "^0.35.4",
+    "web-bot-auth": "0.2.0"
   }
 }

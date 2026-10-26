@@ -1,3 +1,9 @@
+const { isWebBotAuthEnabled } = require('../lib/web-bot-auth');
+const { randomUUID } = require('node:crypto');
+const { ArticleFetchError, fetchDirectHtml } = require('../lib/article-transport');
+const { createArticleRequestPool } = require('../lib/article-request-pool');
+const articleRequests = createArticleRequestPool();
+const {clientIdentity,fetchTelexHtml}=require('../lib/telex-relay-client');
 const ARTICLE_HOSTS = new Set([
   'telex.hu',
   'www.telex.hu',
@@ -98,72 +104,49 @@ const STRIP_PATTERNS = [
   /<p>\s*The post[\s\S]*?first appeared on[\s\S]*?<\/p>/gi
 ];
 module.exports = async function handler(req, res) {
-  if (req.method !== 'GET') {
-    sendJson(res, 405, { error: 'method_not_allowed' });
-    return;
-  }
+  const requestId = randomUUID();
+  res.setHeader('X-Request-ID',requestId);
+  if (req.method !== 'GET') { res.setHeader('Allow','GET');sendJson(res,405,{error:'method_not_allowed',code:'method_not_allowed',requestId});return; }
+  // Browser-origin filtering prevents cross-site drive-by calls, not deliberate
+  // clients. It is not authentication and not the global quota mechanism.
+  if (req.headers?.['sec-fetch-site'] === 'cross-site') {sendJson(res,403,{error:'cross_site_request',code:'cross_site_request',requestId});return;}
   try {
-    await handleArticle(req, res);
+    await handleArticle(req,res,requestId);
   } catch (err) {
-    sendJson(res, 500, { error: 'server_error' });
+    const e = err instanceof ArticleFetchError ? err : new ArticleFetchError('guard_unavailable');
+    console.error(JSON.stringify({event:'reader_failure',requestId,code:e.code,upstreamStatus:e.upstreamStatus}));
+    res.setHeader('Retry-After',String(e.retryAfter));
+    sendJson(res,e.statusCode,{error:e.code,code:e.code,retryAfter:e.retryAfter,requestId,...(e.upstreamStatus===undefined?{}:{upstreamStatus:e.upstreamStatus})});
   }
 };
-async function handleArticle(req, res) {
-  const rawUrl = Array.isArray(req.query?.url) ? req.query.url[0] : req.query?.url || '';
+function validArticleUrl(url) {
+  return url.protocol==='https:' && ARTICLE_HOSTS.has(url.hostname) && !url.username && !url.password && !url.port;
+}
+async function handleArticle(req,res,requestId) {
+  const rawUrl=Array.isArray(req.query?.url)?req.query.url[0]:req.query?.url || '';
   let articleUrl;
-  try {
-    articleUrl = new URL(rawUrl);
-  } catch {
-    sendJson(res, 400, { error: 'bad_url' });
-    return;
-  }
-  if (articleUrl.protocol !== 'https:' || !ARTICLE_HOSTS.has(articleUrl.hostname)) {
-    sendJson(res, 400, { error: 'unsupported_source' });
-    return;
-  }
-  const relayUrl = process.env.TELEX_RELAY_URL;
-  const relaySecret = process.env.TELEX_RELAY_SECRET;
-  const useRelay = ['telex.hu', 'www.telex.hu'].includes(articleUrl.hostname) && relayUrl && relaySecret;
-  let fetchUrl = articleUrl.href;
-  const relayHeaders = {};
-  if (useRelay) {
-    const relayArticleUrl = new URL(articleUrl.href);
-    relayArticleUrl.hostname = 'telex.hu';
-    relayArticleUrl.search = '';
-    relayArticleUrl.hash = '';
-    const endpoint = new URL(relayUrl);
-    if (endpoint.protocol !== 'https:' || endpoint.hostname !== 'flux-telex-reader.balazskemenesi.workers.dev'
-      || endpoint.username || endpoint.password || endpoint.port || endpoint.pathname !== '/article') {
-      throw new Error('Invalid Telex relay configuration');
+  try {articleUrl=new URL(rawUrl);} catch {sendJson(res,400,{error:'bad_url',code:'bad_url',requestId});return;}
+  if(!validArticleUrl(articleUrl)){sendJson(res,400,{error:'unsupported_source',code:'unsupported_source',requestId});return;}
+  articleUrl.hash='';
+  const isTelex=['telex.hu','www.telex.hu'].includes(articleUrl.hostname);
+  const canonical=new URL(articleUrl.href);
+  if(isTelex){
+    canonical.hostname='telex.hu';canonical.search='';
+    if(!/^\/[a-z0-9/-]+\/\d{4}\/\d{2}\/\d{2}\/[a-z0-9-]+\/?$/.test(canonical.pathname)){
+      sendJson(res,400,{error:'unsupported_source',code:'unsupported_source',requestId});return;
     }
-    endpoint.search = '';
-    endpoint.hash = '';
-    endpoint.searchParams.set('url', relayArticleUrl.href);
-    fetchUrl = endpoint.href;
-    const timestamp = String(Date.now());
-    relayHeaders['X-Flux-Time'] = timestamp;
-    relayHeaders['X-Flux-Signature'] = require('node:crypto').createHmac('sha256', relaySecret)
-      .update(`${timestamp}\n${relayArticleUrl.href}`).digest('hex');
   }
-  const upstream = await fetch(fetchUrl, {
-    ...(useRelay ? { signal: AbortSignal.timeout(8000) } : {}),
-    headers: {
-      'accept': 'text/html,application/xhtml+xml',
-      'user-agent': 'Mozilla/5.0 FluxReader/1.0',
-      ...relayHeaders
-    }
+  const relaySecret=process.env.TELEX_RELAY_SECRET;
+  const client=clientIdentity(req,relaySecret);
+  const mode=isWebBotAuthEnabled()?'signed':'unsigned';
+  const cacheKey=canonical.href+'|'+mode+'|'+(process.env.TELEX_RELAY_URL || '');
+  const article=await articleRequests.run(cacheKey,client,async()=>{
+    const html=isTelex ? await fetchTelexHtml(req,canonical.href,requestId) : await fetchDirectHtml(canonical.href,{headers:{accept:'text/html,application/xhtml+xml','user-agent':'Mozilla/5.0 FluxReader/1.0'},allowUrl:u=>validArticleUrl(u)&&u.hostname.replace(/^www\./,'')===canonical.hostname.replace(/^www\./,'')});
+    const result=extractArticleForHost(canonical,html);
+    if(!result.content || plainText(result.content).length<240)throw new ArticleFetchError('extract_failed');
+    return result;
   });
-  if (!upstream.ok) {
-    sendJson(res, 502, { error: 'upstream_error', status: upstream.status });
-    return;
-  }
-  const html = await upstream.text();
-  const article = extractArticleForHost(articleUrl, html);
-  if (!article.content || plainText(article.content).length < 240) {
-    sendJson(res, 422, { error: 'extract_failed' });
-    return;
-  }
-  sendJson(res, 200, article);
+  sendJson(res,200,{...article,url:articleUrl.href,requestId});
 }
 function extractArticleForHost(articleUrl, html) {
   const cfg = SOURCE_CONFIG.find(s => articleUrl.hostname.includes(s.host)) || SOURCE_CONFIG.at(-1);

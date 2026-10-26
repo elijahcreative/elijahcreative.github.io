@@ -1,7 +1,7 @@
 {
   "functions": {
     "api/article.js": {
-      "maxDuration": 10,
+      "maxDuration": 20,
       "regions": [
         "fra1"
       ]
@@ -34,13 +34,21 @@
       ]
     },
     "api/feed-image.js": {
-      "maxDuration": 10,
+      "maxDuration": 20,
       "regions": [
         "fra1"
       ]
     }
   },
   "rewrites": [
+    {
+      "source": "/.well-known/http-message-signatures-directory",
+      "destination": "/api/bot-directory"
+    },
+    {
+      "source": "/reader-bot",
+      "destination": "/reader-bot.html"
+    },
     {
       "source": "/share-image",
       "destination": "/api/share-image"

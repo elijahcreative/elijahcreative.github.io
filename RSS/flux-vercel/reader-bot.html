@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Flux Reader — Fetcher information</title>
+<style>
+:root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color-scheme:light dark;font-size:17px;line-height:1.65}body{margin:0;background:light-dark(#fff,#111);color:light-dark(#171717,#eee)}main{max-width:44rem;margin:auto;padding:clamp(24px,6vw,72px) 24px}a{color:light-dark(#078ca5,#61d2e2);text-underline-offset:3px}.brand{font-size:19px;font-weight:800;text-decoration:none}h1{font-size:clamp(28px,6vw,42px);line-height:1.15;letter-spacing:-.035em;margin:36px 0 24px}h2{font-size:20px;margin:32px 0 8px}p{margin:0 0 16px}code{font-size:.85em;overflow-wrap:anywhere}footer{margin-top:40px;padding-top:20px;border-top:1px solid light-dark(#ddd,#383838);font-size:14px;opacity:.75}
+</style>
+</head>
+<body><main>
+<a class="brand" href="/">Flux</a>
+<h1>Reader fetcher information</h1>
+<p>Flux Reader is a small personal RSS reader. It collects headlines and summaries from publishers’ feeds and can request public article pages to display them in a consistent reading view.</p>
+<h2>Requests and identification</h2>
+<p>Full article text is requested when a reader opens an article; hovering or touching a link does not prefetch the text. The Flip view may separately retrieve page metadata to improve image resolution. It does not recursively crawl links to build a search index.</p>
+<p>When Web Bot Auth is activated, the fetcher identifies itself as <code>FluxReader/1.0 (+https://fluxreader.vercel.app/reader-bot)</code>. Its public verification directory is served at <code>/.well-known/http-message-signatures-directory</code>. Publishing this information does not claim Cloudflare verification or publisher approval.</p>
+<h2>Content use</h2>
+<p>Flux preserves the article’s source link and attribution. Retrieved text is used for reading and, when a reader explicitly enables it, text-to-speech through ElevenLabs. Flux does not use article content to train AI models.</p>
+<p>RSS metadata may be cached in the reader’s browser. The current Telex relay caches successful article HTML for one hour at a Cloudflare location, and the reader can retain extracted content in memory. Readers may also save articles for later reading on their own device.</p>
+<h2>Access and traffic</h2>
+<p>The current article endpoint is limited to supported publisher hosts. The Telex relay accepts only authenticated calls from the Flux backend and checks its successful HTML cache before applying shared limits of 12 requests per client per minute, 20 globally per minute, and 500 globally per UTC day. These limits include Telex image-metadata requests and any reserved direct retry. Short-lived typed failure records prevent repeated upstream attempts. Flux does not request account credentials from publishers to retrieve protected article content.</p>
+<p>Publishers retain control over access to their websites. A failed fetch can leave only the feed summary and original article link available.</p>
+<footer>This page describes the fetcher. The public verification directory is available only when the operator has enabled it. Last updated: 26 October 2026.</footer>
+</main></body></html>

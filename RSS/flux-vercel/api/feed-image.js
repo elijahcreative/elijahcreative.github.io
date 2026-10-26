@@ -1,5 +1,19 @@
 const https = require('https');
 const net = require('net');
+const {randomUUID}=require('node:crypto');
+const {ArticleFetchError}=require('../lib/article-transport');
+const {createArticleRequestPool}=require('../lib/article-request-pool');
+const {canonicalTelexUrl,clientIdentity,fetchTelexHtml}=require('../lib/telex-relay-client');
+const {isWebBotAuthEnabled}=require('../lib/web-bot-auth');
+const telexImages=createArticleRequestPool({maxEntries:128,maxConcurrent:4,successTtl:3600000});
+async function telexImage(req,url,requestId) {
+  const canonical=canonicalTelexUrl(url.href);
+  const key=canonical.href+'|'+isWebBotAuthEnabled()+'|'+(process.env.TELEX_RELAY_URL || '');
+  return telexImages.run(key,clientIdentity(req,process.env.TELEX_RELAY_SECRET),async()=>{
+    const html=await fetchTelexHtml(req,canonical.href,requestId);
+    return {image:imageFromHead(html,canonical.href)};
+  });
+}
 const { safeLookup } = require('../lib/remote-image');
 
 const MAX_HEAD_BYTES = 512 * 1024;
@@ -12,7 +26,8 @@ function publicUrl(value, base) {
     return url;
   } catch { return null; }
 }
-function fetchHead(url, redirects = 3, deadline = Date.now() + 6000) {
+function fetchHead(url, redirects = 3, deadline = Date.now() + 6000, req, requestId) {
+  if (['telex.hu','www.telex.hu'].includes(url.hostname)) return telexImage(req,url,requestId);
   return new Promise((resolve, reject) => {
     if (Date.now() >= deadline) return reject(new Error('timeout'));
     const request = https.get(url, {
@@ -24,7 +39,7 @@ function fetchHead(url, redirects = 3, deadline = Date.now() + 6000) {
         response.destroy();
         const target = publicUrl(response.headers.location, url);
         if (!target || redirects <= 0) return reject(new Error('redirect'));
-        fetchHead(target, redirects - 1, deadline).then(resolve, reject);
+        fetchHead(target, redirects - 1, deadline, req, requestId).then(resolve, reject);
         return;
       }
       if (status !== 200 || !/^(?:text\/html|application\/xhtml\+xml)(?:;|$)/i.test(response.headers['content-type'] || '')) {
@@ -80,17 +95,25 @@ function imageFromHead(html, base) {
   return null;
 }
 module.exports = async function handler(req, res) {
+  const requestId=randomUUID();
+  res.setHeader('X-Request-ID',requestId);
   res.setHeader('X-Content-Type-Options', 'nosniff');
+  if(req.headers?.['sec-fetch-site']==='cross-site')return res.status(403).json({image:null,code:'cross_site_request',requestId});
   if (req.method !== 'GET') return res.status(405).json({ image: null });
   const value = req.query?.url;
   const url = typeof value === 'string' && value.length <= 4096 && publicUrl(value);
   if (!url) return res.status(400).json({ image: null });
   try {
-    const page = await fetchHead(url);
-    const image = imageFromHead(page.html, page.url);
+    const page = await fetchHead(url,3,Date.now()+6000,req,requestId);
+    const image = 'image' in page ? page.image : imageFromHead(page.html, page.url);
     res.setHeader('Cache-Control', image ? 'public, max-age=86400, s-maxage=86400, stale-while-revalidate=86400' : 'public, max-age=300, s-maxage=300');
     return res.status(200).json({ image });
-  } catch {
+  } catch (error) {
+    if(error instanceof ArticleFetchError){
+      res.setHeader('Cache-Control','no-store');
+      res.setHeader('Retry-After',String(error.retryAfter));
+      return res.status(error.statusCode).json({image:null,code:error.code,retryAfter:error.retryAfter,requestId});
+    }
     res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=300');
     return res.status(200).json({ image: null });
   }

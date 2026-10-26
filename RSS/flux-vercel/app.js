@@ -7,6 +7,12 @@ const YOUTUBE_API = '/api/youtube?input=';
 const FEED_API    = '/api/feed?input=';
 const CACHE_TTL   = 5 * 60 * 1000; // 5 minutes
 const ARTICLE_CACHE_TTL = 10 * 60 * 1000;
+const ARTICLE_NEGATIVE_CACHE_DEFAULT_TTL = 20 * 1000;
+const ARTICLE_NEGATIVE_CACHE_MIN_TTL = 5 * 1000;
+const ARTICLE_NEGATIVE_CACHE_MAX_TTL = 5 * 60 * 1000;
+const ARTICLE_CACHE_MAX_ENTRIES = 120;
+const ARTICLE_NEGATIVE_CACHE_MAX_ENTRIES = 120;
+const ARTICLE_REQUEST_MAX_IN_FLIGHT = 32;
 const TTS_CACHE_NAME = 'flux-tts-george-v1';
 const TTS_CHUNK_MAX = 420;
 const TTS_PLAYBACK_RATE = 1.1;
@@ -121,6 +127,7 @@ const S = {
 };
 const articleMap = {};
 const extractedArticleCache = new Map();
+const articleExtractionFailures = new Map();
 const extractingArticlePromises = new Map();
 let ytVideos = [];
 const ytVideoMap = {};
@@ -1170,7 +1177,7 @@ async function findFlipImage(article) {
         const direct = await probeFlipImage(hvg);
         if (direct) return direct;
       }
-      const cached = extractedArticleCache.get(article.url)?.image;
+      const cached = getRecentMapValue(extractedArticleCache, articleRequestKey(article.url))?.image;
       const src = cached || await fetchT('/api/feed-image?url=' + encodeURIComponent(article.url), { cache: 'force-cache' }, 7500)
         .then(r => r.ok ? r.json() : null).then(data => data?.image).catch(() => null);
       return src && src !== article.image ? probeFlipImage(src) : null;
@@ -1967,18 +1974,30 @@ async function openArticle(id) {
   if (S.activeSpecialView === 'readLater') markReadLaterRead(id);
   saveReturnScroll();
   if (canExtractArticle(a)) {
-    const cached = extractedArticleCache.get(a.url);
+    const cached = getRecentMapValue(extractedArticleCache, articleRequestKey(a.url));
     if (cached) {
-      renderArticleView({ ...a, ...cached, author: cached.author || a.author, date: cached.date ? new Date(cached.date) : a.date });
+      renderArticleView({ ...a, ...cached, url: a.url, author: cached.author || a.author, date: cached.date ? new Date(cached.date) : a.date });
       return;
     }
     if (S.readerMode !== 'modal') renderArticleLoading(a);
-    const extracted = await fetchExtractedArticle(a).catch(() => null);
+    let extracted = null;
+    let extractionError = null;
+    try {
+      extracted = await fetchExtractedArticle(a);
+    } catch (err) {
+      extractionError = err;
+    }
     if (extracted && hasReadableRssContent(extracted)) {
-      extractedArticleCache.set(a.url, extracted);
-      renderArticleView({ ...a, ...extracted, author: extracted.author || a.author, date: extracted.date ? new Date(extracted.date) : a.date });
+      renderArticleView({ ...a, ...extracted, url: a.url, author: extracted.author || a.author, date: extracted.date ? new Date(extracted.date) : a.date });
       return;
     }
+    if (!hasReadableRssContent(a)) {
+      openOriginalArticle(a.url, extractionError);
+      return;
+    }
+    renderArticleView(a);
+    if (extractionError) logArticleFallback(extractionError);
+    return;
   }
   if (!hasReadableRssContent(a)) {
     openOriginalArticle(a.url);
@@ -2021,16 +2040,23 @@ async function openArticleUrl(url) {
     return;
   }
   renderArticleLoading(fallback);
-  const extracted = await fetchExtractedArticle(fallback).catch(() => null);
+  let extracted = null;
+  let extractionError = null;
+  try {
+    extracted = await fetchExtractedArticle(fallback);
+  } catch (err) {
+    extractionError = err;
+  }
   if (extracted && hasReadableRssContent(extracted)) {
-    renderArticleView({ ...fallback, ...extracted, author: extracted.author || fallback.author, date: extracted.date ? new Date(extracted.date) : fallback.date });
+    renderArticleView({ ...fallback, ...extracted, url: fallback.url, author: extracted.author || fallback.author, date: extracted.date ? new Date(extracted.date) : fallback.date });
     return;
   }
   if (hasReadableRssContent(fallback)) {
     renderArticleView(fallback);
+    if (extractionError) logArticleFallback(extractionError);
     return;
   }
-  openOriginalArticle(articleUrl.href);
+  openOriginalArticle(articleUrl.href, extractionError);
 }
 function openUrlParam() {
   try {
@@ -2053,36 +2079,205 @@ function canExtractArticle(a) {
   } catch(e) { return false; }
 }
 async function fetchExtractedArticle(a) {
-  const cached = extractedArticleCache.get(a.url);
+  const key = articleRequestKey(a.url);
+  const cached = getRecentMapValue(extractedArticleCache, key);
   if (cached) return cached;
-  if (extractingArticlePromises.has(a.url)) return extractingArticlePromises.get(a.url);
-  const promise = fetchT(ARTICLE_API + encodeURIComponent(a.url), { cache: 'no-store' }, 12000)
-    .then(r => {
-      if (!r.ok) throw new Error('extract');
-      return r.json();
-    })
-    .then(data => {
-      extractedArticleCache.set(a.url, data);
-      extractingArticlePromises.delete(a.url);
-      return data;
+  const cachedFailure = getArticleExtractionFailure(key);
+  if (cachedFailure) throw articleRequestError(cachedFailure.code, cachedFailure);
+  if (extractingArticlePromises.has(key)) return extractingArticlePromises.get(key);
+  if (extractingArticlePromises.size >= ARTICLE_REQUEST_MAX_IN_FLIGHT) {
+    throw articleRequestError('client_busy');
+  }
+  const promise = Promise.resolve()
+    .then(() => fetchT(ARTICLE_API + encodeURIComponent(a.url), { cache: 'no-store' }, 18000))
+    .then(async response => {
+      const raw = await response.text();
+      const body = parseArticleResponseJson(raw);
+      if (!response.ok) throw articleRequestErrorFromResponse(response, body);
+      if (body && typeof body === 'object' && !Array.isArray(body) && !body.content && (body.code || body.error)) {
+        throw articleRequestErrorFromResponse(response, body);
+      }
+      if (articleLooksLikeChallenge(raw, body, response)) throw articleRequestError('challenge_detected');
+      if (!body || typeof body !== 'object' || Array.isArray(body) || typeof body.content !== 'string') {
+        throw articleRequestError('invalid_content');
+      }
+      if (articlePlainText(body.content).length <= 240) {
+        throw articleRequestError('invalid_content');
+      }
+      const title = typeof body.title === 'string' ? body.title.trim() : '';
+      const article = {
+        source: typeof body.source === 'string' ? body.source : '',
+        url: a.url,
+        title: title || a.title || '',
+        desc: typeof body.desc === 'string' ? body.desc : '',
+        image: typeof body.image === 'string' ? body.image : '',
+        date: typeof body.date === 'string' ? body.date : '',
+        author: typeof body.author === 'string' ? body.author : '',
+        content: body.content
+      };
+      setCappedMapValue(extractedArticleCache, key, article, ARTICLE_CACHE_MAX_ENTRIES);
+      return article;
     })
     .catch(err => {
-      extractingArticlePromises.delete(a.url);
-      throw err;
+      const typed = err?.name === 'ArticleRequestError'
+        ? err
+        : articleRequestError(err?.name === 'AbortError' || err?.code === 'ABORT_ERR' ? 'client_timeout' : 'network_error');
+      cacheArticleExtractionFailure(key, typed);
+      throw typed;
+    })
+    .finally(() => {
+      if (extractingArticlePromises.get(key) === promise) extractingArticlePromises.delete(key);
     });
-  extractingArticlePromises.set(a.url, promise);
+  extractingArticlePromises.set(key, promise);
   return promise;
 }
-function prefetchArticle(id) {
-  const a = articleMap[id];
-  if (!a || !canExtractArticle(a) || extractedArticleCache.has(a.url) || extractingArticlePromises.has(a.url)) return;
-  fetchExtractedArticle(a).catch(() => {});
+function articleRequestKey(rawUrl) {
+  try {
+    const url = new URL(rawUrl);
+    url.hash = '';
+    const host = url.hostname.toLowerCase();
+    if (host === 'telex.hu' || host === 'www.telex.hu') {
+      url.hostname = 'telex.hu';
+      const trackingKey = key => /^utm_/i.test(key) || /^(fbclid|gclid|dclid|mc_cid|mc_eid|yclid|_ga|_gl)$/i.test(key);
+      for (const key of [...new Set(url.searchParams.keys())]) {
+        if (trackingKey(key)) url.searchParams.delete(key);
+      }
+    }
+    return url.href;
+  } catch(e) {
+    return String(rawUrl || '').split('#')[0];
+  }
 }
-function setupArticlePrefetch() {
+function getRecentMapValue(map, key) {
+  if (!map.has(key)) return null;
+  const value = map.get(key);
+  map.delete(key);
+  map.set(key, value);
+  return value;
+}
+function setCappedMapValue(map, key, value, maxEntries) {
+  map.delete(key);
+  map.set(key, value);
+  while (map.size > maxEntries) map.delete(map.keys().next().value);
+}
+function getArticleExtractionFailure(key) {
+  const failure = getRecentMapValue(articleExtractionFailures, key);
+  if (!failure) return null;
+  if (failure.expiresAt <= Date.now()) {
+    articleExtractionFailures.delete(key);
+    return null;
+  }
+  return failure;
+}
+function parseArticleResponseJson(raw) {
+  try { return JSON.parse(raw); } catch(e) { return null; }
+}
+function articleRequestError(code, details = {}) {
+  const safeCode = /^[a-z0-9_.-]{1,80}$/i.test(String(code || '')) ? String(code) : 'article_error';
+  const error = new Error(safeCode);
+  error.name = 'ArticleRequestError';
+  error.code = safeCode;
+  const status = Number(details.upstreamStatus);
+  error.upstreamStatus = Number.isInteger(status) && status >= 100 && status <= 599 ? status : null;
+  error.retryAfter = details.retryAfter ?? null;
+  error.requestId = typeof details.requestId === 'string' ? details.requestId.slice(0, 128) : null;
+  return error;
+}
+function articleRequestErrorFromResponse(response, body) {
+  const status = Number(body?.upstreamStatus ?? body?.status);
+  const code = body?.code || body?.error || (response.status === 429 ? 'rate_limited' : response.status >= 500 ? 'upstream_error' : 'http_error');
+  return articleRequestError(code, {
+    upstreamStatus: Number.isInteger(status) && status >= 100 && status <= 599 ? status : null,
+    retryAfter: body?.retryAfter ?? response.headers?.get?.('retry-after'),
+    requestId: body?.requestId || response.headers?.get?.('x-request-id') || response.headers?.get?.('x-vercel-id')
+  });
+}
+function articleRetryAfterMs(value) {
+  if (typeof value === 'number' && Number.isFinite(value)) return value * 1000;
+  const raw = String(value || '').trim();
+  if (!raw) return null;
+  if (/^\d+(?:\.\d+)?$/.test(raw)) return Number(raw) * 1000;
+  const timestamp = Date.parse(raw);
+  return Number.isFinite(timestamp) ? timestamp - Date.now() : null;
+}
+function cacheArticleExtractionFailure(key, error) {
+  const requestedTtl = articleRetryAfterMs(error.retryAfter);
+  const ttl = Math.max(ARTICLE_NEGATIVE_CACHE_MIN_TTL, Math.min(
+    ARTICLE_NEGATIVE_CACHE_MAX_TTL,
+    requestedTtl ?? ARTICLE_NEGATIVE_CACHE_DEFAULT_TTL
+  ));
+  setCappedMapValue(articleExtractionFailures, key, {
+    code: error.code,
+    upstreamStatus: error.upstreamStatus,
+    retryAfter: Math.ceil(ttl / 1000),
+    requestId: error.requestId,
+    expiresAt: Date.now() + ttl
+  }, ARTICLE_NEGATIVE_CACHE_MAX_ENTRIES);
+}
+function articlePlainText(markup) {
+  return String(markup || '')
+    .replace(/<(script|style|iframe|object|embed)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, ' ')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;|&#160;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;|&apos;/gi, "'")
+    .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Math.min(0x10ffff, Number(n))))
+    .replace(/&#x([\da-f]+);/gi, (_, n) => String.fromCodePoint(Math.min(0x10ffff, parseInt(n, 16))))
+    .replace(/\s+/g, ' ').trim();
+}
+function isArticleChallengeTitle(title) {
+  const normalized = articlePlainText(title).toLowerCase().replace(/[.!…]+$/g, '').replace(/\s+/g, ' ').trim();
+  return new Set([
+    'just a moment',
+    'attention required',
+    'attention required | cloudflare',
+    'attention required! | cloudflare',
+    'access denied',
+    'access denied | cloudflare',
+    'checking your browser',
+    'security check'
+  ]).has(normalized);
+}
+function hasArticleChallengePrompt(value, markup = '') {
+  const text = articlePlainText(value);
+  return /checking your browser before accessing|verify (?:that )?you are human|verify you are not a robot|enable javascript(?: and cookies)? to continue|please enable javascript|complete the security check|security verification required|automated requests (?:are )?not allowed|if you are not redirected|please wait while.{0,60}(?:security|browser|verify)|your request has been blocked|you have been blocked|access to this website has been denied|you are unable to access|owner of this website has banned your access|performing browser integrity check/i.test(text)
+    || /(?:cf-chl-|cf_chl_|cf-browser-verification|challenge-platform|challenge-form|cf-turnstile)/i.test(String(markup || ''));
+}
+function articleLooksLikeChallenge(raw, article, response) {
+  if (article && typeof article === 'object' && !Array.isArray(article)) {
+    const title = String(article.title || '');
+    const prompt = [article.content, article.desc, article.message, article.error]
+      .filter(value => typeof value === 'string').join(' ');
+    if (isArticleChallengeTitle(title) && hasArticleChallengePrompt(prompt, article.content)) return true;
+  }
+  if (article) return false;
+  const html = String(raw || '').slice(0, 12000);
+  const contentType = response?.headers?.get?.('content-type') || '';
+  const htmlResponse = /text\/html|application\/xhtml\+xml/i.test(contentType)
+    || /^\s*(?:<!doctype\s+html|<html\b|<head\b|<title\b)/i.test(html);
+  if (!htmlResponse) return false;
+  const title = /<title\b[^>]*>([\s\S]*?)<\/title\s*>/i.exec(html)?.[1] || '';
+  return isArticleChallengeTitle(title) && hasArticleChallengePrompt(html, html);
+}
+function articleFailureDetails(error) {
+  const status = Number(error?.upstreamStatus);
+  return {
+    code: String(error?.code || 'article_error').slice(0, 80),
+    upstreamStatus: Number.isInteger(status) && status >= 100 && status <= 599 ? status : null,
+    requestId: typeof error?.requestId === 'string' ? error.requestId.slice(0, 128) : null
+  };
+}
+function logArticleFallback(error) {
+  const details = articleFailureDetails(error);
+  console.warn('[Flux Reader] Article extraction failed', details);
+}
+function setupContentInteractions() {
   const content = $('content');
-  if (!content || content._fluxPrefetchBound) return;
-  content._fluxPrefetchBound = true;
-  let timer = null;
+  if (!content || content._fluxContentInteractionsBound) return;
+  content._fluxContentInteractionsBound = true;
   const activeTopicPhotoIndex = track => {
     const origin = track.firstElementChild?.offsetLeft || 0;
     return Array.from(track.children).reduce((best, item, index) =>
@@ -2153,17 +2348,6 @@ function setupArticlePrefetch() {
       paintMagazineTicker(state);
     });
   });
-  content.addEventListener('pointerover', ev => {
-    const item = ev.target.closest('[data-id]');
-    if (!item || !content.contains(item)) return;
-    clearTimeout(timer);
-    timer = setTimeout(() => prefetchArticle(item.dataset.id), 120);
-  }, { passive: true });
-  content.addEventListener('pointerdown', ev => {
-    const item = ev.target.closest('[data-id]');
-    if (!item || !content.contains(item)) return;
-    prefetchArticle(item.dataset.id);
-  }, { passive: true });
 }
 function renderArticleLoading(a) {
   const restoreTop = pendingArticleScrollTop;
@@ -2496,7 +2680,7 @@ function saveReturnScroll() {
 }
 // Keep this tab's exact feed snapshot when Reader falls back to another site.
 const EXTERNAL_RETURN_KEY = 'flux_external_return_v1';
-function openOriginalArticle(url) {
+function openOriginalArticle(url, extractionError = null) {
   const snapshot = {
     url: location.href,
     articles: S.articles,
@@ -2507,7 +2691,8 @@ function openOriginalArticle(url) {
     scrollTop: window._fluxReturnScrollTop ?? $('content')?.scrollTop ?? 0,
     flipPageIndex,
     flipAnchor: currentFlipAnchor(),
-    ytVideos
+    ytVideos,
+    articleFallback: extractionError ? articleFailureDetails(extractionError) : null
   };
   try { sessionStorage.setItem(EXTERNAL_RETURN_KEY, JSON.stringify(snapshot)); } catch(e) {}
   // Loading Reader may have pushed a temporary history entry. Replace that
@@ -2545,6 +2730,9 @@ function restoreExternalReturn(snapshot, cachedPage = false) {
   requestAnimationFrame(() => {
     if (S.layout === 'flip') restoreFlipAnchor(snapshot.flipAnchor);
     else setScrollTopInstant($('content'), snapshot.scrollTop || 0);
+    if (snapshot.articleFallback) {
+      console.warn('[Flux Reader] Article extraction failed', snapshot.articleFallback);
+    }
   });
 }
 window.addEventListener('pageshow', event => {
@@ -5933,7 +6121,7 @@ const Config = {
   buildSettingsUI();
   renderSidebar();
   bindEvents();
-  setupArticlePrefetch();
+  setupContentInteractions();
   setupPullToRefresh();
   setupArticleSwipeBack();
   updateLayoutBtns();

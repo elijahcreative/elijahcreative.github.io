@@ -1,11 +1,19 @@
 {
   "name": "flux-telex-reader",
-  "main": "worker.mjs",
+  "main": "entry.mjs",
   "account_id": "1c90602bf7c66781201669b0cafd0f6a",
   "compatibility_date": "2026-10-02",
   "workers_dev": true,
   "preview_urls": false,
   "placement": { "region": "aws:eu-central-1" },
   "observability": { "enabled": true, "head_sampling_rate": 0.1, "traces": { "enabled": true, "head_sampling_rate": 0.1 } },
-  "ratelimits": [{ "name": "RATE_LIMITER", "namespace_id": "2026100201", "simple": { "limit": 20, "period": 60 } }]
+  "vars": {
+    "TELEX_CLIENT_LIMIT_PER_MINUTE": "12",
+    "TELEX_GLOBAL_LIMIT_PER_MINUTE": "20",
+    "TELEX_GLOBAL_LIMIT_PER_DAY": "500"
+  },
+  "durable_objects": {
+    "bindings": [{ "name": "TELEX_BUDGET", "class_name": "ReaderBudget" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["ReaderBudget"] }]
 }
