@@ -22,7 +22,9 @@ module.exports = async function handler(req, res) {
 
     res.status(200).send(rewritten);
   } catch (err) {
-    res.status(500).send('RSS proxy error');
+    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Retry-After', '60');
+    res.status(502).send('RSS proxy error');
   }
 };
 
@@ -32,16 +34,41 @@ function setRssHeaders(res) {
 }
 
 async function fetchTelexRss() {
+  const relayUrl = process.env.TELEX_RSS_RELAY_URL;
+  const secret = process.env.TELEX_RSS_SECRET;
+  if (relayUrl || secret) {
+    // A configured relay is the single upstream path; avoid redundant blocked requests.
+    const url = new URL(relayUrl);
+    if (!secret || url.protocol !== 'https:' || url.pathname !== '/rss'
+        || !['flux-telex-reader.balazskemenesi.workers.dev', 'flux-telex-reader-preview.balazskemenesi.workers.dev'].includes(url.hostname)
+        || url.search || url.hash || url.username || url.password || url.port) throw new Error('invalid_rss_relay');
+    const time = String(Date.now());
+    const signature = require('node:crypto').createHmac('sha256', secret).update(`${time}\nrss`).digest('hex');
+    const result = await fetch(url.href, {
+      headers: {'user-agent': 'Mozilla/5.0 FluxReader/1.0', 'X-Flux-Time': time, 'X-Flux-Signature': signature},
+      signal: AbortSignal.timeout(6500), redirect: 'error'
+    });
+    if (!result.ok) throw new Error('rss_relay_failed');
+    const text = await result.text();
+    if (!/^\s*(?:<\?xml[^>]*>\s*)?<rss\b/i.test(text) || !/<channel\b/i.test(text) || !/<\/rss>\s*$/i.test(text)) throw new Error('invalid_relay_rss');
+    return text;
+  }
   const upstream = await fetch(TELEX_RSS_URL, {
     headers: {
       accept: 'application/rss+xml, application/xml, text/xml',
-      'user-agent': 'FluxReader/1.0 RSS proxy'
-    }
+      'accept-language': 'hu-HU,hu;q=0.9,en-US;q=0.8,en;q=0.7',
+      'user-agent': 'Mozilla/5.0 FluxReader/1.0'
+    },
+    signal: AbortSignal.timeout(4000)
   }).catch(() => null);
-  if (upstream?.ok) return upstream.text();
+  if (upstream?.ok) {
+    const rss = await upstream.text();
+    if (/^\s*(?:<\?xml[^>]*>\s*)?<rss\b/i.test(rss) && /<channel\b/i.test(rss) && /<\/rss>\s*$/i.test(rss)) return rss;
+  }
 
   const fallback = await fetch(RSS2JSON_URL, {
-    headers: { accept: 'application/json' }
+    headers: { accept: 'application/json' },
+    signal: AbortSignal.timeout(4000)
   });
   if (!fallback.ok) throw new Error('upstream_rss');
   const data = await fallback.json();
