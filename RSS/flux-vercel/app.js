@@ -114,6 +114,7 @@ const S = {
   ytMiniSize:    'm',
   showYoutube:   true,
   sectionView:   false,
+  flipFrontCover: false,
   readerMode:    'fullscreen',
   showArticleMore: true,
   articleMoreColumns: 3,
@@ -199,7 +200,7 @@ function clampInt(value, min, max, fallback) {
   const n = Number.parseInt(value, 10);
   return Number.isFinite(n) ? Math.max(min, Math.min(max, n)) : fallback;
 }
-const SETTINGS_KEYS = ['layout','theme','preset','customAccent','fontSize','activeUrl','ytPerChannel','ytMaxChannels','ytColumns','ytRows','ytSortMode','ytMiniCorner','ytMiniSize','showYoutube','sectionView','readerMode','showArticleMore','articleMoreColumns','articleMoreRows','lastUpdated','showWeather','showF1','showReadLater','showShare','showSpeech'];
+const SETTINGS_KEYS = ['layout','theme','preset','customAccent','fontSize','activeUrl','ytPerChannel','ytMaxChannels','ytColumns','ytRows','ytSortMode','ytMiniCorner','ytMiniSize','showYoutube','sectionView','flipFrontCover','readerMode','showArticleMore','articleMoreColumns','articleMoreRows','lastUpdated','showWeather','showF1','showReadLater','showShare','showSpeech'];
 const SECTION_RULES = [
   { id: 'kozelet',  label: 'Közélet',  keys: ['belfold', 'kozelet', 'politika', 'valasztas', 'kormany', 'onkormanyzat'] },
   { id: 'kulfold',  label: 'Külföld',  keys: ['kulfold', 'vilag', 'europa', 'eu', 'usa', 'ukrajna', 'oroszorszag'] },
@@ -275,6 +276,7 @@ function loadStorage() {
     ytMiniSize: ['s','m','l'].includes(s.ytMiniSize) ? s.ytMiniSize : 'm',
     showYoutube: s.showYoutube !== false,
     sectionView: s.sectionView === true,
+    flipFrontCover: s.flipFrontCover === true,
     readerMode: s.readerMode || 'fullscreen',
     showArticleMore: s.showArticleMore !== false,
     articleMoreColumns: clampInt(s.articleMoreColumns, 1, 4, 3),
@@ -502,6 +504,21 @@ const Fetcher = {
   bust(url) { this._cache.delete(url); }
 };
 const ChevronIcon = '<svg class="chevron" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>';
+// A deterministic edition from the visible feed; it never consumes the normal pages.
+function flipFrontCoverSelection(articles) {
+  const unique = [...new Map(articles.map(a => [aid(a), a])).values()];
+  if (!unique.length) return null;
+  const candidates = unique.slice(0, 12);
+  const lead = candidates.find(a => a.image && a.title?.length >= 25 && a.title.length <= 130)
+    || candidates.find(a => a.image) || unique[0];
+  const rest = unique.filter(a => aid(a) !== aid(lead));
+  const teasers = [];
+  for (const a of [...rest.filter(a => a.feedUrl !== lead.feedUrl), ...rest]) {
+    if (teasers.length === 2) break;
+    if (a.title && a.title.length <= 130 && !teasers.some(b => aid(b) === aid(a))) teasers.push(a);
+  }
+  return { lead, teasers };
+}
 const Renderer = {
   _topicPools: new Map(),
   render(articles, layout = S.layout) {
@@ -631,6 +648,27 @@ const Renderer = {
       <div class="flip-page-stage">${heading}${pageNumber}<div class="flip-page-grid">${stories}</div></div>
     </section>`;
   },
+  _flipFrontCover(articles, total) {
+    const edition = flipFrontCoverSelection(articles);
+    if (!edition) return '';
+    const { lead, teasers } = edition;
+    const photo = lead.image ? `<div class="flip-cover-photo" data-id="${aid(lead)}"><img src="${e(flipImageChoices.get(flipImageKey(lead))?.src || lead.image)}" data-flip-original="${e(lead.image)}" alt="" loading="eager" onload="improveFlipImage(this).catch(() => {})" onerror="flipImageFallback(this)"></div>` : '';
+    const issued = new Date(S.lastUpdated || Date.now());
+    const date = Number.isNaN(issued.getTime()) ? new Date() : issued;
+    const dateLabel = date.toLocaleDateString('hu-HU', { year:'numeric', month:'long', day:'numeric' });
+    const dayLabel = date.toLocaleDateString('hu-HU', { weekday:'long' });
+    return `<section class="flip-page flip-page-frontcover" data-flip-anchor="frontcover" aria-label="Flux magazinborító">
+      <div class="flip-page-stage"><div class="flip-front-cover${lead.image ? '' : ' no-photo'}${lead.title.length > 140 ? ' is-long-title' : ''}">
+        ${photo}<div class="flip-cover-scrim" aria-hidden="true"></div>
+        <header class="flip-cover-head"><div class="flip-cover-masthead">FLUX</div><div class="flip-cover-edition"><span>${e(dateLabel)}</span><span>${e(dayLabel)}</span></div></header>
+        <div class="flip-cover-copy">
+          <button type="button" class="flip-cover-lead" data-id="${aid(lead)}"><span class="flip-cover-kicker">${e(this._category(lead) || lead.feedName || this._feedName(lead.feedUrl))}</span><span class="flip-cover-title">${e(lead.title)}</span></button>
+          <div class="flip-cover-teasers">${teasers.map(a => `<button type="button" class="flip-cover-teaser" data-id="${aid(a)}"><span class="flip-cover-kicker">${e(this._category(a) || a.feedName || this._feedName(a.feedUrl))}</span><span>${e(a.title)}</span></button>`).join('')}</div>
+        </div>
+        <footer class="flip-cover-foot"><button type="button" data-cover-next aria-label="Tovább az első híroldalra"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 15 6-6 6 6"/></svg><span>Tovább a hírekhez</span></button><span class="flip-page-number" aria-label="Borító, utána ${total} oldal">00 / ${String(total).padStart(2, '0')}</span></footer>
+      </div></div>
+    </section>`;
+  },
   _flip(articles) {
     const pages = [];
     const pool = articles.filter(a => a.image);
@@ -695,7 +733,8 @@ const Renderer = {
     }
     if (S.showYoutube) pages.splice(Math.min(1, pages.length), 0, { type: 'youtube' });
     const total = pages.length;
-    return `<div class="flip-layout">${pages.map((page, index) => page.type === 'youtube'
+    const cover = S.flipFrontCover ? this._flipFrontCover(articles, total) : '';
+    return `<div class="flip-layout">${cover}${pages.map((page, index) => page.type === 'youtube'
       ? `<section class="flip-page flip-page-youtube" data-flip-anchor="youtube">
           <div class="flip-page-stage" data-flip-youtube>
             <div class="flip-briefs-heading is-section"><span>YOUTUBE</span></div>
@@ -1274,7 +1313,6 @@ let flipPrimeToken = 0;
 let flipHalfHeight = 0;
 let flipPerspective = 0;
 const FLIP_COMMIT_PROGRESS = .25;
-const FLIP_CAST_SHADOW_MAX = .5;
 const FLIP_CAST_SHADOW_SIZE = 72;
 const FLIP_WHEEL_THRESHOLD = 48;
 const FLIP_WHEEL_GESTURE_GAP = 180;
@@ -1335,6 +1373,7 @@ function currentFlipAnchor() {
   if (!pages.length) return null;
   const index = Math.max(0, Math.min(pages.length - 1, flipPageIndex));
   const page = pages[index];
+  if (page.dataset.flipAnchor === 'frontcover') return 'frontcover';
   return page.querySelector('[data-id]')?.dataset.id || page.dataset.flipAnchor || null;
 }
 function restoreFlipAnchor(anchor) {
@@ -1382,7 +1421,23 @@ function flipStageClone(page) {
   wrapper.appendChild(clone);
   return wrapper;
 }
+function syncFlipFrontCoverState(sourcePage, targetCopy) {
+  const source = sourcePage.querySelector('.flip-front-cover');
+  const target = targetCopy?.querySelector('.flip-front-cover');
+  if (!source || !target) return;
+  // Prepared faces can precede font loading/refitting; use the live cover's geometry.
+  if (source.offsetWidth && source.offsetHeight) {
+    target.style.width = `${source.offsetWidth}px`;
+    target.style.height = `${source.offsetHeight}px`;
+  }
+  for (const selector of ['.flip-cover-masthead', '.flip-cover-copy', '.flip-cover-title']) {
+    const from = source.querySelector(selector);
+    const to = target.querySelector(selector);
+    if (from && to) { to.style.cssText = from.style.cssText; to.className = from.className; }
+  }
+}
 function syncFlipCloneState(sourcePage, targetCopy) {
+  syncFlipFrontCoverState(sourcePage, targetCopy);
   const number = sourcePage.querySelector('.flip-page-number');
   const numberCopy = targetCopy?.querySelector('.flip-page-number');
   if (number && numberCopy) numberCopy.style.cssText = number.style.cssText;
@@ -1508,10 +1563,10 @@ function applyFlipCastShadow(overlay, angle, direction) {
   const depth = flipHalfHeight * Math.sin(radians);
   const scale = flipPerspective ? 1 - depth / flipPerspective : 1;
   const progress = direction > 0 ? angle / 180 : (180 - angle) / 180;
-  const strength = Math.abs(progress * 2 - 1) * FLIP_CAST_SHADOW_MAX;
+  const strength = Math.abs(progress * 2 - 1);
   const edgeY = flipHalfHeight + flipHalfHeight * Math.cos(radians) * scale;
   const above = angle > 90;
-  const alpha = strength * .72;
+  const alpha = `calc(var(--flip-cast-shadow-max, .54) * ${strength})`;
   overlay.style.backgroundImage = above
     ? `linear-gradient(to bottom, transparent, rgba(0,0,0,${alpha}) 88%, transparent)`
     : `linear-gradient(to bottom, transparent, rgba(0,0,0,${alpha}) 12%, transparent)`;
@@ -1602,6 +1657,8 @@ function setFlipPage(index) {
   pages.forEach((page, pageIndex) => page.classList.toggle('is-current', pageIndex === flipPageIndex));
   clearFlipTurnPages();
   content.scrollTop = 0;
+  // Set the live cover geometry before the browser can paint the new page.
+  fitFlipFrontCover(pages[flipPageIndex]);
   requestAnimationFrame(() => {
     if (flipRewinding) return;
     updateFlipNumberContrast(pages[flipPageIndex]);
@@ -1671,7 +1728,8 @@ function handleFlipTouchMove(event) {
   }
   flipGesture.lastY = touch.clientY;
   flipGesture.lastTime = now;
-  const distance = Math.abs(touch.clientY - flipGesture.startY);
+  // Crossing the touch origin must not restart the same turn in reverse motion.
+  const distance = Math.max(0, (flipGesture.startY - touch.clientY) * flipGesture.direction);
   const travel = Math.min(280, Math.max(160, window.innerHeight * .36));
   const progress = Math.min(1, distance / travel);
   flipGesture.progress = progress;
@@ -1920,6 +1978,36 @@ async function rewindFlipToStart() {
     setFlipPage(0);
   }
   if (S.layout === 'flip') primeFlipOverlay();
+}
+function fitFlipFrontCover(page) {
+  const masthead = page?.querySelector('.flip-cover-masthead');
+  if (masthead?.parentElement.clientWidth) {
+    // Fit by changing the font size only, keeping the glyphs' natural proportions.
+    masthead.style.fontSize = '100px';
+    const range = document.createRange();
+    range.selectNodeContents(masthead);
+    const naturalWidth = range.getBoundingClientRect().width;
+    if (naturalWidth > 0) masthead.style.fontSize = `${100 * masthead.parentElement.clientWidth / naturalWidth}px`;
+  }
+  const copy = page?.querySelector('.flip-cover-copy');
+  const title = copy?.querySelector('.flip-cover-title');
+  if (!title || !copy.clientHeight) return;
+  copy.classList.remove('trim-one', 'trim-all');
+  let size = Math.min(144, copy.clientWidth * .43, copy.clientHeight * .48);
+  const fits = () => {
+    const children = [...copy.children].filter(el => getComputedStyle(el).display !== 'none');
+    const height = children.reduce((sum, el) => sum + el.offsetHeight, 0);
+    const gap = parseFloat(getComputedStyle(copy).rowGap) || 0;
+    return height + Math.max(0, children.length - 1) * gap <= copy.clientHeight + 1;
+  };
+  title.style.fontSize = `${size}px`;
+  // Preserve full headlines. Remove supporting lines before going below a readable size.
+  while (!fits() && size > 28) { size -= 1; title.style.fontSize = `${size}px`; }
+  for (const trim of ['trim-one', 'trim-all']) {
+    if (fits()) break;
+    copy.classList.add(trim);
+  }
+  while (!fits() && size > 20) { size -= 1; title.style.fontSize = `${size}px`; }
 }
 function handleFlipResize() {
   if (S.layout !== 'flip') return;
@@ -3567,7 +3655,7 @@ function selectCategory(cat) {
   updateReadLaterNav();
   renderArticles();
 }
-function renderArticles() {
+function renderArticles(options = {}) {
   updateReadLaterNav();
   if (S.activeSpecialView === 'readLater') {
     const articles = S.readLater
@@ -3594,7 +3682,8 @@ function renderArticles() {
     articles = articles.filter(a => a.categories && a.categories.includes(S.activeCategory));
   }
   if (S.sectionView) renderSidebar();
-  const flipAnchor = currentFlipAnchor();
+  const flipAnchor = options.resetFlip ? null : currentFlipAnchor();
+  if (options.resetFlip) flipPageIndex = 0;
   const preservedYtPlayer = $('content').querySelector('.yt-sidebar.yt-player-active');
   if (preservedYtPlayer) preservedYtPlayer.remove();
   Renderer.render(articles);
@@ -3615,6 +3704,8 @@ const LAYOUT_ICONS = {
 };
 const LAYOUT_ORDER = ['magazine','flip','grid','list','reader'];
 function updateLayoutBtns() {
+  const coverSetting = $('flipCoverSetting');
+  if (coverSetting) coverSetting.hidden = S.layout !== 'flip';
   document.querySelectorAll('.v-layout-btn[data-layout]').forEach(b =>
     b.classList.toggle('active', b.dataset.layout === S.layout)
   );
@@ -4242,6 +4333,12 @@ function bindEvents() {
     if (content) content.scrollTo({ top: 0, behavior: 'smooth' });
   }, { passive: true });
   document.addEventListener('click', ev => {
+    if (ev.target.closest('[data-cover-next]')) {
+      if (!flipAnimating && !flipGesture && S.layout === 'flip') {
+        if (beginFlipGesture(1)) { flipGesture.progress = 1; finishFlipGesture(true); }
+      }
+      return;
+    }
     const mobileFeed = ev.target.closest('.mobile-feed-option[data-feed-url]');
     if (mobileFeed) {
       selectFeed(mobileFeed.dataset.feedUrl || null);
@@ -4381,7 +4478,7 @@ function bindEvents() {
     S[input.dataset.setting] = input.type === 'checkbox' ? input.checked : input.value;
     saveSettings();
     renderSidebar();
-    renderArticles();
+    renderArticles({ resetFlip: input.dataset.setting === 'flipFrontCover' });
   });
   window.addEventListener('popstate', () => {
     if (history.state?.flux === 'article') {
@@ -6125,6 +6222,9 @@ const Config = {
   setupPullToRefresh();
   setupArticleSwipeBack();
   updateLayoutBtns();
+  const fitCoverFont = () => { if (S.layout === 'flip' && !flipGesture && !flipAnimating && !flipRewinding) fitFlipFrontCover($('content')?.querySelector('.flip-page.is-current')); };
+  document.fonts?.ready.then(fitCoverFont);
+  document.fonts?.addEventListener('loadingdone', fitCoverFont);
   syncWidgets();
   const navigation = performance.getEntriesByType?.('navigation')?.[0];
   const externalReturn = navigation?.type === 'back_forward' ? takeExternalReturn() : null;
