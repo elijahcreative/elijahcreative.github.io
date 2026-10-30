@@ -57,3 +57,8 @@ test('the visible cover is fitted synchronously before deferred image/contrast w
  const box={flipPageIndex:0,$:()=>({querySelectorAll:()=>[page],scrollTop:0}),clearFlipTurnPages:()=>{},fitFlipFrontCover:()=>events.push('fit'),requestAnimationFrame:f=>deferred.push(f)};
  vm.runInNewContext(fn,box);box.setFlipPage(0);assert.deepEqual(events,['fit']);assert.equal(deferred.length,1);
 });
+test('cover retains the normal toolbar without immersive photo layers',()=>{
+ assert.doesNotMatch(app,/syncFlipCoverChrome|flipCoverHeaderMedia/);
+ const css=fs.readFileSync(require.resolve('../styles.css'),'utf8');
+ assert.doesNotMatch(css,/\.navbar\.is-cover|flip-cover-header-media/);
+});

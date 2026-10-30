@@ -1547,3 +1547,9 @@ body > .yt-player-fullscreen .yt-player-external { flex: 0 0 auto; margin: 0; }
   .flip-cover-photo img { object-position: 70% 40%; }
   .flip-front-cover.is-long-title .flip-cover-copy { width: 60%; }
 }
+
+
+/* The View panel lives outside .navbar, so it needs its own touch highlight reset. */
+.view-panel, .view-panel *, .view-switch-row, .switch-input, .switch-ui { -webkit-tap-highlight-color: transparent; }
+.view-panel :is(button, input, label, [role="button"], [tabindex]):focus:not(:focus-visible) { outline: none; }
+.switch-input:focus-visible + .switch-ui { outline: 2px solid var(--ac); outline-offset: 3px; }

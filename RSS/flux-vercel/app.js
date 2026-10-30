@@ -657,7 +657,7 @@ const Renderer = {
     const date = Number.isNaN(issued.getTime()) ? new Date() : issued;
     const dateLabel = date.toLocaleDateString('hu-HU', { year:'numeric', month:'long', day:'numeric' });
     const dayLabel = date.toLocaleDateString('hu-HU', { weekday:'long' });
-    return `<section class="flip-page flip-page-frontcover" data-flip-anchor="frontcover" aria-label="Flux magazinborító">
+    return `<section class="flip-page flip-page-frontcover" data-flip-anchor="frontcover" aria-label="Flux címlap">
       <div class="flip-page-stage"><div class="flip-front-cover${lead.image ? '' : ' no-photo'}${lead.title.length > 140 ? ' is-long-title' : ''}">
         ${photo}<div class="flip-cover-scrim" aria-hidden="true"></div>
         <header class="flip-cover-head"><div class="flip-cover-masthead">FLUX</div><div class="flip-cover-edition"><span>${e(dateLabel)}</span><span>${e(dayLabel)}</span></div></header>
@@ -3389,10 +3389,16 @@ function setupHoverTapPopup(trigger, popup, openClass, options = {}) {
   let lastPointerType = '';
   const onDocPointer = ev => {
     lastPointerType = ev.pointerType || '';
+    if (options.keepOpenOnInteract && popup.contains(ev.target)) {
+      pinnedByClick = true;
+      clearTimeout(closeTimer);
+    }
   };
   const onDocClick = ev => {
     if (!isOpen()) return;
-    if (trigger.contains(ev.target) || popup.contains(ev.target)) return;
+    // The selected control may have been replaced while handling its click.
+    const path = ev.composedPath?.() || [];
+    if (path.includes(trigger) || path.includes(popup) || trigger.contains(ev.target) || popup.contains(ev.target)) return;
     if (ev.target.closest?.('#navF1, #navWeather, #viewBtn')) return;
     // Empty space between toolbar controls is not an outside-page dismissal.
     if (ev.target.closest?.('.nav-right') && !ev.target.closest?.('button,a,[role="button"]')) return;
@@ -4464,12 +4470,11 @@ function bindEvents() {
   });
   const _vBtn = $('viewBtn'), _vPanel = $('viewPanel');
   _vPanel.classList.add('nav-widget-popup');
-  setupHoverTapPopup(_vBtn, _vPanel, 'open', { toggleOnClick: true, hoverOpen: true, pinOnMouseClick: true, hoverCloseDelay: 400 });
+  setupHoverTapPopup(_vBtn, _vPanel, 'open', { toggleOnClick: true, hoverOpen: true, pinOnMouseClick: true, keepOpenOnInteract: true, hoverCloseDelay: 400 });
   _vPanel.addEventListener('click', ev => {
     const btn = ev.target.closest('.v-layout-btn[data-layout]');
     if (btn) {
       setLayout(btn.dataset.layout);
-      if (activeNavWidget?.popup === _vPanel) activeNavWidget.close();
     }
   });
   _vPanel.addEventListener('change', ev => {
