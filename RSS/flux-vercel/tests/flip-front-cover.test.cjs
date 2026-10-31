@@ -62,3 +62,22 @@ test('cover retains the normal toolbar without immersive photo layers',()=>{
  const css=fs.readFileSync(require.resolve('../styles.css'),'utf8');
  assert.doesNotMatch(css,/\.navbar\.is-cover|flip-cover-header-media/);
 });
+
+test('masthead glass keeps visible word width on resize and one shared mask on prepared faces',()=>{
+ const fn=app.slice(app.indexOf('function fitFlipCoverMasthead('),app.indexOf('function fitFlipFrontCover('));
+ const props={},classes=new Set();
+ const masthead={parentElement:{clientWidth:351},style:{setProperty:(key,value)=>props[key]=value},classList:{add:value=>classes.add(value)}};
+ const box={flipCoverWordMask:()=>({url:'data:image/png;base64,word',ratio:.28})};
+ vm.runInNewContext(fn,box);
+ box.fitFlipCoverMasthead(masthead);assert.ok(Math.abs(parseFloat(masthead.style.height)-98.28)<.001);
+ masthead.parentElement.clientWidth=720;box.fitFlipCoverMasthead(masthead);
+ assert.ok(Math.abs(parseFloat(masthead.style.height)-201.6)<.001);
+ assert.equal(props['--cover-word-mask'],'url("data:image/png;base64,word")');
+ assert.ok(classes.has('is-frosted'));
+});
+test('older browsers keep readable masthead text when the blur mask is unavailable',()=>{
+ const fn=app.slice(app.indexOf('function fitFlipCoverMasthead('),app.indexOf('function fitFlipFrontCover('));
+ const masthead={parentElement:{clientWidth:351},style:{},classList:{add:()=>assert.fail('must not hide fallback')}};
+ const box={flipCoverWordMask:()=>null,document:{createRange:()=>({selectNodeContents(){},getBoundingClientRect:()=>({width:200})})}};
+ vm.runInNewContext(fn,box);box.fitFlipCoverMasthead(masthead);assert.equal(masthead.style.fontSize,'175.5px');
+});

@@ -1979,16 +1979,62 @@ async function rewindFlipToStart() {
   }
   if (S.layout === 'flip') primeFlipOverlay();
 }
-function fitFlipFrontCover(page) {
-  const masthead = page?.querySelector('.flip-cover-masthead');
-  if (masthead?.parentElement.clientWidth) {
-    // Fit by changing the font size only, keeping the glyphs' natural proportions.
-    masthead.style.fontSize = '100px';
-    const range = document.createRange();
-    range.selectNodeContents(masthead);
-    const naturalWidth = range.getBoundingClientRect().width;
-    if (naturalWidth > 0) masthead.style.fontSize = `${100 * masthead.parentElement.clientWidth / naturalWidth}px`;
+// One opaque word mask: overlapping glyphs share one glass surface, never stacked tints.
+const flipCoverWordMasks = new Map();
+function flipCoverWordMask(masthead) {
+  if (!CSS.supports('backdrop-filter', 'blur(1px)') && !CSS.supports('-webkit-backdrop-filter', 'blur(1px)')) return null;
+  const type = getComputedStyle(masthead);
+  const key = `${type.fontFamily}|${type.fontWeight}`;
+  if (flipCoverWordMasks.has(key)) return flipCoverWordMasks.get(key);
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  if (!ctx || !('letterSpacing' in ctx)) return null;
+  // Work at a fixed high resolution, independent of viewport and device pixel ratio.
+  canvas.width = 2048;
+  canvas.height = 1024;
+  ctx.font = `${type.fontWeight} 640px ${type.fontFamily}`;
+  ctx.letterSpacing = '-48px'; // Existing -.075em kerning stays unchanged.
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = '#fff';
+  ctx.fillText('FLUX', 128, 768);
+  const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+  let left = canvas.width, right = -1, top = canvas.height, bottom = -1;
+  for (let y = 0; y < canvas.height; y++) {
+    for (let x = 0; x < canvas.width; x++) {
+      if (!pixels[(y * canvas.width + x) * 4 + 3]) continue;
+      left = Math.min(left, x); right = Math.max(right, x);
+      top = Math.min(top, y); bottom = Math.max(bottom, y);
+    }
   }
+  if (right < left) return null;
+  const width = right - left + 1, height = bottom - top + 1;
+  const ink = document.createElement('canvas');
+  ink.width = width; ink.height = height;
+  ink.getContext('2d').drawImage(canvas, left, top, width, height, 0, 0, width, height);
+  const mask = { url: ink.toDataURL(), ratio: height / width };
+  flipCoverWordMasks.set(key, mask);
+  return mask;
+}
+function fitFlipCoverMasthead(masthead) {
+  const width = masthead?.parentElement.clientWidth;
+  if (!width) return;
+  const mask = flipCoverWordMask(masthead);
+  if (mask) {
+    // Crop to visible ink, so the visible word has equal left/right gutters.
+    masthead.style.height = `${width * mask.ratio}px`;
+    masthead.style.setProperty('--cover-word-mask', `url("${mask.url}")`);
+    masthead.classList.add('is-frosted');
+    return;
+  }
+  // Older browsers keep the original readable type instead of losing the masthead.
+  masthead.style.fontSize = '100px';
+  const range = document.createRange();
+  range.selectNodeContents(masthead);
+  const naturalWidth = range.getBoundingClientRect().width;
+  if (naturalWidth > 0) masthead.style.fontSize = `${100 * width / naturalWidth}px`;
+}
+function fitFlipFrontCover(page) {
+  fitFlipCoverMasthead(page?.querySelector('.flip-cover-masthead'));
   const copy = page?.querySelector('.flip-cover-copy');
   const title = copy?.querySelector('.flip-cover-title');
   if (!title || !copy.clientHeight) return;
