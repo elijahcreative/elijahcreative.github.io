@@ -1,9 +1,9 @@
 {
-    "updated": "2026-11-01T09:49:40.375Z",
+    "updated": "2026-11-02T10:09:16.147Z",
     "nextHoliday": {
-        "date": "November 1.",
-        "name": "Mindenszentek napja",
-        "workday": "Munkaszüneti nap",
+        "date": "November 2.",
+        "name": "Halottak napja",
+        "workday": "Munkanap",
         "daysLeft": 0
     }
 }
