@@ -1,30 +1,30 @@
 {
   "Podiums": [
     {
-      "Country": "🇺🇸 USA",
-      "City": "Austin",
+      "Country": "🇲🇽 Mexico",
+      "City": "Mexico City",
       "Message": "Race ?"
     },
     {
       "Place": "1",
-      "Name": "Antonelli",
-      "Team": "Mercedes",
+      "Name": "Verstappen",
+      "Team": "Red Bull",
       "Points": "+25",
-      "Total": "365"
+      "Total": "261"
     },
     {
       "Place": "2",
-      "Name": "Leclerc",
+      "Name": "Hamilton",
       "Team": "Ferrari",
       "Points": "+18",
-      "Total": "233"
+      "Total": "259"
     },
     {
       "Place": "3",
-      "Name": "Verstappen",
-      "Team": "Red Bull",
+      "Name": "Antonelli",
+      "Team": "Mercedes",
       "Points": "+15",
-      "Total": "236"
+      "Total": "380"
     }
   ]
 }
