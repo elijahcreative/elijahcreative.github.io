@@ -663,7 +663,7 @@ const Renderer = {
         <header class="flip-cover-head"><div class="flip-cover-masthead">FLUX</div><div class="flip-cover-edition"><span>${e(dateLabel)}</span><span>${e(dayLabel)}</span></div></header>
         <div class="flip-cover-copy">
           <button type="button" class="flip-cover-lead" data-id="${aid(lead)}"><span class="flip-cover-kicker">${e(this._category(lead) || lead.feedName || this._feedName(lead.feedUrl))}</span><span class="flip-cover-title">${e(lead.title)}</span></button>
-          <div class="flip-cover-teasers">${teasers.map(a => `<button type="button" class="flip-cover-teaser" data-id="${aid(a)}"><span class="flip-cover-kicker">${e(this._category(a) || a.feedName || this._feedName(a.feedUrl))}</span><span>${e(a.title)}</span></button>`).join('')}</div>
+          <div class="flip-cover-teasers">${teasers.map(a => `<button type="button" class="flip-cover-teaser" data-id="${aid(a)}"><span class="flip-cover-kicker">${e(this._category(a) || a.feedName || this._feedName(a.feedUrl))}</span><span class="flip-cover-teaser-title">${e(a.title)}</span></button>`).join('')}</div>
         </div>
         <footer class="flip-cover-foot"><button type="button" data-cover-next aria-label="Tovább az első híroldalra"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 15 6-6 6 6"/></svg><span>Tovább a hírekhez</span></button><span class="flip-page-number" aria-label="Borító, utána ${total} oldal">00 / ${String(total).padStart(2, '0')}</span></footer>
       </div></div>
@@ -1303,6 +1303,8 @@ let flipPageIndex = 0;
 let flipGesture = null;
 let flipAnimating = false;
 let flipRewinding = false;
+let flipCoverFontState = 'idle';
+let flipCoverFontFitPending = false;
 let flipWheelDelta = 0;
 let flipWheelLastTime = 0;
 let flipWheelGestureActive = false;
@@ -1680,6 +1682,10 @@ function beginFlipGesture(direction, startY = 0) {
   prepareFlipOverlay(currentPage, nextPage, pairIndex);
   positionFlipOverlay(pages[flipPageIndex]);
   setFlipTurnPages(currentPage, nextPage);
+  // A hidden cover may not have had measurable dimensions when its font loaded.
+  // Fit each cover face before synchronizing the turn overlay.
+  fitFlipFrontCover(currentPage);
+  fitFlipFrontCover(nextPage);
   const angle = direction > 0 ? 0 : 180;
   const flap = flipOverlay.querySelector('.flip-turn-flap');
   flap.style.transition = 'none';
@@ -1711,6 +1717,7 @@ function handleFlipTouchMove(event) {
     const startY = flipGesture.startY;
     if (!beginFlipGesture(direction, startY)) {
       flipGesture = null;
+      flushFlipCoverFontFit();
       return;
     }
     flipGesture.startX = startX;
@@ -1742,6 +1749,7 @@ function handleFlipTouchEnd() {
   if (!flipGesture) return;
   if (flipGesture.axis !== 'y' || !('pairIndex' in flipGesture)) {
     flipGesture = null;
+    flushFlipCoverFontFit();
     return;
   }
   finishFlipGesture(flipGesture.progress > FLIP_COMMIT_PROGRESS);
@@ -1749,7 +1757,7 @@ function handleFlipTouchEnd() {
 function handleFlipTouchCancel() {
   if (!flipGesture) return;
   if (flipGesture.axis === 'y' && 'pairIndex' in flipGesture) finishFlipGesture(false);
-  else flipGesture = null;
+  else { flipGesture = null; flushFlipCoverFontFit(); }
 }
 function handleFlipWheel(event) {
   if (S.layout !== 'flip' || !event.currentTarget?.classList.contains('flip-view')) return;
@@ -1808,6 +1816,7 @@ function finishFlipGesture(complete, options = {}) {
       hideFlipOverlay();
       flipGesture = null;
       flipAnimating = false;
+      flushFlipCoverFontFit();
       improveFlipPageImages($('content')?.querySelector('.flip-page.is-current'));
       if (!flipRewinding) flipWheelGestureActive = false;
       if (options.prime !== false) primeFlipOverlay();
@@ -1974,6 +1983,7 @@ async function rewindFlipToStart() {
   }
   flipRewinding = false;
   flipRewindPairs = null;
+  flushFlipCoverFontFit();
   if (S.layout === 'flip' && flipPageIndex !== 0) {
     setFlipPage(0);
   }
@@ -2033,11 +2043,39 @@ function fitFlipCoverMasthead(masthead) {
   const naturalWidth = range.getBoundingClientRect().width;
   if (naturalWidth > 0) masthead.style.fontSize = `${100 * width / naturalWidth}px`;
 }
+// The cover must never be fitted with a temporary fallback font: the result
+// would differ from the next fit after the real font finishes loading.
+function ensureFlipCoverFont() {
+  if (flipCoverFontState === 'ready' || flipCoverFontState === 'failed') return true;
+  if (typeof document === 'undefined' || !document.fonts?.load) return true;
+  if (flipCoverFontState === 'idle') {
+    flipCoverFontState = 'loading';
+    Promise.resolve().then(() => document.fonts.load('700 16px "Flux Cover"')).then(
+      faces => { flipCoverFontState = faces.length ? 'ready' : 'failed'; },
+      () => { flipCoverFontState = 'failed'; }
+    ).then(() => {
+      flipCoverFontFitPending = true;
+      flushFlipCoverFontFit();
+    });
+  }
+  return false;
+}
+function flushFlipCoverFontFit() {
+  if (!flipCoverFontFitPending || S.layout !== 'flip' || flipGesture || flipAnimating || flipRewinding) return;
+  flipCoverFontFitPending = false;
+  const page = $('content')?.querySelector('.flip-page.is-current');
+  if (!page?.querySelector('.flip-cover-title')) return;
+  fitFlipFrontCover(page);
+  // Prepared page faces must use the same fitted typography as the live page.
+  flipPreparedPair = null;
+  primeFlipOverlay();
+}
 function fitFlipFrontCover(page) {
   fitFlipCoverMasthead(page?.querySelector('.flip-cover-masthead'));
   const copy = page?.querySelector('.flip-cover-copy');
   const title = copy?.querySelector('.flip-cover-title');
   if (!title || !copy.clientHeight) return;
+  if (!ensureFlipCoverFont()) { title.style.visibility = 'hidden'; return; }
   copy.classList.remove('trim-one', 'trim-all');
   let size = Math.min(144, copy.clientWidth * .43, copy.clientHeight * .48);
   const fits = () => {
@@ -2047,13 +2085,21 @@ function fitFlipFrontCover(page) {
     return height + Math.max(0, children.length - 1) * gap <= copy.clientHeight + 1;
   };
   title.style.fontSize = `${size}px`;
-  // Preserve full headlines. Remove supporting lines before going below a readable size.
+  // Keep the type readable, but use all four lines before accepting an ellipsis.
+  // The clamp clips visual lines; scrollHeight still measures the full title.
+  const minHeadlineSize = Math.min(size, Math.max(28, Math.min(38, copy.clientWidth * .11)));
+  while (title.scrollHeight > title.clientHeight + 1 && size > minHeadlineSize) {
+    size = Math.max(minHeadlineSize, size - 1);
+    title.style.fontSize = `${size}px`;
+  }
+  // Fit the visible lines and supporting titles before reducing the type further.
   while (!fits() && size > 28) { size -= 1; title.style.fontSize = `${size}px`; }
   for (const trim of ['trim-one', 'trim-all']) {
     if (fits()) break;
     copy.classList.add(trim);
   }
   while (!fits() && size > 20) { size -= 1; title.style.fontSize = `${size}px`; }
+  title.style.removeProperty('visibility');
 }
 function handleFlipResize() {
   if (S.layout !== 'flip') return;
