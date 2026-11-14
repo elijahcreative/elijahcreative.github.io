@@ -1,9 +1,9 @@
 {
-    "updated": "2026-11-13T10:09:33.196Z",
+    "updated": "2026-11-14T09:33:30.788Z",
     "nextHoliday": {
-        "date": "November 13.",
-        "name": "A magyar nyelv napja",
-        "workday": "Munkanap",
-        "daysLeft": 0
+        "date": "December 6.",
+        "name": "Mikulás",
+        "workday": "Munkaszüneti nap",
+        "daysLeft": 22
     }
 }
