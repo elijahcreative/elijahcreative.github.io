@@ -66,41 +66,37 @@ body { position: relative; display: block; height: 100vh; height: 100dvh; overfl
 .nav-widget-popup { isolation: isolate; overflow: visible; }
 [data-theme="dark"] .wx-popup { box-shadow: 0 26px 68px rgba(0,0,0,.5), 0 8px 24px rgba(0,0,0,.28); }
 .wx-popup.wx-open { opacity: 1; pointer-events: all; transform: translateY(0); }
-.wx-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
-.wx-left { display: flex; flex-direction: column; justify-content: flex-start; }
-.wx-big-temp { font-size: 3.2rem; font-weight: 200; line-height: 1; letter-spacing: -3px; color: var(--text); }
+.wx-top { display: flex; align-items: center; gap: 16px; margin-bottom: 8px; }
+.wx-left { display: flex; flex-direction: column; justify-content: flex-start; flex: 0 0 auto; }
+.wx-current { display: flex; align-items: center; gap: 6px; }
+.wx-summary { flex: 1; min-width: 0; font-size: 1rem; line-height: 1.3; color: var(--text); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+.wx-big-temp { font-size: 2.5rem; font-weight: 400; line-height: 1; letter-spacing: -.04em; color: var(--text); }
 .wx-main-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
 .wx-big-icon { line-height: 1; }
-.wx-condition { font-size: .9rem; font-weight: 600; color: var(--text); text-align: right; line-height: 1.3; }
+.wx-condition { font-size: .9rem; font-weight: 600; color: var(--text); text-align: left; line-height: 1.3; }
 .wx-bottom-row { display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: space-between; align-items: center; padding: 6px 0 8px; margin-top: 4px; }
-.wx-meta { display: flex; gap: 10px; font-size: .72rem; color: var(--muted); }
-.wx-meta span { display: flex; align-items: center; gap: 4px; }
-.wx-minmax { font-size: .7rem; color: var(--muted); text-align: right; line-height: 1.6; }
-.wx-hourly { display: grid; grid-template-columns: repeat(6, minmax(40px, 1fr)); gap: 6px; padding: 12px 0 14px; border-top: 1px solid var(--border); overflow-x: auto; }
-.wx-hour { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; }
-.wx-hour-time { font-size: .75rem; color: var(--muted); font-weight: 500; }
-.wx-hour-icon { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; line-height: 1; margin: 2px 0; }
-.wx-hour-temp { font-size: .9rem; font-weight: 600; color: var(--text); }
-.wx-hour-rain { display: flex; align-items: center; justify-content: center; gap: 1px; height: 9px; line-height: 1; font-size: .56rem; font-weight: 600; color: var(--text2); font-variant-numeric: tabular-nums; }
-.wx-forecast { border-top: 1px solid var(--border); padding: 8px 0 4px; width: 100%; overflow: hidden; }
-.wx-frow { display: grid; grid-template-columns: 4.7em 32px minmax(0, 1fr) 3em 2.45em 2.45em; align-items: center; column-gap: 8px; padding: 6px 0; font-size: .8rem; min-width: 0; }
-.wx-fday  { color: var(--text); font-weight: 500; text-align: left; }
-.wx-ficon { display: flex; align-items: center; justify-content: center; width: 32px; height: 28px; }
-.wx-fcond { color: var(--text2); text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.wx-frain { color: var(--text2); display: flex; align-items: center; justify-content: flex-end; gap: 2px; min-width: 0; font-size: .75rem; text-align: right; white-space: nowrap; }
-.wx-ftemp-min,
-.wx-ftemp-max { white-space: nowrap; font-variant-numeric: tabular-nums; }
-.wx-ftemp-min { color: #60a5fa; text-align: right; }
-.wx-ftemp-max { color: #f97316; text-align: left; }
-@container (max-width: 340px) {
-  .wx-frow { grid-template-columns: minmax(0, 1fr) 32px 2.8em 2.2em 2.2em; row-gap: 2px; }
-  .wx-fday { grid-column: 1; grid-row: 1; }
-  .wx-ficon { grid-column: 2; grid-row: 1 / 3; }
-  .wx-fcond { grid-column: 1; grid-row: 2; font-size: .72rem; }
-  .wx-frain { grid-column: 3; grid-row: 1 / 3; }
-  .wx-ftemp-min { grid-column: 4; grid-row: 1 / 3; }
-  .wx-ftemp-max { grid-column: 5; grid-row: 1 / 3; }
-}
+ .wx-meta { display:flex; gap:10px; font-size:.875rem; color:var(--text); }
+.wx-meta span { display:flex; align-items:center; gap:4px; }
+.wx-meta-rain { line-height:1; }
+.wx-meta-rain > .wx-icon { align-self:center; }
+.wx-minmax { font-size:.875rem; color:var(--text); text-align:right; line-height:1.6; }
+.wx-hourly { display:grid; grid-template-columns:repeat(6,minmax(36px,1fr)); gap:6px; padding:10px 0 10px; border-top:1px solid var(--border); overflow-x:auto; }
+.wx-hour { display:flex; flex-direction:column; align-items:center; gap:4px; min-width:0; }
+.wx-hour-time { font-size:.85rem; color:var(--text2); font-weight:500; }
+.wx-hour-icon { display:flex; align-items:center; justify-content:center; width:28px; height:28px; line-height:1; margin:2px 0; }
+.wx-hour-temp { font-size:.95rem; font-weight:600; color:var(--text); }
+.wx-hour-rain { display:flex; align-items:center; justify-content:center; height:14px; line-height:1; font-size:.7rem; font-weight:600; color:#0284c7; font-variant-numeric:tabular-nums; }
+.wx-forecast { border-top:1px solid var(--border); padding:8px 0 4px; width:100%; overflow:hidden; }
+.wx-frow { display:grid; grid-template-columns:4.9em 20px minmax(0,1fr) 2.5em 2.1em minmax(28px,3em) 2.1em; align-items:center; column-gap:5px; padding:4px 0; font-size:.875rem; min-width:0; }
+.wx-fday { color:var(--text); font-weight:500; text-align:left; }
+.wx-ficon { display:flex; align-items:center; justify-content:center; width:20px; height:28px; }
+.wx-fcond { color:var(--text2); text-align:left; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.wx-frain { color:#0284c7; text-align:right; white-space:nowrap; font-variant-numeric:tabular-nums; }
+[data-theme="dark"] :is(.wx-hour-rain,.wx-frain) { color:#7dd3fc; }
+.wx-ftemp-min,.wx-ftemp-max { color:var(--text); white-space:nowrap; font-variant-numeric:tabular-nums; text-align:right; }
+.wx-range { position:relative; height:5px; border-radius:99px; background:color-mix(in srgb,var(--text) 14%,transparent); }
+.wx-range > span { position:absolute; top:0; height:100%; border-radius:inherit; background:linear-gradient(90deg,#49adf0,#f9b859); }
+@container (max-width: 285px) { .wx-frow { grid-template-columns:4em 22px minmax(0,1fr) 2.5em 1.8em minmax(20px,2.4em) 1.8em; font-size:.72rem; column-gap:3px; } }
 .content { --content-gutter: 24px; width: 100%; height: 100vh; height: 100dvh; overflow-x: hidden; overflow-y: auto; padding: 62px var(--content-gutter) 24px; overscroll-behavior: contain; touch-action: pan-y; container-type: inline-size; container-name: magazine-content; }
 .content > .grid-layout,
 .content > .list-layout,

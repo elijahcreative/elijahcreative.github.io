@@ -4815,6 +4815,13 @@ function wxFluxIcon(name, size) {
   const viewBox = isRaindrop || name === 'wind' || name === 'uv-index' ? '0 0 64 64' : '-4 -4 72 72';
   return `<svg class="wx-icon" width="${size}" height="${size}" viewBox="${viewBox}" fill="none" style="display:block;flex-shrink:0" aria-hidden="true"><g transform="translate(0 ${offsetY})">${body}</g></svg>`;
 }
+function wxMetaIcon(name) {
+  const svg = wxFluxIcon(name, 14);
+  // Keep each original shape proportional; the drop's narrower silhouette is intentional.
+  if (name === 'raindrop') return svg.replace('translate(0 3)', 'translate(-10.56 -12.55) scale(1.33)');
+  if (name === 'wind') return svg.replace('translate(0 0)', 'translate(1.5 -2)');
+  return svg;
+}
 function wxIconName(code, isDay) {
   const pair = WX_ICONS[code] || ['not-available','not-available'];
   return pair[isDay ? 0 : 1];
@@ -4828,6 +4835,26 @@ const WX_LABELS = {
   80:'Zápor',81:'Erős zápor',82:'Viharos zápor',
   95:'Zivatar',96:'Zivatar jégesővel',99:'Zivatar jégesővel'
 };
+async function loadWxSummary(el) {
+  let coords;
+  try { coords = JSON.parse(localStorage.getItem('flux_wx_coords') || 'null'); } catch (_) {}
+  const lat = Number(coords?.lat ?? 47.4979), lon = Number(coords?.lon ?? 19.0402);
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
+  const latKey = lat.toFixed(2), lonKey = lon.toFixed(2);
+  const cacheKey = `flux_wx_summary_${latKey}_${lonKey}`;
+  try {
+    const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+    if (cached?.text && Date.now() - cached.ts < 1800000) { el.textContent = cached.text; return; }
+  } catch (_) {}
+  try {
+    const response = await fetch(`/api/weather-summary?lat=${latKey}&lon=${lonKey}`);
+    if (!response.ok) return;
+    const data = await response.json();
+    if (typeof data.text !== 'string' || !data.text.trim()) return;
+    el.textContent = data.text;
+    try { localStorage.setItem(cacheKey, JSON.stringify({text: data.text, ts: Date.now()})); } catch (_) {}
+  } catch (_) {}
+}
 async function loadWeather() {
   const el = document.getElementById('navWeather');
   if (!el) return;
@@ -4847,11 +4874,12 @@ async function loadWeather() {
       ...hr, isSunset: parseInt(hr.time) === sunsetHourRx
     }));
     const ic = (name, size) => wxFluxIcon(name, size);
-    const mainSvg = ic(wxIconName(w.code, isDay), 52);
+    const mainSvg = ic(wxIconName(w.code, isDay), 44);
     const navSvg  = ic(wxIconName(w.code, isDay), 22);
     const hourlyHtml = hourSlots.map(hr => {
       const hrIsDay = parseInt(hr.time) >= 6 && parseInt(hr.time) < 21;
-      const rainHint = Number(hr.precip) > 0 ? `<span class="wx-hour-rain">${hr.precip}%${ic('raindrop', 9)}</span>` : '<span class="wx-hour-rain"></span>';
+      const rainHint = Number(hr.precip) > 0 ? `<span class="wx-hour-rain">${hr.precip}%</span>` : '<span class="wx-hour-rain"></span>';
+      const hourIcon = Number(hr.precip) > 0 && ![71,73,75,77,85,86,95,96,99].includes(Number(hr.code)) ? 'rain' : wxIconName(hr.code, hrIsDay);
       if (hr.isSunset) {
         return `<div class="wx-hour">
           <span class="wx-hour-time" style="color:var(--ac);font-weight:600">${w.sunsetTime}</span>
@@ -4862,7 +4890,7 @@ async function loadWeather() {
       }
       return `<div class="wx-hour">
         <span class="wx-hour-time">${hr.time || ''}</span>
-        <div class="wx-hour-icon">${ic(wxIconName(hr.code, hrIsDay), 24)}</div>
+        <div class="wx-hour-icon">${ic(hourIcon, 24)}</div>
         <span class="wx-hour-temp">${hr.temp}°</span>
         ${rainHint}
       </div>`;
@@ -4873,36 +4901,43 @@ async function loadWeather() {
       <div class="wx-popup nav-widget-popup" id="wxPopup">
         <div class="wx-top">
           <div class="wx-left">
-            <div class="wx-big-temp">${w.temp}°</div>
-          </div>
-          <div class="wx-main-right">
-            <div class="wx-big-icon">${mainSvg}</div>
+            <div class="wx-current"><div class="wx-big-temp">${w.temp}°</div><div class="wx-big-icon">${mainSvg}</div></div>
             <div class="wx-condition">${label}</div>
           </div>
+          <div class="wx-summary"></div>
         </div>
         <div class="wx-bottom-row">
           <div class="wx-meta">
-            ${w.precip0 > 0 ? `<span>${ic('raindrop', 14)}${w.precip0}%</span>` : ''}
-            <span>${ic('uv-index', 14)}UV ${w.uv}</span>
-            <span>${ic('wind', 14)}${wind} km/h</span>
+            ${w.precip0 > 0 ? `<span class="wx-meta-rain">${wxMetaIcon('raindrop')}<span>${w.precip0}%</span></span>` : ''}
+            <span>${wxMetaIcon('uv-index')}UV ${w.uv}</span>
+            <span>${wxMetaIcon('wind')}${wind} km/h</span>
           </div>
-          <div class="wx-minmax"><span style="color:#60a5fa">↓${w.tmin}°</span>&nbsp; <span style="color:#f97316">↑${w.tmax}°</span></div>
+          <div class="wx-minmax"><span>↓${w.tmin}°</span>&nbsp; <span>↑${w.tmax}°</span></div>
         </div>
         <div class="wx-hourly">${hourlyHtml}</div>
-        <div class="wx-forecast">${(w.days || []).map((day, i) => {
+        <div class="wx-forecast">${(w.days || []).map((day, i, days) => {
+          const low = Math.min(...days.map(d => d.tmin));
+          const high = Math.max(...days.map(d => d.tmax));
+          const span = Math.max(1, high - low);
+          const start = Math.max(0, Math.min(100, (day.tmin - low) / span * 100));
+          const width = Math.max(2, Math.min(100 - start, (day.tmax - day.tmin) / span * 100));
+          const dailyIcon = Number(day.precip) > 0 && ![71,73,75,77,85,86,95,96,99].includes(Number(day.code)) ? 'rain' : wxIconName(day.code, true);
           const HU = ['Vasárnap','Hétfő','Kedd','Szerda','Csütörtök','Péntek','Szombat'];
           return `<div class="wx-frow">
             <span class="wx-fday">${i === 0 ? 'Holnap' : HU[day.dow]}</span>
-            <span class="wx-ficon">${ic(wxIconName(day.code, true), 20)}</span>
+            <span class="wx-ficon">${ic(dailyIcon, 20)}</span>
             <span class="wx-fcond">${WX_LABELS[day.code] || ''}</span>
-            <span class="wx-frain">${day.precip > 0 ? `${day.precip}%${ic('raindrop', 11)}` : ''}</span>
+            <span class="wx-frain">${day.precip > 0 ? `${day.precip}%` : ''}</span>
             <span class="wx-ftemp-min">${day.tmin}°</span>
+            <span class="wx-range" aria-hidden="true"><span style="left:${start}%;width:${width}%"></span></span>
             <span class="wx-ftemp-max">${day.tmax}°</span>
           </div>`;
         }).join('')}</div>
       </div>`;
     el.title = '';
-    setupHoverTapPopup(el, el.querySelector('#wxPopup'), 'wx-open');
+    const popup = el.querySelector('#wxPopup');
+    setupHoverTapPopup(el, popup, 'wx-open');
+    loadWxSummary(popup.querySelector('.wx-summary'));
   }
   try {
     const cached = JSON.parse(localStorage.getItem('flux_wx') || 'null');
