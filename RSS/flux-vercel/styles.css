@@ -67,13 +67,13 @@ body { position: relative; display: block; height: 100vh; height: 100dvh; overfl
 [data-theme="dark"] .wx-popup { box-shadow: 0 26px 68px rgba(0,0,0,.5), 0 8px 24px rgba(0,0,0,.28); }
 .wx-popup.wx-open { opacity: 1; pointer-events: all; transform: translateY(0); }
 .wx-top { display: flex; align-items: center; gap: 16px; margin-bottom: 8px; }
-.wx-left { display: flex; flex-direction: column; justify-content: flex-start; flex: 0 0 auto; }
+.wx-left { display: flex; flex-direction: column; justify-content: flex-start; flex: 0 1 auto; max-width: 45%; min-width: 0; }
 .wx-current { display: flex; align-items: center; gap: 6px; }
-.wx-summary { flex: 1; min-width: 0; font-size: 1rem; line-height: 1.3; color: var(--text); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+.wx-summary { flex: 1; min-width: 0; font-size: .9rem; line-height: 1.3; color: var(--text); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
 .wx-big-temp { font-size: 2.5rem; font-weight: 400; line-height: 1; letter-spacing: -.04em; color: var(--text); }
 .wx-main-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
 .wx-big-icon { line-height: 1; }
-.wx-condition { font-size: .9rem; font-weight: 600; color: var(--text); text-align: left; line-height: 1.3; }
+.wx-condition { font-size: .9rem; font-weight: 600; color: var(--text); text-align: left; line-height: 1.3; overflow-wrap: anywhere; }
 .wx-bottom-row { display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: space-between; align-items: center; padding: 6px 0 8px; margin-top: 4px; }
  .wx-meta { display:flex; gap:10px; font-size:.875rem; color:var(--text); }
 .wx-meta span { display:flex; align-items:center; gap:4px; }
@@ -95,7 +95,7 @@ body { position: relative; display: block; height: 100vh; height: 100dvh; overfl
 [data-theme="dark"] :is(.wx-hour-rain,.wx-frain) { color:#7dd3fc; }
 .wx-ftemp-min,.wx-ftemp-max { color:var(--text); white-space:nowrap; font-variant-numeric:tabular-nums; text-align:right; }
 .wx-range { position:relative; height:5px; border-radius:99px; background:color-mix(in srgb,var(--text) 14%,transparent); }
-.wx-range > span { position:absolute; top:0; height:100%; border-radius:inherit; background:linear-gradient(90deg,#49adf0,#f9b859); }
+.wx-range > span { position:absolute; top:0; height:100%; border-radius:inherit; }
 @container (max-width: 285px) { .wx-frow { grid-template-columns:4em 22px minmax(0,1fr) 2.5em 1.8em minmax(20px,2.4em) 1.8em; font-size:.72rem; column-gap:3px; } }
 .content { --content-gutter: 24px; width: 100%; height: 100vh; height: 100dvh; overflow-x: hidden; overflow-y: auto; padding: 62px var(--content-gutter) 24px; overscroll-behavior: contain; touch-action: pan-y; container-type: inline-size; container-name: magazine-content; }
 .content > .grid-layout,

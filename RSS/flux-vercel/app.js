@@ -4835,6 +4835,25 @@ const WX_LABELS = {
   80:'Zápor',81:'Erős zápor',82:'Viharos zápor',
   95:'Zivatar',96:'Zivatar jégesővel',99:'Zivatar jégesővel'
 };
+function wxRoundedPrecip(value) {
+  const n = Number(value);
+  return Number.isFinite(n) ? Math.min(100, Math.max(0, Math.round(n / 5) * 5)) : 0;
+}
+function wxForecastIcon(code, isDay, chance) {
+  const current = wxIconName(code, isDay);
+  if (['snow', 'thunderstorms'].some(type => current.includes(type))) return current;
+  if (wxRoundedPrecip(chance) > 0) return 'rain';
+  return /rain|drizzle/.test(current) ? (isDay ? 'overcast-day' : 'overcast-night') : current;
+}
+function wxTemperatureColor(value) {
+  const stops = [[-15,[49,91,208]],[0,[60,172,230]],[10,[71,197,199]],[20,[115,201,142]],[25,[239,208,89]],[30,[243,154,71]],[40,[221,74,72]]];
+  const t = Number(value);
+  if (!Number.isFinite(t)) return 'rgb(71, 197, 199)';
+  const high = stops.findIndex(stop => stop[0] >= t);
+  if (high <= 0) return `rgb(${stops[high < 0 ? stops.length - 1 : 0][1].join(', ')})`;
+  const a = stops[high-1], b = stops[high], f = (t-a[0])/(b[0]-a[0]);
+  return `rgb(${a[1].map((v,i)=>Math.round(v+(b[1][i]-v)*f)).join(', ')})`;
+}
 async function loadWxSummary(el) {
   let coords;
   try { coords = JSON.parse(localStorage.getItem('flux_wx_coords') || 'null'); } catch (_) {}
@@ -4878,8 +4897,9 @@ async function loadWeather() {
     const navSvg  = ic(wxIconName(w.code, isDay), 22);
     const hourlyHtml = hourSlots.map(hr => {
       const hrIsDay = parseInt(hr.time) >= 6 && parseInt(hr.time) < 21;
-      const rainHint = Number(hr.precip) > 0 ? `<span class="wx-hour-rain">${hr.precip}%</span>` : '<span class="wx-hour-rain"></span>';
-      const hourIcon = Number(hr.precip) > 0 && ![71,73,75,77,85,86,95,96,99].includes(Number(hr.code)) ? 'rain' : wxIconName(hr.code, hrIsDay);
+      const chance = wxRoundedPrecip(hr.precip);
+      const rainHint = chance > 0 ? `<span class="wx-hour-rain">${chance}%</span>` : '<span class="wx-hour-rain"></span>';
+      const hourIcon = wxForecastIcon(hr.code, hrIsDay, chance);
       if (hr.isSunset) {
         return `<div class="wx-hour">
           <span class="wx-hour-time" style="color:var(--ac);font-weight:600">${w.sunsetTime}</span>
@@ -4908,7 +4928,7 @@ async function loadWeather() {
         </div>
         <div class="wx-bottom-row">
           <div class="wx-meta">
-            ${w.precip0 > 0 ? `<span class="wx-meta-rain">${wxMetaIcon('raindrop')}<span>${w.precip0}%</span></span>` : ''}
+            ${wxRoundedPrecip(w.precip0) > 0 ? `<span class="wx-meta-rain">${wxMetaIcon('raindrop')}<span>${wxRoundedPrecip(w.precip0)}%</span></span>` : ''}
             <span>${wxMetaIcon('uv-index')}UV ${w.uv}</span>
             <span>${wxMetaIcon('wind')}${wind} km/h</span>
           </div>
@@ -4921,15 +4941,16 @@ async function loadWeather() {
           const span = Math.max(1, high - low);
           const start = Math.max(0, Math.min(100, (day.tmin - low) / span * 100));
           const width = Math.max(2, Math.min(100 - start, (day.tmax - day.tmin) / span * 100));
-          const dailyIcon = Number(day.precip) > 0 && ![71,73,75,77,85,86,95,96,99].includes(Number(day.code)) ? 'rain' : wxIconName(day.code, true);
+          const chance = wxRoundedPrecip(day.precip);
+          const dailyIcon = wxForecastIcon(day.code, true, chance);
           const HU = ['Vasárnap','Hétfő','Kedd','Szerda','Csütörtök','Péntek','Szombat'];
           return `<div class="wx-frow">
             <span class="wx-fday">${i === 0 ? 'Holnap' : HU[day.dow]}</span>
             <span class="wx-ficon">${ic(dailyIcon, 20)}</span>
             <span class="wx-fcond">${WX_LABELS[day.code] || ''}</span>
-            <span class="wx-frain">${day.precip > 0 ? `${day.precip}%` : ''}</span>
+            <span class="wx-frain">${chance > 0 ? `${chance}%` : ''}</span>
             <span class="wx-ftemp-min">${day.tmin}°</span>
-            <span class="wx-range" aria-hidden="true"><span style="left:${start}%;width:${width}%"></span></span>
+            <span class="wx-range" aria-hidden="true"><span style="left:${start}%;width:${width}%;background:linear-gradient(90deg,${wxTemperatureColor(day.tmin)},${wxTemperatureColor(day.tmax)})"></span></span>
             <span class="wx-ftemp-max">${day.tmax}°</span>
           </div>`;
         }).join('')}</div>
