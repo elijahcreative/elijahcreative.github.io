@@ -1,30 +1,30 @@
 {
   "Podiums": [
     {
-      "Country": "🇧🇷 Brazil",
-      "City": "São Paulo",
+      "Country": "🇺🇸 USA",
+      "City": "Las Vegas",
       "Message": "Race ?"
     },
     {
       "Place": "1",
-      "Name": "Norris",
-      "Team": "McLaren",
+      "Name": "Verstappen",
+      "Team": "Red Bull",
       "Points": "+25",
-      "Total": "246"
+      "Total": "304"
     },
     {
       "Place": "2",
-      "Name": "Verstappen",
-      "Team": "Red Bull",
+      "Name": "Norris",
+      "Team": "McLaren",
       "Points": "+18",
-      "Total": "279"
+      "Total": "264"
     },
     {
       "Place": "3",
-      "Name": "Hadjar",
-      "Team": "Red Bull",
+      "Name": "Piastri",
+      "Team": "McLaren",
       "Points": "+15",
-      "Total": "122"
+      "Total": "167"
     }
   ]
 }
